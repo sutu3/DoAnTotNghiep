@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: Warehouse
+  datasource:
+    url: jdbc:mysql://localhost:3316/warehouse
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+logging:
+  level:
+    com.netflix.discovery: DEBUG
+    org.springframework.cloud: TRACE
