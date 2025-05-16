@@ -7,8 +7,8 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Data
@@ -16,16 +16,25 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Category {
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String categoryId;
-    @Column(columnDefinition = "VARCHAR(100) COMMENT 'tên danh mục của sản phẩm'", nullable = false)
-    String categoryName;
-    @Column(columnDefinition = "TEXT COMMENT 'mô tả danh mục của sản phẩm'", nullable = false)
+    String productId;
+    @Column(columnDefinition = "VARCHAR(100) COMMENT 'ma sku của san pham'", unique = true,nullable = false)
+    String skuCode;
+    @Column(columnDefinition = "VARCHAR(255) COMMENT 'tên cua san pham'", nullable = false)
+    String productName;
+    @Column(precision = 10, scale = 2, columnDefinition = "DECIMAL(10,2) COMMENT 'gia cua san pham'",nullable = false)
+    BigDecimal productPrice;
+    @Column(columnDefinition = "VARCHAR(255) COMMENT 'url của san pham'", nullable = false)
+    String urlImage;
+    @Column(columnDefinition = "TEXT COMMENT 'mo ta của san pham'", nullable = false)
     String description;
-    @OneToMany(mappedBy="category")
-    List<Product> products;
+    @ManyToOne
+    @JoinColumn(name = "categoryId",nullable = false)
+    Category category;
+    // thiếu warehouseId
+    //thiếu roleId
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
     LocalDateTime createdAt;

@@ -1,8 +1,8 @@
 spring:
   application:
-    name: TransportService
+    name: Warehouse
   datasource:
-    url: jdbc:mysql://localhost:3316/Warehouse
+    url: jdbc:mysql://localhost:3316/warehouse
     username: root
     password: root
     driver-class-name: com.mysql.jdbc.Driver
