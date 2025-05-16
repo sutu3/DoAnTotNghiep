@@ -1,1 +1,21 @@
-spring.application.name=Warehouse
+spring:
+  application:
+    name: TransportService
+  datasource:
+    url: jdbc:mysql://localhost:3316/Warehouse
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+logging:
+  level:
+    com.netflix.discovery: DEBUG
+    org.springframework.cloud: TRACE
