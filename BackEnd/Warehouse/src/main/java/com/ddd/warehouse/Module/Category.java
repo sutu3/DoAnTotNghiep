@@ -19,9 +19,9 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String categoryId;
-    @Column(columnDefinition = "VARCHAR(100) COMMENT 'tên của user'", nullable = false)
+    @Column(columnDefinition = "VARCHAR(100) COMMENT 'tên danh mục của sản phẩm'", nullable = false)
     String categoryName;
-    @Column(columnDefinition = "TEXT COMMENT 'tên đầy đủ của user'", nullable = false)
+    @Column(columnDefinition = "TEXT COMMENT 'mô tả danh mục của sản phẩm'", nullable = false)
     String description;
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp

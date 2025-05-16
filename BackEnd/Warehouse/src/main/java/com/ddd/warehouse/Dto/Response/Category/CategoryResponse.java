@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+
 
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -12,6 +14,10 @@ import lombok.experimental.FieldDefaults;
 public record CategoryResponse(
         String categoryId,
         String categoryName,
-        String description
+        String description,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
+        Boolean isDeleted,
+        LocalDateTime deletedAt
 ){
 }
