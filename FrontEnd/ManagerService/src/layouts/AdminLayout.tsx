@@ -1,6 +1,5 @@
 import AppSidebar from '@/components/Admin/AppSidebar'
 import NavbarAdmin from '@/components/Admin/NavbarAdmin'
-import { cn } from '@/lib/utils'
 import  { useEffect, useRef, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import {useClickOutside} from "@/Hooks/use-click-outside.tsx";
@@ -25,6 +24,13 @@ const AdminLayouts = ({ children }) => {
     });
 
     // @ts-ignore
+    // @ts-ignore
+    // @ts-ignore
+    // @ts-ignore
+    // @ts-ignore
+    // @ts-ignore
+    // @ts-ignore
+    // @ts-ignore
     return (
         <ThemeProvider>
             <div className="min-h-screen bg-slate-100 transition-colors dark:bg-slate-950">
@@ -34,6 +40,7 @@ const AdminLayouts = ({ children }) => {
                 } />
 
                 {/* 1. Thanh Sidebar */}
+
                 <AppSidebar ref={sidebarRef} collapsed={collapsed} />
 
                 {/* 2. Phần Navbar và Content */}

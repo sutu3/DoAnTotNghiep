@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
     BellIcon,
     ChevronsLeft,
@@ -13,10 +12,10 @@ import HomeIconNavBar from "../../assets/HomeIconNavBar.png";
 import { useTheme } from "@/Utils/ThemeContext.tsx";
 import { Menu, Transition } from "@headlessui/react";
 
+// @ts-ignore
 const NavbarAdmin = ({ collapsed, setCollapsed }) => {
+    // @ts-ignore
     const { setTheme } = useTheme();
-    const [themeMenuOpen, setThemeMenuOpen] = useState(false);
-    const [notifMenuOpen, setNotifMenuOpen] = useState(false);
 
     return (
         <header className="relative z-10 flex h-14 items-center justify-between bg-white px-4 shadow-sm dark:bg-slate-900">

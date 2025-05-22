@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record CategoryResponse(
         String categoryId,

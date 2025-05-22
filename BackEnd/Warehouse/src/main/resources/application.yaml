@@ -2,7 +2,7 @@ spring:
   application:
     name: Warehouse
   datasource:
-    url: jdbc:mysql://localhost:3316/warehouse
+    url: jdbc:mysql://localhost:3316/warehouse?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: root
     password: root
     driver-class-name: com.mysql.jdbc.Driver

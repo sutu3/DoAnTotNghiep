@@ -1,48 +1,36 @@
-// RouterSetup.tsx
 import { RouterProvider, createBrowserRouter, useNavigate, useHref } from "react-router-dom";
-import { useEffect, useState } from "react";
 import LoginPage from "@/pages/LoginPage.tsx";
 import AdminLayout from "@/layouts/AdminLayout.tsx";
 import PageNotFound from "@/pages/PageNotFound.tsx";
 import { CheckAuth } from "@/Utils/CheckAuth.tsx";
 import { Provider } from "@/provider.tsx";
 import { HeroUIProvider } from "@heroui/system";
-
-// Step 1: Tạo router
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <AdminLayout />,
+        element: (
+            <HeroUIProviderWrapper>
+                <AdminLayout children={undefined} />
+            </HeroUIProviderWrapper>
+        ),
         loader: CheckAuth,
-        children: [
-            { path: "*", element: <PageNotFound /> },
-        ],
+        children: [{ path: "*", element: <PageNotFound /> }],
     },
-    {
-        path: "/login",
-        element: <LoginPage />,
-    },
+    { path: "/login", element: <LoginPage /> },
 ]);
 
-// Step 2: Bọc Provider và HeroUIProvider bên trong RouterProvider
 export default function RouterSetup() {
-    return (
-        <RouterProvider router={router}>
-            <HeroWrapper />
-        </RouterProvider>
-    );
+    return <RouterProvider router={router} />;
 }
 
-// Step 3: HeroUI cần nằm trong context của Router
-function HeroWrapper() {
+function HeroUIProviderWrapper({ children }: { children: React.ReactNode }) {
     const navigate = useNavigate();
-    const href = useHref();
+    const useHrefFn = (href: string) => useHref(href);
 
     return (
-        <HeroUIProvider navigate={navigate} useHref={href}>
-            <Provider>
-                {/* Dùng lại router.children từ Provider nếu cần */}
-            </Provider>
+        <HeroUIProvider navigate={navigate} useHref={useHrefFn}>
+            <Provider>{children}</Provider>
         </HeroUIProvider>
     );
 }
+

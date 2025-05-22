@@ -1,7 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
+// @ts-ignore
 const ThemeContext = createContext();
 
+// @ts-ignore
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     const storedTheme = localStorage.getItem("theme");
