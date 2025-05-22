@@ -16,7 +16,6 @@ import { Menu, Transition } from "@headlessui/react";
 const NavbarAdmin = ({ collapsed, setCollapsed }) => {
     // @ts-ignore
     const { setTheme } = useTheme();
-
     return (
         <header className="relative z-10 flex h-14 items-center justify-between bg-white px-4 shadow-sm dark:bg-slate-900">
             {/* Left Side */}
