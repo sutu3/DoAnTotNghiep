@@ -9,14 +9,19 @@ import {
 } from "@heroui/react";
 
 import { VerticalDotsIcon } from "@/components/UI/Table/IconTable.tsx";
+import { formatVND } from "@/Utils/FormatVND.tsx";
+import React from "react";
 
 const statusColorMap = {
   active: "success",
   paused: "danger",
   vacation: "warning",
 };
-
-const RenderCell = (object: any, columnKey: string) => {
+interface ProductProgs {
+  object: object;
+  columnKey: string;
+}
+const RenderCell: React.FC<ProductProgs> = ({ object, columnKey }) => {
   const cellValue = object[columnKey];
 
   switch (columnKey) {
@@ -42,6 +47,8 @@ const RenderCell = (object: any, columnKey: string) => {
           </p>
         </div>
       );
+    case "price":
+      return <span>{formatVND(Number(cellValue))}</span>;
     case "status":
       return (
         <Chip
@@ -52,6 +59,15 @@ const RenderCell = (object: any, columnKey: string) => {
         >
           {cellValue}
         </Chip>
+      );
+    case "productName":
+      return (
+        <User
+          avatarProps={{ radius: "full", size: "md", src: object.avatar }}
+          classNames={{ description: "text-default-500" }}
+          description={object.category}
+          name={object.productName}
+        />
       );
     case "actions":
       return (

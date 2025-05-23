@@ -17,12 +17,26 @@ import {
   TableClassNames,
 } from "@/components/UI/Table/TableCss.tsx";
 
+// Định nghĩa interface cho object (row data)
+interface DataObject {
+  id: number | string;
+  [key: string]: any;
+}
+
+// Định nghĩa interface cho column
+interface Column {
+  uid: string;
+  name: string;
+  sortable?: boolean;
+}
+
 interface TableProductProps {
   isDarkMode: boolean;
   visibleColumn: string[];
-  objects: object;
-  columns: object;
+  objects: DataObject[];
+  columns: Column[];
 }
+
 const TableUI: React.FC<TableProductProps> = ({
   isDarkMode,
   objects,
@@ -30,13 +44,18 @@ const TableUI: React.FC<TableProductProps> = ({
   visibleColumn,
 }) => {
   const [filterValue, setFilterValue] = React.useState("");
-  const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
-  const [visibleColumns, setVisibleColumns] = React.useState(
+  const [selectedKeys, setSelectedKeys] = React.useState<Set<number | string>>(
+    new Set(),
+  );
+  const [visibleColumns, setVisibleColumns] = React.useState<Set<string>>(
     new Set(visibleColumn),
   );
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [sortDescriptor, setSortDescriptor] = React.useState({
+  const [sortDescriptor, setSortDescriptor] = React.useState<{
+    column: string;
+    direction: "ascending" | "descending";
+  }>({
     column: "age",
     direction: "ascending",
   });
@@ -47,16 +66,12 @@ const TableUI: React.FC<TableProductProps> = ({
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = React.useMemo(() => {
-    // @ts-ignore
-    if (visibleColumns === "all") return columns;
+    if (visibleColumns.has("all")) return columns;
 
-    return columns.filter((column) =>
-      Array.from(visibleColumns).includes(column.uid),
-    );
-  }, [visibleColumns]);
+    return columns.filter((column) => visibleColumns.has(column.uid));
+  }, [visibleColumns, columns]);
 
   const filteredItems = React.useMemo(() => {
-    // @ts-ignore
     return filterItems(objects, filterValue, statusFilter, hasSearchFilter);
   }, [objects, filterValue, statusFilter, hasSearchFilter]);
 
@@ -65,33 +80,28 @@ const TableUI: React.FC<TableProductProps> = ({
   }, [filteredItems, page, rowsPerPage]);
 
   const sortedItems = React.useMemo(() => {
-    // @ts-ignore
     return sortItems(items, sortDescriptor);
   }, [items, sortDescriptor]);
 
   const tableClassNames = <TableClassNames isDarkMode={isDarkMode} />;
-  // Class cho checkboxesProps, có thể cũng thay đổi theo theme
   const checkboxPropsThemed = <CheckboxPropsThemed isDarkMode={isDarkMode} />;
 
   const onRowsPerPageChange = React.useCallback(
-    (e: { target: { value: any } }) => {
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
       setRowsPerPage(Number(e.target.value));
       setPage(1);
     },
     [],
   );
 
-  const onSearchChange = React.useCallback(
-    (value: React.SetStateAction<string>) => {
-      if (value) {
-        setFilterValue(value);
-        setPage(1);
-      } else {
-        setFilterValue("");
-      }
-    },
-    [],
-  );
+  const onSearchChange = React.useCallback((value: string) => {
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue("");
+    }
+  }, []);
 
   return (
     <Table
@@ -109,7 +119,7 @@ const TableUI: React.FC<TableProductProps> = ({
         />
       }
       bottomContentPlacement="outside"
-      checkboxesProps={checkboxPropsThemed} // Sử dụng checkboxProps đã được theme hóa
+      checkboxesProps={checkboxPropsThemed}
       classNames={tableClassNames}
       selectedKeys={selectedKeys}
       selectionMode="multiple"
@@ -123,7 +133,7 @@ const TableUI: React.FC<TableProductProps> = ({
           setStatusFilter={setStatusFilter}
           setVisibleColumns={setVisibleColumns}
           statusFilter={statusFilter}
-          usersLength={objects?.length}
+          usersLength={objects.length}
           visibleColumns={visibleColumns}
           onRowsPerPageChange={onRowsPerPageChange}
           onSearchChange={onSearchChange}
@@ -138,17 +148,17 @@ const TableUI: React.FC<TableProductProps> = ({
           <TableColumn
             key={column.uid}
             align={column.uid === "actions" ? "center" : "start"}
-            allowsSorting={column.sortable}
+            allowsSorting={!!column.sortable}
           >
             {column.name}
           </TableColumn>
         )}
       </TableHeader>
       <TableBody emptyContent={"No users found"} items={sortedItems}>
-        {(item) => (
-          <TableRow key={item.id}>
+        {(object) => (
+          <TableRow key={object.id}>
             {(columnKey) => (
-              <TableCell>{RenderCell(item, columnKey)}</TableCell>
+              <TableCell>{RenderCell(object, columnKey)}</TableCell>
             )}
           </TableRow>
         )}

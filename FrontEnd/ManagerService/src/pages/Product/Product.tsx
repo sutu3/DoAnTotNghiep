@@ -5,7 +5,7 @@ import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 const Product = () => {
   const isSidebarCollapsed =
     localStorage.getItem("theme") != "light" ? true : false;
-  const INITIAL_VISIBLE_COLUMNS = ["name", "role", "status", "actions"];
+  const INITIAL_VISIBLE_COLUMNS = ["productName", "skuCode", "status", "actions"];
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
