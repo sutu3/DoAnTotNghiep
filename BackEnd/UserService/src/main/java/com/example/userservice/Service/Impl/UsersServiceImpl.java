@@ -31,25 +31,27 @@ public class UsersServiceImpl implements UserService {
     UserRepo userRepo;
 
     @Override
-    public List<UserResponse> getAll(){
+    public List<UserResponse> getAll() {
         return userRepo.findAll().stream().map(userMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Page<UserResponse> getAllUserByUserName(String userName, Pageable pageable) {
-        return userRepo.findByUserName(userName,pageable).map(userMapper::toResponse);
+        return userRepo.findByUserName(userName, pageable).map(userMapper::toResponse);
     }
 
     @Override
     public UserResponse CreateUser(UserRequest request) {
-        userRepo.findByPhoneNumberAndEmail(request.phoneNumber(), request.email())
-                .orElseThrow(()->new AppException(ErrorCode.USER_EXIST));
-        Users user=userMapper.toEntity(request);
+        if (userRepo.exsistByPhoneNumberAndEmail(request.phoneNumber(), request.email())) {
+            throw new AppException(ErrorCode.USER_EXIST);
+        }
+        Users user = userMapper.toEntity(request);
         user.setStatus(StatusEnum.Active);
         user.setIsDeleted(false);
         return userMapper.toResponse(userRepo.save(user));
     }
+
 
     @Override
     public String DeletedUser(String id) {
