@@ -13,7 +13,8 @@ public enum ErrorCode {
     USER_EXIST(1002,"User is existed",HttpStatus.BAD_REQUEST),
     TASK_TYPE_NOT_FOUND(1001,"Task Type not found",HttpStatus.NOT_FOUND),
     TASK_TYPE_EXIST(1002,"Task Type is existed",HttpStatus.BAD_REQUEST),
-
+    TASK_NOT_FOUND(1001,"Task not found",HttpStatus.NOT_FOUND),
+    TASK_EXIST(1002,"Task is existed",HttpStatus.BAD_REQUEST),
     UNAUTHENTICATED(1004,"Khong du quyen truy cap",HttpStatus.UNAUTHORIZED),
     UNCATEGORIZED(9999,"Uncategorized", HttpStatus.INTERNAL_SERVER_ERROR);
     ErrorCode(int Code,String Message, HttpStatusCode sponse){
