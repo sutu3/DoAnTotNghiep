@@ -27,6 +27,7 @@ public class UserController {
         return ApiResponse.<List<UserResponse>>builder()
                 .Result(userService.getAll())
                 .message("SuccessFull")
+                .success(true)
                 .code(0)
                 .build();
     }
@@ -39,6 +40,7 @@ public class UserController {
         return ApiResponse.<Page<UserResponse>>builder()
                 .Result(userService.getAllUserByUserName(userName,pageable))
                 .message("SuccessFull")
+                .success(true)
                 .code(0)
                 .build();
     }
@@ -47,6 +49,7 @@ public class UserController {
         return ApiResponse.<UserResponse>builder()
                 .Result(userService.CreateUser(request))
                 .message("SuccessFull")
+                .success(true)
                 .code(0)
                 .build();
     }
@@ -55,6 +58,7 @@ public class UserController {
         return ApiResponse.<String>builder()
                 .Result(userService.DeletedUser(id))
                 .message("Deleted SuccessFull")
+                .success(true)
                 .code(0)
                 .build();
     }
