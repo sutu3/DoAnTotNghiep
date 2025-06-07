@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -19,4 +21,6 @@ public class TaskType extends BaseEntity{
     String taskName;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'mô tả nhiệm vụ'", nullable = false)
     String description;
+    @OneToMany(mappedBy="taskType")
+    List<Tasks> tasks;
 }
