@@ -43,7 +43,7 @@ public class UsersServiceImpl implements UserService {
 
     @Override
     public UserResponse CreateUser(UserRequest request) {
-        if (userRepo.exsistByPhoneNumberAndEmail(request.phoneNumber(), request.email())) {
+        if (userRepo.existsByPhoneNumberAndEmail(request.phoneNumber(), request.email())) {
             throw new AppException(ErrorCode.USER_EXIST);
         }
         Users user = userMapper.toEntity(request);
@@ -55,12 +55,17 @@ public class UsersServiceImpl implements UserService {
 
     @Override
     public String DeletedUser(String id) {
-        Users user=userRepo.findById(id)
-                .orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
+        Users user=findById(id);
         user.setIsDeleted(true);
         user.setDeletedAt(LocalDateTime.now());
         userRepo.save(user);
         return "Deleted Completed";
+    }
+
+    @Override
+    public Users findById(String id) {
+        return userRepo.findById(id)
+                .orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
 

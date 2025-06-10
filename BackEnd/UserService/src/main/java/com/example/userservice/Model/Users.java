@@ -4,12 +4,15 @@ import com.example.userservice.Enum.StatusEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @Entity
+@SuperBuilder  // Thay @Builder bằng @SuperBuilder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Users extends BaseEntity{
     @Id
@@ -27,4 +30,6 @@ public class Users extends BaseEntity{
     String phoneNumber;
     @Enumerated(EnumType.STRING)
     StatusEnum status;
+    @OneToMany(mappedBy="user")
+    List<TaskUser> taskUsers;
 }
