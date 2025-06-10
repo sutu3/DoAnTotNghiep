@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+
 @Entity
 @SuperBuilder
 @Data
@@ -30,4 +32,6 @@ public class Warehouses extends BaseEntity{
     String country;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'Mã người quản lý'", nullable = false)
     String managerId;
+    @OneToMany(mappedBy="warehouse")
+    List<Stacks> stacks;
 }

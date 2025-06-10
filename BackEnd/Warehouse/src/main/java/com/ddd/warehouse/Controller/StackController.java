@@ -1,0 +1,105 @@
+package com.ddd.warehouse.Controller;
+
+import com.ddd.warehouse.Dto.Request.StackRequest;
+import com.ddd.warehouse.Dto.Response.ApiResponse;
+import com.ddd.warehouse.Dto.Response.Stack.StackResponse;
+import com.ddd.warehouse.Dto.Response.Warehouse.WarehousesResponse;
+import com.ddd.warehouse.Form.StackForm;
+import com.ddd.warehouse.Service.StackService;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/stacks")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
+@Slf4j
+public class StackController {
+    private final StackService stackService;
+
+    @GetMapping("/search?page={pageNumber}&size={pageSize}")
+    public ApiResponse<Page<StackResponse>> getAll(
+            @RequestParam("pageNumber") int page,
+            @RequestParam("pageSize") int size
+    ){
+        Pageable pageable = PageRequest.of(page, size);
+        return ApiResponse.<Page<StackResponse>>builder()
+                .Result(stackService.getAll(pageable))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/warehouse/{warehouseId}/search?page={pageNumber}&size={pageSize}")
+    public ApiResponse<Page<StackResponse>> getAllByWarehouse(
+            @RequestParam("pageNumber") int page,
+            @RequestParam("pageSize") int size,
+            @PathVariable String warehouseId
+    ){
+        Pageable pageable = PageRequest.of(page, size);
+        return ApiResponse.<Page<StackResponse>>builder()
+                .Result(stackService.getAllByWarehouseId(pageable, warehouseId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/name/{stackName}")
+    public ApiResponse<StackResponse> getByStackName(
+            @PathVariable String stackName
+    ){
+        return ApiResponse.<StackResponse>builder()
+                .Result(stackService.getByStackNameResponse(stackName))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/{stackid}")
+    public ApiResponse<StackResponse> getByStackId(
+            @PathVariable String stackid
+    ){
+        return ApiResponse.<StackResponse>builder()
+                .Result(stackService.getByIdResponse(stackid))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @PostMapping
+    public ApiResponse<StackResponse> create(@RequestBody StackRequest stackRequest){
+        return ApiResponse.<StackResponse>builder()
+                .Result(stackService.createStack(stackRequest))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @PutMapping("/{stackId}")
+    public ApiResponse<StackResponse> updateByStackId(
+            @PathVariable String stackId,
+            @RequestBody StackForm update
+            ){
+        return ApiResponse.<StackResponse>builder()
+                .Result(stackService.updateStack(update,stackId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @DeleteMapping("/{stackId}")
+    public ApiResponse<String> deleteByStackId(@PathVariable String stackId){
+        return ApiResponse.<String>builder()
+                .Result(stackService.deleteStack(stackId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+}

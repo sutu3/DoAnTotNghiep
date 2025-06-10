@@ -99,4 +99,13 @@ public class WarehouseController {
                 .success(true)
                 .build();
     }
+    @DeleteMapping("/{warehouseId}")
+    public ApiResponse<String> deleteWarehouse(@PathVariable String warehouseId){
+        return ApiResponse.<String>builder()
+                .Result(warehouseService.deleteWarehouse(warehouseId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
 }
