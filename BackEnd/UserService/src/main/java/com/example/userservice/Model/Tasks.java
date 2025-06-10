@@ -6,14 +6,16 @@ import com.example.userservice.Enum.StatusTaskEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
+@SuperBuilder  // Thay @Builder bằng @SuperBuilder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Tasks extends BaseEntity {
     @Id
@@ -22,6 +24,8 @@ public class Tasks extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "taskTypeId",nullable = false)
     TaskType taskType;
+    @OneToMany(mappedBy="task")
+    List<TaskUser> taskUsers;
     @Enumerated(EnumType.STRING)
     StatusTaskEnum status;
     @Enumerated(EnumType.STRING)

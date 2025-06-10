@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class TaskTypeController {
 
     TaskTypeRepo taskTypeRepo;
-    private final TaskTypeService taskTypeService;
+    TaskTypeService taskTypeService;
 
     @GetMapping("/search?page={pageNumber}&size={pageSize}")
     public ApiResponse<Page<TaskTypeResponse>> getAll(

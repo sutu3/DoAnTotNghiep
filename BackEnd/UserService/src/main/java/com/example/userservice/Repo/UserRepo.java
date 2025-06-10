@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepo extends JpaRepository<Users,String>, JpaSpecificationExecutor<Users> {
     Page<Users> findByUserName(String s,Pageable pageable);
-    boolean exsistByPhoneNumberAndEmail(String phoneNumber,String Email);
+    boolean existsByPhoneNumberAndEmail(String phoneNumber, String email);
 
 }
 

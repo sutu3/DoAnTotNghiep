@@ -4,14 +4,15 @@ package com.example.userservice.Model;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Entity
+@SuperBuilder  // Thay @Builder bằng @SuperBuilder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TaskType extends BaseEntity{
     @Id
