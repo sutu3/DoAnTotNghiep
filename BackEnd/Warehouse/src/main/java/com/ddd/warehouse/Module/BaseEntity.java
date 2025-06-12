@@ -1,6 +1,7 @@
 package com.ddd.warehouse.Module;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@MappedSuperclass
 public class BaseEntity {
 
     @CreationTimestamp
@@ -24,7 +26,7 @@ public class BaseEntity {
     @Column(nullable = false, updatable = true, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     LocalDateTime updatedAt;
 
-    @Column(columnDefinition = "boolean COMMENT 'flat coi entity co dung  nua'", nullable = false)
+    @Column(columnDefinition = "BOOL COMMENT 'flat coi entity co dung  nua'", nullable = false)
     Boolean isDeleted;
 
     @Column(columnDefinition = "DATETIME COMMENT 'Thời gian xoa'", nullable = true)

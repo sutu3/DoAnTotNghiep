@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,12 +24,14 @@ import org.springframework.web.bind.annotation.*;
 public class WarehouseController {
     private final WarehouseService warehouseService;
 
-    @GetMapping("/search?page={pageNumber}&size={pageSize}")
+    @GetMapping("/search")
     public ApiResponse<Page<WarehousesResponse>> getAll(
             @RequestParam("pageNumber") int page,
             @RequestParam("pageSize") int size
     ){
-        Pageable pageable = PageRequest.of(page, size);
+        Sort.Direction soft= Sort.Direction.ASC;
+        Sort sortBy=Sort.by(soft,"warehouseId");
+        Pageable pageable = PageRequest.of(page, size, sortBy);
         return ApiResponse.<Page<WarehousesResponse>>builder()
                 .Result(warehouseService.getAll(pageable))
                 .code(0)
@@ -37,7 +40,7 @@ public class WarehouseController {
                 .build();
 
     }
-    @GetMapping("/manager/{id}")
+    @GetMapping("search/byManager/{id}")
     public ApiResponse<WarehousesResponse> getByManagerId(@PathVariable String id){
         return ApiResponse.<WarehousesResponse>builder()
                 .Result(warehouseService.getByManagerId(id))
@@ -55,11 +58,12 @@ public class WarehouseController {
                 .success(true)
                 .build();
     }
-    @GetMapping("/search/?name={warehouseName}")
+    @GetMapping("/search/byName")
     public ApiResponse<Page<WarehousesResponse>> getByWarehouseName(
-            @RequestParam String warehouseName,
+            @RequestParam ("warehouseName") String warehouseName,
             @RequestParam("pageNumber") int page,
             @RequestParam("pageSize") int size){
+        log.debug("page: {}, size: {}", page, size);
         Pageable pageable = PageRequest.of(page, size);
         return ApiResponse.<Page<WarehousesResponse>>builder()
                 .Result(warehouseService.getByName(warehouseName, pageable))

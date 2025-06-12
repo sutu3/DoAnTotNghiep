@@ -1,0 +1,19 @@
+package com.ddd.warehouse.Repo;
+
+import com.ddd.warehouse.Module.Bins;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface BinRepo extends JpaRepository<Bins,String>, JpaSpecificationExecutor<Bins> {
+    Page<Bins> findAllByIsDeleted(Pageable pageable, boolean isDeleted);
+    Page<Bins> findAllByWarehouse_WarehouseId(Pageable pageable, String warehouseId);
+    Page<Bins> findAllByStack_StackName(Pageable pageable, String stackName);
+    Optional<Bins> findByBinCodeAndStack_StackNameAndWarehouse_WarehouseId(String binCode, String stackStackName,String  warehouseId);
+    boolean existsByBinCodeAndStack_StackNameAndWarehouse_WarehouseId(String binCode, String stackStackName,String  warehouseId);
+}

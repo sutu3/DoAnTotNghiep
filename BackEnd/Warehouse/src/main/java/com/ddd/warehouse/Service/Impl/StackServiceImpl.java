@@ -27,9 +27,9 @@ import java.util.Optional;
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @Slf4j
 public class StackServiceImpl implements StackService {
-    private final StackMapper stackMapper;
-    private final StackRepo stackRepo;
-    private final WarehouseService warehouseService;
+    StackMapper stackMapper;
+    StackRepo stackRepo;
+    WarehouseService warehouseService;
 
     @Override
     public Page<StackResponse> getAll(Pageable pageable) {
@@ -38,35 +38,34 @@ public class StackServiceImpl implements StackService {
 
     @Override
     public Page<StackResponse> getAllByWarehouseId(Pageable pageable, String warehouseId) {
-        return stackRepo.findAllByWarehouseId(pageable, warehouseId).map(stackMapper::toResponse);
+        return stackRepo.findAllByWarehouse_WarehouseId(pageable, warehouseId).map(stackMapper::toResponse);
     }
-
     @Override
-    public StackResponse getByStackNameResponse(String stackName) {
-        return stackMapper.toResponse(getByStackName(stackName));
+    public Boolean exsistByStack(String stackName,String warehouseId) {
+        return stackRepo.existsByStackNameAndWarehouse_WarehouseId(stackName,warehouseId);
     }
-
     @Override
-    public Stacks getByStackName(String stackName) {
-        return stackRepo.findByStackName(stackName)
+    public StackResponse getByStackNameResponse(String stackName,String warehouseId) {
+        return stackMapper.toResponse(getByStackName(stackName,warehouseId));
+    }
+    @Override
+    public Stacks getByStackName(String stackName,String warehouseId) {
+        return stackRepo.findByStackNameAndWarehouse_WarehouseId(stackName,warehouseId)
                 .orElseThrow(() -> new AppException(ErrorCode.STACK_NOT_FOUND));
     }
-
     @Override
     public Stacks getById(String stackId) {
         return stackRepo.findById(stackId).orElseThrow(() -> new AppException(ErrorCode.STACK_NOT_FOUND));
     }
-
     @Override
     public StackResponse getByIdResponse(String stackId) {
-        return getByIdResponse(stackId);
+        return stackMapper.toResponse(getById(stackId));
     }
-
     @Override
     public StackResponse createStack(StackRequest stackRequest) {
         Warehouses warehouses=warehouseService.getById(stackRequest.warehouse());
-        Optional<Stacks> existing= Optional.ofNullable(getByStackName(stackRequest.stackName()));
-        if(existing.isPresent()){
+        if(exsistByStack(stackRequest.warehouse(),stackRequest.warehouse())){
+            Optional<Stacks> existing= Optional.ofNullable(getByStackName(stackRequest.stackName(),stackRequest.warehouse()));
             Stacks stack=existing.get();
             if(stack.getIsDeleted()){
                 throw new AppException(ErrorCode.STACK_EXIST);
@@ -80,14 +79,15 @@ public class StackServiceImpl implements StackService {
         stacks.setIsDeleted(false);
         return stackMapper.toResponse(stackRepo.save(stacks));
     }
-
     @Override
     public StackResponse updateStack(StackForm update,String stackId) {
         Stacks stacks=getById(stackId);
+        if(exsistByStack(update.stackName(),stacks.getWarehouse().getWarehouseId())){
+            throw new AppException(ErrorCode.STACK_EXIST);
+        }
         stackMapper.update(stacks,update);
         return stackMapper.toResponse(stackRepo.save(stacks));
     }
-
     @Override
     public String deleteStack(String stackId) {
         Stacks stack=getById(stackId);

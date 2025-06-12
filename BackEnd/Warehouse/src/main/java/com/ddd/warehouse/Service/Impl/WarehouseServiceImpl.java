@@ -30,7 +30,8 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public Page<WarehousesResponse> getAll(Pageable pageable) {
-        return warehouseRepo.findAllByIsDeleted(false, pageable).map(warehouseMapper::toResponse);
+        return warehouseRepo.findAllByIsDeletedFalse( pageable)
+                .map(warehouseMapper::toResponse);
     }
 
     @Override
