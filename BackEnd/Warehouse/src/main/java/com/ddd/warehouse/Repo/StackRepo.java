@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface StackRepo extends JpaRepository<Stacks,String>, JpaSpecificationExecutor<Stacks> {
     Page<Stacks> findAllByIsDeleted(Pageable pageable, boolean isDeleted);
-    Page<Stacks> findAllByWarehouseId(Pageable pageable, String warehouseId);
-    Optional<Stacks> findByStackName(String stackName);
-    boolean existsByStackName(String stackName);
+    Page<Stacks> findAllByWarehouse_WarehouseId(Pageable pageable, String warehouseId);
+    Optional<Stacks> findByStackNameAndWarehouse_WarehouseId(String stackName,String warehouseId);
+    boolean existsByStackNameAndWarehouse_WarehouseId(String stackName,String warehouseId);
 }

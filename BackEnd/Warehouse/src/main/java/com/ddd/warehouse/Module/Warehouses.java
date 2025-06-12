@@ -33,5 +33,7 @@ public class Warehouses extends BaseEntity{
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'Mã người quản lý'", nullable = false)
     String managerId;
     @OneToMany(mappedBy="warehouse")
+    List<Bins> bins;
+    @OneToMany(mappedBy="warehouse")
     List<Stacks> stacks;
 }

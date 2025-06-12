@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @Slf4j
 public class StackController {
-    private final StackService stackService;
+    StackService stackService;
 
-    @GetMapping("/search?page={pageNumber}&size={pageSize}")
+    @GetMapping("/search")
     public ApiResponse<Page<StackResponse>> getAll(
             @RequestParam("pageNumber") int page,
             @RequestParam("pageSize") int size
@@ -36,7 +36,7 @@ public class StackController {
                 .success(true)
                 .build();
     }
-    @GetMapping("/warehouse/{warehouseId}/search?page={pageNumber}&size={pageSize}")
+    @GetMapping("/ByWarehouse/{warehouseId}")
     public ApiResponse<Page<StackResponse>> getAllByWarehouse(
             @RequestParam("pageNumber") int page,
             @RequestParam("pageSize") int size,
@@ -50,12 +50,13 @@ public class StackController {
                 .success(true)
                 .build();
     }
-    @GetMapping("/name/{stackName}")
+    @GetMapping("/name/{stackName}/warehouse/{warehouse}")
     public ApiResponse<StackResponse> getByStackName(
-            @PathVariable String stackName
+            @PathVariable String stackName,
+            @PathVariable String warehouse
     ){
         return ApiResponse.<StackResponse>builder()
-                .Result(stackService.getByStackNameResponse(stackName))
+                .Result(stackService.getByStackNameResponse(stackName,warehouse))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

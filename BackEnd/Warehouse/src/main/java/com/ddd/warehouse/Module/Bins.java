@@ -8,24 +8,23 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
-
 @Entity
 @SuperBuilder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Stacks extends BaseEntity{
+public class Bins extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String stackId;
-    @Column(columnDefinition = "VARCHAR(100) COMMENT 'tên của dãy stack'", nullable = false)
-    String stackName;
-    @Column(columnDefinition = "VARCHAR(255) COMMENT 'mô tả của dãy stack'")
-    String description;
-    @OneToMany(mappedBy="stack")
-    List<Bins> bin;
+    String binId;
+    @Column(columnDefinition = "VARCHAR(100) COMMENT 'mã code của bin'", nullable = false)
+    String binCode;
+    @Column(columnDefinition = "INTEGER COMMENT 'sức chưa của bin'", nullable = false)
+    Integer capacity;
+    @ManyToOne
+    @JoinColumn(name = "stackId",nullable = false)
+    Stacks stack;
     @ManyToOne
     @JoinColumn(name = "warehouseId",nullable = false)
     Warehouses warehouse;
