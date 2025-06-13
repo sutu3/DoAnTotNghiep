@@ -8,7 +8,6 @@ import NavbarAdmin from "@/components/Admin/NavbarAdmin";
 import { useClickOutside } from "@/Hooks/use-click-outside"; // Đảm bảo import đúng
 import { ThemeProvider } from "@/Utils/ThemeContext";
 import { LayoutProvider, useLayout } from "@/layouts/LayoutContext.tsx";
-import {useSelector} from "react-redux"; // Đảm bảo import đúng
 // @ts-ignore
 
 const AdminLayoutContent = () => {
@@ -49,7 +48,7 @@ const AdminLayoutContent = () => {
         />
 
         {/* 2.2: Phần nội dung */}
-        <div className="h-[calc(100vh-60px)] overflow-y-auto overflow-x-hidden p-4 md:p-6">
+        <div className="h-[calc(100vh)] overflow-y-auto overflow-x-hidden">
           <Outlet /> {/* Outlet render các route con, không cần props */}
         </div>
       </div>

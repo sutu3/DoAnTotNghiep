@@ -17,9 +17,7 @@ const Product = () => {
             <BreadcrumbsUI isDarkMode={isSidebarCollapsed} />
           </div>
 
-          {/* Bên phải: Tiêu đề chính và mô tả phụ */}
-          {/* sm:text-right sẽ căn phải khối này trên màn hình từ sm trở lên */}
-          {/* Trên màn hình nhỏ (xs), nó sẽ căn trái mặc định do flex-col */}
+
           <div className="sm:text-right">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">
               Product Page
@@ -46,6 +44,7 @@ const Product = () => {
               isDarkMode={isSidebarCollapsed}
               objects={objects}
               visibleColumn={INITIAL_VISIBLE_COLUMNS}
+              getId={(objects)=>objects.id}
             />
           </div>
         </div>

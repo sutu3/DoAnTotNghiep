@@ -11,6 +11,7 @@ import { CheckAuth } from "@/Utils/CheckAuth.tsx";
 import { ProviderUI } from "@/providerUI.tsx";
 import { HeroUIProvider } from "@heroui/system";
 import Product from "@/pages/Product/Product.tsx";
+import User from "@/pages/User/page.tsx";
 import { Provider } from "react-redux";
 import store from "@/Store/Store.tsx";
 const router = createBrowserRouter([
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
     children: [
       { path: "*", element: <PageNotFound /> },
       { path: "admin/products", element: <Product /> },
+      { path: "/admin/users", element: <User /> },
     ],
   },
   { path: "/login", element: <LoginPage /> },

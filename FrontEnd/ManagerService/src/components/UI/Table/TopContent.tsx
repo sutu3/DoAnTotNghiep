@@ -33,8 +33,8 @@ interface TopContentProps {
   setVisibleColumns: (value: Set<string>) => void;
   columns: Column[];
   usersLength: number;
+  onchange: (value: any) => void;
   onRowsPerPageChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  hasSearchFilter: boolean;
 }
 
 const TopContent: React.FC<TopContentProps> = ({
@@ -46,9 +46,8 @@ const TopContent: React.FC<TopContentProps> = ({
   visibleColumns,
   setVisibleColumns,
   columns,
-  usersLength,
+  usersLength, onchange,
   onRowsPerPageChange,
-  hasSearchFilter,
 }) => {
   return (
     <div className="flex flex-col gap-4">
@@ -122,6 +121,7 @@ const TopContent: React.FC<TopContentProps> = ({
             className="bg-foreground text-background"
             endContent={<PlusIcon />}
             size="sm"
+            onPress={onchange}
           >
             Add New
           </Button>

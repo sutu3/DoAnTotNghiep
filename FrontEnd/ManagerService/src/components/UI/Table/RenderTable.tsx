@@ -17,14 +17,27 @@ const statusColorMap = {
   paused: "danger",
   vacation: "warning",
 };
+interface DataObject {
+  id: number | string;
+  [key: string]: any;
+}
 interface ProductProgs {
-  object: object;
+  object: DataObject;
   columnKey: string;
 }
-const RenderCell: React.FC<ProductProgs> = ({ object, columnKey }) => {
+const RenderCell: React.FC<ProductProgs> = ( object, columnKey ) => {
+  console.log(columnKey);
   const cellValue = object[columnKey];
 
   switch (columnKey) {
+    case "userName":
+      return (
+          <User
+              avatarProps={{ radius: "full", size: "sm", src: object.urlImage }}
+              description={object.email}
+              name={object.userName}
+          />
+      );
     case "name":
       return (
         <User
@@ -47,6 +60,8 @@ const RenderCell: React.FC<ProductProgs> = ({ object, columnKey }) => {
           </p>
         </div>
       );
+    case "warehouseName":
+      return <span>{object?.warehouses?.warehouseName ?? "N/A"}</span>;
     case "price":
       return <span>{formatVND(Number(cellValue))}</span>;
     case "status":
@@ -87,7 +102,7 @@ const RenderCell: React.FC<ProductProgs> = ({ object, columnKey }) => {
         </div>
       );
     default:
-      return cellValue;
+      return <span>{cellValue}</span>;;
   }
 };
 
