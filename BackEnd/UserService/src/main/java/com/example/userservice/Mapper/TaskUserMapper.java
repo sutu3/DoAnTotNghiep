@@ -12,6 +12,7 @@ public interface TaskUserMapper {
     @Mapping(target = "user",ignore = true)
     @Mapping(target = "task",ignore = true)
     TaskUser toEntity(TaskUserRequest request);
+    @Mapping(target = "user.warehouses",ignore = true)
     TaskUserResponse toResponse(TaskUser entity);
    /* void update(@MappingTarget TaskUser entity, TaskUserForm update);*/
 }

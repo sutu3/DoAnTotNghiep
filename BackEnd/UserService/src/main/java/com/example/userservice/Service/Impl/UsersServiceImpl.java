@@ -1,6 +1,7 @@
 package com.example.userservice.Service.Impl;
 
-
+import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
+import com.example.userservice.Client.WarehouseService.WarehouseController;
 import com.example.userservice.Dto.Request.UserRequest;
 import com.example.userservice.Dto.Responses.User.UserResponse;
 import com.example.userservice.Enum.StatusEnum;
@@ -24,21 +25,35 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class UsersServiceImpl implements UserService {
+
     UserMapper userMapper;
     UserRepo userRepo;
+    WarehouseController warehouseService; // Sử dụng Feign Client đúng chức năng
 
     @Override
     public List<UserResponse> getAll() {
-        return userRepo.findAll().stream().map(userMapper::toResponse)
+        return userRepo.findAll().stream()
+                .map(user -> {
+                    UserResponse response = userMapper.toResponse(user);
+                    WarehousesResponse warehouse = null;
+                    warehouse = warehouseService.getWarehouse(user.getWarehouses()).getResult();
+                    return MapperUserResponse(response, warehouse);
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
     public Page<UserResponse> getAllUserByUserName(String userName, Pageable pageable) {
-        return userRepo.findByUserName(userName, pageable).map(userMapper::toResponse);
+        return userRepo.findByUserName(userName, pageable)
+                .map(user -> {
+                    UserResponse response = userMapper.toResponse(user);
+                    WarehousesResponse warehouse = null;
+                    warehouse = warehouseService.getWarehouse(user.getWarehouses()).getResult();
+                    return MapperUserResponse(response, warehouse);
+                });
     }
 
     @Override
@@ -46,16 +61,21 @@ public class UsersServiceImpl implements UserService {
         if (userRepo.existsByPhoneNumberAndEmail(request.phoneNumber(), request.email())) {
             throw new AppException(ErrorCode.USER_EXIST);
         }
+
+        WarehousesResponse warehouses= warehouseService.getWarehouse(request.warehouses()).getResult();
+
         Users user = userMapper.toEntity(request);
         user.setStatus(StatusEnum.Active);
         user.setIsDeleted(false);
-        return userMapper.toResponse(userRepo.save(user));
-    }
 
+        Users savedUser = userRepo.save(user);
+        UserResponse response = userMapper.toResponse(savedUser);
+        return MapperUserResponse(response, warehouses);
+    }
 
     @Override
     public String DeletedUser(String id) {
-        Users user=findById(id);
+        Users user = findById(id);
         user.setIsDeleted(true);
         user.setDeletedAt(LocalDateTime.now());
         userRepo.save(user);
@@ -65,8 +85,25 @@ public class UsersServiceImpl implements UserService {
     @Override
     public Users findById(String id) {
         return userRepo.findById(id)
-                .orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
-
+    @Override
+    public UserResponse MapperUserResponse(UserResponse response, WarehousesResponse warehousesResponse) {
+        return UserResponse.builder()
+                .userId(response.userId())
+                .userName(response.userName())
+                .fullName(response.fullName())
+                .email(response.email())
+                .urlImage(response.urlImage())
+                .phoneNumber(response.phoneNumber())
+                .status(response.status())
+                .taskUsers(response.taskUsers())
+                .warehouses(warehousesResponse)
+                .createdAt(response.createdAt())
+                .updatedAt(response.updatedAt())
+                .isDeleted(response.isDeleted())
+                .deletedAt(response.deletedAt())
+                .build();
+    }
 }

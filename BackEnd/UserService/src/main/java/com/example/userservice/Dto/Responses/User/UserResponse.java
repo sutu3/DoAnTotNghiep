@@ -1,14 +1,13 @@
 package com.example.userservice.Dto.Responses.User;
 
+import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.userservice.Dto.Responses.TaskUser.TaskUserResponseNoList;
 import com.example.userservice.Enum.StatusEnum;
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+@Builder
 public record UserResponse(
         String userId,
         String userName,
@@ -18,6 +17,7 @@ public record UserResponse(
         String phoneNumber,
         StatusEnum status,
         List<TaskUserResponseNoList> taskUsers,
+        WarehousesResponse warehouses,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         Boolean isDeleted,

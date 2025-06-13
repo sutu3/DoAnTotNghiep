@@ -22,39 +22,39 @@ import org.springframework.web.bind.annotation.*;
 public class TaskUserController {
     private final TaskUserService taskUserService;
 
-    @GetMapping("/users/search?page={pageNumber}&size={pageSize}&idUser={id}")
+    @GetMapping("/users/{id}/search")
     public ApiResponse<Page<TaskUserResponse>> getAllByIdUser(
             @RequestParam("pageNumber") int pageNumber,
             @RequestParam("pageSize") int pageSize,
-            @RequestParam("id") String UserId
+            @PathVariable  String id
     ){
         Pageable pageable= PageRequest.of(pageNumber,pageSize);
         return ApiResponse.<Page<TaskUserResponse>>builder()
-                .Result(taskUserService.getAllByUserId(UserId,pageable))
+                .Result(taskUserService.getAllByUserId(id,pageable))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)
                 .build();
     }
-    @GetMapping("/tasks/search?page={pageNumber}&size={pageSize}&idTask={id}")
+    @GetMapping("/tasks/{id}/search")
     public ApiResponse<Page<TaskUserResponse>> getAllByIdTask(
             @RequestParam("pageNumber") int pageNumber,
             @RequestParam("pageSize") int pageSize,
-            @RequestParam("id") String TaskId
+            @PathVariable String id
     ){
         Pageable pageable= PageRequest.of(pageNumber,pageSize);
         return ApiResponse.<Page<TaskUserResponse>>builder()
-                .Result(taskUserService.getAllByTaskId(TaskId,pageable))
+                .Result(taskUserService.getAllByTaskId(id,pageable))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)
                 .build();
     }
-    @GetMapping("/taskType/search?page={pageNumber}&size={pageSize}&idTask={id}")
+    @GetMapping("/taskTypes/taskName/{taskName}")
     public ApiResponse<Page<TaskUserResponse>> getAllByTaskType(
             @RequestParam("pageNumber") int pageNumber,
             @RequestParam("pageSize") int pageSize,
-            @RequestParam("taskTypeName") String taskName
+            @PathVariable String taskName
     ){
         Pageable pageable= PageRequest.of(pageNumber,pageSize);
         return ApiResponse.<Page<TaskUserResponse>>builder()
