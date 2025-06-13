@@ -1,0 +1,45 @@
+# =================================================================
+# Stage 1: Build aplication
+# Sử dụng image Maven có sẵn Java 23 để build.
+# Đặt tên cho stage này là "builder"
+# =================================================================
+FROM maven:3.9.8-eclipse-temurin-23-alpine AS builder
+
+# Đặt thư mục làm việc
+WORKDIR /app
+
+# TỐI ƯU: Copy file pom.xml trước để tận dụng cache của Docker
+# Nếu pom.xml không đổi, Docker sẽ không cần tải lại dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copy phần còn lại của source code
+COPY src ./src
+
+# Build ứng dụng và bỏ qua tests
+RUN mvn clean package -DskipTests
+
+# =================================================================
+# Stage 2: Create final runnable image
+# Sử dụng image JRE (nhẹ hơn JDK) của Java 23
+# =================================================================
+FROM eclipse-temurin:23-jre-alpine
+
+# Đặt thư mục làm việc
+WORKDIR /app
+
+# BẢO MẬT: Tạo một user và group riêng để chạy ứng dụng
+RUN addgroup -S spring && adduser -S spring -G spring
+
+# Chuyển sang user vừa tạo
+USER spring:spring
+
+# Copy file .jar đã được build từ stage "builder"
+# Wildcard (*) giúp tự động lấy đúng file jar dù tên version thay đổi
+COPY --from=builder /app/target/*.jar app.jar
+
+# Cổng mà ứng dụng Spring Boot của bạn sẽ chạy (mặc định là 8080)
+EXPOSE 8080
+
+# Lệnh để khởi chạy ứng dụng khi container bắt đầu
+ENTRYPOINT ["java", "-jar", "app.jar"]
