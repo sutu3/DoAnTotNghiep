@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(
         name = "Warehouse",
-        url = "https://warehouseservice-latest.onrender.com/api",
+        url = "https://doantotnghiep-pb6y.onrender.com/api",
         fallback = WarehouseServiceFallback.class)
 public interface WarehouseController {
     @GetMapping("/warehouses/{id}")
