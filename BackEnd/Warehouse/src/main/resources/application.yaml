@@ -6,6 +6,7 @@ spring:
     username: "avnadmin"
     password: "AVNS_qlIFCPONWrpyRD8A4Rr"
     driver-class-name: "com.mysql.cj.jdbc.Driver"
+    
   jpa:
     database: mysql
     hibernate:
