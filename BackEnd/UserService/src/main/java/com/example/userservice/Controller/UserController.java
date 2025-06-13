@@ -31,14 +31,14 @@ public class UserController {
                 .code(0)
                 .build();
     }
-    @GetMapping("/search?userName={userName}&page={pageNumber}&size={pageSize}")
+    @GetMapping("/search/userName/{name}")
     public ApiResponse<Page<UserResponse>> getAllByUserName(
-            @RequestParam("userName") String userName,
+            @PathVariable String name,
             @RequestParam("pageNumber") int page,
             @RequestParam("pageSize") int size){
         Pageable pageable= PageRequest.of(page,size);
         return ApiResponse.<Page<UserResponse>>builder()
-                .Result(userService.getAllUserByUserName(userName,pageable))
+                .Result(userService.getAllUserByUserName(name,pageable))
                 .message("SuccessFull")
                 .success(true)
                 .code(0)

@@ -25,7 +25,7 @@ public class TaskTypeController {
     TaskTypeRepo taskTypeRepo;
     TaskTypeService taskTypeService;
 
-    @GetMapping("/search?page={pageNumber}&size={pageSize}")
+    @GetMapping("/search")
     public ApiResponse<Page<TaskTypeResponse>> getAll(
             @RequestParam("pageNumber") int page,
             @RequestParam("pageSize") int size

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class TaskController {
     private final TaskService taskService;
 
-    @GetMapping("/search?page={pageNumber}&size={pageSize}")
+    @GetMapping("/search")
     public ApiResponse<Page<TaskResponse>> getAll(
             @RequestParam("pageNumber") int page,
             @RequestParam("pageSize") int size
