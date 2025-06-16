@@ -36,88 +36,16 @@ export interface StackCreate {
 
 interface StackState {
     Stacks: StackType[];
+    totalPage:number,
     StackEdit: StackType;
     StackCreate: StackCreate;
 }
 
-/*
-const stacks: StackType[] = [
-    {
-        stackId: "stack-1",
-        stackName: "Stack A",
-        description: "Lô hàng A",
-        bin: [
-            {
-                binId: "bin-001",
-                binCode: "A-A1",
-                status:"loaded",
-                capacity: 10,
-                createdAt: "2025-06-10T08:00:00Z",
-                updatedAt: "2025-06-10T08:00:00Z",
-                isDeleted: false,
-                deletedAt: null,
-            },
-            {
-                binId: "bin-002",
-                binCode: "A-A2",
-                capacity: 12,
-                status:"free",
-                createdAt: "2025-06-10T08:05:00Z",
-                updatedAt: "2025-06-10T08:05:00Z",
-                isDeleted: false,
-                deletedAt: null,
-            },
-        ],
-    },
-    {
-        stackId: "stack-2",
-        stackName: "Stack B",
-        description: "Lô hàng B",
-        bin: [
-            {
-                binId: "bin-003",
-                binCode: "B-B1",
-                capacity: 8,
-                status: "loaded",
-                createdAt: "2025-06-10T08:10:00Z",
-                updatedAt: "2025-06-10T08:10:00Z",
-                isDeleted: false,
-                deletedAt: null,
-            },
-            {
-                binId: "bin-004",
-                binCode: "B-B2",
-                capacity: 15,
-                status: "loaded",
-                createdAt: "2025-06-10T08:15:00Z",
-                updatedAt: "2025-06-10T08:15:00Z",
-                isDeleted: false,
-                deletedAt: null,
-            },
-        ],
-    },
-    {
-        stackId: "stack-3",
-        stackName: "Stack C",
-        description: "Lô hàng C",
-        bin: [
-            {
-                binId: "bin-005",
-                binCode: "C-C1",
-                capacity: 20,
-                status: "free",
-                createdAt: "2025-06-10T08:20:00Z",
-                updatedAt: "2025-06-10T08:20:00Z",
-                isDeleted: false,
-                deletedAt: null,
-            },
-        ],
-    },
-];
-*/
+
 
 const initialState: StackState = {
     Stacks: [],
+    totalPage:0,
     StackEdit: {
         stackId: "",
         stackName: "",
@@ -134,8 +62,9 @@ const StackSlice = createSlice({
     name: "stack",
     initialState,
     reducers: {
-
-
+        initToTalPage: (state, action) => {
+            state.totalPage = action.payload || 0;
+        }
 
     },
     extraReducers: (builder) => {
@@ -203,8 +132,10 @@ export const MiddleGetAllStack = (page: pageApi) => {
             const { warehouse } = getState().warehouse;
             const warehouseId = warehouse?.warehouseId;
 
-            const response=await dispatch(GetAllStack({ warehouseId, page }));
-            return response.result;
+            const action = await dispatch(GetAllStack({ warehouseId, page }));
+            dispatch(StackSlice.actions.initToTalPage(action.payload.result.totalPages));
+
+
         } catch (error: any) {
             showToast({
                 title: "Error",

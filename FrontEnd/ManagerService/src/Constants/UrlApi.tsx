@@ -1,4 +1,5 @@
 const BASE_URL = "https://doantotnghiep-pb6y.onrender.com/api";
+const TEST_URL = "http://localhost:8080/api";
 export interface pageApi{pageNumber:number,pageSize:number}
 export const API_ROUTES = {
     warehouse: {

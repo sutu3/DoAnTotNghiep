@@ -21,6 +21,7 @@ export const fetchApi = async <T = any>({
         method,
         headers: {
             "Content-Type": "application/json",
+            "credentials": "include",
             ...headers,
         },
     };

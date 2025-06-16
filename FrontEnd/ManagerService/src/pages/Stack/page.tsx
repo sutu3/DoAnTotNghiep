@@ -2,30 +2,30 @@ import {useEffect, useState} from "react";
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 import TableUI from "@/components/UI/Table/TableUI.tsx";
 import StackSummaryPanel from "@/components/Admin/StackSummaryPanel.tsx";
-import {columns, GetAllStack, MiddleAddStack, MiddleGetAllStack, StackType} from "@/Store/StackSlice.tsx";
+import {columns, MiddleAddStack, MiddleGetAllStack} from "@/Store/StackSlice.tsx";
 import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
 import { Layers} from "lucide-react";
 import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
 import StackForm from "@/components/Form/StackForm.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {StacksSelector} from "@/Store/Selector.tsx";
+import {StacksSelector, TotalPageStack} from "@/Store/Selector.tsx";
 import {pageApi} from "@/Constants/UrlApi.tsx";
 
 export default function StackPage() {
     const stacks=useSelector(StacksSelector);
+    const totalPageStack=useSelector(TotalPageStack);
+    console.log(totalPageStack)
     const dispatch = useDispatch();
     const [selectedStack, setSelectedStack] = useState(stacks[0]);
     const INITIAL_VISIBLE_COLUMNS = ["stackName", "description","binCount", "statusStack", "actions"];
     const [isOpen, setIsOpen] = useState(false);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(5);
-    const [totalPage, setTotalPage] = useState(1);
 
     useEffect(() => {
-        const PageApi:pageApi={pageNumber:page,pageSize:pageSize}
+        const PageApi:pageApi={pageNumber:page-1,pageSize:pageSize-2}
         const fetchData = async () => {
-            const res = dispatch(MiddleGetAllStack(PageApi))
-            setTotalPage(res.totalPages); // hoặc `totalElements / pageSize`
+            dispatch(MiddleGetAllStack(PageApi))
         };
         fetchData();
     }, [page, pageSize]);
@@ -45,7 +45,6 @@ export default function StackPage() {
         setIsOpen(!isOpen);
     }
     const handleAddStack= async ()=>{
-        console.log(formData);
         await dispatch(MiddleAddStack(formData));
         setIsOpen(false);
         setFormData({ stackName: "", description: "", warehouses: "" });
@@ -101,8 +100,10 @@ export default function StackPage() {
                                     objects={stacks}
                                     visibleColumn={INITIAL_VISIBLE_COLUMNS}
                                     getId={(item) => item.stackId}
-                                    page={page} pageSize={pageSize} totalPage={totalPage}
-                                    onPageChange={setTotalPage}                                />
+                                    pageNumber={page}
+                                    pageSize={pageSize}
+                                    totalPage={totalPageStack}
+                                    onPageChange={setPage}                                />
                             </div>
                         </div>
                     </div>

@@ -37,7 +37,7 @@ interface TableProductProps {
   onGetId: (item: string) => void;
   getId: (item: DataObject | User| StackType) => string;
   onchange?: (data: any) => void;
-  page: number;
+  pageNumber: number;
   pageSize: number;
   totalPage: number;
 
@@ -51,7 +51,8 @@ const TableUI: React.FC<TableProductProps> = ({
                                                   onGetId,
                                                 visibleColumn,
                                                 getId,
-    page,
+    totalPage,
+    pageNumber,
     pageSize,
     onPageChange,
                                                 onchange,
@@ -60,7 +61,7 @@ const TableUI: React.FC<TableProductProps> = ({
   const [selectedKeys, setSelectedKeys] = React.useState<Set<number | string>>(new Set());
   const [visibleColumns, setVisibleColumns] = React.useState<Set<string>>(new Set(visibleColumn));
   const [statusFilter, setStatusFilter] = React.useState("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(pageSize);
   const [sortDescriptor, setSortDescriptor] = React.useState<{
     column: string;
     direction: "ascending" | "descending";
@@ -68,7 +69,8 @@ const TableUI: React.FC<TableProductProps> = ({
     column: "id",
     direction: "ascending",
   });
-  const pages = Math.ceil(objects.length / rowsPerPage);
+  console.log(totalPage)
+  const pages = totalPage;
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = React.useMemo(() => {
@@ -98,7 +100,7 @@ const TableUI: React.FC<TableProductProps> = ({
           bottomContent={
             <BottomContent
                 hasSearchFilter={hasSearchFilter}
-                page={page}
+                page={pageNumber}
                 pages={pages}
                 selectedKeys={selectedKeys}
                 setPage={(p) => onPageChange(p)} itemsLength={0}            />
