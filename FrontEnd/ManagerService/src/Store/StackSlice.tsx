@@ -1,7 +1,7 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {fetchApi} from "@/Api/FetchApi.tsx";
-import {API_ROUTES} from "@/Constants/UrlApi.tsx";
+import {API_ROUTES, pageApi} from "@/Constants/UrlApi.tsx";
 // Kích thước 1 bin
 export interface Bin {
     binId: string;
@@ -40,6 +40,7 @@ interface StackState {
     StackCreate: StackCreate;
 }
 
+/*
 const stacks: StackType[] = [
     {
         stackId: "stack-1",
@@ -113,9 +114,10 @@ const stacks: StackType[] = [
         ],
     },
 ];
+*/
 
 const initialState: StackState = {
-    Stacks: stacks,
+    Stacks: [],
     StackEdit: {
         stackId: "",
         stackName: "",
@@ -140,7 +142,12 @@ const StackSlice = createSlice({
         builder
             .addCase(addStack.fulfilled,(state, action)=>{
                 const result=action.payload?.result;
-                state.Stacks=[...state.Stacks,result]
+                const StackMapper=mappedStack(result);
+                state.Stacks=[...state.Stacks,StackMapper]
+            })
+            .addCase(GetAllStack.fulfilled,(state,action)=>{
+                const result:StackType[]=action.payload?.result?.content;
+                state.Stacks=result.map((el:StackType)=>mappedStack(el));
             })
 
     },
@@ -159,23 +166,52 @@ export const addStack = createAsyncThunk(
         }
     }
 );
-const mapBinData = (bin: Bin): { id: string; status: string; metadata?: any } => {
-    return {
-        id: bin.binCode,
-        status: bin.capacity > 0 ? "loaded" : "free",
-        metadata: {
-            size: { h: 10, w: 10, weight: bin.capacity },
-            deliveredAt: new Date(bin.createdAt).toLocaleTimeString(),
-            row: bin.binCode.split("-")[1]?.charAt(0) || "1"
+
+export const GetAllStack = createAsyncThunk(
+    "stack/getAllStack", // sửa tên action đúng với mục đích
+    async (
+        {
+            warehouseId,
+            page,
+        }: { warehouseId: string; page: pageApi },
+        { rejectWithValue }
+    ) => {
+        try {
+            return await fetchApi({
+                method: "GET",
+                url: API_ROUTES.warehouse.stack.search(page, warehouseId),
+            });
+        } catch (error: any) {
+            return rejectWithValue(error.message);
         }
+    }
+);
+
+
+const mappedStack = (stackFromApi: StackType): StackType => {
+    return {
+        stackId: stackFromApi.stackId,
+        stackName: stackFromApi.stackName,
+        description: stackFromApi.description,
+        bin: stackFromApi.bin
     };
 };
 
-const mappedStack = (stackFromApi: StackType) => {
-    return {
-        id: stackFromApi.stackId,
-        name: stackFromApi.stackName,
-        bins: stackFromApi.bin.map(mapBinData)
+export const MiddleGetAllStack = (page: pageApi) => {
+    return async function check(dispatch, getState) {
+        try {
+            const { warehouse } = getState().warehouse;
+            const warehouseId = warehouse?.warehouseId;
+
+            const response=await dispatch(GetAllStack({ warehouseId, page }));
+            return response.result;
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
     };
 };
 export const MiddleAddStack = (payload:StackCreate) => {

@@ -1,14 +1,15 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 import TableUI from "@/components/UI/Table/TableUI.tsx";
 import StackSummaryPanel from "@/components/Admin/StackSummaryPanel.tsx";
-import {columns, MiddleAddStack, StackType} from "@/Store/StackSlice.tsx";
+import {columns, GetAllStack, MiddleAddStack, MiddleGetAllStack, StackType} from "@/Store/StackSlice.tsx";
 import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
 import { Layers} from "lucide-react";
 import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
 import StackForm from "@/components/Form/StackForm.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {StacksSelector} from "@/Store/Selector.tsx";
+import {pageApi} from "@/Constants/UrlApi.tsx";
 
 export default function StackPage() {
     const stacks=useSelector(StacksSelector);
@@ -16,7 +17,18 @@ export default function StackPage() {
     const [selectedStack, setSelectedStack] = useState(stacks[0]);
     const INITIAL_VISIBLE_COLUMNS = ["stackName", "description","binCount", "statusStack", "actions"];
     const [isOpen, setIsOpen] = useState(false);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [totalPage, setTotalPage] = useState(1);
 
+    useEffect(() => {
+        const PageApi:pageApi={pageNumber:page,pageSize:pageSize}
+        const fetchData = async () => {
+            const res = dispatch(MiddleGetAllStack(PageApi))
+            setTotalPage(res.totalPages); // hoặc `totalElements / pageSize`
+        };
+        fetchData();
+    }, [page, pageSize]);
     const [formData, setFormData] = useState({
         stackName:  "",
         description:  "",
@@ -83,13 +95,14 @@ export default function StackPage() {
                             <div className="p-0 md:p-4">
                                 <TableUI
                                     onchange={handleOpenModel}
-                                    onGetId={(item)=>handleStackClick(item)}
+                                    onGetId={(item) => handleStackClick(item)}
                                     columns={columns}
                                     isDarkMode={isSidebarCollapsed}
                                     objects={stacks}
                                     visibleColumn={INITIAL_VISIBLE_COLUMNS}
                                     getId={(item) => item.stackId}
-                                />
+                                    page={page} pageSize={pageSize} totalPage={totalPage}
+                                    onPageChange={setTotalPage}                                />
                             </div>
                         </div>
                     </div>
