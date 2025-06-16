@@ -17,6 +17,7 @@ import {
   TableClassNames,
 } from "@/components/UI/Table/TableCss.tsx";
 import { User } from "@/types";
+import {StackType} from "@/Store/StackSlice.tsx";
 
 interface DataObject {
   id: number | string;
@@ -32,9 +33,10 @@ interface Column {
 interface TableProductProps {
   isDarkMode: boolean;
   visibleColumn: string[];
-  objects: DataObject[] | User[];
+  objects: DataObject[] | User[]| StackType[];
   columns: Column[];
-  getId: (item: DataObject|User) => string ;
+    onGetId: (item: String) => void;
+  getId: (item: DataObject|User|StackType) => string ;
   onchange?: (data: any) => void;
 }
 
@@ -42,6 +44,7 @@ const TableUI: React.FC<TableProductProps> = ({
                                                 isDarkMode,
                                                 objects,
                                                 columns,
+                                                  onGetId,
                                                 visibleColumn,
                                                 getId,
                                                 onchange,
@@ -111,10 +114,9 @@ console.log(sortedItems)
             />
           }
           bottomContentPlacement="outside"
-          checkboxesProps={checkboxPropsThemed}
           classNames={tableClassNames}
-          selectedKeys={selectedKeys}
           selectionMode="multiple"
+          onRowAction={(key) => onGetId(key)}
           sortDescriptor={sortDescriptor}
           topContent={
             <TopContent
@@ -152,7 +154,9 @@ console.log(sortedItems)
             return (
                 <TableRow key={getId(item)}>
                   {(columnKey) => (
-                      <TableCell>{RenderCell(item, columnKey.toString())}</TableCell>
+                      <TableCell onClick={() => onGetId(getId(item))}>
+                          {RenderCell(item, columnKey.toString())}
+                      </TableCell>
                   )}
                 </TableRow>
             );

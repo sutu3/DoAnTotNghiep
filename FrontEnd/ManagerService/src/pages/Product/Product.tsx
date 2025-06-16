@@ -44,7 +44,7 @@ const Product = () => {
               isDarkMode={isSidebarCollapsed}
               objects={objects}
               visibleColumn={INITIAL_VISIBLE_COLUMNS}
-              getId={(objects)=>objects.id}
+              getId={(objects)=>objects?.id}
             />
           </div>
         </div>

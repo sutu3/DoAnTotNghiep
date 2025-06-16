@@ -1,4 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
+import WarehouseSlice from "@/Store/WarehouseSlice.tsx";
+import StackSlice from "@/Store/StackSlice.tsx";
 
 const ThemeReducer = (state = { value: true }, action: any) => {
   switch (action.type) {
@@ -10,9 +12,12 @@ const ThemeReducer = (state = { value: true }, action: any) => {
       return state;
   }
 };
+
 const store = configureStore({
   reducer: {
     themeReducer: ThemeReducer,
+    warehouse: WarehouseSlice.reducer,
+    stack: StackSlice.reducer,
   },
 });
 

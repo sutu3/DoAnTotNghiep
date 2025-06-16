@@ -2,15 +2,43 @@ import TableUI from "@/components/UI/Table/TableUI.tsx";
 import { columns, objects } from "@/Data/User/Data.tsx";
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
-import {Button} from "@heroui/button";
 import {useState} from "react";
+import UserForm from "@/components/Form/UserForm.tsx";
+import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
+import {IdCard} from "lucide-react";
+import {warehouse} from "@/Store/Selector.tsx";
+import {useSelector} from "react-redux";
+export interface UserCreate {
+        userName: string;
+        fullName: string;
+        email: string;
+        urlImage: string;
+        phoneNumber: string;
+        warehouses: string;
+    };
 
 const User = () => {
+    console.log(useSelector(warehouse))
     const [isOpen, setIsOpen] = useState(false);
+    const [idShow, setIdShow] = useState<String>("");
+    const [formData, setFormData] = useState({
+        userName:  "",
+        fullName:  "",
+        email:  "",
+        urlImage:  "",
+        phoneNumber:  "",
+        warehouses:  "",
+    });
+    const handleChange = (key: string, value: string) => {
+        setFormData((prev) => ({ ...prev, [key]: value }));
+    }
     const isSidebarCollapsed = localStorage.getItem("theme") != "light";
-    const INITIAL_VISIBLE_COLUMNS = ["userName", "status", "actions"];
+    const INITIAL_VISIBLE_COLUMNS = ["userName","fullName","email","phoneNumber","", "status", "actions"];
     const handleOpenModel=()=>{
         setIsOpen(!isOpen);
+    }
+    const handleOnGetId=(data:string)=>{
+        setIdShow(data);
     }
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
@@ -44,10 +72,11 @@ const User = () => {
                         <TableUI
                             onchange={handleOpenModel}
                             columns={columns}
+                            onGetId={(item)=>handleOnGetId(item)}
                             isDarkMode={isSidebarCollapsed}
                             objects={objects}
                             visibleColumn={INITIAL_VISIBLE_COLUMNS}
-                            getId={(item)=>item.userId}
+                            getId={(item) => item.id}
                         />
                     </div>
                 </div>
@@ -56,8 +85,8 @@ const User = () => {
                 isOpen={isOpen}
                 onOpenChange={setIsOpen}
                 title="Thêm Mới nhân viên"
-                children={<div>heheheehehehe</div>}
-                footer={<Button onPress={() => setIsOpen(false)}>Đóng</Button>}
+                children={<UserForm data={formData} onChange={handleChange}/>}
+                footer={<ButtonUI className={"bg-gradient-to-tr from-green-500 to-green-300 text-green-100 shadow-lg"} startContent={<IdCard />} label={"Add Employee"} loading={false}/>}
             />
         </div>
     );
