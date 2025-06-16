@@ -11,12 +11,12 @@ import {
 import RenderCell from "@/components/UI/Table/RenderTable.tsx";
 import BottomContent from "@/components/UI/Table/BottomContent.tsx";
 import TopContent from "@/components/UI/Table/TopContent.tsx";
-import { filterItems, paginateItems, sortItems } from "@/Utils/TableUtils.tsx";
 import {
-  CheckboxPropsThemed,
+
   TableClassNames,
 } from "@/components/UI/Table/TableCss.tsx";
 import { User } from "@/types";
+import {StackType} from "@/Store/StackSlice.tsx";
 
 interface DataObject {
   id: number | string;
@@ -32,18 +32,28 @@ interface Column {
 interface TableProductProps {
   isDarkMode: boolean;
   visibleColumn: string[];
-  objects: DataObject[] | User[];
+  objects: DataObject[] | User[]| StackType[];
   columns: Column[];
-  getId: (item: DataObject|User) => string ;
+  onGetId: (item: string) => void;
+  getId: (item: DataObject | User| StackType) => string;
   onchange?: (data: any) => void;
+  page: number;
+  pageSize: number;
+  totalPage: number;
+
+  onPageChange: (page: number) => void;
 }
 
 const TableUI: React.FC<TableProductProps> = ({
                                                 isDarkMode,
                                                 objects,
                                                 columns,
+                                                  onGetId,
                                                 visibleColumn,
                                                 getId,
+    page,
+    pageSize,
+    onPageChange,
                                                 onchange,
                                               }) => {
   const [filterValue, setFilterValue] = React.useState("");
@@ -58,8 +68,6 @@ const TableUI: React.FC<TableProductProps> = ({
     column: "id",
     direction: "ascending",
   });
-  const [page, setPage] = React.useState(1);
-
   const pages = Math.ceil(objects.length / rowsPerPage);
   const hasSearchFilter = Boolean(filterValue);
 
@@ -68,33 +76,20 @@ const TableUI: React.FC<TableProductProps> = ({
     return columns.filter((column) => visibleColumns.has(column.uid.toString()));
   }, [visibleColumns, columns]);
 
-  const filteredItems = React.useMemo(() => {
-    return filterItems(objects, filterValue, statusFilter, hasSearchFilter);
-  }, [objects, filterValue, statusFilter, hasSearchFilter]);
-
-  const paginatedItems = React.useMemo(() => {
-    return paginateItems(filteredItems, page, rowsPerPage);
-  }, [filteredItems, page, rowsPerPage]);
-
-  const sortedItems = React.useMemo(() => {
-    return sortItems(paginatedItems, sortDescriptor);
-  }, [paginatedItems, sortDescriptor]);
   const tableClassNames = TableClassNames({ isDarkMode });
-  const checkboxPropsThemed = CheckboxPropsThemed({ isDarkMode });
 
   const onRowsPerPageChange = React.useCallback(
       (e: React.ChangeEvent<HTMLSelectElement>) => {
         setRowsPerPage(Number(e.target.value));
-        setPage(1);
+        onPageChange(1);
       },
       [],
   );
 
   const onSearchChange = React.useCallback((value: string) => {
     setFilterValue(value);
-    setPage(1);
+    onPageChange(1);
   }, []);
-console.log(sortedItems)
   return (
       <Table
           isCompact
@@ -103,18 +98,15 @@ console.log(sortedItems)
           bottomContent={
             <BottomContent
                 hasSearchFilter={hasSearchFilter}
-                itemsLength={paginatedItems.length}
                 page={page}
                 pages={pages}
                 selectedKeys={selectedKeys}
-                setPage={setPage}
-            />
+                setPage={(p) => onPageChange(p)} itemsLength={0}            />
           }
           bottomContentPlacement="outside"
-          checkboxesProps={checkboxPropsThemed}
           classNames={tableClassNames}
-          selectedKeys={selectedKeys}
           selectionMode="multiple"
+          onRowAction={(key) => onGetId(key)}
           sortDescriptor={sortDescriptor}
           topContent={
             <TopContent
@@ -147,12 +139,14 @@ console.log(sortedItems)
               </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent="No data found" items={sortedItems}>
+        <TableBody emptyContent="No data found" items={objects}>
           {( item ) => {
             return (
                 <TableRow key={getId(item)}>
                   {(columnKey) => (
-                      <TableCell>{RenderCell(item, columnKey.toString())}</TableCell>
+                      <TableCell onClick={() => onGetId(getId(item))}>
+                          {RenderCell(item, columnKey.toString())}
+                      </TableCell>
                   )}
                 </TableRow>
             );

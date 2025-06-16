@@ -23,7 +23,6 @@ interface ModalUIProps {
 const ModalUI: React.FC<ModalUIProps> = ({
                                              isOpen: isOpenProp,
                                              onOpenChange: onOpenChangeProp,
-                                             trigger,
                                              title = "Modal Title",
                                              children,
                                              footer,
@@ -33,7 +32,6 @@ const ModalUI: React.FC<ModalUIProps> = ({
     const isControlled = isOpenProp !== undefined;
 
     const isOpen = isControlled ? isOpenProp : disclosure.isOpen;
-    const onOpen = isControlled ? () => onOpenChangeProp?.(true) : disclosure.onOpen;
     const onOpenChange = isControlled ? onOpenChangeProp! : disclosure.onOpenChange;
 
     const targetRef = React.useRef(null);
@@ -42,19 +40,37 @@ const ModalUI: React.FC<ModalUIProps> = ({
     return (
         <>
 
-            <Modal ref={targetRef} isOpen={isOpen} onOpenChange={onOpenChange}>
-                <ModalContent>
+            <Modal
+                ref={targetRef}
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                classNames={{
+                    backdrop: "bg-black/30 backdrop-blur-sm",
+                }}
+            >
+                <ModalContent className="rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl">
                     {(onClose) => (
                         <>
-                            <ModalHeader {...moveProps} className="flex flex-col gap-1">
-                                {title}
+                            <ModalHeader
+                                {...moveProps}
+                                className="flex flex-col gap-1 bg-gradient-to-r from-indigo-200 via-purple-300 rounded-xl  to-pink-200 text-white rounded-t-2xl px-6 py-4"
+                            >
+                                <h3 className="text-lg font-semibold">{title}</h3>
                             </ModalHeader>
-                            <ModalBody>{children}</ModalBody>
-                            <ModalFooter>
+
+                            <ModalBody className="px-6 py-4 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200">
+                                {children}
+                            </ModalBody>
+
+                            <ModalFooter className="bg-gray-50 dark:bg-gray-800 px-6 py-4 rounded-b-2xl border-t border-gray-200 dark:border-gray-700">
                                 {footer || (
                                     <>
-                                        <Button variant="light" onPress={onClose}>Close</Button>
-                                        <Button color="primary" onPress={onClose}>OK</Button>
+                                        <Button variant="light" onPress={onClose}>
+                                            Close
+                                        </Button>
+                                        <Button color="primary" onPress={onClose}>
+                                            OK
+                                        </Button>
                                     </>
                                 )}
                             </ModalFooter>

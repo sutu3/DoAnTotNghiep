@@ -14,6 +14,9 @@ import Product from "@/pages/Product/Product.tsx";
 import User from "@/pages/User/page.tsx";
 import { Provider } from "react-redux";
 import store from "@/Store/Store.tsx";
+import WarehousePage from "@/pages/Dashboard/page.tsx";
+import StackPage from "@/pages/Stack/page.tsx";
+import {ToastProvider} from "@heroui/react";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -27,6 +30,8 @@ const router = createBrowserRouter([
       { path: "*", element: <PageNotFound /> },
       { path: "admin/products", element: <Product /> },
       { path: "/admin/users", element: <User /> },
+      { path: "/admin/", element: <WarehousePage /> },
+      { path: "/admin/tasks", element: <StackPage /> },
     ],
   },
   { path: "/login", element: <LoginPage /> },
@@ -42,6 +47,7 @@ function HeroUIProviderWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <HeroUIProvider navigate={navigate} useHref={useHrefFn}>
+      <ToastProvider />
       <Provider store={store}>
       <ProviderUI>{children}</ProviderUI>
       </Provider>
