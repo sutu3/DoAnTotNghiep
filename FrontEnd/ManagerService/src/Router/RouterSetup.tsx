@@ -46,7 +46,6 @@ export default function RouterSetup() {
 function HeroUIProviderWrapper({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const useHrefFn = (href: string) => useHref(href);
-
   return (
     <HeroUIProvider navigate={navigate} useHref={useHrefFn}>
       <ToastProvider />
