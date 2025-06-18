@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = TaskMapper.class)
 public interface TaskUserMapper {
     @Mapping(target = "user",ignore = true)
     @Mapping(target = "task",ignore = true)

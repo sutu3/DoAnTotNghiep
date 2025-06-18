@@ -24,4 +24,6 @@ public class TaskType extends BaseEntity{
     String description;
     @OneToMany(mappedBy="taskType")
     List<Tasks> tasks;
+    @Column(columnDefinition = "VARCHAR(36) COMMENT 'mã id của warehouse chi tiết nhiệm vụ'",nullable = false)
+    String warehouses;
 }

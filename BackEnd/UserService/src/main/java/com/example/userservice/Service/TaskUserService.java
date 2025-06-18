@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public interface TaskUserService {
     Page<TaskUserResponse> getAllByUserId(String id, Pageable pageable);
     Page<TaskUserResponse> getAllByTaskId(String id, Pageable pageable);
-    Page<TaskUserResponse> getAllByTaskTypeName(String taskName, Pageable pageable);
+    Page<TaskUserResponse> getAllByTaskTypeName(String taskName,String warehouseId, Pageable pageable);
     TaskUserResponse createTaskUser(TaskUserRequest request);
     TaskUser findById(String id);
     TaskUserResponse findByIdToResponse(String id);

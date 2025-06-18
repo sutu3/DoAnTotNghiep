@@ -25,23 +25,27 @@ public class TaskTypeController {
     TaskTypeRepo taskTypeRepo;
     TaskTypeService taskTypeService;
 
-    @GetMapping("/search")
+    @GetMapping("/search/warehouse/{warehouseId}/getALl")
     public ApiResponse<Page<TaskTypeResponse>> getAll(
             @RequestParam("pageNumber") int page,
-            @RequestParam("pageSize") int size
+            @RequestParam("pageSize") int size,
+            @PathVariable String warehouseId
     ){
         Pageable pageable= PageRequest.of(page,size);
         return ApiResponse.<Page<TaskTypeResponse>>builder()
-                .Result(taskTypeService.getAll(pageable))
+                .Result(taskTypeService.getAll(pageable,warehouseId))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)
                 .build();
     }
-    @GetMapping("/{taskName}")
-    public ApiResponse<TaskTypeResponse> getByTaskName(@PathVariable String taskName){
+    @GetMapping("/search/warehouse/{warehouseId}/getName")
+    public ApiResponse<TaskTypeResponse> getByTaskName(
+            @RequestParam("taskName") String taskName,
+            @PathVariable String warehouseId
+    ){
         return ApiResponse.<TaskTypeResponse>builder()
-                .Result(taskTypeService.getByTaskNametoResponse(taskName))
+                .Result(taskTypeService.getByTaskNametoResponse(taskName,warehouseId))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)
@@ -67,10 +71,13 @@ public class TaskTypeController {
                 .success(true)
                 .build();
     }
-    @DeleteMapping("/{taskName}")
-    public ApiResponse<String> deleteTaskName(@PathVariable String taskName){
+    @DeleteMapping("/search/warehouse/{warehouseId}/taskTypeName/{taskName}")
+    public ApiResponse<String> deleteTaskName(
+            @PathVariable String taskName,
+            @PathVariable String warehouseId
+    ){
         return ApiResponse.<String>builder()
-                .Result(taskTypeService.deleteByTaskName(taskName))
+                .Result(taskTypeService.deleteByTaskName(taskName,warehouseId))
                 .message("Deleted SuccessFull")
                 .success(true)
                 .code(0)

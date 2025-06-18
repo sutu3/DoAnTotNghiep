@@ -5,16 +5,16 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TaskTypeResponse {
+public class TaskTypeResponseNoList {
         String taskTypeId;
         String taskName;
         String description;
-        WarehousesResponse warehouses;
         LocalDateTime createdAt;
         LocalDateTime updatedAt;
         Boolean isDeleted;

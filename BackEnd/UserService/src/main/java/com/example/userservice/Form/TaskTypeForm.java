@@ -5,7 +5,7 @@ import lombok.Builder;
 @Builder
 public record TaskTypeForm(
         String taskName,
-        String description
-
+        String description,
+        String warehouses
 ) {
 }

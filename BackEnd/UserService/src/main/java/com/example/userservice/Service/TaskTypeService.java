@@ -12,12 +12,12 @@ import java.util.Optional;
 
 @Service
 public interface TaskTypeService {
-    Page<TaskTypeResponse> getAll(Pageable pageable);
+    Page<TaskTypeResponse> getAll(Pageable pageable,String warehouse);
 
-    TaskType getByTaskName(String taskName);
+    TaskType getByTaskName(String taskName,String warehouses);
     TaskType getByid(String id);
-    TaskTypeResponse getByTaskNametoResponse(String taskName);
+    TaskTypeResponse getByTaskNametoResponse(String taskName,String warehouses);
     TaskTypeResponse createTaskType(TaskTypeRequest request);
     TaskTypeResponse updateTaskType(TaskTypeForm update,String id);
-    String deleteByTaskName(String taskName);
+    String deleteByTaskName(String taskName,String warehouses);
 }

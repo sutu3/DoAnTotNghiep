@@ -50,15 +50,16 @@ public class TaskUserController {
                 .success(true)
                 .build();
     }
-    @GetMapping("/taskTypes/taskName/{taskName}")
+    @GetMapping("/search/warehouse/{warehouseId}/taskTypes/taskName/{taskName}")
     public ApiResponse<Page<TaskUserResponse>> getAllByTaskType(
             @RequestParam("pageNumber") int pageNumber,
             @RequestParam("pageSize") int pageSize,
-            @PathVariable String taskName
+            @PathVariable String taskName,
+            @PathVariable String warehouseId
     ){
         Pageable pageable= PageRequest.of(pageNumber,pageSize);
         return ApiResponse.<Page<TaskUserResponse>>builder()
-                .Result(taskUserService.getAllByTaskTypeName(taskName,pageable))
+                .Result(taskUserService.getAllByTaskTypeName(taskName,warehouseId,pageable))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

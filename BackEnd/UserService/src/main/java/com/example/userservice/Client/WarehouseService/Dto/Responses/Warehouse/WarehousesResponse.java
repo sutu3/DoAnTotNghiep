@@ -1,21 +1,16 @@
 package com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse;
 
-import lombok.Builder;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 
 @Builder
-public record WarehousesResponse(
-        String warehouseId,
-        String warehouseName,
-        String address,
-        String street,
-        String district,
-        String country,
-        String managerId,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        Boolean isDeleted,
-        LocalDateTime deletedAt
-) {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class WarehousesResponse{
+    String warehouseName;
+    String managerId;
 }
