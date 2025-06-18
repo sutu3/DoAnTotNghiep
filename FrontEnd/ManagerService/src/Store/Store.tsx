@@ -1,12 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
+
 import WarehouseSlice from "@/Store/WarehouseSlice.tsx";
 import StackSlice from "@/Store/StackSlice.tsx";
 
 const ThemeReducer = (state = { value: true }, action: any) => {
   switch (action.type) {
-    case 'light':
+    case "light":
       return { value: true };
-    case 'dark':
+    case "dark":
       return { value: false };
     default:
       return state;

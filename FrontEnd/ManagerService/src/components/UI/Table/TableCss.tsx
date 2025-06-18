@@ -1,9 +1,7 @@
-import React, { useMemo } from "react";
-
 interface TableProgs {
   isDarkMode: boolean;
 }
-export const TableClassNames: React.FC<TableProgs> = ({ isDarkMode }) => {
+export const TableClassNames = ({ isDarkMode }: TableProgs) => {
   const baseClasses = {
     wrapper: ["max-h-[382px]", "max-w-3xl", "shadow-md rounded-lg"], // Gộp từ cả hai
     table: "min-w-full",
@@ -58,7 +56,7 @@ export const TableClassNames: React.FC<TableProgs> = ({ isDarkMode }) => {
 };
 
 // Class cho checkboxesProps, có thể cũng thay đổi theo theme
-export const CheckboxPropsThemed: React.FC<TableProgs> = ({ isDarkMode }) => {
+export const CheckboxPropsThemed = ({ isDarkMode }: TableProgs) => {
   if (!isDarkMode) {
     return {
       classNames: {
@@ -75,4 +73,3 @@ export const CheckboxPropsThemed: React.FC<TableProgs> = ({ isDarkMode }) => {
     },
   };
 };
-

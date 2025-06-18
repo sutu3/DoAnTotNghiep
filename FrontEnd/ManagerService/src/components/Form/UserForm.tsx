@@ -1,16 +1,12 @@
 import { Input } from "@heroui/react";
-import {UserCreate} from "@/pages/User/page.tsx";
 
+import { UserCreate } from "@/pages/User/page.tsx";
 
 interface Props {
-    data: UserCreate;
-    onChange: (key:string,value: string) => void;
+  data: UserCreate;
+  onChange: (key: string, value: string) => void;
 }
-const UserForm = ({data,onChange}:Props) => {
-
-
-
-
+const UserForm = ({ data, onChange }: Props) => {
   return (
     <div className="space-y-4">
       <Input
@@ -24,8 +20,8 @@ const UserForm = ({data,onChange}:Props) => {
         onValueChange={(val) => onChange("fullName", val)}
       />
       <Input
-        type="email"
         label="Email"
+        type="email"
         value={data.email}
         onValueChange={(val) => onChange("email", val)}
       />
@@ -34,7 +30,6 @@ const UserForm = ({data,onChange}:Props) => {
         value={data.phoneNumber}
         onValueChange={(val) => onChange("phoneNumber", val)}
       />
-
     </div>
   );
 };

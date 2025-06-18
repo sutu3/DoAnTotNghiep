@@ -4,25 +4,27 @@ import {
   useNavigate,
   useHref,
 } from "react-router-dom";
+import { HeroUIProvider } from "@heroui/system";
+import { Provider } from "react-redux";
+import { ToastProvider } from "@heroui/react";
+
 import LoginPage from "@/pages/LoginPage.tsx";
 import AdminLayout from "@/layouts/AdminLayout.tsx";
 import PageNotFound from "@/pages/PageNotFound.tsx";
 import { CheckAuth } from "@/Utils/CheckAuth.tsx";
 import { ProviderUI } from "@/providerUI.tsx";
-import { HeroUIProvider } from "@heroui/system";
 import Product from "@/pages/Product/Product.tsx";
 import User from "@/pages/User/page.tsx";
-import { Provider } from "react-redux";
 import store from "@/Store/Store.tsx";
 import WarehousePage from "@/pages/Dashboard/page.tsx";
 import StackPage from "@/pages/Stack/page.tsx";
-import {ToastProvider} from "@heroui/react";
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: (
       <HeroUIProviderWrapper>
-        <AdminLayout children={undefined} />
+        <AdminLayout />
       </HeroUIProviderWrapper>
     ),
     loader: CheckAuth,
@@ -31,7 +33,7 @@ const router = createBrowserRouter([
       { path: "admin/products", element: <Product /> },
       { path: "/admin/users", element: <User /> },
       { path: "/admin/", element: <WarehousePage /> },
-      { path: "/admin/tasks", element: <StackPage /> },
+      { path: "/admin/locations", element: <StackPage /> },
     ],
   },
   { path: "/login", element: <LoginPage /> },
@@ -49,7 +51,7 @@ function HeroUIProviderWrapper({ children }: { children: React.ReactNode }) {
     <HeroUIProvider navigate={navigate} useHref={useHrefFn}>
       <ToastProvider />
       <Provider store={store}>
-      <ProviderUI>{children}</ProviderUI>
+        <ProviderUI>{children}</ProviderUI>
       </Provider>
     </HeroUIProvider>
   );

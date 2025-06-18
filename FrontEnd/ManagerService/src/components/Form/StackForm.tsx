@@ -1,16 +1,12 @@
 import { Input } from "@heroui/react";
-import {StackCreate} from "@/Store/StackSlice.tsx";
 
+import { StackCreate } from "@/Store/StackSlice.tsx";
 
 interface Props {
-    data: StackCreate;
-    onChange: (key:string,value: string) => void;
+  data: StackCreate;
+  onChange: (key: string, value: string) => void;
 }
-const StackForm = ({data,onChange}:Props) => {
-
-
-
-
+const StackForm = ({ data, onChange }: Props) => {
   return (
     <div className="space-y-4">
       <Input
@@ -23,7 +19,6 @@ const StackForm = ({data,onChange}:Props) => {
         value={data.description}
         onValueChange={(val) => onChange("description", val)}
       />
-
     </div>
   );
 };

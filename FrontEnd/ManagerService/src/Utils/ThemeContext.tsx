@@ -7,7 +7,9 @@ const ThemeContext = createContext();
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     const storedTheme = localStorage.getItem("theme");
+
     if (storedTheme) return storedTheme; // "light", "dark", or "system"
+
     return "system"; // Default to "system"
   });
 
@@ -19,7 +21,10 @@ export const ThemeProvider = ({ children }) => {
 
     if (theme === "system") {
       // Kiểm tra cài đặt hệ thống
-      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const systemPrefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      ).matches;
+
       root.classList.add(systemPrefersDark ? "dark" : "light");
     } else {
       root.classList.add(theme); // "light" hoặc "dark"
@@ -38,8 +43,10 @@ export const ThemeProvider = ({ children }) => {
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);
+
   if (!context) {
     throw new Error("useTheme must be used within a ThemeProvider");
   }
+
   return context;
 };

@@ -27,14 +27,15 @@ interface TopContentProps {
   filterValue: string;
   setFilterValue: (value: string) => void;
   onSearchChange: (value: string) => void;
-  statusFilter: Set<string>;
-  setStatusFilter: (value: Set<string>) => void;
+  statusFilter: string;
+  setStatusFilter: (value: string) => void;
   visibleColumns: Set<string>;
   setVisibleColumns: (value: Set<string>) => void;
   columns: Column[];
   usersLength: number;
-  onchange: (value: any) => void;
+  onchange?: (value: any) => void;
   onRowsPerPageChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  hasSearchFilter: boolean;
 }
 
 const TopContent: React.FC<TopContentProps> = ({
@@ -46,7 +47,8 @@ const TopContent: React.FC<TopContentProps> = ({
   visibleColumns,
   setVisibleColumns,
   columns,
-  usersLength, onchange,
+  usersLength,
+  onchange,
   onRowsPerPageChange,
 }) => {
   return (
@@ -81,9 +83,13 @@ const TopContent: React.FC<TopContentProps> = ({
               disallowEmptySelection
               aria-label="Table Columns"
               closeOnSelect={false}
-              selectedKeys={statusFilter}
+              selectedKeys={new Set([statusFilter])}
               selectionMode="multiple"
-              onSelectionChange={setStatusFilter}
+              onSelectionChange={(keys) => {
+                const keysArray = Array.from(keys as Set<string>);
+
+                setStatusFilter(keysArray[0] || "all");
+              }}
             >
               {StatusOptions.map((status) => (
                 <DropdownItem key={status.uid} className="capitalize">
@@ -108,7 +114,9 @@ const TopContent: React.FC<TopContentProps> = ({
               closeOnSelect={false}
               selectedKeys={visibleColumns}
               selectionMode="multiple"
-              onSelectionChange={setVisibleColumns}
+              onSelectionChange={(keys) => {
+                setVisibleColumns(new Set(Array.from(keys as Set<string>)));
+              }}
             >
               {columns.map((column) => (
                 <DropdownItem key={column.uid} className="capitalize">
