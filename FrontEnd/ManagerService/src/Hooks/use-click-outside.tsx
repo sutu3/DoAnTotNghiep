@@ -9,7 +9,7 @@ export const useClickOutside = (refs: unknown, callback: unknown) => {
       // Kiểm tra xem tất cả các ref có chứa event target không
       const isOutside = refsArray.every(
         (ref: { current: { contains: (arg0: any) => any } }) =>
-          !ref?.current?.contains(event.target)
+          !ref?.current?.contains(event.target),
       );
 
       if (isOutside && typeof callback === "function") {

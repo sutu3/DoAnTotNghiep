@@ -12,8 +12,8 @@ import java.util.Optional;
 
 @Repository
 public interface TaskTypeRepo extends JpaRepository<TaskType,String>, JpaSpecificationExecutor<TaskType> {
-    Page<TaskType> findAllByIsDeleted(boolean isDeleted, Pageable pageable);
+    Page<TaskType> findAllByIsDeletedAndWarehouses(boolean isDeleted,String warehouse, Pageable pageable);
     boolean existsByTaskName(String name);
-    Optional<TaskType> findByTaskName(String taskName);
+    Optional<TaskType> findByTaskNameAndWarehouses(String taskName,String warehouses);
 
 }

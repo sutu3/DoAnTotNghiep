@@ -5,7 +5,12 @@ import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 const Product = () => {
   const isSidebarCollapsed =
     localStorage.getItem("theme") != "light" ? true : false;
-  const INITIAL_VISIBLE_COLUMNS = ["productName", "skuCode", "status", "actions"];
+  const INITIAL_VISIBLE_COLUMNS = [
+    "productName",
+    "skuCode",
+    "status",
+    "actions",
+  ];
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
@@ -16,7 +21,6 @@ const Product = () => {
           <div>
             <BreadcrumbsUI isDarkMode={isSidebarCollapsed} />
           </div>
-
 
           <div className="sm:text-right">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">
@@ -41,10 +45,17 @@ const Product = () => {
           <div className="p-0 md:p-4">
             <TableUI
               columns={columns}
+              getId={(objects) =>
+                String(objects?.userId || objects?.stackId || objects?.id || "")
+              }
               isDarkMode={isSidebarCollapsed}
               objects={objects}
+              pageNumber={1}
+              pageSize={10}
+              totalPage={1}
               visibleColumn={INITIAL_VISIBLE_COLUMNS}
-              getId={(objects)=>objects?.id}
+              onGetId={() => {}}
+              onPageChange={() => {}}
             />
           </div>
         </div>

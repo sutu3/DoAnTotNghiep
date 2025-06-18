@@ -6,7 +6,7 @@ import lombok.Builder;
 @Builder
 public record TaskTypeRequest(
         String taskName,
-        String description
-
+        String description,
+        String warehouses
 ) {
 }

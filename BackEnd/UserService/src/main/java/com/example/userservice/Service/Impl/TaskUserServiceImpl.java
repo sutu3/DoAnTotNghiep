@@ -48,8 +48,8 @@ public class TaskUserServiceImpl implements TaskUserService {
     }
 
     @Override
-    public Page<TaskUserResponse> getAllByTaskTypeName(String taskName, Pageable pageable) {
-        taskTypeService.getByTaskName(taskName);
+    public Page<TaskUserResponse> getAllByTaskTypeName(String taskName,String warehouseId, Pageable pageable) {
+        taskTypeService.getByTaskName(taskName,warehouseId);
         return taskUserRepo.findAllByTask_TaskType_TaskName(taskName,pageable)
                 .map(taskUserMapper::toResponse);
     }
@@ -63,7 +63,6 @@ public class TaskUserServiceImpl implements TaskUserService {
         taskUser.setIsDeleted(false);
         taskUser.setTask(task);
         taskUser.setUser(user);
-
         return taskUserMapper.toResponse(taskUserRepo.save(taskUser));
     }
 

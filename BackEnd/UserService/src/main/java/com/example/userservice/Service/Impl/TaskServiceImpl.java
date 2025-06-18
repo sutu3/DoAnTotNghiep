@@ -1,5 +1,7 @@
 package com.example.userservice.Service.Impl;
 
+import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
+import com.example.userservice.Client.WarehouseService.WarehouseController;
 import com.example.userservice.Dto.Request.LevelRequest;
 import com.example.userservice.Dto.Request.StatusRequest;
 import com.example.userservice.Dto.Request.TaskRequest;
@@ -24,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,10 +36,17 @@ public class TaskServiceImpl implements TaskService {
     TaskMapper taskMapper;
     TaskRepo taskRepo;
     TaskTypeService taskTypeService;
-
+    WarehouseController warehouseController;
     @Override
-    public Page<TaskResponse> getAll(Pageable pageable) {
-        return taskRepo.findAllByIsDeleted(false, pageable).map(taskMapper::toResponse);
+    public Page<TaskResponse> getAll(Pageable pageable,String warehouseId) {
+        return taskRepo.findAllByIsDeletedAndWarehouses(false,warehouseId, pageable)
+                .map(task->{
+                    TaskResponse taskResponse=taskMapper.toResponse(task);
+                    WarehousesResponse warehouse = warehouseController
+                            .getWarehouse(warehouseId)
+                            .getResult();
+                    return taskMapper.updateWarehouse(taskResponse,warehouse);
+                });
     }
 
     @Override
@@ -47,48 +57,64 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskResponse getByIdToResponse(String id) {
-        return taskMapper.toResponse(getById(id));
+        Tasks tasks= getById(id);
+        WarehousesResponse warehouse = warehouseController
+                .getWarehouse(tasks.getWarehouses()).getResult();
+        return taskMapper.updateWarehouse(taskMapper.toResponse(tasks),warehouse);
     }
 
     @Override
     public TaskResponse createTask(TaskRequest request) {
-        TaskType taskType=taskTypeService.getByTaskName(request.taskType());
+        WarehousesResponse warehouse = warehouseController
+                .getWarehouse(request.warehouses()).getResult();
+        TaskType taskType=taskTypeService.getByTaskName(request.taskType(), request.warehouses());
         Tasks task=taskMapper.toEntity(request);
         task.setIsDeleted(false);
         task.setTaskType(taskType);
         task.setStatus(StatusTaskEnum.Pending);
-        return taskMapper.toResponse(taskRepo.save(task));
+        task.setWarehouses(request.warehouses());
+        taskRepo.save(task);
+        return taskMapper.updateWarehouse(taskMapper.toResponse(task),warehouse);
     }
 
     @Override
     public TaskResponse updateTask(TaskForm update, String id) {
-        Tasks tasks=getById(id);
-        TaskType taskType=taskTypeService.getByTaskName(update.taskType());
-        tasks.setTaskType(taskType);
-        taskMapper.update(tasks,update);
-        return taskMapper.toResponse(taskRepo.save(tasks));
+
+        Tasks task=getById(id);
+        WarehousesResponse warehouse = warehouseController
+                .getWarehouse(task.getWarehouses()).getResult();
+        TaskType taskType=taskTypeService.getByTaskName(update.taskType(),task.getWarehouses());
+        task.setTaskType(taskType);
+        taskMapper.update(task,update);
+        return taskMapper.updateWarehouse(taskMapper.toResponse(task),warehouse);
     }
 
     @Override
     public TaskResponse updateStatus(StatusRequest Status, String id) {
         Tasks task=getById(id);
+        WarehousesResponse warehouse = warehouseController
+                .getWarehouse(task.getWarehouses()).getResult();
         task.setStatus(StatusTaskEnum.valueOf(Status.status()));
-        return taskMapper.toResponse(taskRepo.save(task));
+        return taskMapper.updateWarehouse(taskMapper.toResponse(task),warehouse);
     }
 
     @Override
     public TaskResponse updateLevel(LevelRequest level, String id) {
         Tasks task=getById(id);
+        WarehousesResponse warehouse = warehouseController
+                .getWarehouse(task.getWarehouses()).getResult();
         task.setLevel(LevelEnum.valueOf(level.level()));
-        return taskMapper.toResponse(taskRepo.save(task));
+        return taskMapper.updateWarehouse(taskMapper.toResponse(task),warehouse);
     }
 
     @Override
     public TaskResponse updateCompletedStatus(String id) {
         Tasks task=getById(id);
+        WarehousesResponse warehouse = warehouseController
+                .getWarehouse(task.getWarehouses()).getResult();
         task.setStatus(StatusTaskEnum.Complete);
         task.setCompleteAt(LocalDateTime.now());
-        return taskMapper.toResponse(taskRepo.save(task));
+        return taskMapper.updateWarehouse(taskMapper.toResponse(task),warehouse);
     }
 
     @Override

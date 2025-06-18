@@ -40,7 +40,7 @@ public class UsersServiceImpl implements UserService {
                     UserResponse response = userMapper.toResponse(user);
                     WarehousesResponse warehouse = null;
                     warehouse = warehouseService.getWarehouse(user.getWarehouses()).getResult();
-                    return MapperUserResponse(response, warehouse);
+                    return userMapper.updateWarehouse(response, warehouse);
                 })
                 .collect(Collectors.toList());
     }
@@ -61,18 +61,15 @@ public class UsersServiceImpl implements UserService {
         if (userRepo.existsByPhoneNumberAndEmail(request.phoneNumber(), request.email())) {
             throw new AppException(ErrorCode.USER_EXIST);
         }
-
         WarehousesResponse warehouses= warehouseService.getWarehouse(request.warehouses()).getResult();
-
         Users user = userMapper.toEntity(request);
         user.setStatus(StatusEnum.Active);
         user.setIsDeleted(false);
 
         Users savedUser = userRepo.save(user);
         UserResponse response = userMapper.toResponse(savedUser);
-        return MapperUserResponse(response, warehouses);
+        return userMapper.updateWarehouse(response, warehouses);
     }
-
     @Override
     public String DeletedUser(String id) {
         Users user = findById(id);
@@ -91,19 +88,19 @@ public class UsersServiceImpl implements UserService {
     @Override
     public UserResponse MapperUserResponse(UserResponse response, WarehousesResponse warehousesResponse) {
         return UserResponse.builder()
-                .userId(response.userId())
-                .userName(response.userName())
-                .fullName(response.fullName())
-                .email(response.email())
-                .urlImage(response.urlImage())
-                .phoneNumber(response.phoneNumber())
-                .status(response.status())
-                .taskUsers(response.taskUsers())
+                .userId(response.getUserId())
+                .userName(response.getUserName())
+                .fullName(response.getFullName())
+                .email(response.getEmail())
+                .urlImage(response.getUrlImage())
+                .phoneNumber(response.getPhoneNumber())
+                .status(response.getStatus())
+                .taskUsers(response.getTaskUsers())
                 .warehouses(warehousesResponse)
-                .createdAt(response.createdAt())
-                .updatedAt(response.updatedAt())
-                .isDeleted(response.isDeleted())
-                .deletedAt(response.deletedAt())
+                .createdAt(response.getCreatedAt())
+                .updatedAt(response.getUpdatedAt())
+                .isDeleted(response.getIsDeleted())
+                .deletedAt(response.getDeletedAt())
                 .build();
     }
 }

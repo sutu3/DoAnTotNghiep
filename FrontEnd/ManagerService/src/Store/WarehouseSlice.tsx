@@ -4,10 +4,10 @@ export interface Warehouse {
   warehouseId: string;
   warehouseName: string;
   address: string;
-  street: string,
-  district: string,
-  country: string,
-  managerId: string,
+  street: string;
+  district: string;
+  country: string;
+  managerId: string;
 }
 export interface WarehouseState {
   warehouseList: Warehouse[];
@@ -23,20 +23,16 @@ const initialState: WarehouseState = {
     street: "Cao Lỗ",
     district: "quận 8",
     country: "Thành Phố Hồ Chí Minh",
-    managerId: ""
+    managerId: "",
   },
 };
 const WarehouseSlice = createSlice({
   name: "warehouse",
   initialState,
-  reducers: {
-
-
-
-  },
+  reducers: {},
   extraReducers: (builder) => {
-    builder
-     /* .addCase(DeletePurchaseItem.fulfilled, (state, action) => {
+    builder;
+    /* .addCase(DeletePurchaseItem.fulfilled, (state, action) => {
         const index1 = state.OrderPurchase.findIndex(
           (el) => el.status === "Prepare"
         );
@@ -61,4 +57,5 @@ const WarehouseSlice = createSlice({
       });*/
   },
 });
+
 export default WarehouseSlice;

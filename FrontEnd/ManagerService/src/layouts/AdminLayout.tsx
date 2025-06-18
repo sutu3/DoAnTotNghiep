@@ -11,8 +11,6 @@ import { LayoutProvider, useLayout } from "@/layouts/LayoutContext.tsx";
 // @ts-ignore
 
 const AdminLayoutContent = () => {
-
-
   const { isSidebarCollapsed, setIsSidebarCollapsed } = useLayout();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -26,11 +24,18 @@ const AdminLayoutContent = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 transition-colors dark:bg-slate-950">
-
       <div
+        aria-label="Close sidebar"
         className={`pointer-events-none fixed inset-0 z-40 bg-black opacity-0 transition-opacity md:hidden
                   ${!isSidebarCollapsed && "pointer-events-auto opacity-30"}`}
-        onClick={() => setIsSidebarCollapsed(true)} // Thêm onClick để đóng khi click vào overlay
+        role="button"
+        tabIndex={0}
+        onClick={() => setIsSidebarCollapsed(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            setIsSidebarCollapsed(true);
+          }
+        }}
       />
 
       {/* 1. Thanh Sidebar */}

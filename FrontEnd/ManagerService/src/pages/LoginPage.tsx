@@ -1,12 +1,5 @@
+const LoginPage = () => {
+  return <>LoginPage</>;
+};
 
-
-
-
-const LoginPage=()=> {
-
-    return (
-        <>LoginPage</>
-    )
-}
-
-export default LoginPage
+export default LoginPage;

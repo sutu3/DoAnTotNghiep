@@ -1,12 +1,13 @@
 import { Breadcrumbs, BreadcrumbItem } from "@heroui/react";
 import { useLocation } from "react-router-dom";
+
 import { AdminIcon } from "@/components/UI/Breadcrumbs/IconBreadcrumbs.tsx"; // Giả sử AdminIcon chấp nhận className
 
 interface BreadcrumbsUIProps {
   isDarkMode?: boolean;
 }
 
-const BreadcrumbsUI = ({ isDarkMode }: BreadcrumbsUIProps) => {
+const BreadcrumbsUI = ({ isDarkMode: _isDarkMode }: BreadcrumbsUIProps) => {
   const locationPath = useLocation().pathname; // ví dụ "/dashboard/profile"
   const pathArray = locationPath.split("/").filter((el) => el !== ""); // loại bỏ phần rỗng
 
@@ -26,9 +27,13 @@ const BreadcrumbsUI = ({ isDarkMode }: BreadcrumbsUIProps) => {
     iconColor: "text-sky-400",
   };
 
-  const currentClasses = localStorage.getItem("theme")=="light" ? lightModeClasses : darkModeClasses;
+  const currentClasses =
+    localStorage.getItem("theme") == "light"
+      ? lightModeClasses
+      : darkModeClasses;
 
-  console.log(isDarkMode)
+  // console.log(isDarkMode);
+
   return (
     <Breadcrumbs
       classNames={{
@@ -42,15 +47,14 @@ const BreadcrumbsUI = ({ isDarkMode }: BreadcrumbsUIProps) => {
       variant="solid"
     >
       <BreadcrumbItem href="/">
-
         <AdminIcon
           className={`${currentClasses.iconColor} w-5 h-5 transition-colors duration-300 ease-in-out`}
-
         />
       </BreadcrumbItem>
       {pathArray.map((el, idx) => {
         accumulatedPath += "/" + el;
         const label = el.charAt(0).toUpperCase() + el.slice(1);
+
         return (
           <BreadcrumbItem
             key={accumulatedPath}

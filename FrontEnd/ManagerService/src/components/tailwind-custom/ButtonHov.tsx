@@ -1,16 +1,17 @@
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-const ButtonHov = ({Title = "", classCustom = ""}) => {
-    const navigate=useNavigate();
-    return (
-        <>
-            <button onClick={()=>navigate("/")} className={`btn ${classCustom}`}>
+const ButtonHov = ({ Title = "", classCustom = "" }) => {
+  const navigate = useNavigate();
+
+  return (
+    <>
+      <button className={`btn ${classCustom}`} onClick={() => navigate("/")}>
         <span className={`relative z-10 font-bold `}>
-          { ( Title === "") ? "Shop Now" : Title }
+          {Title === "" ? "Shop Now" : Title}
         </span>
-            </button>
-        </>
-    )
-}
+      </button>
+    </>
+  );
+};
 
-export default ButtonHov
+export default ButtonHov;

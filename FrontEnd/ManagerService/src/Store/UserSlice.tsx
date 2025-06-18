@@ -1,16 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {Warehouse} from "@/types";
-import {user} from "@heroui/theme";
 
-export interface User{
-  userId: string,
-  userName: string,
-  fullName: string,
-  email: string,
-  urlImage: string,
-  phoneNumber: string,
-  status: 'Active'|'InActive',
-  taskUsers: [],
+export interface User {
+  userId: string;
+  userName: string;
+  fullName: string;
+  email: string;
+  urlImage: string;
+  phoneNumber: string;
+  status: "Active" | "InActive";
+  taskUsers: [];
 }
 export interface WarehouseState {
   userList: User[];
@@ -33,14 +31,10 @@ const initialState: WarehouseState = {
 const WarehouseSlice = createSlice({
   name: "warehouse",
   initialState,
-  reducers: {
-
-
-
-  },
+  reducers: {},
   extraReducers: (builder) => {
-    builder
-     /* .addCase(DeletePurchaseItem.fulfilled, (state, action) => {
+    builder;
+    /* .addCase(DeletePurchaseItem.fulfilled, (state, action) => {
         const index1 = state.OrderPurchase.findIndex(
           (el) => el.status === "Prepare"
         );
@@ -65,4 +59,5 @@ const WarehouseSlice = createSlice({
       });*/
   },
 });
+
 export default WarehouseSlice;

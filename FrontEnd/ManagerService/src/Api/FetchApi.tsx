@@ -21,7 +21,7 @@ export const fetchApi = async <T = any>({
         method,
         headers: {
             "Content-Type": "application/json",
-            "redirect": "follow",
+            "credentials": "include",
             ...headers,
         },
     };

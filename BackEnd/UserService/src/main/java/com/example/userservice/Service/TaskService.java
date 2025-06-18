@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface TaskService {
-    Page<TaskResponse> getAll(Pageable pageable);
+    Page<TaskResponse> getAll(Pageable pageable,String warehouse);
     Tasks getById(String id);
     TaskResponse getByIdToResponse(String id);
     TaskResponse createTask(TaskRequest request);
