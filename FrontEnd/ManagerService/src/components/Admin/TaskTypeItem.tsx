@@ -4,10 +4,10 @@ import clsx from "clsx";
 import {getRandomLightColor} from "@/Utils/RandumColor.tsx";
 import {TaskType} from "@/Store/TaskSlice.tsx";
 
-// Renamed from Task to TaskTypeCard for clarity
+// Renamed from TaskType to TaskTypeCard for clarity
 
 interface TaskTypeCardProps {
-    taskType: TaskType; // Task data comes as a prop
+    taskType: TaskType; // TaskType data comes as a prop
     onClick?: (task: TaskType) => void; // Optional click handler if needed for navigation/details
 }
 const TaskTypeCard: React.FC<TaskTypeCardProps> = ({ taskType, onClick }) => {

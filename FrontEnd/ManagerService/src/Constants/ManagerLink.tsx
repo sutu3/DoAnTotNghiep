@@ -65,11 +65,11 @@ export const ManagerLink = [
     ],
   },
   {
-    title: "Task Management",
+    title: "TaskType Management",
     links: [
-      { label: "Create Task Type", icon: Settings, path: "/admin/taskType" },
+      { label: "Create TaskType Type", icon: Settings, path: "/admin/taskType" },
       {
-        label: "Assign Task",
+        label: "Assign TaskType",
         icon: Settings,
         path: "/admin/task-assignments",
       },

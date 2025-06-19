@@ -5,13 +5,14 @@ import StatCardAdmin from "@/components/Admin/StatCardAdmin.tsx";
 import StatFilterAdmin from "@/components/Admin/StatFilterAdmin.tsx";
 import Stack from "@/pages/Stack.tsx";
 import { StacksSelector } from "@/Store/Selector.tsx";
+import CardUI from "@/components/Admin/Dashboard/CardUI.tsx";
 
 export default function WarehousePage() {
   const stacks = useSelector(StacksSelector);
 
   return (
     <div className="min-h-screen  bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="flex gap-4 p-6 rounded-lg">
+      <div className="flex gap-4 p-4 rounded-lg">
         <StatCardAdmin mainValue="3432" subLabel="New Order" />
         <StatCardAdmin mainValue="$532k" rightValue="4125" subLabel="Sales" />
         <StatCardAdmin
@@ -21,6 +22,7 @@ export default function WarehousePage() {
         />
         <StatCardAdmin mainValue="33(23%)" subLabel="Return Customers" />
         <StatFilterAdmin />
+
       </div>
       <div className="flex flex-row gap-2">
         {/* Left: Dashboard layout */}
