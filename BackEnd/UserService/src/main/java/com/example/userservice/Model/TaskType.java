@@ -18,7 +18,7 @@ public class TaskType extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String taskTypeId;
-    @Column(columnDefinition = "VARCHAR(255) COMMENT 'tên của nhiệm vụ'", nullable = false,unique = true)
+    @Column(columnDefinition = "VARCHAR(255) COMMENT 'tên của nhiệm vụ'", nullable = false)
     String taskName;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'mô tả nhiệm vụ'", nullable = false)
     String description;

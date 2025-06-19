@@ -50,6 +50,18 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public Page<TaskResponse> getAllByTaskTypeId(Pageable pageable, String taskTypeId,String warehouseId) {
+        return taskRepo.findAllByIsDeletedAndTaskType_TaskTypeId(false,taskTypeId, pageable)
+                .map(task->{
+                    TaskResponse taskResponse=taskMapper.toResponse(task);
+                    WarehousesResponse warehouse = warehouseController
+                            .getWarehouse(warehouseId)
+                            .getResult();
+                    return taskMapper.updateWarehouse(taskResponse,warehouse);
+                });
+    }
+
+    @Override
     public Tasks getById(String id) {
         return taskRepo.findById(id)
                 .orElseThrow(()->new AppException(ErrorCode.TASK_NOT_FOUND));
