@@ -2,6 +2,8 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import WarehouseSlice from "@/Store/WarehouseSlice.tsx";
 import StackSlice from "@/Store/StackSlice.tsx";
+import TaskTypeSlice from "@/Store/TaskSlice.tsx";
+import {fetchApi} from "@/Api/FetchApi.tsx";
 
 const ThemeReducer = (state = { value: true }, action: any) => {
   switch (action.type) {
@@ -19,7 +21,20 @@ const store = configureStore({
     themeReducer: ThemeReducer,
     warehouse: WarehouseSlice.reducer,
     stack: StackSlice.reducer,
+    taskType: TaskTypeSlice.reducer,
   },
 });
+export const callApiThunk = async (
+    method: "GET" | "POST" | "PUT" | "DELETE",
+    url: string,
+    body?: any,
+    rejectWithValue?: any
+) => {
+  try {
+    return await fetchApi({ method, url, body });
+  } catch (error: any) {
+    return rejectWithValue?.(error.message);
+  }
+};
 
 export default store;

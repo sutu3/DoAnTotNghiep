@@ -6,28 +6,30 @@ interface InputProg {
   label: string;
   placeholder: string;
   type: string;
+  className?: string; // 👈 optional className
 }
+
 const InputUI = ({
-  onChange,
-  defaultValue,
-  label,
-  placeholder,
-  type,
-}: InputProg) => {
+                   onChange,
+                   defaultValue,
+                   label,
+                   placeholder,
+                   type,
+                   className = "max-w-xs", // 👈 default fallback
+                 }: InputProg) => {
   return (
-    <Input
-      isClearable
-      aria-labelledby="Input"
-      className="max-w-xs"
-      defaultValue={defaultValue}
-      label={label}
-      placeholder={placeholder}
-      type={type}
-      variant="bordered"
-      onChange={(e) => onChange(e.target.value)}
-      // eslint-disable-next-line no-console
-      onClear={() => console.log("input cleared")}
-    />
+      <Input
+          isClearable
+          aria-labelledby="Input"
+          className={className} // 👈 apply class
+          defaultValue={defaultValue}
+          label={label}
+          placeholder={placeholder}
+          type={type}
+          variant="bordered"
+          onChange={(e) => onChange(e.target.value)}
+          onClear={() => console.log("input cleared")}
+      />
   );
 };
 
