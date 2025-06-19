@@ -6,6 +6,7 @@ import com.ddd.warehouse.Dto.Response.Warehouse.WarehousesResponse;
 import com.ddd.warehouse.Form.AddressForm;
 import com.ddd.warehouse.Form.WarehousesForm;
 import com.ddd.warehouse.Service.WarehouseService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @Slf4j
+@Tag(name = "Warehouses API", description = "Quản lý kho")
+
 public class WarehouseController {
     private final WarehouseService warehouseService;
 

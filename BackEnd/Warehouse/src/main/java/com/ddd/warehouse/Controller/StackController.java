@@ -6,6 +6,7 @@ import com.ddd.warehouse.Dto.Response.Stack.StackResponse;
 import com.ddd.warehouse.Dto.Response.Warehouse.WarehousesResponse;
 import com.ddd.warehouse.Form.StackForm;
 import com.ddd.warehouse.Service.StackService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @Slf4j
+@Tag(name = "Stacks API", description = "Quản lý dãy hàng trong kho")
+
 public class StackController {
     StackService stackService;
 

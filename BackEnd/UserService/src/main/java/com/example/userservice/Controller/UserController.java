@@ -4,6 +4,7 @@ import com.example.userservice.Dto.Request.UserRequest;
 import com.example.userservice.Dto.Responses.ApiResponse;
 import com.example.userservice.Dto.Responses.User.UserResponse;
 import com.example.userservice.Service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @Slf4j
+@Tag(name = "User API", description = "Quản lý người dùng trong kho")
+
 public class UserController {
     UserService userService;
     @GetMapping

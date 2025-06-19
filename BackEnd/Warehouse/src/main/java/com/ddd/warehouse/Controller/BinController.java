@@ -5,6 +5,7 @@ import com.ddd.warehouse.Dto.Response.ApiResponse;
 import com.ddd.warehouse.Dto.Response.Bin.BinResponse;
 import com.ddd.warehouse.Form.BinForm;
 import com.ddd.warehouse.Service.BinService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @Slf4j
+@Tag(name = "Bins API", description = "Quản lý ô chứa trong kho")
 public class BinController {
     BinService binService;
 
