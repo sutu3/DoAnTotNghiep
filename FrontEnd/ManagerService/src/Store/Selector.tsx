@@ -4,3 +4,5 @@ export const StacksSelector = (state: { stack: { Stacks: any } }) =>
   state.stack.Stacks;
 export const TotalPageStack = (state: { stack: { totalPage: number } }) =>
   state.stack.totalPage;
+export const TaskTypeSelector = (state: { taskType: any }) =>
+    state.taskType.taskTypes;

@@ -67,9 +67,9 @@ export const ManagerLink = [
   {
     title: "Task Management",
     links: [
-      { label: "Create Tasks", icon: Settings, path: "/admin/tasks" },
+      { label: "Create Task Type", icon: Settings, path: "/admin/taskType" },
       {
-        label: "Assign Tasks",
+        label: "Assign Task",
         icon: Settings,
         path: "/admin/task-assignments",
       },

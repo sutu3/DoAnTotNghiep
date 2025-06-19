@@ -7,6 +7,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
     ({ className, type, ...props }, ref) => {
         return (
             <input
+
                 type={type}
                 ref={ref} // Use the forwarded ref
                 data-slot="input" // Keep if needed for specific data attributes

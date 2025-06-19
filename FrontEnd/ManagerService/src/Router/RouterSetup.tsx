@@ -18,6 +18,8 @@ import User from "@/pages/User/page.tsx";
 import store from "@/Store/Store.tsx";
 import WarehousePage from "@/pages/Dashboard/page.tsx";
 import StackPage from "@/pages/Stack/page.tsx";
+import TaskTypeItem from "@/pages/Task/page.tsx";
+import Task from "@/pages/Task/page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -34,7 +36,7 @@ const router = createBrowserRouter([
       { path: "/admin/users", element: <User /> },
       { path: "/admin/", element: <WarehousePage /> },
       { path: "/admin/locations", element: <StackPage /> },
-
+      { path: "/admin/taskType", element: <Task /> },
     ],
   },
   { path: "/login", element: <LoginPage /> },

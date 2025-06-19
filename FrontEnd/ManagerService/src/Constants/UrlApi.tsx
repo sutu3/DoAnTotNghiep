@@ -15,6 +15,10 @@ export const API_ROUTES = {
     bin: {
       addBin: `${BASE_URL}/bins`,
     },
+    task:{
+      search: (params: pageApi, warehouse: string) =>
+          `${BASE_URL}/taskTypes/search/warehouse/${warehouse}?pageNumber=${params.pageNumber}&pageSize=${params.pageSize}`,
+    },
     warehouse: {
       addWarehouse: `${BASE_URL}/warehouse`,
     },

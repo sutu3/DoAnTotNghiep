@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import { showToast } from "@/components/UI/Toast/ToastUI.tsx";
-import { fetchApi } from "@/Api/FetchApi.tsx";
 import { API_ROUTES, pageApi } from "@/Constants/UrlApi.tsx";
+import {callApiThunk} from "@/Store/Store.tsx";
 // Kích thước 1 bin
 export interface Bin {
   binId: string;
@@ -80,36 +80,25 @@ const StackSlice = createSlice({
   },
 });
 export const addStack = createAsyncThunk(
-  "stack/addStack",
-  async (payload: StackCreate, { rejectWithValue }) => {
-    try {
-      return await fetchApi({
-        method: "POST",
-        url: API_ROUTES.warehouse.stack.addStack,
-        body: payload,
-      });
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  },
+    "stack/addStack",
+    async (payload: StackCreate, { rejectWithValue }) =>
+        await callApiThunk("POST", API_ROUTES.warehouse.stack.addStack, payload, rejectWithValue)
 );
 
 export const GetAllStack = createAsyncThunk(
-  "stack/getAllStack", // sửa tên action đúng với mục đích
-  async (
-    { warehouseId, page }: { warehouseId: string; page: pageApi },
-    { rejectWithValue },
-  ) => {
-    try {
-      return await fetchApi({
-        method: "GET",
-        url: API_ROUTES.warehouse.stack.search(page, warehouseId),
-      });
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  },
+    "stack/getAllStack",
+    async (
+        { warehouseId, page }: { warehouseId: string; page: pageApi },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES.warehouse.stack.search(page, warehouseId),
+            undefined,
+            rejectWithValue
+        )
 );
+
 
 const mappedStack = (stackFromApi: StackType): StackType => {
   return {
