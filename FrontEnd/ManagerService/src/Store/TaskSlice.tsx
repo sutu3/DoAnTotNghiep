@@ -53,7 +53,7 @@ export const GetAllTask = createAsyncThunk(
         { warehouseId, page }: { warehouseId: string; page: pageApi },
         { rejectWithValue },
     ) => await
-        callApiThunk("GET",API_ROUTES.warehouse.task.search(page,warehouseId),undefined,rejectWithValue)
+        callApiThunk("GET",API_ROUTES.user.task.search(page,warehouseId),undefined,rejectWithValue)
 );
 export const MiddleGetAllTask = (page: pageApi) => {
     return async function check(dispatch: any, getState: any) {
