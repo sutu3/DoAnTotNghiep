@@ -40,6 +40,21 @@ public class TaskController {
                 .success(true)
                 .build();
     }
+    @GetMapping("/search/warehouse/{warehouseId}/taskType/{taskTypeId}")
+    public ApiResponse<Page<TaskResponse>> getAllByTaskTypeId(
+            @RequestParam("pageNumber") int page,
+            @RequestParam("pageSize") int size,
+            @PathVariable String warehouseId,
+            @PathVariable String taskTypeId
+    ){
+        Pageable pageable= PageRequest.of(page,size);
+        return ApiResponse.<Page<TaskResponse>>builder()
+                .Result(taskService.getAllByTaskTypeId(pageable,taskTypeId,warehouseId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
     @GetMapping("/{id}")
     public ApiResponse<TaskResponse> getById(@PathVariable String id){
         return ApiResponse.<TaskResponse>builder()

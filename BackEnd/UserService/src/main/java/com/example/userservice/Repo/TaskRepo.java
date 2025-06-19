@@ -10,4 +10,5 @@ import java.util.Optional;
 
 public interface TaskRepo extends JpaRepository<Tasks,String>, JpaSpecificationExecutor<Tasks> {
     Page<Tasks> findAllByIsDeletedAndWarehouses(boolean isdeleted, String warehouse, Pageable pageable);
+    Page<Tasks> findAllByIsDeletedAndTaskType_TaskTypeId(boolean isdeleted,String tasktypeId, Pageable pageable);
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface TaskService {
     Page<TaskResponse> getAll(Pageable pageable,String warehouse);
+    Page<TaskResponse> getAllByTaskTypeId(Pageable pageable,String taskTypeId,String warehouseId);
     Tasks getById(String id);
     TaskResponse getByIdToResponse(String id);
     TaskResponse createTask(TaskRequest request);
