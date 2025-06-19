@@ -6,6 +6,7 @@ import com.example.userservice.Dto.Responses.TaskType.TaskTypeResponse;
 import com.example.userservice.Form.TaskTypeForm;
 import com.example.userservice.Repo.TaskTypeRepo;
 import com.example.userservice.Service.TaskTypeService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,12 +21,13 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @Slf4j
+@Tag(name = "TackTypes API", description = "Quản lý Loại Nhiệm vụ trong kho")
 public class TaskTypeController {
 
     TaskTypeRepo taskTypeRepo;
     TaskTypeService taskTypeService;
 
-    @GetMapping("/search/warehouse/{warehouseId}/getALl")
+    @GetMapping("/search/warehouse/{warehouseId}/getAll")
     public ApiResponse<Page<TaskTypeResponse>> getAll(
             @RequestParam("pageNumber") int page,
             @RequestParam("pageSize") int size,

@@ -5,6 +5,7 @@ import com.example.userservice.Dto.Request.TaskUserRequest;
 import com.example.userservice.Dto.Responses.ApiResponse;
 import com.example.userservice.Dto.Responses.TaskUser.TaskUserResponse;
 import com.example.userservice.Service.TaskUserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @Slf4j
+@Tag(name = "TackUser API", description = "Quản lý phân loại Nhiệm vụ cua người dùng trong kho")
+
 public class TaskUserController {
     private final TaskUserService taskUserService;
 
