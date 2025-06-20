@@ -6,13 +6,14 @@ import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
 import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
 import TaskForm from "@/components/Form/TaskForm.tsx";
 import InputTaskType from "@/components/Admin/TaskType/InputTaskType.tsx";
-import {MiddleGetAllTask, TaskType, TaskTypeCreated} from "@/Store/TaskSlice.tsx";
 import {TaskTypeSelector, TotalPageTask} from "@/Store/Selector.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {pageApi} from "@/Constants/UrlApi.tsx";
 import CustomPagination from "@/components/UI/Pagination/PaginationUI.tsx";
 import CardUI from "@/components/Admin/Dashboard/CardUI.tsx";
 import {useNavigate} from "react-router-dom";
+import {MiddleAddTaskType, MiddleGetAllTaskType, TaskType, TaskTypeCreated} from "@/Store/TaskTypeSlice.tsx";
+import {MiddleAddStack} from "@/Store/StackSlice.tsx";
 
 const taskTypeStats = [
     {
@@ -56,7 +57,7 @@ const AdminTaskPage = () => {
     useEffect(() => {
         const PageApi: pageApi = { pageNumber: page - 1, pageSize: 8 };
         const fetchData = async () => {
-            (dispatch as any)(MiddleGetAllTask(PageApi));
+            (dispatch as any)(MiddleGetAllTaskType(PageApi));
         };
 
         fetchData();
@@ -69,10 +70,17 @@ const AdminTaskPage = () => {
     const TaskTypeList: TaskType[] = useSelector(TaskTypeSelector);
     const totalPage = useSelector(TotalPageTask);
 
-    const handleAddTask = () => {
-        setIsOpen(!isOpen);
+    const handleAddTaskType = async () => {
+        await (dispatch as any)(MiddleAddTaskType(formData));
+        setIsOpen(false);
+        setFormData({ taskName: "", description: "", warehouses: "" });
+
     };
 
+    const handleOpen = () => {
+        setIsOpen(!isOpen);
+
+    };
     const isSidebarCollapsed = localStorage.getItem("theme") !== "light";
 
     const handleCardClick = (task: TaskType) => {
@@ -102,7 +110,7 @@ const AdminTaskPage = () => {
                     type="text"
                 />
                 <button
-                    onClick={handleAddTask}
+                    onClick={handleOpen}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition"
                 >
                     <Plus size={20} />
@@ -143,7 +151,7 @@ const AdminTaskPage = () => {
                         label="Add Tasks"
                         loading={false}
                         startContent={<Plus size={18} />}
-                        onClick={() => console.log("")}
+                        onClick={handleAddTaskType}
                     />
                 }
                 isOpen={isOpen}

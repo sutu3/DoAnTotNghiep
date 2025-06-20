@@ -10,3 +10,6 @@ export const TotalPageTask = (state: { taskType: { totalPage: number } }) =>
     state.taskType.totalPage;
 export const TaskTypeSelector = (state: { taskType: any }) =>
     state.taskType.taskTypes;
+
+export const TaskSelector = (state: { tasks: any }) =>
+    state.tasks.tasks;
