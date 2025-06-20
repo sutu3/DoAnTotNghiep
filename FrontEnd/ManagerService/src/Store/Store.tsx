@@ -2,8 +2,9 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import WarehouseSlice from "@/Store/WarehouseSlice.tsx";
 import StackSlice from "@/Store/StackSlice.tsx";
-import TaskTypeSlice from "@/Store/TaskSlice.tsx";
 import {fetchApi} from "@/Api/FetchApi.tsx";
+import TaskTypeSlice from "@/Store/TaskTypeSlice.tsx";
+import TaskSlice from "@/Store/TaskSlice.tsx";
 
 const ThemeReducer = (state = { value: true }, action: any) => {
   switch (action.type) {
@@ -22,6 +23,7 @@ const store = configureStore({
     warehouse: WarehouseSlice.reducer,
     stack: StackSlice.reducer,
     taskType: TaskTypeSlice.reducer,
+    tasks: TaskSlice.reducer,
   },
 });
 export const callApiThunk = async (

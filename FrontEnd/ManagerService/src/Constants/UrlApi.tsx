@@ -21,9 +21,18 @@ export const API_ROUTES = {
     },
   },
   user: {
-    task: {
-      search: (params: pageApi, warehouse: string) =>
-          `${BASE_URL_User}/taskTypes/search/warehouse/${warehouse}/getAll?pageNumber=${params.pageNumber}&pageSize=${params.pageSize}`,
+    taskType: {
+      addTaskType:`${BASE_URL_User}/taskTypes`,
+      search: (params: pageApi, warehouse: string) => ({
+        GetAll: `${BASE_URL_User}/taskTypes/search/warehouse/${warehouse}/getAll?pageNumber=${params.pageNumber}&pageSize=${params.pageSize}`,
+      }),
     },
-  }
+    task: {
+      search: (params: pageApi, warehouse:string) => ({
+        GetAll: {
+          ByIdTaskType:(taskTypeId: string) => `${BASE_URL_User}/tasks/search/warehouse/${warehouse}/taskType/${taskTypeId}?pageNumber=${params.pageNumber}&pageSize=${params.pageSize}`,
+        }
+      }),
+    },
+  },
 };

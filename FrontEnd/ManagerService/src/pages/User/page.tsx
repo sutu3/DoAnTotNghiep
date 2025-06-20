@@ -32,7 +32,7 @@ const User = () => {
   const handleChange = (key: string, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
-  const isSidebarCollapsed = localStorage.getItem("theme") != "light";
+  const isSidebarCollapsed = localStorage.getItem("theme") == "light";
   const INITIAL_VISIBLE_COLUMNS = [
     "userName",
     "fullName",

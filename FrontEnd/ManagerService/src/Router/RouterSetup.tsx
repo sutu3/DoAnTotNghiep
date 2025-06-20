@@ -18,9 +18,7 @@ import User from "@/pages/User/page.tsx";
 import store from "@/Store/Store.tsx";
 import WarehousePage from "@/pages/Dashboard/page.tsx";
 import StackPage from "@/pages/Stack/page.tsx";
-import TaskTypeItem from "@/pages/TaskType/page.tsx";
 import Task from "@/pages/TaskType/page.tsx";
-import ComponentChart from "@/components/UI/CircelChart/CirelUI.tsx";
 import TasksPage from "@/pages/TaskType/Tasks/page.tsx";
 
 const router = createBrowserRouter([

@@ -14,6 +14,8 @@ import TopContent from "@/components/UI/Table/TopContent.tsx";
 import { TableClassNames } from "@/components/UI/Table/TableCss.tsx";
 import { User } from "@/types";
 import { StackType } from "@/Store/StackSlice.tsx";
+import {TaskType} from "@/Store/TaskTypeSlice.tsx";
+import {Task} from "@/Store/TaskSlice.tsx";
 
 interface DataObject {
   id: number | string;
@@ -29,10 +31,10 @@ interface Column {
 interface TableProductProps {
   isDarkMode: boolean;
   visibleColumn: string[];
-  objects: DataObject[] | User[] | StackType[];
+  objects: DataObject[] | User[] | StackType[]|Task[];
   columns: Column[];
   onGetId: (item: string) => void;
-  getId: (item: DataObject | User | StackType) => string;
+  getId: (item: DataObject | User | StackType|Task) => string;
   onchange?: (data: any) => void;
   pageNumber: number;
   pageSize: number;
@@ -82,7 +84,7 @@ const TableUI: React.FC<TableProductProps> = ({
     );
   }, [visibleColumns, columns]);
 
-  const tableClassNames = TableClassNames({ isDarkMode });
+   const tableClassNames = TableClassNames({ isDarkMode });
 
   const onRowsPerPageChange = React.useCallback(
     (_e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -99,6 +101,7 @@ const TableUI: React.FC<TableProductProps> = ({
 
   return (
     <Table
+
       isCompact
       removeWrapper
       aria-label="Custom table with cells, pagination and sorting"
@@ -155,7 +158,7 @@ const TableUI: React.FC<TableProductProps> = ({
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody emptyContent="No data found" items={objects}>
+      <TableBody className={"bg-white dark:bg-gray-900 text-gray-800 dark:text-white"} emptyContent="No data found" items={objects}>
         {(item) => {
           return (
             <TableRow key={getId(item)}>

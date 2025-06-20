@@ -1,17 +1,61 @@
 import TableUI from "@/components/UI/Table/TableUI.tsx";
-import { columns, objects } from "@/Data/Product/Data.tsx";
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
+import {useEffect, useState} from "react";
+import {pageApi} from "@/Constants/UrlApi.tsx";
+import {useDispatch, useSelector} from "react-redux";
+import {columns, MiddleGetAllTask, Task, TaskCreated} from "@/Store/TaskSlice.tsx";
+import { useSearchParams} from "react-router-dom";
+import {TaskSelector} from "@/Store/Selector.tsx";
+import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
+import {Layers} from "lucide-react";
+import StackForm from "@/components/Form/StackForm.tsx";
+import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
 
 const TasksPage = () => {
+    const Task:Task[]=useSelector(TaskSelector);
+    const dispatch = useDispatch();
+    const [searchParams]=useSearchParams()
+    const idTaskType=searchParams.get("idTaskType");
     const isSidebarCollapsed =
-        localStorage.getItem("theme") != "light" ? true : false;
+        localStorage.getItem("theme") == "light" ? true : false;
     const INITIAL_VISIBLE_COLUMNS = [
-        "productName",
-        "skuCode",
-        "status",
+        "taskType",
+        "description",
+        "statusTask",
+        "completeAt",
+        "warehouseName",
+        "taskUsers",
+        "level",
         "actions",
     ];
+    const [page, setPage] = useState(1);
+    const [isOpen,setIsOpen]=useState(false);
+    const [formData,setFormData]=useState<TaskCreated>({
+        description:"",
+        taskType:"",
+        level:"",
+        completeAt: ""
+    });
+    const handleChange = (key: string, value: string) => {
+        setFormData((prev) => ({...prev, [key]: value}));
+    };
+    const handleGetIdTask = (taskId: string) => {
+        console.log(taskId);
+    }
+    const handleOpenModel=()=>{
+        setIsOpen(!isOpen);
+    }
+    const handleAddStack=()=>{
 
+    }
+    useEffect(() => {
+        const PageApi: pageApi = { pageNumber: page - 1, pageSize: 8 };
+        const fetchData = async () => {
+            (dispatch as any)(MiddleGetAllTask(PageApi,idTaskType));
+        };
+
+        fetchData();
+    }, [page]);
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">
@@ -34,32 +78,43 @@ const TasksPage = () => {
 
                 {/* 4. Phần Nội dung - TableUI trong một "card" */}
                 <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden">
-                    {/*<div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                        <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
-                            Product List
-                        </h2>
-                         Bạn có thể thêm các nút hành động khác cho bảng ở đây nếu cần,
-                         ví dụ như nút "Add New" nếu nó không phải là một phần của TableUI
-                    </div>*/}
-
                     <div className="p-0 md:p-4">
                         <TableUI
                             columns={columns}
                             getId={(objects) =>
-                                String(objects?.userId || objects?.stackId || objects?.id || "")
+                                String(objects?.userId || objects?.stackId || objects?.id || ""||objects?.taskId)
                             }
                             isDarkMode={isSidebarCollapsed}
-                            objects={objects}
+                            objects={Task}
                             pageNumber={1}
+                            onchange={handleOpenModel}
                             pageSize={10}
                             totalPage={1}
                             visibleColumn={INITIAL_VISIBLE_COLUMNS}
-                            onGetId={() => {}}
+                            onGetId={(taskId) => {handleGetIdTask(taskId)}}
                             onPageChange={() => {}}
                         />
                     </div>
                 </div>
             </div>
+            <ModalUI
+                footer={
+                    <ButtonUI
+                        className={
+                            "bg-gradient-to-tr from-green-500 to-green-300 text-green-100 shadow-lg"
+                        }
+                        label={"Add Stack"}
+                        loading={false}
+                        startContent={<Layers />}
+                        onClick={handleAddStack}
+                    />
+                }
+                isOpen={isOpen}
+                title="Thêm Mới nhân viên"
+                onOpenChange={setIsOpen}
+            >
+                <StackForm data={formData} onChange={handleChange} />
+            </ModalUI>
         </div>
     );
 };
