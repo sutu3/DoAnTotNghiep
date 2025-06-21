@@ -12,7 +12,7 @@ import java.util.List;
 
 @Service
 public interface UserService {
-    List<UserResponse> getAll();
+    Page<UserResponse> getAllByWarehouseId(String warehouseId,Pageable pageable);
     Page<UserResponse> getAllUserByUserName(String userName, Pageable pageable);
     UserResponse CreateUser(UserRequest request);
     UserResponse MapperUserResponse(UserResponse response, WarehousesResponse warehousesResponse);

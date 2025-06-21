@@ -14,6 +14,6 @@ import java.util.Optional;
 public interface UserRepo extends JpaRepository<Users,String>, JpaSpecificationExecutor<Users> {
     Page<Users> findByUserName(String s,Pageable pageable);
     boolean existsByPhoneNumberAndEmail(String phoneNumber, String email);
-
+    Page<Users> findByWarehouses(String warehouseId, Pageable pageable);
 }
 
