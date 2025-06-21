@@ -47,7 +47,6 @@ export const VerticalDotsIcon: React.FC<IconProps> = ({
 }) => {
   return (
     <svg
-      aria-hidden="true"
       fill="none"
       focusable="false"
       height={size || height}
@@ -69,7 +68,6 @@ export const SearchIcon = (
 ) => {
   return (
     <svg
-      aria-hidden="true"
       fill="none"
       focusable="false"
       height="1em"
@@ -99,7 +97,6 @@ export const SearchIcon = (
 export const ChevronDownIcon = ({ strokeWidth = 1.5, ...otherProps }) => {
   return (
     <svg
-      aria-hidden="true"
       fill="none"
       focusable="false"
       height="1em"

@@ -31,8 +31,9 @@ export const API_ROUTES = {
       search: (params: pageApi, warehouse:string) => ({
         GetAll: {
           ByIdTaskType:(taskTypeId: string) => `${BASE_URL_User}/tasks/search/warehouse/${warehouse}/taskType/${taskTypeId}?pageNumber=${params.pageNumber}&pageSize=${params.pageSize}`,
-        }
+        },
       }),
+      addTask: `${BASE_URL_User}/tasks`,
     },
   },
 };

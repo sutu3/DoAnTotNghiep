@@ -3,19 +3,26 @@ import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 import {useEffect, useState} from "react";
 import {pageApi} from "@/Constants/UrlApi.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {columns, MiddleGetAllTask, Task, TaskCreated} from "@/Store/TaskSlice.tsx";
+import {columns, MiddleAddTask, MiddleGetAllTask, Task, TaskCreated} from "@/Store/TaskSlice.tsx";
 import { useSearchParams} from "react-router-dom";
-import {TaskSelector} from "@/Store/Selector.tsx";
+import {TaskSelector, TaskTypeSelector} from "@/Store/Selector.tsx";
 import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
 import {Layers} from "lucide-react";
 import StackForm from "@/components/Form/StackForm.tsx";
 import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
+import TaskForm from "@/components/Form/TaskForm.tsx";
+import {MiddleAddStack} from "@/Store/StackSlice.tsx";
+import {TaskType} from "@/Store/TaskTypeSlice.tsx";
 
 const TasksPage = () => {
     const Task:Task[]=useSelector(TaskSelector);
     const dispatch = useDispatch();
     const [searchParams]=useSearchParams()
-    const idTaskType=searchParams.get("idTaskType");
+    const idTaskType = searchParams.get("idTaskType");
+    const allTaskTypes: TaskType[] = useSelector(TaskTypeSelector);
+    const taskTypeInfo = allTaskTypes?.find(
+        (t: TaskType) => t.taskTypeId === idTaskType
+    );
     const isSidebarCollapsed =
         localStorage.getItem("theme") == "light" ? true : false;
     const INITIAL_VISIBLE_COLUMNS = [
@@ -32,6 +39,7 @@ const TasksPage = () => {
     const [isOpen,setIsOpen]=useState(false);
     const [formData,setFormData]=useState<TaskCreated>({
         description:"",
+        warehouse:"",
         taskType:"",
         level:"",
         completeAt: ""
@@ -45,8 +53,16 @@ const TasksPage = () => {
     const handleOpenModel=()=>{
         setIsOpen(!isOpen);
     }
-    const handleAddStack=()=>{
-
+    const handleAddStack=async ()=>{
+          await (dispatch as any)(MiddleAddTask({...formData,taskType:taskTypeInfo?.taskName}));
+        setIsOpen(false);
+        setFormData({
+            warehouse:"",
+            taskType: "",
+            description:"",
+            level:"",
+            completeAt:""
+        })
     }
     useEffect(() => {
         const PageApi: pageApi = { pageNumber: page - 1, pageSize: 8 };
@@ -98,22 +114,23 @@ const TasksPage = () => {
                 </div>
             </div>
             <ModalUI
+                size={"2xl"}
                 footer={
                     <ButtonUI
                         className={
                             "bg-gradient-to-tr from-green-500 to-green-300 text-green-100 shadow-lg"
                         }
-                        label={"Add Stack"}
+                        label={"Add Task"}
                         loading={false}
                         startContent={<Layers />}
                         onClick={handleAddStack}
                     />
                 }
                 isOpen={isOpen}
-                title="Thêm Mới nhân viên"
+                title="Thêm Mới Nhiệm vu"
                 onOpenChange={setIsOpen}
             >
-                <StackForm data={formData} onChange={handleChange} />
+                <TaskForm taskType={taskTypeInfo} data={formData} onChange={handleChange} />
             </ModalUI>
         </div>
     );

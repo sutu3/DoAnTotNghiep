@@ -18,6 +18,7 @@ interface ModalUIProps {
   children?: React.ReactNode; // ModalBody content
   footer?: React.ReactNode; // ModalFooter content
   draggable?: boolean;
+  size?: "sm" | "md" | "lg"|"xl"|"2xl"|"3xl";
 }
 
 const ModalUI: React.FC<ModalUIProps> = ({
@@ -27,6 +28,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
                                            children,
                                            footer,
                                            draggable = true, // Default to true
+    size = "md",
                                          }) => {
   const disclosure = useDisclosure();
   // Determine if the modal state is controlled externally
@@ -53,6 +55,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
         This component typically handles overlay (backdrop) and positioning
       */}
         <Modal
+            size={size}
             ref={targetRef} // Pass ref to the modal element for dragging
             // Customizing backdrop styling
             classNames={{
