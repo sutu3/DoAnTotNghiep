@@ -35,7 +35,7 @@ export interface TaskCreated {
     level: string; // Enum nếu backend cố định giá trị
     description: string;
     completeAt: string;
-    warehouse:string,
+    warehouses:string,
 }
 interface TaskState  {
     tasks: Task[],
@@ -61,6 +61,10 @@ const TaskSlice = createSlice({
                 const result: Task[] = (action.payload as any)?.result?.content;
                 state.tasks=result;
             })
+            .addCase(AddTask.fulfilled, (state, action) => {
+                const result: Task = (action.payload as any)?.result;
+                state.tasks=[...state.tasks,result];
+            })
 
     },
 });
@@ -82,10 +86,13 @@ export const AddTask=createAsyncThunk(
 export const MiddleAddTask = ( CreateTask:TaskCreated ) => {
     return async function check(dispatch: any,getState:any) {
         try {
-            console.log(CreateTask)
             const { warehouse } = getState().warehouse;
             const warehouseId = warehouse?.warehouseId;
-            const action = await dispatch(AddTask({payload: {...CreateTask,warehouse:warehouseId}}));
+            console.log(warehouseId)
+            console.log({...CreateTask,warehouses:warehouseId})
+
+            const action = await dispatch(AddTask({payload: {...CreateTask,warehouses:warehouseId}}));
+
             dispatch(
                 TaskSlice.actions.initToTalPage(action.payload.result.totalPages),
             );
