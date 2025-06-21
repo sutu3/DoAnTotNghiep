@@ -4,7 +4,6 @@ import TaskTypeCard from "@/components/Admin/TaskTypeItem.tsx";
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
 import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
-import TaskForm from "@/components/Form/TaskForm.tsx";
 import InputTaskType from "@/components/Admin/TaskType/InputTaskType.tsx";
 import {TaskTypeSelector, TotalPageTask} from "@/Store/Selector.tsx";
 import {useDispatch, useSelector} from "react-redux";
@@ -13,7 +12,7 @@ import CustomPagination from "@/components/UI/Pagination/PaginationUI.tsx";
 import CardUI from "@/components/Admin/Dashboard/CardUI.tsx";
 import {useNavigate} from "react-router-dom";
 import {MiddleAddTaskType, MiddleGetAllTaskType, TaskType, TaskTypeCreated} from "@/Store/TaskTypeSlice.tsx";
-import {MiddleAddStack} from "@/Store/StackSlice.tsx";
+import TaskTypeForm from "@/components/Form/TaskTypeForm.tsx";
 
 const taskTypeStats = [
     {
@@ -158,7 +157,7 @@ const AdminTaskPage = () => {
                 title="Thêm Loại Nhiệm vụ"
                 onOpenChange={setIsOpen}
             >
-                <TaskForm data={formData} onChange={handleChange} />
+                <TaskTypeForm data={formData} onChange={handleChange} />
             </ModalUI>
         </div>
     );

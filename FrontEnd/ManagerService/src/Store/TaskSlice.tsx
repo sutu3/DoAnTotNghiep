@@ -31,10 +31,11 @@ export interface Task {
     completeAt: string; // ISO date string
 }
 export interface TaskCreated {
-    taskType: "";
-    level: "Low" | "Medium" | "Hight" | string; // Enum nếu backend cố định giá trị
+    taskType: string|undefined;
+    level: string; // Enum nếu backend cố định giá trị
     description: string;
     completeAt: string;
+    warehouse:string,
 }
 interface TaskState  {
     tasks: Task[],
@@ -64,13 +65,39 @@ const TaskSlice = createSlice({
     },
 });
 export const GetAllTask = createAsyncThunk(
-    "stack/getAllTask", // sửa tên action đúng với mục đích
+    "task/getAllTask", // sửa tên action đúng với mục đích
     async (
         { warehouseId, page,taskTypeId }: { warehouseId: string; page: pageApi,taskTypeId: string },
         { rejectWithValue },
     ) => await
         callApiThunk("GET",API_ROUTES.user.task.search(page,warehouseId).GetAll.ByIdTaskType(taskTypeId),undefined,rejectWithValue)
 );
+export const AddTask=createAsyncThunk(
+    "task/AddTask",
+    async (
+        {payload}: { payload: TaskCreated },{rejectWithValue},
+    )=>await
+        callApiThunk("POST",API_ROUTES.user.task.addTask,payload,rejectWithValue)
+);
+export const MiddleAddTask = ( CreateTask:TaskCreated ) => {
+    return async function check(dispatch: any,getState:any) {
+        try {
+            console.log(CreateTask)
+            const { warehouse } = getState().warehouse;
+            const warehouseId = warehouse?.warehouseId;
+            const action = await dispatch(AddTask({payload: {...CreateTask,warehouse:warehouseId}}));
+            dispatch(
+                TaskSlice.actions.initToTalPage(action.payload.result.totalPages),
+            );
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+}
 export const MiddleGetAllTask = (page: pageApi, taskTypeId: string | null) => {
     return async function check(dispatch: any, getState: any) {
         try {
