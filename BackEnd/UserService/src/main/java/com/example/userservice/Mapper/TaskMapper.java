@@ -13,6 +13,7 @@ import org.mapstruct.MappingTarget;
 public interface TaskMapper {
     @Mapping(target = "taskType",ignore = true)
     @Mapping(target = "warehouses",ignore = true)
+    @Mapping(source = "completeAt", target = "completeAt", qualifiedByName = "mapToLocalDateTime")
     Tasks toEntity(TaskRequest request);
     @Mapping(target = "warehouses",ignore = true)
     TaskResponse toResponse(Tasks task);
