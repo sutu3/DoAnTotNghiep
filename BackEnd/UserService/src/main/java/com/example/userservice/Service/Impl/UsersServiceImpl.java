@@ -34,15 +34,15 @@ public class UsersServiceImpl implements UserService {
     WarehouseController warehouseService; // Sử dụng Feign Client đúng chức năng
 
     @Override
-    public List<UserResponse> getAll() {
-        return userRepo.findAll().stream()
+    public Page<UserResponse> getAllByWarehouseId(String warehouseId,Pageable pageable) {
+        return userRepo.findByWarehouses(warehouseId,pageable)
                 .map(user -> {
                     UserResponse response = userMapper.toResponse(user);
                     WarehousesResponse warehouse = null;
                     warehouse = warehouseService.getWarehouse(user.getWarehouses()).getResult();
-                    return userMapper.updateWarehouse(response, warehouse);
+                    return MapperUserResponse(response, warehouse);
                 })
-                .collect(Collectors.toList());
+                ;
     }
 
     @Override

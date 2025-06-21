@@ -25,10 +25,15 @@ import java.util.List;
 
 public class UserController {
     UserService userService;
-    @GetMapping
-    public ApiResponse<List<UserResponse>> getAll(){
-        return ApiResponse.<List<UserResponse>>builder()
-                .Result(userService.getAll())
+    @GetMapping("/search/warehouses/{warehouseId}")
+    public ApiResponse<Page<UserResponse>> getAll(
+            @PathVariable String warehouseId,
+            @RequestParam("pageNumber") int page,
+            @RequestParam("pageSize") int size
+    ){
+        Pageable pageable= PageRequest.of(page,size);
+        return ApiResponse.<Page<UserResponse>>builder()
+                .Result(userService.getAllByWarehouseId(warehouseId,pageable))
                 .message("SuccessFull")
                 .success(true)
                 .code(0)
