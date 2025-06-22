@@ -18,6 +18,7 @@ const StackForm = ({ data, onChange }: Props) => {
         label="Description"
         value={data.description}
         onValueChange={(val) => onChange("description", val)}
+
       />
     </div>
   );
