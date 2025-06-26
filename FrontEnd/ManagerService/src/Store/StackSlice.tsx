@@ -82,7 +82,10 @@ const StackSlice = createSlice({
 export const addStack = createAsyncThunk(
     "stack/addStack",
     async (payload: StackCreate, { rejectWithValue }) =>
-        await callApiThunk("POST", API_ROUTES.warehouse.stack.addStack, payload, rejectWithValue)
+        await callApiThunk("POST", API_ROUTES
+            .warehouse
+            .stacks(null)
+            .addStacks, payload, rejectWithValue)
 );
 
 export const GetAllStack = createAsyncThunk(
@@ -93,7 +96,12 @@ export const GetAllStack = createAsyncThunk(
     ) =>
         await callApiThunk(
             "GET",
-            API_ROUTES.warehouse.stack.search(page, warehouseId),
+            API_ROUTES
+                .warehouse
+                .stacks(page)
+                .search
+                .byWarehouseId( warehouseId)
+                .getAll,
             undefined,
             rejectWithValue
         )

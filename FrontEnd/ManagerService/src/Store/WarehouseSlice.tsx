@@ -54,6 +54,9 @@ const WarehouseSlice = createSlice({
           "orderPurchase",
           JSON.stringify(state.OrderPurchase)
         );
+        https://doantotnghiep-pb6y.onrender.com/api/taskTypes/search/warehouse/cd42ab93-f2d7-476e-912e-d3c4efe25e73/getAll?pageNumber=0&pageSize=8
+        https://userservice-kuug.onrender.com/api/taskTypes/search/warehouse/cd42ab93-f2d7-476e-912e-d3c4efe25e73/getAll?pageNumber=0&pageSize=8
+
       });*/
   },
 });
