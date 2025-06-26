@@ -5,6 +5,7 @@ import StackSlice from "@/Store/StackSlice.tsx";
 import {fetchApi} from "@/Api/FetchApi.tsx";
 import TaskTypeSlice from "@/Store/TaskTypeSlice.tsx";
 import TaskSlice from "@/Store/TaskSlice.tsx";
+import UserSlice from "@/Store/UserSlice.tsx";
 
 const ThemeReducer = (state = { value: true }, action: any) => {
   switch (action.type) {
@@ -23,6 +24,7 @@ const store = configureStore({
     warehouse: WarehouseSlice.reducer,
     stack: StackSlice.reducer,
     taskType: TaskTypeSlice.reducer,
+    users: UserSlice.reducer,
     tasks: TaskSlice.reducer,
   },
 });

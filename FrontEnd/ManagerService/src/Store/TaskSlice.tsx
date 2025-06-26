@@ -74,23 +74,29 @@ export const GetAllTask = createAsyncThunk(
         { warehouseId, page,taskTypeId }: { warehouseId: string; page: pageApi,taskTypeId: string },
         { rejectWithValue },
     ) => await
-        callApiThunk("GET",API_ROUTES.user.task.search(page,warehouseId).GetAll.ByIdTaskType(taskTypeId),undefined,rejectWithValue)
+        callApiThunk("GET",API_ROUTES
+            .user
+            .tasks(page)
+            .search
+            .byWarehouseId(warehouseId)
+            .byIdTaskType(taskTypeId)
+            .getAll,undefined,rejectWithValue)
 );
 export const AddTask=createAsyncThunk(
     "task/AddTask",
     async (
         {payload}: { payload: TaskCreated },{rejectWithValue},
     )=>await
-        callApiThunk("POST",API_ROUTES.user.task.addTask,payload,rejectWithValue)
+        callApiThunk("POST",API_ROUTES
+            .user
+            .tasks(null)
+            .addTask,payload,rejectWithValue)
 );
 export const MiddleAddTask = ( CreateTask:TaskCreated ) => {
     return async function check(dispatch: any,getState:any) {
         try {
             const { warehouse } = getState().warehouse;
             const warehouseId = warehouse?.warehouseId;
-            console.log(warehouseId)
-            console.log({...CreateTask,warehouses:warehouseId})
-
             const action = await dispatch(AddTask({payload: {...CreateTask,warehouses:warehouseId}}));
 
             dispatch(
@@ -105,7 +111,7 @@ export const MiddleAddTask = ( CreateTask:TaskCreated ) => {
         }
     };
 }
-export const MiddleGetAllTask = (page: pageApi, taskTypeId: string | null) => {
+export const MiddleGetAllTask = (page: pageApi, taskTypeId: string ) => {
     return async function check(dispatch: any, getState: any) {
         try {
             const { warehouse } = getState().warehouse;

@@ -1,5 +1,16 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice} from "@reduxjs/toolkit";
 
+
+export const columns = [
+  { name: "ID", uid: "userId", sortable: true },
+  { name: "Username", uid: "userName", sortable: true },
+  { name: "Full Name", uid: "fullName", sortable: true },
+  { name: "Email", uid: "email", sortable: true },
+  { name: "Phone", uid: "phoneNumber", sortable: false },
+  { name: "Warehouse", uid: "warehouseName", sortable: false },
+  { name: "Status", uid: "status", sortable: true },
+  { name: "Actions", uid: "actions" },
+];
 export interface User {
   userId: string;
   userName: string;
@@ -10,13 +21,23 @@ export interface User {
   status: "Active" | "InActive";
   taskUsers: [];
 }
-export interface WarehouseState {
+export interface UserCreate {
+  userName: string;
+  fullName: string;
+  email: string;
+  urlImage: string;
+  phoneNumber: string;
+  warehouses: string;
+}
+export interface UserState {
   userList: User[];
+  totalPage: 0,
   user: User;
 }
 
-const initialState: WarehouseState = {
+const initialState:UserState = {
   userList: [],
+  totalPage:0,
   user: {
     userId: "",
     userName: "",
@@ -28,36 +49,17 @@ const initialState: WarehouseState = {
     taskUsers: [],
   },
 };
-const WarehouseSlice = createSlice({
-  name: "warehouse",
+const UserSlice = createSlice({
+  name: "user",
   initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder;
-    /* .addCase(DeletePurchaseItem.fulfilled, (state, action) => {
-        const index1 = state.OrderPurchase.findIndex(
-          (el) => el.status === "Prepare"
-        );
-        if (index1 !== -1) {
-          state.OrderPurchase = state.OrderPurchase.map((el, index) =>
-            index === index1
-              ? {
-                  ...el,
-                  purchaseorderitem: state.OrderPurchase[
-                    index
-                  ].purchaseorderitem.filter(
-                    (el1) => el1.purchase_order_items_id != action.payload
-                  ),
-                }
-              : el
-          );
-        }
-        localStorage.setItem(
-          "orderPurchase",
-          JSON.stringify(state.OrderPurchase)
-        );
-      });*/
+  reducers: {
+    initToTalPage: (state, action) => {
+      state.totalPage = action.payload || 0;
+    },
+    setUserList: (state, action) => {
+      state.userList = action.payload;
+    },
   },
 });
-
-export default WarehouseSlice;
+export const { initToTalPage,setUserList } = UserSlice.actions;
+export default UserSlice;

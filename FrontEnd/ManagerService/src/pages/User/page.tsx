@@ -1,25 +1,26 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { IdCard } from "lucide-react";
 
 import TableUI from "@/components/UI/Table/TableUI.tsx";
-import { columns, objects } from "@/Data/User/Data.tsx";
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
 import UserForm from "@/components/Form/UserForm.tsx";
 import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
+import {useDispatch, useSelector} from "react-redux";
+import {columns} from "@/Store/UserSlice.tsx";
+import { TotalPageUser, UserSelector} from "@/Store/Selector.tsx";
+import {pageApi} from "@/Constants/UrlApi.tsx";
+import {MiddleGetAllUser} from "@/Store/Thunk/UserThunk.tsx";
 
-export interface UserCreate {
-  userName: string;
-  fullName: string;
-  email: string;
-  urlImage: string;
-  phoneNumber: string;
-  warehouses: string;
-}
+
 
 const User = () => {
   // console.log(useSelector(warehouse));
   const [isOpen, setIsOpen] = useState(false);
+  const totalPageStack = useSelector(TotalPageUser);
+  const [page, setPage] = useState(1);
+  const objects=useSelector(UserSelector);
+  const dispatch = useDispatch();
   // const [idShow, setIdShow] = useState<String>("");
   const [formData, setFormData] = useState({
     userName: "",
@@ -38,7 +39,7 @@ const User = () => {
     "fullName",
     "email",
     "phoneNumber",
-    "",
+    "warehouseName",
     "status",
     "actions",
   ];
@@ -49,7 +50,14 @@ const User = () => {
     // setIdShow(data); // Commented out since idShow is not used
     // console.log("Selected ID:", data);
   };
+  useEffect(() => {
+    const PageApi: pageApi = { pageNumber: page - 1, pageSize:  5 };
 
+    const fetch=async ()=>{
+      (dispatch as any)(MiddleGetAllUser(PageApi));
+    }
+    fetch();
+  },[page])
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
@@ -87,7 +95,7 @@ const User = () => {
               onchange={handleOpenModel}
               pageNumber={1}
               pageSize={10}
-              totalPage={1}
+              totalPage={totalPageStack}
               visibleColumn={INITIAL_VISIBLE_COLUMNS}
               onGetId={(item) => handleOnGetId(item)}
               onPageChange={() => {}}
@@ -98,16 +106,22 @@ const User = () => {
       <ModalUI
         footer={
           <ButtonUI
-            className={
-              "bg-gradient-to-tr from-green-500 to-green-300 text-green-100 shadow-lg"
-            }
-            label={"Add Employee"}
-            loading={false}
-            startContent={<IdCard />}
+              className="relative z-0 font-medium text-black px-5 py-2 rounded-full overflow-hidden
+             border border-transparent
+             before:content-[''] before:absolute before:inset-0 before:rounded-full
+             before:border before:border-transparent before:bg-gradient-to-r
+             before:from-pink-500 before:to-purple-500
+             before:z-[-1]"
+              label="Add new"
+              loading={false}
+              startContent={<IdCard />}
           />
+
+
         }
+        size={"2xl"}
         isOpen={isOpen}
-        title="Thêm Mới nhân viên"
+        title="User From"
         onOpenChange={setIsOpen}
       >
         <UserForm data={formData} onChange={handleChange} />

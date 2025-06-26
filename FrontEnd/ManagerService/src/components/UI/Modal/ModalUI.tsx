@@ -48,12 +48,8 @@ const ModalUI: React.FC<ModalUIProps> = ({
   });
 
   return (
-      // Fragment wrapper is okay here as Modal component handles its own portal/rendering
       <>
-        {/*
-        The actual Modal component from @heroui/react (or NextUI/other library)
-        This component typically handles overlay (backdrop) and positioning
-      */}
+
         <Modal
             size={size}
             ref={targetRef} // Pass ref to the modal element for dragging
@@ -66,29 +62,25 @@ const ModalUI: React.FC<ModalUIProps> = ({
             // Potentially add `isDismissable={false}` if you don't want to close on outside click/esc
         >
           {/* Modal content area - styled container */}
-          <ModalContent
-              className="relative rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transform transition-all duration-300 ease-out opacity-100 translate-y-0 sm:scale-100" // Added transformative animation classes (adjust duration/ease)
-          >
+            <ModalContent
+                className="rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg"
+            >
             {/* Function as children pattern provided by NextUI ModalContent */}
             {(onClose) => (
                 <>
                   {/* Modal Header - Drag Handle */}
-                  <ModalHeader
-                      {...moveProps} // Apply drag properties to header
-                      // Styling for the header
-                      className="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-sky-400 via-fuchsia-500 to-violet-600 text-white rounded-t-2xl cursor-grab active:cursor-grabbing" // Changed gradient, ensured justify-between/items-center, added cursor styles
+                    <ModalHeader
+                        {...moveProps}
+                        className="flex items-center px-5 py-3 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white font-semibold text-lg border-b border-gray-200 dark:border-gray-700 cursor-move"
                   >
-                    <h3 className="text-xl font-bold text-shadow-md">{title}</h3> {/* Larger title, added text-shadow class (requires plugin or custom style) */}
-                    {/* You might add a close button here if the modal library doesn't include one or if you want a custom one */}
-                    {/*
-                 <Button isIconOnly variant="light" size="sm" onPress={onClose} className="text-white/70 hover:text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                 </Button>
-                 */}
+                      <div className="text-center">
+                          <h1 className="text-3xl font-bold">{title} 👋</h1>
+                      </div>
+
                   </ModalHeader>
 
                   {/* Modal Body - Content Area */}
-                  <ModalBody className="px-6 py-6 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 overflow-y-auto max-h-[60vh]"> {/* Increased vertical padding, added overflow-y and max-height */}
+                    <ModalBody className="px-5 py-5 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 overflow-y-auto max-h-[60vh]"> {/* Increased vertical padding, added overflow-y and max-height */}
                     {children} {/* Render passed-in children */}
                   </ModalBody>
 
