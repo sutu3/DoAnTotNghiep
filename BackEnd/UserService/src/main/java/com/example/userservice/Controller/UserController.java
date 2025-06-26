@@ -70,4 +70,13 @@ public class UserController {
                 .code(0)
                 .build();
     }
+    @GetMapping("/{id}")
+    public ApiResponse<UserResponse> getById(@PathVariable String id){
+        return ApiResponse.<UserResponse>builder()
+                .Result(userService.getByUserId(id))
+                .message("SuccessFull")
+                .success(true)
+                .code(0)
+                .build();
+    }
 }

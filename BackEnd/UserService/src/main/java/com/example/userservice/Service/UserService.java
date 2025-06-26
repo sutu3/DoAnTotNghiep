@@ -18,4 +18,5 @@ public interface UserService {
     UserResponse MapperUserResponse(UserResponse response, WarehousesResponse warehousesResponse);
     String DeletedUser(String id);
     Users findById(String id);
+    UserResponse getByUserId(String id);
 }
