@@ -23,3 +23,9 @@ export interface User {
   taskUsers: [];
   warehouses: Warehouse;
 }
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  result: T;
+  code:number,
+}
