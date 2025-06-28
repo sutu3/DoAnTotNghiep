@@ -6,17 +6,14 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CategoryResponse {
+public class CategoryResponseNoList {
     String categoryId;
     String categoryName;
     String description;
-    WarehousesResponse warehouses;
-    UserResponse createByUser;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 }
