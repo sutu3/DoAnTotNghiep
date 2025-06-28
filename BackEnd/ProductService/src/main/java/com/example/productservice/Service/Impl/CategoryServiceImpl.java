@@ -32,7 +32,7 @@ public class CategoryServiceImpl implements CategoryService {
     CategoryRepo categoryRepo;
     CategoryMapper categoryMapper;
     WarehouseController warehouseController;
-    private final UserController userController;
+    UserController userController;
 
     @Override
     public Page<CategoryResponse> getAllByWarehouseId(Pageable pageable, String warehouses) {
@@ -42,10 +42,12 @@ public class CategoryServiceImpl implements CategoryService {
                             .getWarehouse(category.getWarehouses())
                             .getResult();
                    UserResponse userResponse= userController
-                           .getUser(category.getCategoryId())
+                           .getUser(category.getCreateByUser())
                            .getResult();
                     CategoryResponse categoryResponse = categoryMapper.toResponse(category);
-                    return categoryMapper.updateWarehouse(categoryResponse, warehousesResponse,userResponse);
+                    return categoryMapper.updateCreateByUser(
+                            categoryMapper.updateWarehouse(categoryResponse, warehousesResponse)
+                            ,userResponse);
                 });
     }
 
@@ -65,7 +67,9 @@ public class CategoryServiceImpl implements CategoryService {
         UserResponse userResponse= userController
                 .getUser(category.getCreateByUser())
                 .getResult();
-        return categoryMapper.updateWarehouse(categoryResponse,warehouse,userResponse);
+        return categoryMapper.updateCreateByUser(
+                categoryMapper.updateWarehouse(categoryResponse, warehouse)
+                ,userResponse);
     }
 
     @Override
@@ -86,12 +90,16 @@ public class CategoryServiceImpl implements CategoryService {
             category.setIsDeleted(false);
             category.setDescription(request.description());
             CategoryResponse categoryResponse=categoryMapper.toResponse(categoryRepo.save(category));
-            return categoryMapper.updateWarehouse(categoryResponse,warehouse,userResponse);
+            return categoryMapper.updateCreateByUser(
+                    categoryMapper.updateWarehouse(categoryResponse, warehouse)
+                    ,userResponse);
         }
         Category category=categoryMapper.toEntity(request);
         category.setIsDeleted(false);
         CategoryResponse categoryResponse=categoryMapper.toResponse(categoryRepo.save(category));
-        return categoryMapper.updateWarehouse(categoryResponse,warehouse,userResponse);
+        return categoryMapper.updateCreateByUser(
+                categoryMapper.updateWarehouse(categoryResponse, warehouse)
+                ,userResponse);
     }
 
     @Override
@@ -119,7 +127,9 @@ public class CategoryServiceImpl implements CategoryService {
                 .getResult();
         CategoryResponse categoryResponse=categoryMapper
                 .toResponse(category);
-        return categoryMapper.updateWarehouse(categoryResponse,warehousesResponse,userResponse);
+        return  categoryMapper.updateCreateByUser(
+                categoryMapper.updateWarehouse(categoryResponse, warehousesResponse)
+                ,userResponse);
     }
 
     @Override
@@ -133,7 +143,9 @@ public class CategoryServiceImpl implements CategoryService {
         WarehousesResponse warehousesResponse=warehouseController
                 .getWarehouse(category.getWarehouses())
                 .getResult();
-        CategoryResponse categoryResponse=categoryMapper.toResponse(category);
-        return categoryMapper.updateWarehouse(categoryResponse,warehousesResponse,userResponse);
+        CategoryResponse categoryResponse=categoryMapper.toResponse(categoryRepo.save(category));
+        return  categoryMapper.updateCreateByUser(
+                categoryMapper.updateWarehouse(categoryResponse, warehousesResponse)
+                ,userResponse);
     }
 }

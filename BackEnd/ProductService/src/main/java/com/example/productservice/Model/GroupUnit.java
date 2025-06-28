@@ -1,5 +1,6 @@
 package com.example.productservice.Model;
 
+import com.example.productservice.Enum.UnitType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,18 +17,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Category extends BaseEntity {
+public class GroupUnit extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String categoryId;
-    @Column(columnDefinition = "VARCHAR(100) COMMENT 'Ten cua the loai'", nullable = false)
-    String categoryName;
-    @Column(columnDefinition = "TEXT COMMENT 'Mo ta the loai'", nullable = false)
+    String groupUnitID;
+    @Column(columnDefinition = "VARCHAR(100) COMMENT 'Ten cua group đơn vị'", nullable = false)
+    String groupName;
+    @Column(columnDefinition = "VARCHAR(100) COMMENT 'Mô ta cua group đơn vị'", nullable = false)
     String description;
-    @Column(columnDefinition = "VARCHAR(36) COMMENT 'mã id của warehouse của từng category'",nullable = false)
-    String warehouses;
+    @Column(columnDefinition = "Float COMMENT 'Tỷ lệ quy đổi'", nullable = false)
+    Float baseUnitRatio;
+    @Enumerated(EnumType.STRING)
+    UnitType unitType;
     @Column(columnDefinition = "VARCHAR(36) COMMENT 'mã id của user đã tạo'",nullable = false)
     String createByUser;
-    @OneToMany(mappedBy="category")
-    List<Product> products;
+    @OneToMany(mappedBy="groupUnit")
+    List<Unit> units;
 }
