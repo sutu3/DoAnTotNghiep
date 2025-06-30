@@ -149,9 +149,8 @@ const AdminTaskPage = () => {
                         className="bg-gradient-to-tr from-green-500 to-emerald-400 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-200 hover:from-green-600 hover:to-emerald-500 active:scale-95 px-6 py-3 rounded-xl text-sm flex items-center gap-2"
                         label="Add Tasks"
                         loading={false}
-                        startContent={<Plus size={18} />}
-                        onClick={handleAddTaskType}
-                    />
+                        startContent={<Plus size={18}/>}
+                        onClick={handleAddTaskType} variant={undefined}                    />
                 }
                 isOpen={isOpen}
                 title="Thêm Loại Nhiệm vụ"

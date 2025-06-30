@@ -8,12 +8,24 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Progress,
+    Tooltip,
   User,
 } from "@heroui/react"; // Assuming @heroui/react maps to your actual UI library (e.g., NextUI)
 
 import { VerticalDotsIcon } from "@/components/UI/Table/IconTable.tsx";
 import { formatVND } from "@/Utils/FormatVND.tsx";
-import {CheckCircle, Clock, Loader2, XCircle} from "lucide-react";
+import {
+    CheckCircle,
+    Clock, DeleteIcon,
+    Droplet,
+    EditIcon,
+    EyeIcon,
+    Loader2,
+    PackageCheck,
+    Ruler,
+    Weight,
+    XCircle
+} from "lucide-react";
 const statusIconMap: Record<string, JSX.Element> = {
     Pending: <Clock className="w-4 h-4 text-warning" />,
     In_Progress: <Loader2 className="w-4 h-4 animate-spin text-primary" />,
@@ -26,6 +38,12 @@ const statusStyleMap: Record<string, string> = {
     In_Progress: "bg-primary/10 text-primary",
     Complete: "bg-success/10 text-success",
     Cancel: "bg-danger/10 text-danger",
+};
+const unitTypeIconMap: Record<string, JSX.Element> = {
+    Quantity: <PackageCheck className="w-4 h-4 text-success" />,
+    Length: <Ruler className="w-4 h-4 text-primary" />,
+    Volume: <Droplet className="w-4 h-4 text-blue-500" />,
+    Weight: <Weight className="w-4 h-4 text-warning" />,
 };
 
 
@@ -92,9 +110,41 @@ const RenderCell = (object: any, columnKey: string) => {
             year: "numeric",
           })
           : "N/A";
+      case "unitType":
+          return (
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-800 dark:text-white">
+                  {unitTypeIconMap[cellValue] || <span className="text-default-400">•</span>}
+                  <span>{cellValue ?? "N/A"}</span>
+              </div>
+          );
+      case "createdAt":
+          return (
+              <div className="inline-flex flex-col text-start leading-tight">
+      <span className="text-sm font-medium text-gray-800 dark:text-white">
+        {object?.createdAt
+            ? new Date(object.createdAt).toLocaleDateString("vi-VN", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+            })
+            : "N/A"}
+      </span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+        {object?.createdAt
+            ? new Date(object.createdAt).toLocaleTimeString("vi-VN", {
+                hour: "2-digit",
+                minute: "2-digit",
+            })
+            : ""}
+      </span>
+              </div>
+          );
 
+      case "createByUser": // Consolidated the duplicate warehouseName case
+          return <span className="text-blue-400">{object?.createByUser?.userName ?? "N/A"}</span>;
     case "warehouseName": // Consolidated the duplicate warehouseName case
       return <span className={"text-blue-400"}>{object?.warehouses?.warehouseName ?? "N/A"}</span>;
+
 
     case "taskUsers":
       return (
@@ -166,17 +216,26 @@ const RenderCell = (object: any, columnKey: string) => {
     case "price":
       return <span>{cellValue ? formatVND(Number(cellValue)) : formatVND(0)}</span>;
 
-    case "status": // Assuming this is for a different status field than statusTask
-      return (
-          <Chip
-              className="capitalize border-none gap-1 text-gray-800 dark:text-white"
-              color={statusColorMap[cellValue] || "default"}
-              size="sm"
-              variant="dot"
-          >
-            {cellValue ?? "N/A"}
-          </Chip>
-      );
+      case "action":
+          return (
+              <div className="relative flex items-center gap-2">
+                  <Tooltip content="Details">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                <EyeIcon />
+              </span>
+                  </Tooltip>
+                  <Tooltip content="Edit user">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                <EditIcon />
+              </span>
+                  </Tooltip>
+                  <Tooltip color="danger" content="Delete user">
+              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                <DeleteIcon />
+              </span>
+                  </Tooltip>
+              </div>
+          );
 
     case "statusStack": // This seems specific, likely stack status based on bin count
       const stackStatus = object.bin?.length === 12 ? "danger" : "success"; // Color based on fullness
