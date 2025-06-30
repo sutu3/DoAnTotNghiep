@@ -39,7 +39,7 @@ const initialState:UserState = {
   userList: [],
   totalPage:0,
   user: {
-    userId: "",
+    userId: "3126d2f9-3810-44d3-8714-a6870855681d",
     userName: "",
     fullName: "",
     email: "",

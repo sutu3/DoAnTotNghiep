@@ -1,6 +1,6 @@
 const BASE_URL_Warehouse = "https://doantotnghiep-pb6y.onrender.com/api";
 const BASE_URL_User = "https://userservice-kuug.onrender.com/api";
-
+const BASE_URL_Product = "https://productservice-8qdv.onrender.com/api";
 export interface pageApi {
   pageNumber: number;
   pageSize: number;
@@ -34,6 +34,49 @@ export const API_ROUTES = {
         addWarehouse: base,
       };
     },
+  },
+  product:{
+    category:(page: pageApi | null) => {
+      const base = `${BASE_URL_Product}/categories`;
+      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      return{
+        addCategory: base,
+        search:(()=>{
+          const search=base+"/search"
+          return{
+            byWarehouseId: (warehouseId: string) => ({
+              getAll: `${search}/warehouseId/${warehouseId}${pageUrl}`,
+            })
+          }
+        })
+      }
+    },
+    unit:(page: pageApi | null) => {
+      const base = `${BASE_URL_Product}/units`;
+      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+    return{
+      getAll: base+pageUrl,
+      addUnit: base,
+      search:(()=>{
+        const searchUrl = `${base}/search`;
+        return {
+          unitGroupName:((groupName: string) => {
+            const GroupUnitName=searchUrl+"/groupUnitName/"+groupName;
+            return{
+              GetAll:GroupUnitName+pageUrl,
+            }
+          })
+        }
+      })
+    }
+    },
+    GroupUnit:(page: pageApi | null) => {
+      const base = `${BASE_URL_Product}/groupUnits`;
+      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      return{
+        GetAll: base+pageUrl,
+      }
+    }
   },
 user:{
   users: (page: pageApi | null) => {

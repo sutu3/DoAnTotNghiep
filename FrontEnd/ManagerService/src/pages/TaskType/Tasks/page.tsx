@@ -8,10 +8,8 @@ import { useSearchParams} from "react-router-dom";
 import {TaskSelector, TaskTypeSelector} from "@/Store/Selector.tsx";
 import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
 import {Layers} from "lucide-react";
-import StackForm from "@/components/Form/StackForm.tsx";
 import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
 import TaskForm from "@/components/Form/TaskForm.tsx";
-import {MiddleAddStack} from "@/Store/StackSlice.tsx";
 import {TaskType} from "@/Store/TaskTypeSlice.tsx";
 
 const TasksPage = () => {
@@ -39,7 +37,7 @@ const TasksPage = () => {
     const [isOpen,setIsOpen]=useState(false);
     const [formData,setFormData]=useState<TaskCreated>({
         description:"",
-        warehouse:"",
+        warehouses:"",
         taskType:"",
         level:"",
         completeAt: ""
@@ -57,7 +55,7 @@ const TasksPage = () => {
           await (dispatch as any)(MiddleAddTask({...formData,taskType:taskTypeInfo?.taskName}));
         setIsOpen(false);
         setFormData({
-            warehouse:"",
+            warehouses: "",
             taskType: "",
             description:"",
             level:"",
@@ -71,7 +69,7 @@ const TasksPage = () => {
         };
 
         fetchData();
-    }, [page]);
+    }, [page,idTaskType]);
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">
@@ -117,14 +115,11 @@ const TasksPage = () => {
                 size={"2xl"}
                 footer={
                     <ButtonUI
-                        className={
-                            "bg-gradient-to-tr from-green-500 to-green-300 text-green-100 shadow-lg"
-                        }
+                        className={"bg-gradient-to-tr from-green-500 to-green-300 text-green-100 shadow-lg"}
                         label={"Add Task"}
                         loading={false}
-                        startContent={<Layers />}
-                        onClick={handleAddStack}
-                    />
+                        startContent={<Layers/>}
+                        onClick={handleAddStack} variant={undefined}                    />
                 }
                 isOpen={isOpen}
                 title="Thêm Mới Nhiệm vu"
