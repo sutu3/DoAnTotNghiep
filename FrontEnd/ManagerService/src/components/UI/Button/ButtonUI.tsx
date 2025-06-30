@@ -7,6 +7,8 @@ interface ButtonProps {
   endContent?: React.ReactNode;
   startContent?: React.ReactNode;
   className?: string;
+  variant:"solid" | "bordered" | "light" | "flat" | "faded" | "shadow" | "ghost" | undefined
+  color?:"danger" | "default" | "primary" | "secondary" | "success" | "warning" | undefined
 }
 const ButtonUI = ({
   label,
@@ -15,6 +17,8 @@ const ButtonUI = ({
   endContent,
   startContent,
   className,
+                    color="danger",
+                    variant="solid",
 }: ButtonProps) => {
   return (
     <Button
@@ -22,7 +26,9 @@ const ButtonUI = ({
       className={className}
       endContent={endContent}
       isLoading={loading}
-      radius="lg"
+      radius="md"
+      variant={variant}
+      color={color}
       startContent={startContent}
       onPress={onClick}
     >

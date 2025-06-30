@@ -6,6 +6,9 @@ import {fetchApi} from "@/Api/FetchApi.tsx";
 import TaskTypeSlice from "@/Store/TaskTypeSlice.tsx";
 import TaskSlice from "@/Store/TaskSlice.tsx";
 import UserSlice from "@/Store/UserSlice.tsx";
+import GroupUnit from "@/Store/GroupUnit.tsx";
+import UnitSlice from "@/Store/Unit.tsx";
+import CategorySlice from "@/Store/CategorySlice.tsx";
 
 const ThemeReducer = (state = { value: true }, action: any) => {
   switch (action.type) {
@@ -26,6 +29,9 @@ const store = configureStore({
     taskType: TaskTypeSlice.reducer,
     users: UserSlice.reducer,
     tasks: TaskSlice.reducer,
+    groupUnit:GroupUnit.reducer,
+    unit:UnitSlice.reducer,
+    category:CategorySlice.reducer,
   },
 });
 export const callApiThunk = async (
