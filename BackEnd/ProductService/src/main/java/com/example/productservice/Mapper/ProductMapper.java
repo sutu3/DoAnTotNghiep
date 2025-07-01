@@ -1,5 +1,6 @@
 package com.example.productservice.Mapper;
 
+import com.example.productservice.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.productservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.productservice.Dto.Requests.ProductRequest;
@@ -17,6 +18,7 @@ public interface ProductMapper {
     Product toEntity(ProductRequest request);
     @Mapping(target = "createByUser",ignore = true)
     @Mapping(target = "warehouses",ignore = true)
+    @Mapping(target = "supplier",ignore = true)
     ProductResponse toResponse(Product product);
     ProductResponse updateWarehouse(
             @MappingTarget ProductResponse productResponse,
@@ -24,6 +26,10 @@ public interface ProductMapper {
     ProductResponse updateCreateByUser(
             @MappingTarget ProductResponse productResponse,
             UserResponse createByUser);
+    ProductResponse updateSupplier(
+            @MappingTarget ProductResponse productResponse,
+            SupplierResponse supplier
+    );
     @Mapping(target = "unit",ignore = true)
     @Mapping(target = "category",ignore = true)
     void updateResquest(@MappingTarget Product product,ProductRequest request);

@@ -1,5 +1,6 @@
 package com.example.productservice.Dto.Responses.Product;
 
+import com.example.productservice.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.productservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.productservice.Dto.Responses.Category.CategoryResponseNoList;
@@ -26,7 +27,7 @@ public class ProductResponse{
     String description;
     String urlImageProduct;
     BigDecimal price;
-    String supplier;
+    SupplierResponse supplier;
     WarehousesResponse warehouses;
     UserResponse createByUser;
     Boolean isActive;

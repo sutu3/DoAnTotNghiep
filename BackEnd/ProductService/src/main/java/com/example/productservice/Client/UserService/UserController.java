@@ -1,5 +1,6 @@
 package com.example.productservice.Client.UserService;
 
+import com.example.productservice.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.productservice.Client.UserService.Fallbacks.UserServiceFallback;
 import com.example.productservice.Dto.Responses.ApiResponse;
@@ -14,5 +15,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface UserController {
     @GetMapping("/users/{id}")
     ApiResponse<UserResponse> getUser(@PathVariable String id);
-
-}
+    @GetMapping("/suppliers/{id}")
+    ApiResponse<SupplierResponse> getSupplier(@PathVariable String id);}
