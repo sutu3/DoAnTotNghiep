@@ -10,11 +10,11 @@ import java.util.Map;
 @Configuration
 public class CloundinaryConfig {
     @Bean
-    public Cloudinary cloudinaryConfig() {
+    public Cloudinary cloudinary(CloudinaryProperties properties) {
         Map<String, String> config = new HashMap<>();
-        config.put("cloud_name", "dclib4xzd");
-        config.put("api_key", "726942689373288");
-        config.put("api_secret", "mMV8mQaatgJAppzRh-z0_BroibE");
+        config.put("cloud_name", properties.getCloudName());
+        config.put("api_key", properties.getApiKey());
+        config.put("api_secret", properties.getApiSecret());
         return new Cloudinary(config);
     }
 }
