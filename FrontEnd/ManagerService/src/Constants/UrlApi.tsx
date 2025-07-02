@@ -79,6 +79,7 @@ export const API_ROUTES = {
       search:(()=>{
         const searchUrl = `${base}/search`;
         return {
+          unitName:`${searchUrl}/UnitNames`,
           unitGroupName:((groupName: string) => {
             const GroupUnitName=searchUrl+"/groupUnitName/"+groupName;
             return{
@@ -108,6 +109,7 @@ export const API_ROUTES = {
           return {
             byWarehouseId: (warehouseId: string) => ({
               getAll: `${searchUrl}/byWarehouseId/${warehouseId}${pageUrl}`,
+              getAllName: `${searchUrl}/byWarehouseId/${warehouseId}/SuppliersName`,
             }),
           }
         })
