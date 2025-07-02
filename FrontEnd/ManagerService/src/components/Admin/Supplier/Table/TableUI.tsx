@@ -14,14 +14,11 @@ import {
     TableHeader,
     TableRow,
 } from "@heroui/react";
-import {ChevronDownIcon, PlusIcon, SearchIcon} from "lucide-react";
-import {useDispatch, useSelector} from "react-redux";
-import { UnitSelector} from "@/Store/Selector.tsx";
-import {useNavigate, useSearchParams} from "react-router-dom";
-import {pageApi} from "@/Constants/UrlApi.tsx";
-import {MiddleGetAllUnit} from "@/Store/Thunk/UnitThunk.tsx";
-import {columns, Unit} from "@/Store/Unit.tsx";
-import RenderTable, {Props} from "@/components/Admin/UnitType/Table/RenderTable.tsx";
+import {ChevronDownIcon, SearchIcon} from "lucide-react";
+import {useSelector} from "react-redux";
+import { SupplierSelector} from "@/Store/Selector.tsx";
+import {columns, Supplier} from "@/Store/SupplierSlice.tsx";
+import RenderTable, {Props} from "@/components/Admin/Supplier/Table/RenderTable.tsx";
 
 
 export const statusOptions = [
@@ -35,12 +32,13 @@ export function capitalize(s: string) {
     return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
 }
 
+
 const INITIAL_VISIBLE_COLUMNS = [
-    "unitName",
-    "shortName",
-    "ratioToBase",
-    "isDefault",
-    "groupUnit",
+    "groupUnitID",
+    "groupName",
+    "description",
+    "baseUnitRatio",
+    "unitType",
     "createByUser",
     "actions",
     "createdAt","action"
@@ -50,8 +48,7 @@ interface Pros{
     open: boolean;
 }
 const TableUI=({setOpen,open}:Pros)=> {
-    const navigate = useNavigate();
-    const object = useSelector(UnitSelector);
+    const object = useSelector(SupplierSelector);
     const [event, setEvent] = useState("");
     const [filterValue, setFilterValue] = React.useState("");
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
@@ -63,23 +60,19 @@ const TableUI=({setOpen,open}:Pros)=> {
         direction: "ascending",
     });
     const [page, setPage] = React.useState(1);
-    const dispatch = useDispatch();
-    const [searchParams]=useSearchParams()
-    const groupUnitName = searchParams.get("groupUnitName")||"";
     useEffect(() => {
-        const PageApi: pageApi = { pageNumber: page - 1, pageSize: 8 };
-        const fetchData = async () => {
-            (dispatch as any)(MiddleGetAllUnit(PageApi,groupUnitName));
-        };
-
-        if(groupUnitName!=""){
-            fetchData();
+        if(event=="Detail") {
         }
-    }, [groupUnitName]);
-    const handleDetail=(id: string) => {
-        navigate(`/admin/unitType?id=${id}`)
+    }, [event]);
+    const handleDetail=(supplierId:string) => {
+        console.log(supplierId);
+        // Detail của supplier
     }
+    const handleDelete=(supplierId:string) => {
+        console.log(supplierId);
 
+        // Delete của supplier
+    }
     const pages = Math.ceil(object.length / rowsPerPage);
 
     const hasSearchFilter = Boolean(filterValue);
@@ -95,7 +88,7 @@ const TableUI=({setOpen,open}:Pros)=> {
 
         if (hasSearchFilter) {
             filteredobject = filteredobject.filter((object) =>
-                object.unitName.toLowerCase().includes(filterValue.toLowerCase()),
+                object.supplierName.toLowerCase().includes(filterValue.toLowerCase()),
             );
         }
         if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
@@ -130,7 +123,7 @@ const TableUI=({setOpen,open}:Pros)=> {
         setPage(1);
     }, []);
 
-    const onSearchChange = React.useCallback((value: React.SetStateAction<string>) => {
+    const onSearchChange = React.useCallback((value) => {
         if (value) {
             setFilterValue(value);
             setPage(1);
@@ -208,12 +201,7 @@ const TableUI=({setOpen,open}:Pros)=> {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-                        <Button onClick={()=>{
-                            console.log("hehehehhehehe")
-                            setOpen(!open)
-                        }}           aria-labelledby="Button" className="bg-foreground text-background" endContent={<PlusIcon/>} size="sm">
-                            Add New gggg
-                        </Button>
+
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
@@ -313,18 +301,17 @@ const TableUI=({setOpen,open}:Pros)=> {
                     </TableColumn>
                 )}
             </TableHeader>
-            <TableBody className={"bg-white dark:bg-gray-900 text-gray-800 dark:text-white"} emptyContent={"No object found"} items={sortedItems}>
-                {(item: Unit) => (
-                    <TableRow key={item.unitID}>
+            <TableBody emptyContent={"No object found"} items={sortedItems}>
+                {(item: Supplier) => (
+                    <TableRow key={item.supplierId}>
                         {(columnKey) => <TableCell>
                             {RenderTable({
-                                unitID: item.unitID,
-                                item,
-                                columnKey,
-                                open,
-                                setEvent,
+                               item,
                                 setOpen,
-                                handleDetail
+                                open,
+                                columnKey,
+                                handleDetail,
+                                handleDelete
                             } as Props)}</TableCell>}
                     </TableRow>
                 )}
