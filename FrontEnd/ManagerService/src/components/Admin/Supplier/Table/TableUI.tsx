@@ -229,7 +229,7 @@ const TableUI=({setOpen,open}:Pros)=> {
         hasSearchFilter,
     ]);
 
-    const bottomContent = React.useMemo(() => {
+    const bottomContent = useMemo(() => {
         return (
             <div className="py-2 px-2 flex justify-between items-center">
                 <Pagination
@@ -253,7 +253,7 @@ const TableUI=({setOpen,open}:Pros)=> {
         );
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
-    const classNames = React.useMemo(
+    const classNames = useMemo(
         () => ({
             wrapper: ["max-h-[382px]", "max-w-3xl"],
             th: ["bg-transparent", "text-default-500", "border-b", "border-divider"],
