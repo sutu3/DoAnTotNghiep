@@ -13,25 +13,10 @@
           <entry name="$USER_HOME$/.m2/repository/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
           <entry name="$USER_HOME$/.m2/repository/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
         </processorPath>
+        <module name="Warehouse" />
         <module name="FileService" />
-      </profile>
-      <profile name="Annotation profile for ProductService" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.m2/repository/org/mapstruct/mapstruct-processor/1.6.0/mapstruct-processor-1.6.0.jar" />
-          <entry name="$USER_HOME$/.m2/repository/org/mapstruct/mapstruct/1.6.0/mapstruct-1.6.0.jar" />
-          <entry name="$USER_HOME$/.m2/repository/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
-          <entry name="$USER_HOME$/.m2/repository/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
-          <entry name="$USER_HOME$/.m2/repository/org/mapstruct/mapstruct-processor/1.6.0/mapstruct-processor-1.6.0.jar" />
-          <entry name="$USER_HOME$/.m2/repository/org/mapstruct/mapstruct/1.6.0/mapstruct-1.6.0.jar" />
-          <entry name="$USER_HOME$/.m2/repository/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
-          <entry name="$USER_HOME$/.m2/repository/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
-        </processorPath>
         <module name="UserService" />
         <module name="ProductService" />
-        <module name="Warehouse" />
       </profile>
     </annotationProcessing>
   </component>

@@ -28,7 +28,7 @@ public class UploadImageFileService implements UploadImageFile {
     Cloudinary cloudinary;
     ImageRepo imageRepo;
     @Override
-    public String uploadImage(MultipartFile image) throws IOException {
+    public Image uploadImage(MultipartFile image) throws IOException {
         assert image.getOriginalFilename() != null;
         String publicValue=generatePublicValue(image.getOriginalFilename());
         String extension = getFileName(image.getOriginalFilename())[1];
@@ -42,7 +42,7 @@ public class UploadImageFileService implements UploadImageFile {
         return imageRepo.save(Image.builder()
                 .publicId(publicValue)
                 .urlImage(filepatch)
-                .build()).getIdimage();
+                .build());
     }
     private File conver(MultipartFile file) {
         assert file.getOriginalFilename() != null;

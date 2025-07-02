@@ -1,5 +1,6 @@
 package com.example.productservice.Service.Impl;
 
+import com.example.productservice.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.productservice.Client.UserService.UserController;
 import com.example.productservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
@@ -137,8 +138,10 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse enrich(Product product) {
         UserResponse userResponse = userController.getUser(product.getCreateByUser()).getResult();
         WarehousesResponse warehousesResponse = warehouseController.getWarehouse(product.getWarehouses()).getResult();
+        SupplierResponse supplierResponse=userController.getSupplier(product.getSupplier()).getResult();
         ProductResponse productResponse = productMapper.toResponse(product);
         ProductResponse productResponseWarehouse = productMapper.updateWarehouse(productResponse, warehousesResponse);
-        return productMapper.updateCreateByUser(productResponseWarehouse, userResponse);
+        ProductResponse productResponseSupplier = productMapper.updateSupplier(productResponseWarehouse, supplierResponse);
+        return productMapper.updateCreateByUser(productResponseSupplier, userResponse);
     }
 }
