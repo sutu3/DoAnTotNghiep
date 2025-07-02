@@ -1,5 +1,6 @@
 package com.example.userservice.Dto.Responses.Supplier;
 
+import com.example.userservice.Enum.StatusSupplier;
 import jakarta.persistence.Column;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -14,6 +15,7 @@ public class SupplierResponse {
     String urlSupplier;
     String supplierName;
     String email;
+    StatusSupplier status;
     String phoneNumber;
     String address;
     String district;

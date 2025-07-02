@@ -2,6 +2,7 @@ package com.example.userservice.Service.Impl;
 
 import com.example.userservice.Dto.Request.SupplierRequest;
 import com.example.userservice.Dto.Responses.Supplier.SupplierResponse;
+import com.example.userservice.Enum.StatusSupplier;
 import com.example.userservice.Exception.AppException;
 import com.example.userservice.Exception.ErrorCode;
 import com.example.userservice.Form.SupplierForm;
@@ -63,6 +64,7 @@ public class SupplierServiceImpl implements SupplierService {
             return supplierMapper.toResponse(supplier);
         }
         Supplier supplier=supplierMapper.toEntity(supplierRequest);
+        supplier.setStatus(StatusSupplier.Supplier);
         supplier.setIsDeleted(false);
         supplierRepo.save(supplier);
         return supplierMapper.toResponse(supplier);
