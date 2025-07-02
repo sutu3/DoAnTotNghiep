@@ -1,13 +1,25 @@
 "use client";
 import {  useState } from "react";
-import {Input, NumberInput, Select, SelectItem, Textarea} from "@heroui/react";
+import {Input, NumberInput, Textarea} from "@heroui/react";
 import {useFileStore} from "@/zustand/File.tsx";
-import {useProductStore} from "@/zustand/Product.tsx";
+import {ProductCreate, useProductStore} from "@/zustand/Product.tsx";
+import CategorySelect from "@/components/Admin/Product/Select/CategorySelect.tsx";
 
-export default function SupplierForm() {
+export default function ProductForm() {
     const { product, setProduct } = useProductStore();
     const {setFile} =useFileStore();
-
+    const [formdata, setFormdata] = useState<ProductCreate>({
+        category: "",
+        createByUser: "",
+        description: "",
+        price: 0,
+        productName: "",
+        sku: "",
+        supplier: "",
+        unit: "",
+        urlImageProduct: "",
+        warehouses: ""
+    });
 
 
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -15,7 +27,9 @@ export default function SupplierForm() {
 
 // Fetch wards when district changes
 
-
+    const handleChange = (key:string, value: string | number) => {
+        setFormdata(prev => ({ ...prev, [key]: value }));
+    };
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -83,7 +97,10 @@ export default function SupplierForm() {
                 value={product.description}
                 onChange={(e) => setProduct({description: e.target.value})}
             />
-
+            <CategorySelect
+                setFormdata={(key, value) =>
+                    handleChange(key, value)}
+            />
 
             {/* Province */}
 

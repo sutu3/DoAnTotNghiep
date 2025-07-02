@@ -5,6 +5,7 @@ import ThumbnailUI from "@/components/Admin/Supplier/Thumbnail/ThumbnailUI.tsx";
 import {Button, Spinner} from "@heroui/react";
 import {useState} from "react";
 import {useProductStore} from "@/zustand/Product.tsx";
+import ProductForm from "@/components/Form/ProductForm.tsx";
 
 export default function AddNewProductPage() {
     const {product}=useProductStore();
@@ -25,7 +26,7 @@ export default function AddNewProductPage() {
                 {/* Left: Supplier Form - chiếm 2/3 */}
                 <div className="md:col-span-2 bg-white rounded-xl shadow-lg p-6">
                     <h1 className="text-2xl font-bold text-gray-800 mb-6">Add New Supplier</h1>
-                    <SupplierForm />
+                    <ProductForm />
                 </div>
 
                 {/* Right: Supplier Summary Card - chiếm 1/3 */}
