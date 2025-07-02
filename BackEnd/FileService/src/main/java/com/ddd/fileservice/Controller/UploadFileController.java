@@ -26,7 +26,7 @@ public class UploadFileController {
     ImageService imageService;
     @PostMapping("/upload")
     public ImageResponse uploadFileImage(@RequestParam("file") MultipartFile file) throws IOException, IOException {
-        String idImage= String.valueOf(uploadFile.uploadImage(file));
+        String idImage= String.valueOf(uploadFile.uploadImage(file).getIdImage());
         return imageService.getById(idImage);
     }
 }
