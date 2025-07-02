@@ -4,6 +4,9 @@ import com.example.userservice.Enum.StatusSupplier;
 import jakarta.persistence.Column;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Builder
 @Data
@@ -21,4 +24,6 @@ public class SupplierResponse {
     String district;
     String street;
     String country;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
 }
