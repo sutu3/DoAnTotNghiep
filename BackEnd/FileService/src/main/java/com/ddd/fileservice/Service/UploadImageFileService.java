@@ -30,20 +30,29 @@ public class UploadImageFileService implements UploadImageFile {
     @Override
     public Image uploadImage(MultipartFile image) throws IOException {
         assert image.getOriginalFilename() != null;
-        String publicValue=generatePublicValue(image.getOriginalFilename());
+
+        String publicValue = generatePublicValue(image.getOriginalFilename());
         String extension = getFileName(image.getOriginalFilename())[1];
-        File fileupload=conver(image);
-        log.info("File Upload Is:"+fileupload.toString());
-        log.info("Public Value Is:"+publicValue.toString());
-        log.info("extension Is:"+extension.toString());
-        cloudinary.uploader().upload(fileupload, ObjectUtils.asMap("public_id",publicValue ));
-        String filepatch=cloudinary.url().generate(StringUtils.join(publicValue+"."+extension));
-        cleanDisk(fileupload);
+
+        log.info("Uploading to Cloudinary as bytes...");
+        log.info("Public Value: {}", publicValue);
+        log.info("Extension: {}", extension);
+
+        // Upload từ bytes, không ghi ra đĩa
+        var uploadResult = cloudinary.uploader().upload(
+                image.getBytes(),
+                ObjectUtils.asMap("public_id", publicValue)
+        );
+
+        String fileUrl = cloudinary.url().generate(publicValue + "." + extension);
+
+        // Lưu DB
         return imageRepo.save(Image.builder()
                 .publicId(publicValue)
-                .urlImage(filepatch)
+                .urlImage(fileUrl)
                 .build());
     }
+
     private File conver(MultipartFile file) {
         assert file.getOriginalFilename() != null;
         File conVertFile = new File(StringUtils.join(generatePublicValue(file.getOriginalFilename()), ".", getFileName(file.getOriginalFilename())[1]));
