@@ -9,6 +9,7 @@ state.category.categoryList;
 export const TotalPageCategory = (state: { category: { totalPage: number } }) =>
     state.category.totalPage;
 
+
 export const StacksSelector = (state: { stack: { Stacks: any } }) =>
   state.stack.Stacks;
 export const TotalPageStack = (state: { stack: { totalPage: number } }) =>
@@ -18,6 +19,11 @@ export const SupplierSelector = (state: { supplier: { suppliers: any } }) =>
     state.supplier.suppliers;
 export const TotalPageSelector = (state: { supplier: { totalPage: number } }) =>
     state.supplier.totalPage;
+
+export const ProductSelector = (state: { product: { products: any } }) =>
+    state.product.products;
+export const TotalPageProduct = (state: { product: { totalPage: number } }) =>
+    state.product.totalPage;
 
 export const TotalPageTask = (state: { taskType: { totalPage: number } }) =>
     state.taskType.totalPage;

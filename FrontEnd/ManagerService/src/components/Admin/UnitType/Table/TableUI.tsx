@@ -16,7 +16,7 @@ import {
 } from "@heroui/react";
 import {ChevronDownIcon, PlusIcon, SearchIcon} from "lucide-react";
 import {useDispatch, useSelector} from "react-redux";
-import { UnitSelector} from "@/Store/Selector.tsx";
+import {TotalPageUnit, UnitSelector} from "@/Store/Selector.tsx";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {pageApi} from "@/Constants/UrlApi.tsx";
 import {MiddleGetAllUnit} from "@/Store/Thunk/UnitThunk.tsx";
@@ -80,7 +80,7 @@ const TableUI=({setOpen,open}:Pros)=> {
         navigate(`/admin/unitType?id=${id}`)
     }
 
-    const pages = Math.ceil(object.length / rowsPerPage);
+    const pages = useSelector(TotalPageUnit);
 
     const hasSearchFilter = Boolean(filterValue);
 

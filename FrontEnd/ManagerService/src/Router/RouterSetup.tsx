@@ -25,6 +25,7 @@ import DetailUnit from "@/pages/Unit/DetailUnit/page.tsx";
 import CategoryPage from "@/pages/Category/page.tsx";
 import SupplierPage from "@/pages/Supplier/page.tsx";
 import AddNewSupplierPage from "@/pages/Supplier/Addnew/page.tsx";
+import ProductPage from "@/pages/Product/page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -37,7 +38,7 @@ const router = createBrowserRouter([
     loader: CheckAuth,
     children: [
       { path: "*", element: <PageNotFound /> },
-      { path: "admin/products", element: <Product /> },
+      { path: "admin/products", element: <ProductPage /> },
       { path: "/admin/users", element: <User /> },
       { path: "/admin/", element: <WarehousePage /> },
       { path: "/admin/locations", element: <StackPage /> },

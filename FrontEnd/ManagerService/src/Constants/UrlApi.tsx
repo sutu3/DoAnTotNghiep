@@ -40,6 +40,20 @@ export const API_ROUTES = {
     },
   },
   product:{
+    product:((page: pageApi | null) => {
+      const base = `${BASE_URL_Product}/products`;
+      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+    return{
+      search:(()=>{
+        const search=base+"/search";
+        return{
+          byWarehouseId: (warehouseId: string) => ({
+            getAll: `${search}/warehouseId/${warehouseId}${pageUrl}`,
+          })
+        }
+      })
+    }
+    }),
     category:(page: pageApi | null) => {
       const base = `${BASE_URL_Product}/categories`;
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
@@ -83,7 +97,7 @@ export const API_ROUTES = {
     }
   },
 user:{
-    supplier:((page:pageApi|null)=>{
+    supplier:(page:pageApi|null)=>{
       const base = `${BASE_URL_User}/suppliers`;
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
       return{
@@ -97,7 +111,7 @@ user:{
           }
         })
       }
-    }),
+    },
   users: (page: pageApi | null) => {
     const base = `${BASE_URL_User}/users`;
     const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";

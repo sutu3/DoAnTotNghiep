@@ -3,26 +3,20 @@
 import SupplierForm from "@/components/Form/SupplierForm.tsx";
 import ThumbnailUI from "@/components/Admin/Supplier/Thumbnail/ThumbnailUI.tsx";
 import {Button, Spinner} from "@heroui/react";
-import {useDispatch} from "react-redux";
 import {useState} from "react";
-import {MiddleAddSupplier} from "@/Store/Thunk/ShupplierThunk.tsx";
-import {useNavigate} from "react-router-dom";
-import {MiddleUploadImage, UploadResponse} from "@/Store/Thunk/UploadThunk.tsx";
-import useSupplierStore from "@/zustand/Supplier.tsx";
+import {useProductStore} from "@/zustand/Product.tsx";
 
-export default function AddNewSupplierPage() {
-    const { supplier,setSupplier } = useSupplierStore();
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+export default function AddNewProductPage() {
+    const {product}=useProductStore();
     const [loading, setLoading] = useState(false);
     const hanldAddNewSupplier = async ()=>{
         setLoading(true);
-        const imageResponse:UploadResponse=await (dispatch as any)(MiddleUploadImage());
+        /*const imageResponse:UploadResponse=await (dispatch as any)(MiddleUploadImage());
         setSupplier({urlSupplier:imageResponse.urlImage})
         await (dispatch as any)(MiddleAddSupplier(supplier));
 
         await new Promise(resolve => setTimeout(resolve, 2000));
-        navigate("/admin/suppliers");
+        navigate("/admin/suppliers");*/
         setLoading(false)
     }
     return (
@@ -36,9 +30,9 @@ export default function AddNewSupplierPage() {
 
                 {/* Right: Supplier Summary Card - chiếm 1/3 */}
                 <div className="md:col-span-1  gap-5   p-6 flex flex-col items-center">
-                    {supplier.urlSupplier ? (
+                    {product.urlImageProduct ? (
                         <ThumbnailUI/>
-                        ) : (
+                    ) : (
                         <p className="text-gray-400 text-sm">Upload an image to preview</p>
                     )}
                     <Button disabled={loading} className="w-full bg-primary text-white" onClick={hanldAddNewSupplier}>

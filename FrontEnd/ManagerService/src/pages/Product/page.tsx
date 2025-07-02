@@ -1,20 +1,16 @@
-import {useEffect, useState} from "react";
+import { useState} from "react";
 import { IdCard } from "lucide-react";
 
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
 import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
-import {useDispatch} from "react-redux";
-import {pageApi} from "@/Constants/UrlApi.tsx";
-import TableUI from "@/components/Admin/Supplier/Table/TableUI.tsx";
-import {MiddleGetAllSupplier} from "@/Store/Thunk/ShupplierThunk.tsx";
+import TableUI from "@/components/Admin/Product/Table/TableUI.tsx";
 
 
 
-const SupplierPage = () => {
+const ProductPage = () => {
     // console.log(useSelector(warehouse));
     const [isOpen, setIsOpen] = useState(false);
-    const dispatch = useDispatch();
     // const [idShow, setIdShow] = useState<String>("");
 
     const isSidebarCollapsed = localStorage.getItem("theme") == "light";
@@ -22,14 +18,6 @@ const SupplierPage = () => {
     /* const handleOpenModel = () => {
          setIsOpen(!isOpen);
      };*/
-
-    useEffect(() => {
-        const PageApi: pageApi = { pageNumber: 0, pageSize:  5 };
-        const fetch=async ()=>{
-            (dispatch as any)(MiddleGetAllSupplier(PageApi));
-        }
-        fetch();
-    },[])
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">
@@ -57,8 +45,8 @@ const SupplierPage = () => {
                     </div>
                     <div className="p-0 md:p-4">
                         <TableUI
-                            setOpen={setIsOpen}
-                            open={isOpen} />
+                            key={""}
+                            setKey={()=>{}} />
                     </div>
                 </div>
             </div>
@@ -92,4 +80,4 @@ const SupplierPage = () => {
     );
 };
 
-export default SupplierPage;
+export default ProductPage;

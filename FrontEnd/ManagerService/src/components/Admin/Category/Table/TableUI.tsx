@@ -16,7 +16,7 @@ import {
 } from "@heroui/react";
 import {ChevronDownIcon, PlusIcon, SearchIcon} from "lucide-react";
 import {useDispatch, useSelector} from "react-redux";
-import { CategorySelector} from "@/Store/Selector.tsx";
+import {CategorySelector, TotalPageCategory, TotalPageUnit} from "@/Store/Selector.tsx";
 import {pageApi} from "@/Constants/UrlApi.tsx";
 import {MiddleGetAllCategory} from "@/Store/Thunk/CategoryThunk.tsx";
 import {Category, columns} from "@/Store/CategorySlice.tsx";
@@ -71,7 +71,7 @@ const TableUI=({setOpen,open,key,setKey}:Progs)=> {
 
     }, []);
 
-    const pages = Math.ceil(object.length / rowsPerPage);
+    const pages = useSelector(TotalPageCategory);
 
     const hasSearchFilter = Boolean(filterValue);
 
