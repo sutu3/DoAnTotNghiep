@@ -41,7 +41,7 @@ public class UnitController {
                 .success(true)
                 .build();
     }
-    @GetMapping("/search/groupUnitNames")
+    @GetMapping("/search/UnitNames")
     public ApiResponse<List<UnitNameResponse>> getAllByGroupUnitName(){
         return ApiResponse.<List<UnitNameResponse>>builder()
                 .Result(unitService.getAllUnitName())
