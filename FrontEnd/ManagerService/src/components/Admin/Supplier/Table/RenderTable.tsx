@@ -51,7 +51,7 @@ const RenderCell: React.FC<Props> = ({
       </span>
                 </div>
             );
-        case "userName":
+        case "supplierName":
             return (
                 <User
                     avatarProps={{radius: "full", size: "sm", src: item.urlSupplier}}
