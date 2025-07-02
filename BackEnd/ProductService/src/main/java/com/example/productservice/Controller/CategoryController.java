@@ -2,6 +2,7 @@ package com.example.productservice.Controller;
 
 import com.example.productservice.Dto.Requests.CategoryRequest;
 import com.example.productservice.Dto.Responses.ApiResponse;
+import com.example.productservice.Dto.Responses.Category.CategoryNameResponse;
 import com.example.productservice.Dto.Responses.Category.CategoryResponse;
 import com.example.productservice.Form.CategoryForm;
 import com.example.productservice.Service.CategoryService;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -43,6 +46,16 @@ public class CategoryController {
     ) {
         return ApiResponse.<CategoryResponse>builder()
                 .Result(categoryService.getByIdResponse(categoryId))
+                .code(0)
+                .message("SuccessFully")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/search/warehouseId/{warehouse}/categoryNames")
+    public ApiResponse<List<CategoryNameResponse>> getByWarehouseId(
+            @PathVariable String warehouse) {
+        return ApiResponse.<List<CategoryNameResponse>>builder()
+                .Result(categoryService.getAllCategoryName(warehouse))
                 .code(0)
                 .message("SuccessFully")
                 .success(true)

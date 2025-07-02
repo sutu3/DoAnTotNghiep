@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +36,12 @@ public class SupplierServiceImpl implements SupplierService {
     public Page<SupplierResponse> getAll(Pageable pageable, String warehouse) {
         return supplierRepo.findAllByWarehousesAndIsDeleted(warehouse, false, pageable)
                 .map(supplierMapper::toResponse);
+    }
+
+    @Override
+    public List<SupplierResponse> getALlList(String warehouse) {
+        return supplierRepo.findAllByWarehousesAndIsDeleted(warehouse, false).stream()
+                .map(supplierMapper::toResponse).collect(Collectors.toList());
     }
 
     @Override

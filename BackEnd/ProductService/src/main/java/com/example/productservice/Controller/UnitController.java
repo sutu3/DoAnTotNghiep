@@ -3,6 +3,7 @@ package com.example.productservice.Controller;
 import com.example.productservice.Dto.Requests.UnitRequest;
 import com.example.productservice.Dto.Responses.ApiResponse;
 import com.example.productservice.Dto.Responses.GroupUnit.GroupUnitResponse;
+import com.example.productservice.Dto.Responses.Unit.UnitNameResponse;
 import com.example.productservice.Dto.Responses.Unit.UnitResponse;
 import com.example.productservice.Form.UnitForm;
 import com.example.productservice.Service.UnitService;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/units")
@@ -33,6 +36,15 @@ public class UnitController {
         Pageable pageable= PageRequest.of(page,size);
         return ApiResponse.<Page<UnitResponse>>builder()
                 .Result(unitService.getAll(pageable))
+                .code(0)
+                .message("SuccessFully")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/search/groupUnitNames")
+    public ApiResponse<List<UnitNameResponse>> getAllByGroupUnitName(){
+        return ApiResponse.<List<UnitNameResponse>>builder()
+                .Result(unitService.getAllUnitName())
                 .code(0)
                 .message("SuccessFully")
                 .success(true)

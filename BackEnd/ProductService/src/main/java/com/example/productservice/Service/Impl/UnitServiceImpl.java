@@ -3,6 +3,7 @@ package com.example.productservice.Service.Impl;
 import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.productservice.Client.UserService.UserController;
 import com.example.productservice.Dto.Requests.UnitRequest;
+import com.example.productservice.Dto.Responses.Unit.UnitNameResponse;
 import com.example.productservice.Dto.Responses.Unit.UnitResponse;
 import com.example.productservice.Exception.AppException;
 import com.example.productservice.Exception.ErrorCode;
@@ -22,7 +23,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +62,13 @@ public class UnitServiceImpl implements UnitService {
     public Unit getById(String id) {
         return unitRepo.findById(id)
                 .orElseThrow(()->new AppException(ErrorCode.UNIT_NOT_FOUND));
+    }
+
+    @Override
+    public List<UnitNameResponse> getAllUnitName() {
+        return unitRepo.findAllByIsDeleted(false)
+                .stream().map(unitMapper::toNameResponse)
+                .collect(Collectors.toList());
     }
 
     @Override

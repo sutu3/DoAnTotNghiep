@@ -3,6 +3,7 @@ package com.example.productservice.Mapper;
 import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.productservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.productservice.Dto.Requests.CategoryRequest;
+import com.example.productservice.Dto.Responses.Category.CategoryNameResponse;
 import com.example.productservice.Dto.Responses.Category.CategoryResponse;
 import com.example.productservice.Form.CategoryForm;
 import com.example.productservice.Model.Category;
@@ -16,6 +17,7 @@ public interface CategoryMapper {
     @Mapping(target = "createByUser", ignore = true)
     @Mapping(target = "warehouses",ignore = true)
     CategoryResponse toResponse(Category category);
+    CategoryNameResponse toNameResponse(Category category);
     CategoryResponse updateWarehouse(
             @MappingTarget CategoryResponse category,
             WarehousesResponse warehouses);

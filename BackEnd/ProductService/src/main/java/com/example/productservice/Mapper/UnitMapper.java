@@ -2,6 +2,7 @@ package com.example.productservice.Mapper;
 
 import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.productservice.Dto.Requests.UnitRequest;
+import com.example.productservice.Dto.Responses.Unit.UnitNameResponse;
 import com.example.productservice.Dto.Responses.Unit.UnitResponse;
 import com.example.productservice.Form.UnitForm;
 import com.example.productservice.Model.Unit;
@@ -15,6 +16,7 @@ public interface UnitMapper {
     Unit toEntity(UnitRequest request);
     @Mapping(target = "createByUser",ignore = true)
     UnitResponse toResponse(Unit unit);
+    UnitNameResponse toNameResponse(Unit unit);
     UnitResponse updateCreateByUser(@MappingTarget  UnitResponse unitResponse, UserResponse createByUser);
     void update(@MappingTarget  Unit unit, UnitForm update);
     @Mapping(target = "groupUnit",ignore = true)

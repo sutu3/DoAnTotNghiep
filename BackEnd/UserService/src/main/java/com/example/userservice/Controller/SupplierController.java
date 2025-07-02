@@ -16,12 +16,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/suppliers")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @Slf4j
-@Tag(name = "TackTypes API", description = "Quản lý Người dùng ngoài")
+@Tag(name = "Supplier API", description = "Quản lý Người dùng ngoài")
 public class SupplierController {
 
     private final SupplierService supplierService;
@@ -35,6 +37,17 @@ public class SupplierController {
         Pageable pageable= PageRequest.of(page,size);
         return ApiResponse.<Page<SupplierResponse>>builder()
                 .Result(supplierService.getAll(pageable,warehouseId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/search/byWarehouseId/{warehouseId}/SuppliersName")
+    public ApiResponse<List<SupplierResponse>> getALl(
+            @PathVariable String warehouseId
+    ){
+        return ApiResponse.<List<SupplierResponse>>builder()
+                .Result(supplierService.getALlList(warehouseId))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

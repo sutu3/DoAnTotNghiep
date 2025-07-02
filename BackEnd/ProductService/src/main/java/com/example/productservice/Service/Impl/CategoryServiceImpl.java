@@ -5,6 +5,7 @@ import com.example.productservice.Client.UserService.UserController;
 import com.example.productservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.productservice.Client.WarehouseService.WarehouseController;
 import com.example.productservice.Dto.Requests.CategoryRequest;
+import com.example.productservice.Dto.Responses.Category.CategoryNameResponse;
 import com.example.productservice.Dto.Responses.Category.CategoryResponse;
 import com.example.productservice.Exception.AppException;
 import com.example.productservice.Exception.ErrorCode;
@@ -22,7 +23,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +52,12 @@ public class CategoryServiceImpl implements CategoryService {
                             categoryMapper.updateWarehouse(categoryResponse, warehousesResponse)
                             ,userResponse);
                 });
+    }
+
+    @Override
+    public List<CategoryNameResponse> getAllCategoryName(String warehouses) {
+        return categoryRepo.findAllByIsDeletedAndWarehouses(false, warehouses)
+                .stream().map(categoryMapper::toNameResponse).collect(Collectors.toList());
     }
 
     @Override
