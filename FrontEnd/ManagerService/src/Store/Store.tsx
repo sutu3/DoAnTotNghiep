@@ -10,6 +10,7 @@ import GroupUnit from "@/Store/GroupUnit.tsx";
 import UnitSlice from "@/Store/Unit.tsx";
 import CategorySlice from "@/Store/CategorySlice.tsx";
 import SupplierSlice from "@/Store/SupplierSlice.tsx";
+import ProductSlice from "@/Store/ProductSlice.tsx";
 
 const ThemeReducer = (state = { value: true }, action: any) => {
   switch (action.type) {
@@ -34,6 +35,7 @@ const store = configureStore({
     unit:UnitSlice.reducer,
     category:CategorySlice.reducer,
     supplier:SupplierSlice.reducer,
+    product:ProductSlice.reducer,
   },
 });
 export const callApiThunk = async (

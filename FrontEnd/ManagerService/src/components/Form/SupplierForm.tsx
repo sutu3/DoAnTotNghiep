@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
-import { Input, Select, SelectItem } from "@heroui/react";
+import {useEffect, useState} from "react";
+import {Input, Select, SelectItem} from "@heroui/react";
 import {useFileStore} from "@/zustand/File.tsx";
 import useSupplierStore from "@/zustand/Supplier.tsx";
 
@@ -61,6 +61,7 @@ export default function SupplierForm() {
             <div className="flex items-center gap-2">
                 <div className="w-full">
                     <Input
+                        aria-labelledby="Input"
                         label="Upload Image"
                         type="file"
                         accept="image/*"
@@ -83,22 +84,26 @@ export default function SupplierForm() {
             {/* Main Form */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
+                    aria-labelledby="Input"
                     label="Supplier Name"
                     value={supplier.supplierName}
                     onChange={(e) => setSupplier({ supplierName: e.target.value })}
                 />
                 <Input
+                    aria-labelledby="Input"
                     label="Email"
                     type="email"
                     value={supplier.email}
                     onChange={(e) => setSupplier({ email: e.target.value })}
                 />
                 <Input
+                    aria-labelledby="Input"
                     label="Phone Number"
                     value={supplier.phoneNumber}
                     onChange={(e) => setSupplier({ phoneNumber: e.target.value })}
                 />
                 <Input
+                    aria-labelledby="Input"
                     label="Address"
                     value={supplier.address}
                     onChange={(e) => setSupplier({ address: e.target.value })}
@@ -109,6 +114,7 @@ export default function SupplierForm() {
 
             {/* Province */}
             <Select
+                aria-labelledby="Input"
                 label="City / Province"
                 selectedKeys={[provinceCode]}
                 onChange={(key) => {
@@ -119,7 +125,7 @@ export default function SupplierForm() {
                 }}
             >
                 {provinces.map((prov: any) => (
-                    <SelectItem key={prov.code} value={prov.code}>
+                    <SelectItem key={prov.code}>
                         {prov.name}
                     </SelectItem>
                 ))}
@@ -127,6 +133,7 @@ export default function SupplierForm() {
 
             {/* District */}
             <Select
+                aria-labelledby="Input"
                 label="District"
                 selectedKeys={[districtCode]}
                 isDisabled={!provinceCode}
@@ -139,12 +146,14 @@ export default function SupplierForm() {
                 }}
             >
                 {districts.map((dist: any) => (
-                    <SelectItem key={dist.code} value={dist.code}>
+                    <SelectItem aria-labelledby="Input"
+                                key={dist.code} value={dist.code}>
                         {dist.name}
                     </SelectItem>
                 ))}
             </Select>
             <Select
+                aria-labelledby="Input"
                 label="Ward / Commune"
                 selectedKeys={[wardCode]}
                 isDisabled={!districtCode}

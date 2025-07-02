@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {
     Button,
     Dropdown,
@@ -14,13 +14,23 @@ import {
     TableHeader,
     TableRow,
 } from "@heroui/react";
-import {ChevronDownIcon, SearchIcon} from "lucide-react";
-import {columns, GroupUnit} from "@/Store/GroupUnit.tsx";
-import {useSelector} from "react-redux";
-import {GroupUnitSelector, TotalPageGroupUnit, TotalPageUnit} from "@/Store/Selector.tsx";
-import RenderTable, {Props} from "@/components/Admin/Unit/Table/RenderTable.tsx";
+import {ChevronDownIcon, PlusIcon, SearchIcon} from "lucide-react";
+import {useDispatch, useSelector} from "react-redux";
+import {
+    ProductSelector,
+    TotalPageProduct,
+} from "@/Store/Selector.tsx";
+import {pageApi} from "@/Constants/UrlApi.tsx";
+import {MiddleGetAllProduct} from "@/Store/Thunk/ProductThunk.tsx";
+import {columns, Product} from "@/Store/ProductSlice.tsx";
+import RenderTable, {Props} from "@/components/Admin/Product/Table/RenderTable.tsx";
 import {useNavigate} from "react-router-dom";
 
+
+
+export function capitalize(s: string) {
+    return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
+}
 
 export const statusOptions = [
     {name: "Active", uid: "active"},
@@ -28,26 +38,26 @@ export const statusOptions = [
     {name: "Vacation", uid: "vacation"},
 ];
 
-
-export function capitalize(s: string) {
-    return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
-}
-
-
 const INITIAL_VISIBLE_COLUMNS = [
-    "groupUnitID",
-    "groupName",
+    "productName",
     "description",
-    "baseUnitRatio",
-    "unitType",
-    "createByUser",
-    "actions",
-    "createdAt","action"
-];const TableUI=()=> {
-    const navigate = useNavigate();
-    const object = useSelector(GroupUnitSelector);
-    const [event, setEvent] = useState("");
-    const [open, setOpen] = useState(false);
+    "warehouse",
+    "unit",
+    "createdAt",
+    "sku",
+    "supplier",
+    "isActive",
+    "category",
+    "createdAt"
+];
+interface Progs{
+
+    key:string;
+    setKey:(object:string) => void;
+}
+const TableUI=({key,setKey}:Progs)=> {
+    const navigate=useNavigate();
+    const object = useSelector(ProductSelector);
     const [filterValue, setFilterValue] = React.useState("");
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
@@ -58,15 +68,20 @@ const INITIAL_VISIBLE_COLUMNS = [
         direction: "ascending",
     });
     const [page, setPage] = React.useState(1);
+    const dispatch = useDispatch();
+    object.map((el)=>console.log(el))
     useEffect(() => {
-        if(event=="Detail") {
-        }
-    }, [event]);
-    const handleDetail=(name: string) => {
-        navigate(`/admin/unitType?groupUnitName=${name}`)
-    }
+        const PageApi: pageApi = { pageNumber: page - 1, pageSize: 5 };
+        const fetchData = async () => {
+            (dispatch as any)(MiddleGetAllProduct(PageApi));
+        };
 
-    const pages =useSelector(TotalPageGroupUnit);
+
+        fetchData();
+
+    }, []);
+
+    const pages = useSelector(TotalPageProduct);
 
     const hasSearchFilter = Boolean(filterValue);
 
@@ -81,7 +96,7 @@ const INITIAL_VISIBLE_COLUMNS = [
 
         if (hasSearchFilter) {
             filteredobject = filteredobject.filter((object) =>
-                object.groupName.toLowerCase().includes(filterValue.toLowerCase()),
+                object.productName.toLowerCase().includes(filterValue.toLowerCase()),
             );
         }
         if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
@@ -111,7 +126,7 @@ const INITIAL_VISIBLE_COLUMNS = [
     }, [sortDescriptor, items]);
 
 
-    const onRowsPerPageChange = React.useCallback((e) => {
+    const onRowsPerPageChange = React.useCallback((e: { target: { value: any; }; }) => {
         setRowsPerPage(Number(e.target.value));
         setPage(1);
     }, []);
@@ -194,7 +209,11 @@ const INITIAL_VISIBLE_COLUMNS = [
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-
+                        <Button onClick={()=>{
+                           navigate("/admin/products/addnew");
+                        }}           aria-labelledby="Button" className="bg-foreground text-background" endContent={<PlusIcon/>} size="sm">
+                            Add New
+                        </Button>
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
@@ -274,11 +293,12 @@ const INITIAL_VISIBLE_COLUMNS = [
                     wrapper: "after:bg-foreground after:text-background text-background",
                 },
             }}
+            defaultSelectedKeys={[key]}
             classNames={classNames}
             selectedKeys={selectedKeys}
-            selectionMode="none"
             sortDescriptor={sortDescriptor}
             topContent={topContent}
+            selectionMode="single"
             topContentPlacement="outside"
             onSelectionChange={setSelectedKeys}
             onSortChange={setSortDescriptor}
@@ -294,18 +314,13 @@ const INITIAL_VISIBLE_COLUMNS = [
                     </TableColumn>
                 )}
             </TableHeader>
-            <TableBody emptyContent={"No object found"} items={sortedItems}>
-                {(item: GroupUnit) => (
-                    <TableRow key={item.groupUnitID}>
+            <TableBody className={"bg-white dark:bg-gray-900 text-gray-800 dark:text-white"} emptyContent={"No object found"} items={sortedItems}>
+                {(item: Product) => (
+                    <TableRow onClick={()=>setKey(item.productId)} key={item.productId}>
                         {(columnKey) => <TableCell>
                             {RenderTable({
-                                groupUnitID: item.groupUnitID,
-                                item,
+                                item: item,
                                 columnKey,
-                                open,
-                                setEvent,
-                                setOpen,
-                                handleDetail
                             } as Props)}</TableCell>}
                     </TableRow>
                 )}

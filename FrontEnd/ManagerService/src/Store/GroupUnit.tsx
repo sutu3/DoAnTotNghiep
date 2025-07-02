@@ -29,7 +29,7 @@ export interface GroupUnit {
     baseUnitRatio: number;
     unitType: 'Length'|'Quantity'|'Volume'|'Weight'|null;
     createByUser: UserResponse;
-    createdAt: Date;
+    createdAt: Date|null;
 }
 
 export interface GroupUnitState {
@@ -52,6 +52,7 @@ const initialState:GroupUnitState = {
             email: "",
             urlImage: ""
         },
+        createdAt: null
     },
 };
 const GroupUnitSlice = createSlice({

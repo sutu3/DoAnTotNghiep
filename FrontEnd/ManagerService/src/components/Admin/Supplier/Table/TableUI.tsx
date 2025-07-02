@@ -15,7 +15,7 @@ import {
 } from "@heroui/react";
 import {ChevronDownIcon, PlusIcon, SearchIcon} from "lucide-react";
 import {useSelector} from "react-redux";
-import { SupplierSelector} from "@/Store/Selector.tsx";
+import {SupplierSelector, TotalPageSelector, TotalPageUnit} from "@/Store/Selector.tsx";
 import {columns, Supplier} from "@/Store/SupplierSlice.tsx";
 import RenderTable, {Props} from "@/components/Admin/Supplier/Table/RenderTable.tsx";
 import {useNavigate} from "react-router-dom";
@@ -67,7 +67,7 @@ const TableUI=({setOpen,open}:Pros)=> {
 
         // Delete của supplier
     }
-    const pages = Math.ceil(object.length / rowsPerPage);
+    const pages =useSelector(TotalPageSelector);
 
     const hasSearchFilter = Boolean(filterValue);
 
