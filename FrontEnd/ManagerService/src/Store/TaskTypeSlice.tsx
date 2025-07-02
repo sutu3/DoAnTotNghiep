@@ -2,7 +2,6 @@ import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {API_ROUTES, pageApi} from "@/Constants/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {callApiThunk} from "@/Store/Store.tsx";
-import TaskSlice, {GetAllTask} from "@/Store/TaskSlice.tsx";
 
 interface Warehouse {
     warehouseName: string;
@@ -58,7 +57,12 @@ export const GetAllTaskType = createAsyncThunk(
         { warehouseId, page }: { warehouseId: string; page: pageApi },
         { rejectWithValue },
     ) => await
-        callApiThunk("GET",API_ROUTES.user.taskType.search(page,warehouseId).GetAll,undefined,rejectWithValue)
+        callApiThunk("GET",API_ROUTES
+            .user
+            .taskType(page)
+            .search
+            .byWarehouseId(warehouseId)
+            .getAll,undefined,rejectWithValue)
 );
 export const AddTaskType=createAsyncThunk(
     "taskType/AddTaskType",
@@ -66,7 +70,10 @@ export const AddTaskType=createAsyncThunk(
         {payload}:{payload: TaskTypeCreated},
         {rejectWithValue},
         )=>await
-        callApiThunk("POST",API_ROUTES.user.taskType.addTaskType,payload,rejectWithValue)
+        callApiThunk("POST",API_ROUTES
+            .user
+            .taskType(null)
+            .addTask,payload,rejectWithValue)
 );
 export const MiddleAddTaskType = (TaskTypeCreate:TaskTypeCreated) => {
     return async function check(dispatch: any, getState: any) {

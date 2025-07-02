@@ -10,12 +10,14 @@ const StackForm = ({ data, onChange }: Props) => {
   return (
     <div className="space-y-4">
       <Input
-        label="Stack Name"
+          aria-labelledby="Input"
+          label="Stack Name"
         value={data.stackName}
         onValueChange={(val) => onChange("stackName", val)}
       />
       <Input
-        label="Description"
+          aria-labelledby="Input"
+          label="Description"
         value={data.description}
         onValueChange={(val) => onChange("description", val)}
 

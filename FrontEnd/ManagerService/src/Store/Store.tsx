@@ -5,6 +5,11 @@ import StackSlice from "@/Store/StackSlice.tsx";
 import {fetchApi} from "@/Api/FetchApi.tsx";
 import TaskTypeSlice from "@/Store/TaskTypeSlice.tsx";
 import TaskSlice from "@/Store/TaskSlice.tsx";
+import UserSlice from "@/Store/UserSlice.tsx";
+import GroupUnit from "@/Store/GroupUnit.tsx";
+import UnitSlice from "@/Store/Unit.tsx";
+import CategorySlice from "@/Store/CategorySlice.tsx";
+import SupplierSlice from "@/Store/SupplierSlice.tsx";
 
 const ThemeReducer = (state = { value: true }, action: any) => {
   switch (action.type) {
@@ -23,7 +28,12 @@ const store = configureStore({
     warehouse: WarehouseSlice.reducer,
     stack: StackSlice.reducer,
     taskType: TaskTypeSlice.reducer,
+    users: UserSlice.reducer,
     tasks: TaskSlice.reducer,
+    groupUnit:GroupUnit.reducer,
+    unit:UnitSlice.reducer,
+    category:CategorySlice.reducer,
+    supplier:SupplierSlice.reducer,
   },
 });
 export const callApiThunk = async (
