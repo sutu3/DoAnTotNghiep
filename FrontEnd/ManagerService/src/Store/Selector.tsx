@@ -14,6 +14,11 @@ export const StacksSelector = (state: { stack: { Stacks: any } }) =>
 export const TotalPageStack = (state: { stack: { totalPage: number } }) =>
   state.stack.totalPage;
 
+export const SupplierSelector = (state: { supplier: { suppliers: any } }) =>
+    state.supplier.suppliers;
+export const TotalPageSelector = (state: { supplier: { totalPage: number } }) =>
+    state.supplier.totalPage;
+
 export const TotalPageTask = (state: { taskType: { totalPage: number } }) =>
     state.taskType.totalPage;
 export const TaskTypeSelector = (state: { taskType: any }) =>

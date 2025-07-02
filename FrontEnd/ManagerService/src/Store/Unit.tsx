@@ -1,4 +1,4 @@
-import GroupUnitSlice, {GroupUnit, GroupUnitState} from "@/Store/GroupUnit.tsx";
+import  {GroupUnit} from "@/Store/GroupUnit.tsx";
 import {createSlice} from "@reduxjs/toolkit";
 export interface UserResponse {
     userId: string;
