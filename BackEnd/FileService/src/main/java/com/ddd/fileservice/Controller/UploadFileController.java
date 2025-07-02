@@ -38,6 +38,8 @@ public class UploadFileController {
     })
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ImageResponse uploadFileImage(@RequestParam("file") MultipartFile file) throws IOException {
+        log.info("Uploading image to Cloudinary");
+        log.info("Uploading: {}", file.getOriginalFilename()); // log thử
         var uploadedImage = uploadFile.uploadImage(file);
         return imageService.getById(String.valueOf(uploadedImage.getIdImage()));
     }
