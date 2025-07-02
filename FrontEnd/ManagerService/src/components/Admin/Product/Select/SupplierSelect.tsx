@@ -6,56 +6,55 @@ import {useSelector} from "react-redux";
 import {warehouseSelector} from "@/Store/Selector.tsx";
 import {ProductCreate, useProductStore} from "@/zustand/Product.tsx";
 import {ApiResponse} from "@/types";
-import {Unit} from "@/Store/Unit.tsx";
+import {Supplier} from "@/Store/SupplierSlice.tsx";
 
 interface Props {
     formData:ProductCreate
     setFormData: (ket: string, value: string | number) => void,
 }
 
-const unitSelect = ({formData,setFormData}: Props) => {
+const SupplierSelect = ({formData,setFormData}: Props) => {
     const warehouse = useSelector(warehouseSelector)?.warehouseId;
     console.log(warehouse);
-    const {  setProduct } = useProductStore();
-    const [listUnit, setListUnit] = useState<Unit[]>([]);
+    const { setProduct} = useProductStore();
+    const [listSupplier, setListSupplier] = useState<Supplier[]>([]);
 
     useEffect(() => {
         const fetch = async () => {
-            const unitList: ApiResponse<Unit[]> = await fetchApi({
+            const SupplierList: ApiResponse<Supplier[]> = await fetchApi({
                 method: "GET",
-                url: API_ROUTES.product
-                    .unit(null)
+                url: API_ROUTES.user
+                    .supplier(null)
                     .search()
-                    .unitName,
+                    .byWarehouseId(warehouse)
+                    .getAllName,
             });
-            setListUnit(unitList.result);
+            setListSupplier(SupplierList.result);
         };
         fetch();
     }, [warehouse]);
 
     return (
         <Select
-            label="unit"
-            selectedKeys={[formData.unit]}
             aria-labelledby="Input"
-
+            label="Supplier"
+            selectedKeys={[formData.supplier]}
             onSelectionChange={(keys) => {
                 const selectedId = Array.from(keys)[0].toString();
-                const selectedUnit = listUnit.find(unit => unit.unitID === selectedId);
+                const selectedUnit = listSupplier.find(supplier => supplier.supplierId === selectedId);
 
                 if (selectedUnit) {
-                    setProduct({unit: selectedUnit.unitName});
+                    setProduct({supplier: selectedUnit.supplierName});
                     // ✅ Lưu ID vào formData
-                    setFormData("unit", selectedId);
+                    setFormData("supplier", selectedId);
                 }
             }}
         >
-            {listUnit && listUnit?.map((cat) => (
-                <SelectItem
-                    aria-labelledby="Input"
-                    key={cat.unitID}>{cat.unitName}</SelectItem>
+            {listSupplier && listSupplier?.map((cat) => (
+                <SelectItem aria-labelledby="Input"
+                            key={cat.supplierId}>{cat.supplierName}</SelectItem>
             ))}
         </Select>
     );
 };
-export default unitSelect;
+export default SupplierSelect;

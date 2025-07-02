@@ -1,15 +1,27 @@
 "use client";
 
-import SupplierForm from "@/components/Form/SupplierForm.tsx";
 import ThumbnailUI from "@/components/Admin/Supplier/Thumbnail/ThumbnailUI.tsx";
 import {Button, Spinner} from "@heroui/react";
 import {useState} from "react";
-import {useProductStore} from "@/zustand/Product.tsx";
+import {ProductCreate, useProductStore} from "@/zustand/Product.tsx";
 import ProductForm from "@/components/Form/ProductForm.tsx";
+import ProductThumbnail from "@/components/Admin/Product/Thumbnail/ThumbnailUI.tsx";
 
 export default function AddNewProductPage() {
     const {product}=useProductStore();
     const [loading, setLoading] = useState(false);
+    const [formData, setformData] = useState<ProductCreate>({
+        category: "",
+        createByUser: "",
+        description: "",
+        price: 0,
+        productName: "",
+        sku: "",
+        supplier: "",
+        unit: "",
+        urlImageProduct: "",
+        warehouses: ""
+    });
     const hanldAddNewSupplier = async ()=>{
         setLoading(true);
         /*const imageResponse:UploadResponse=await (dispatch as any)(MiddleUploadImage());
@@ -26,13 +38,13 @@ export default function AddNewProductPage() {
                 {/* Left: Supplier Form - chiếm 2/3 */}
                 <div className="md:col-span-2 bg-white rounded-xl shadow-lg p-6">
                     <h1 className="text-2xl font-bold text-gray-800 mb-6">Add New Supplier</h1>
-                    <ProductForm />
+                    <ProductForm formData={formData} setformData={setformData}/>
                 </div>
 
                 {/* Right: Supplier Summary Card - chiếm 1/3 */}
                 <div className="md:col-span-1  gap-5   p-6 flex flex-col items-center">
                     {product.urlImageProduct ? (
-                        <ThumbnailUI/>
+                        <ProductThumbnail/>
                     ) : (
                         <p className="text-gray-400 text-sm">Upload an image to preview</p>
                     )}

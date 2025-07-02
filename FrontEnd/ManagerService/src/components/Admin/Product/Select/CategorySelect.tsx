@@ -5,15 +5,18 @@ import {API_ROUTES} from "@/Constants/UrlApi.tsx";
 import {useSelector} from "react-redux";
 import {warehouseSelector} from "@/Store/Selector.tsx";
 import {Category} from "@/Store/CategorySlice.tsx";
-import { useProductStore} from "@/zustand/Product.tsx";
+import {ProductCreate, useProductStore} from "@/zustand/Product.tsx";
 import {ApiResponse} from "@/types";
+
 interface Props {
-    setFormdata: (ket: String, value: string | number) => void,
+    formData:ProductCreate
+    setFormData: (ket: string, value: string | number) => void,
 }
-const CategorySelect = ({ setFormdata }: Props) => {
+
+const CategorySelect = ({formData,setFormData}: Props) => {
     const warehouse = useSelector(warehouseSelector)?.warehouseId;
     console.log(warehouse);
-    const { product, setProduct } = useProductStore();
+    const {  setProduct } = useProductStore();
     const [listCategory, setListCategory] = useState<Category[]>([]);
 
     useEffect(() => {
@@ -25,7 +28,6 @@ const CategorySelect = ({ setFormdata }: Props) => {
                     .search()
                     .byWarehouseId(warehouse).getAllName,
             });
-            console.log("🚀 categoryList", categoryList.result); // <-- kiểm tra tại đây
             setListCategory(categoryList.result);
         };
         fetch();
@@ -33,16 +35,24 @@ const CategorySelect = ({ setFormdata }: Props) => {
 
     return (
         <Select
+            aria-labelledby="Input"
             label="Category"
-            selectedKeys={[product.category]}
+            selectedKeys={[formData.category]}
             onSelectionChange={(keys) => {
                 const selectedId = Array.from(keys)[0].toString();
-                setProduct( {category: selectedId} );
-                setFormdata("category", selectedId);
+                const selectedCategory = listCategory.find(cat => cat.categoryId === selectedId);
+
+                if (selectedCategory) {
+                    setProduct({category: selectedCategory.categoryName});
+
+                    // ✅ Lưu ID vào formData
+                    setFormData("category", selectedCategory.categoryId);
+                }
             }}
         >
             {listCategory&&listCategory?.map((cat) => (
-                <SelectItem key={cat.categoryId}>{cat.categoryName}</SelectItem>
+                <SelectItem aria-labelledby="Input"
+                            key={cat.categoryId}>{cat.categoryName}</SelectItem>
             ))}
         </Select>
     );
