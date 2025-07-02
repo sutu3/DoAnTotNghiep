@@ -24,6 +24,7 @@ import GroupUnit from "@/pages/Unit/page.tsx";
 import DetailUnit from "@/pages/Unit/DetailUnit/page.tsx";
 import CategoryPage from "@/pages/Category/page.tsx";
 import SupplierPage from "@/pages/Supplier/page.tsx";
+import AddNewSupplierPage from "@/pages/Supplier/Addnew/page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,7 @@ const router = createBrowserRouter([
       { path: "/admin/units", element: <GroupUnit /> },
       { path: "/admin/categories", element: <CategoryPage /> },
       { path: "/admin/suppliers", element: <SupplierPage /> },
+      { path: "/admin/suppliers/addnew", element: <AddNewSupplierPage /> },
     ],
   },
   { path: "/login", element: <LoginPage /> },

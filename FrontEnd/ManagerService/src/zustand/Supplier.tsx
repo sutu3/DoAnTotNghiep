@@ -2,34 +2,42 @@
 import { create } from "zustand";
 import {SupplierCreate} from "@/Store/SupplierSlice.tsx";
 
+
+
 interface SupplierStore {
     supplier: SupplierCreate;
-    setSupplier: (data: Partial<SupplierCreate>) => void;
-    resetSupplier: () => void;
+    setSupplier: (partial: Partial<SupplierCreate>) => void;
+    reset: () => void;
 }
 
-const defaultSupplier: SupplierCreate = {
-    urlSupplier: "",
-    supplierName: "",
-    email: "",
-    phoneNumber: "",
-    address: "",
-    district: "",
-    street: "",
-    country: "",
-    warehouses: "",
-};
-
-export const useSupplierStore = create<SupplierStore>((set) => ({
-    supplier: defaultSupplier,
-
-    setSupplier: (data) =>
-        set((state) => ({
+const useSupplierStore = create<SupplierStore>((set) => ({
+    supplier: {
+        urlSupplier: "",
+        supplierName: "",
+        email: "",
+        phoneNumber: "",
+        address: "",
+        district: "",
+        street: "",
+        country: "",
+        warehouses: "",
+    },
+    setSupplier: (partial) =>
+        set((state) => ({ supplier: { ...state.supplier, ...partial } })),
+    reset: () =>
+        set(() => ({
             supplier: {
-                ...state.supplier,
-                ...data,
+                urlSupplier: "",
+                supplierName: "",
+                email: "",
+                phoneNumber: "",
+                address: "",
+                district: "",
+                street: "",
+                country: "",
+                warehouses: "",
             },
         })),
-
-    resetSupplier: () => set({ supplier: defaultSupplier }),
 }));
+
+export default useSupplierStore;

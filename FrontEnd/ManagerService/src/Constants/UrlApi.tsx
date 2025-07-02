@@ -1,12 +1,16 @@
 const BASE_URL_Warehouse = "https://doantotnghiep-pb6y.onrender.com/api";
 const BASE_URL_User = "https://userservice-kuug.onrender.com/api";
 const BASE_URL_Product = "https://productservice-8qdv.onrender.com/api";
+const BASE_URL_File = "https://fileservice-zp3y.onrender.com";
 export interface pageApi {
   pageNumber: number;
   pageSize: number;
 }
 
 export const API_ROUTES = {
+  file:{
+    uploadImage: BASE_URL_File+"/images/upload",
+  },
   warehouse: {
     stacks: (page: pageApi | null) => {
       const base = `${BASE_URL_Warehouse}/stacks`;
