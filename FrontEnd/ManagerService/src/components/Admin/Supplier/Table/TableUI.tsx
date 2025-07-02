@@ -1,4 +1,3 @@
-import React, {useEffect, useState} from "react";
 import {
     Button,
     Dropdown,
@@ -14,11 +13,13 @@ import {
     TableHeader,
     TableRow,
 } from "@heroui/react";
-import {ChevronDownIcon, SearchIcon} from "lucide-react";
+import {ChevronDownIcon, PlusIcon, SearchIcon} from "lucide-react";
 import {useSelector} from "react-redux";
 import { SupplierSelector} from "@/Store/Selector.tsx";
 import {columns, Supplier} from "@/Store/SupplierSlice.tsx";
 import RenderTable, {Props} from "@/components/Admin/Supplier/Table/RenderTable.tsx";
+import {useNavigate} from "react-router-dom";
+import {useCallback, useMemo, useState} from "react";
 
 
 export const statusOptions = [
@@ -27,20 +28,17 @@ export const statusOptions = [
     {name: "Vacation", uid: "vacation"},
 ];
 
-
 export function capitalize(s: string) {
     return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
 }
 
 
 const INITIAL_VISIBLE_COLUMNS = [
-    "groupUnitID",
-    "groupName",
-    "description",
-    "baseUnitRatio",
-    "unitType",
-    "createByUser",
-    "actions",
+    "supplierName",
+    "email",
+    "phoneNumber",
+    "address",
+    "status",
     "createdAt","action"
 ];
 interface Pros{
@@ -49,21 +47,17 @@ interface Pros{
 }
 const TableUI=({setOpen,open}:Pros)=> {
     const object = useSelector(SupplierSelector);
-    const [event, setEvent] = useState("");
-    const [filterValue, setFilterValue] = React.useState("");
-    const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
-    const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
-    const [statusFilter, setStatusFilter] = React.useState("all");
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const [sortDescriptor, setSortDescriptor] = React.useState({
+    const navigate = useNavigate(); // ✅ tạo hàm navigate từ hook
+    const [filterValue, setFilterValue] = useState("");
+    const [selectedKeys, setSelectedKeys] = useState(new Set([]));
+    const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [sortDescriptor, setSortDescriptor] = useState({
         column: "age",
         direction: "ascending",
     });
-    const [page, setPage] = React.useState(1);
-    useEffect(() => {
-        if(event=="Detail") {
-        }
-    }, [event]);
+    const [page, setPage] = useState(1);
     const handleDetail=(supplierId:string) => {
         console.log(supplierId);
         // Detail của supplier
@@ -77,13 +71,14 @@ const TableUI=({setOpen,open}:Pros)=> {
 
     const hasSearchFilter = Boolean(filterValue);
 
-    const headerColumns = React.useMemo(() => {
+    const headerColumns = useMemo(() => {
+        // @ts-ignore
         if (visibleColumns === "all") return columns;
 
         return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);
 
-    const filteredItems = React.useMemo(() => {
+    const filteredItems = useMemo(() => {
         let filteredobject = [...object];
 
         if (hasSearchFilter) {
@@ -100,14 +95,14 @@ const TableUI=({setOpen,open}:Pros)=> {
         return filteredobject;
     }, [object, filterValue, statusFilter]);
 
-    const items = React.useMemo(() => {
+    const items = useMemo(() => {
         const start = (page - 1) * rowsPerPage;
         const end = start + rowsPerPage;
 
         return filteredItems.slice(start, end);
     }, [page, filteredItems, rowsPerPage]);
 
-    const sortedItems = React.useMemo(() => {
+    const sortedItems = useMemo(() => {
         return [...items].sort((a, b) => {
             const first = a[sortDescriptor.column];
             const second = b[sortDescriptor.column];
@@ -118,12 +113,12 @@ const TableUI=({setOpen,open}:Pros)=> {
     }, [sortDescriptor, items]);
 
 
-    const onRowsPerPageChange = React.useCallback((e: { target: { value: any; }; }) => {
+    const onRowsPerPageChange = useCallback((e: { target: { value: any; }; }) => {
         setRowsPerPage(Number(e.target.value));
         setPage(1);
     }, []);
 
-    const onSearchChange = React.useCallback((value) => {
+    const onSearchChange = useCallback((value) => {
         if (value) {
             setFilterValue(value);
             setPage(1);
@@ -132,7 +127,7 @@ const TableUI=({setOpen,open}:Pros)=> {
         }
     }, []);
 
-    const topContent = React.useMemo(() => {
+    const topContent = useMemo(() => {
         return (
             <div className="flex flex-col gap-4">
                 <div className="flex justify-between gap-3 items-end">
@@ -201,7 +196,11 @@ const TableUI=({setOpen,open}:Pros)=> {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-
+                        <Button
+                            onClick={() => navigate("/admin/suppliers/addnew")} // ✅ dùng navigate đúng cách
+                                   aria-labelledby="Button" className="bg-foreground text-background" endContent={<PlusIcon/>} size="sm">
+                            Add New
+                        </Button>
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
@@ -281,6 +280,7 @@ const TableUI=({setOpen,open}:Pros)=> {
                     wrapper: "after:bg-foreground after:text-background text-background",
                 },
             }}
+
             classNames={classNames}
             selectedKeys={selectedKeys}
             selectionMode="none"
