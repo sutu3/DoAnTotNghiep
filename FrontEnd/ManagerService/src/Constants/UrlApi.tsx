@@ -79,6 +79,21 @@ export const API_ROUTES = {
     }
   },
 user:{
+    supplier:((page:pageApi|null)=>{
+      const base = `${BASE_URL_User}/suppliers`;
+      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      return{
+        addSupplier: base,
+        search:(()=>{
+          const searchUrl = `${base}/search`;
+          return {
+            byWarehouseId: (warehouseId: string) => ({
+              getAll: `${searchUrl}/byWarehouseId/${warehouseId}${pageUrl}`,
+            }),
+          }
+        })
+      }
+    }),
   users: (page: pageApi | null) => {
     const base = `${BASE_URL_User}/users`;
     const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
