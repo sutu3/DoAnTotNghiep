@@ -23,6 +23,6 @@ public class AddressEntity  extends BaseEntity{
     String district;
     @Column(columnDefinition = "VARCHAR(36) COMMENT 'tên đường'",nullable = false)
     String street;
-    @Column(columnDefinition = "VARCHAR(36) COMMENT tên thành phố'",nullable = false)
+    @Column(columnDefinition = "VARCHAR(36) COMMENT 'tên thành phố'",nullable = false)
     String country;
 }
