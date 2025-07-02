@@ -16,7 +16,7 @@ export interface ProductCreate {
 
 interface ProductState {
     product: ProductCreate;
-    setProduct: (partial: Partial<ProductCreate>) => void;
+    setProduct: (partial:  Partial<ProductCreate>) => void;
     updateField: <K extends keyof ProductCreate>(key: K, value: ProductCreate[K]) => void;
     resetProduct: () => void;
 }

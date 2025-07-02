@@ -40,7 +40,7 @@ export const API_ROUTES = {
     },
   },
   product:{
-    product:((page: pageApi | null) => {
+    product:(page: pageApi | null) => {
       const base = `${BASE_URL_Product}/products`;
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
     return{
@@ -53,7 +53,7 @@ export const API_ROUTES = {
         }
       })
     }
-    }),
+    },
     category:(page: pageApi | null) => {
       const base = `${BASE_URL_Product}/categories`;
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
@@ -64,6 +64,7 @@ export const API_ROUTES = {
           return{
             byWarehouseId: (warehouseId: string) => ({
               getAll: `${search}/warehouseId/${warehouseId}${pageUrl}`,
+              getAllName: `${search}/warehouseId/${warehouseId}/categoryNames`,
             })
           }
         })
@@ -96,7 +97,7 @@ export const API_ROUTES = {
       }
     }
   },
-user:{
+  user:{
     supplier:(page:pageApi|null)=>{
       const base = `${BASE_URL_User}/suppliers`;
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
