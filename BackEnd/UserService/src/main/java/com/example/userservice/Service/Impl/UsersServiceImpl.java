@@ -86,6 +86,11 @@ public class UsersServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse getByUserId(String id) {
+        return userMapper.toResponse(findById(id));
+    }
+
+    @Override
     public UserResponse MapperUserResponse(UserResponse response, WarehousesResponse warehousesResponse) {
         return UserResponse.builder()
                 .userId(response.getUserId())
