@@ -1,5 +1,7 @@
 package com.example.userservice.Model;
 
+import com.example.userservice.Enum.StatusSupplier;
+import com.example.userservice.Enum.StatusTaskEnum;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,9 +26,12 @@ public class Supplier extends AddressEntity{
     String supplierName;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'Email của người dùng'",nullable = false)
     String email;
+    @Enumerated(EnumType.STRING)
+    StatusSupplier status;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'Điện thoại của người dùng'",nullable = false)
     String phoneNumber;
     @Column(columnDefinition = "VARCHAR(36) COMMENT 'mã id của warehouse'",nullable = false)
     String warehouses;
+
 
 }
