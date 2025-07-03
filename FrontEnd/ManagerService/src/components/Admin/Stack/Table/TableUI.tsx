@@ -17,13 +17,14 @@ import {
 import {ChevronDownIcon, PlusIcon, SearchIcon} from "lucide-react";
 import {useDispatch, useSelector} from "react-redux";
 import {
-     StacksSelector,
-    TotalPageProduct,
+    StacksSelector,
+    TotalPageProduct, TotalPageStack,
 } from "@/Store/Selector.tsx";
 import {pageApi} from "@/Constants/UrlApi.tsx";
 import RenderTable, {Props} from "@/components/Admin/Stack/Table/RenderTable.tsx";
 import {MiddleGetAllStack} from "@/Store/Thunk/StackThunk.tsx";
 import {columns, StackType} from "@/Store/StackSlice.tsx";
+import {useNavigate} from "react-router-dom";
 
 
 
@@ -44,7 +45,7 @@ const INITIAL_VISIBLE_COLUMNS = [
     "warehouse",
     "createdAt",
     "binCount",
-    "actions"
+    "action"
 ];
 interface Progs{
     setKey: (key: string) => void;
@@ -54,6 +55,7 @@ interface Progs{
 }
 const TableUI=({open,setOpen,setKey,key}:Progs)=> {
     const object = useSelector(StacksSelector);
+    const navigate = useNavigate();
     const [filterValue, setFilterValue] = React.useState("");
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
@@ -65,9 +67,8 @@ const TableUI=({open,setOpen,setKey,key}:Progs)=> {
     });
     const [page, setPage] = React.useState(1);
     const dispatch = useDispatch();
-console.log(
-    object
-)
+    const pages = useSelector(TotalPageStack);
+
     useEffect(() => {
         const PageApi: pageApi = { pageNumber: page - 1, pageSize: 5 };
         const fetchData = async () => {
@@ -77,10 +78,9 @@ console.log(
 
         fetchData();
 
-    }, []);
+    }, [page]);
 
-    const pages = useSelector(TotalPageProduct);
-
+    console.log("Page:"+pages);
     const hasSearchFilter = Boolean(filterValue);
 
     const headerColumns = React.useMemo(() => {
@@ -279,6 +279,14 @@ console.log(
         [],
     );
 
+    function handleDetail(key:string) {
+        navigate(`/admin/locations/stack?stackId=${key}`);
+    }
+
+    function handleDelete(name:string) {
+
+    }
+
     return (
         <Table
             isCompact
@@ -317,6 +325,8 @@ console.log(
                     <TableRow onClick={()=>setKey(item.stackId)}  key={item.stackId}>
                         {(columnKey) => <TableCell>
                             {RenderTable({
+                                handleDetail,
+                                handleDelete,
                                 item: item,
                                 columnKey,
                             } as Props)}</TableCell>}

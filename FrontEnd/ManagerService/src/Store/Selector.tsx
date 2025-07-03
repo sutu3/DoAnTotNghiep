@@ -12,7 +12,7 @@ export const TotalPageCategory = (state: { category: { totalPage: number } }) =>
 
 export const StacksSelector = (state: { stack: { Stacks: any } }) =>
   state.stack.Stacks;
-export const TotalPageStack = (state: { stack: { totalPage: number } }) =>
+export const TotalPageStack =(state:any)  =>
   state.stack.totalPage;
 
 export const SupplierSelector = (state: { supplier: { suppliers: any } }) =>

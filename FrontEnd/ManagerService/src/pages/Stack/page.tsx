@@ -35,25 +35,25 @@ export default function StackPage() {
   const handleOpenModel = () => {
     setIsOpen(!isOpen);
   };
+  const [loading, setLoading] = useState(false);
+
   const handleAddStack = async () => {
+    setLoading(true);  // Bắt đầu loading
     await (dispatch as any)(MiddleAddStack(formState));
+
     setIsOpen(false);
-    setFormState({binQuantity: 0, stackName: "", description: "", warehouse: "" });
+    setFormState({ binQuantity: 0, stackName: "", description: "", warehouse: "" });
+
+    setTimeout(() => {
+      setLoading(false);  // Kết thúc loading sau 1 giây
+    }, 1000);
   };
+
   const handleStackClick = (stackId: string) => {
     const found = stacks.find((s: any) => s.stackId === stackId);
 
     if (found) setSelectedStack(found);
   };
-  let stats = selectedStack
-    ? {
-        total: selectedStack?.bin?.length,
-        loaded: selectedStack.bin.filter((b: any) => b.status === "loaded")
-          .length,
-        free: selectedStack.bin.filter((b: any) => b.status === "free").length,
-        empty: 12 - selectedStack?.bin?.filter((b: any) => b.status === "EMPTY").length,
-      }
-    : { total: 0, loaded: 0, free: 0, empty: 0 };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 sm:p-2 lg:p-4">
@@ -91,7 +91,7 @@ export default function StackPage() {
 
           {/* RIGHT: Chart + Summary */}
           <div>
-            <StackSummaryPanel stack={selectedStack} />
+            <StackSummaryPanel  stack={selectedStack} />
           </div>
         </div>
       </div>
@@ -99,14 +99,11 @@ export default function StackPage() {
       <ModalUI
         footer={
           <ButtonUI
-            className={
-              "bg-gradient-to-tr from-green-500 to-green-300 text-green-100 shadow-lg"
-            }
-            label={"Add Stack"}
-            loading={false}
-            startContent={<Layers />}
-            onClick={handleAddStack}
-          />
+              className={"bg-gradient-to-tr from-green-500 to-green-300 text-green-100 shadow-lg"}
+              label={"Add Stack"}
+              loading={loading}
+              startContent={<Layers/>}
+              onClick={handleAddStack} variant={undefined}          />
         }
         isOpen={isOpen}
         title="Thêm Mới nhân viên"

@@ -18,7 +18,7 @@ export const columns = [
   { name: "Description", uid: "description", sortable: true },
   { name: "Number of Bins", uid: "binCount", sortable: true },
   { name: "Warehouses", uid: "warehouse", sortable: true },
-  { name: "Actions", uid: "actions" },
+  { name: "Actions", uid: "action" },
 ];
 
 export interface StackType {
@@ -67,7 +67,7 @@ const StackSlice = createSlice({
   initialState,
   reducers: {
     initToTalPage: (state, action) => {
-      state.totalPage = action.payload || 0;
+      state.totalPage = action.payload ;
     },
     setStackList: (state, action) => {
       state.Stacks = action.payload;
