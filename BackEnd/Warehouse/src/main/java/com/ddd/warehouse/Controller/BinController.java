@@ -47,15 +47,15 @@ public class BinController {
                 .success(true)
                 .build();
     }
-    @PostMapping
-    public ApiResponse<BinResponse> save(@RequestBody BinRequest binRequest){
-        return ApiResponse.<BinResponse>builder()
-                .Result(binService.createBin(binRequest))
-                .code(0)
-                .message("SuccessFull")
-                .success(true)
-                .build();
-    }
+//    @PostMapping
+//    public ApiResponse<BinResponse> save(@RequestBody BinRequest binRequest){
+//        return ApiResponse.<BinResponse>builder()
+//                .Result(binService.createBin(binRequest))
+//                .code(0)
+//                .message("SuccessFull")
+//                .success(true)
+//                .build();
+//    }
     @GetMapping("/search/byStackName/{stackName}")
     public ApiResponse<Page<BinResponse>> getBinByCode(
             @PathVariable String stackName,

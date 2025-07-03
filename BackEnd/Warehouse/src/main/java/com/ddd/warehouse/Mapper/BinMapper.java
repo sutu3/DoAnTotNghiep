@@ -2,6 +2,7 @@ package com.ddd.warehouse.Mapper;
 
 import com.ddd.warehouse.Dto.Request.BinRequest;
 import com.ddd.warehouse.Dto.Response.Bin.BinResponse;
+import com.ddd.warehouse.Dto.Response.Bin.BinResponseNoWarehouse;
 import com.ddd.warehouse.Form.BinForm;
 import com.ddd.warehouse.Module.Bins;
 import org.mapstruct.Mapper;
@@ -13,6 +14,7 @@ public interface BinMapper {
     @Mapping(target = "warehouse",ignore = true)
     @Mapping(target = "stack",ignore = true)
     Bins toEntity(BinRequest request);
+    BinResponseNoWarehouse toDto(Bins bins);
     BinResponse toResponse(Bins entity);
     void update(@MappingTarget Bins entity, BinForm update);
 

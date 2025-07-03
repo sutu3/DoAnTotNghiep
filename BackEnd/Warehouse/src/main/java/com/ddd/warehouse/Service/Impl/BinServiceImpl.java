@@ -2,6 +2,8 @@ package com.ddd.warehouse.Service.Impl;
 
 import com.ddd.warehouse.Dto.Request.BinRequest;
 import com.ddd.warehouse.Dto.Response.Bin.BinResponse;
+import com.ddd.warehouse.Dto.Response.Bin.BinResponseNoWarehouse;
+import com.ddd.warehouse.Enum.BinStatus;
 import com.ddd.warehouse.Exception.AppException;
 import com.ddd.warehouse.Exception.ErrorCode;
 import com.ddd.warehouse.Form.BinForm;
@@ -18,6 +20,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,7 +37,8 @@ import static com.ddd.warehouse.Utils.CheckNumber.IsLessThanOrEqualZero;
 public class BinServiceImpl implements BinService {
      BinMapper binMapper;
      BinRepo binRepo;
-     StackService stackService;
+    @Lazy
+    StackService stackService;
      WarehouseRepo warehouseRepo;
     CheckNumber checkNumber;
 
@@ -82,29 +86,30 @@ public class BinServiceImpl implements BinService {
     }
 
     @Override
-    public BinResponse createBin(BinRequest BinRequest) {
+    public BinResponseNoWarehouse createBin(BinRequest BinRequest) {
         if(IsLessThanOrEqualZero(BinRequest.capacity())){
             throw new AppException(ErrorCode.CAPICITY_INVALID);
         }
-        Stacks stack=stackService.getByStackName(BinRequest.stack(),BinRequest.warehouse());
-        String binCode=stack.getStackName()+"-"+BinRequest.binCode();
-                Warehouses warehouses=warehouseRepo.getById(BinRequest.warehouse());
-        if(exsistByBinCode(BinRequest.warehouse(),BinRequest.stack(),BinRequest.warehouse())){
-            Optional<Bins> exsisting= Optional.ofNullable(
-                    getByBinCode(binCode,stack.getStackName(),warehouses.getWarehouseId()));
-            Bins bin=exsisting.get();
-            if(bin.getIsDeleted()){
-                bin.setCapacity(bin.getCapacity());
-                bin.setIsDeleted(false);
-                return binMapper.toResponse(binRepo.save(bin));
-            }
-        }
+        Stacks stack = stackService.getById(BinRequest.stack());
+        String binCode = BinRequest.binCode();
+        Warehouses warehouses=warehouseRepo.getById(BinRequest.warehouse());
+//        if (exsistByBinCode(BinRequest.binCode(), BinRequest.stack(), BinRequest.warehouse())) {
+//            Optional<Bins> exsisting= Optional.ofNullable(
+//                    getByBinCode(binCode,stack.getStackName(),warehouses.getWarehouseId()));
+//            Bins bin=exsisting.get();
+//            if(bin.getIsDeleted()){
+//                bin.setCapacity(bin.getCapacity());
+//                bin.setIsDeleted(false);
+//                return binMapper.toResponse(binRepo.save(bin));
+//            }
+//        }
         Bins bin= binMapper.toEntity(BinRequest);
+        bin.setStatus(BinStatus.EMPTY);
         bin.setBinCode(binCode);
         bin.setStack(stack);
         bin.setWarehouse(warehouses);
         bin.setIsDeleted(false);
-        return binMapper.toResponse(binRepo.save(bin));
+        return binMapper.toDto(binRepo.save(bin));
     }
 
     @Override
