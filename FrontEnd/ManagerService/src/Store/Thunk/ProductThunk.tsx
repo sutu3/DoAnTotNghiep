@@ -2,42 +2,47 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import {callApiThunk} from "@/Store/Store.tsx";
 import {API_ROUTES, pageApi} from "@/Constants/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
-import {initToTalPage, setProductList} from "@/Store/ProductSlice.tsx";
+import {initToTalPage, setAddProduct, setProductList} from "@/Store/ProductSlice.tsx";
+import {ProductCreate} from "@/zustand/Product.tsx";
 
-// export const AddProduct = createAsyncThunk(
-//     "product/AddProduct",
-//     async (
-//         { payload }: { payload: SupplierCreate },
-//         { rejectWithValue }
-//     ) =>
-//         await callApiThunk(
-//             "POST",
-//             API_ROUTES.user.supplier(null).addSupplier,
-//             payload,
-//             rejectWithValue
-//         )
-// );
-// export const MiddleAddSupplier = (SupplierCreate:SupplierCreate) => {
-//     return async function (dispatch: any,getState: any) {
-//         try {
-//             const { warehouse } = getState().warehouse;
-//             const warehouseId = warehouse?.warehouseId;
-//             const action = await dispatch(AddSupplier({ payload:{...SupplierCreate,warehouses:warehouseId} }));
-//             dispatch(setAddSupplier(action.payload.result));
-//             showToast({
-//                 title: "Add New",
-//                 description: `Message: Add New Supplier ${SupplierCreate.supplierName} Successfully`,
-//                 color: "Success",
-//             });
-//         } catch (error: any) {
-//             showToast({
-//                 title: "Error",
-//                 description: `Message: ${error.message || error}`,
-//                 color: "danger",
-//             });
-//         }
-//     };
-// };
+export const AddProduct = createAsyncThunk(
+    "product/AddProduct",
+    async (
+        { payload }: { payload: ProductCreate },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "POST",
+            API_ROUTES.product.product(null).addProduct,
+            payload,
+            rejectWithValue
+        )
+);
+export const MiddleAddProduct = (productCreate:ProductCreate) => {
+    return async function (dispatch: any,getState: any) {
+        try {
+            const { warehouse } = getState().warehouse;
+            const warehouseId = warehouse?.warehouseId;
+            const {user}= getState().users;
+            const userId= user?.userId;
+            const action = await dispatch(
+                AddProduct({ payload:{...productCreate,warehouses:warehouseId,createByUser:userId}
+                }));
+            dispatch(setAddProduct(action.payload.result));
+            showToast({
+                title: "Add New",
+                description: `Message: Add New Product ${productCreate.productName} Successfully`,
+                color: "Success",
+            });
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
 export const GetAllProductIdWarehouse = createAsyncThunk(
     "product/GetAllProductIdWarehouse",
     async (

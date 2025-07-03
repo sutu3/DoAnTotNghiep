@@ -44,6 +44,7 @@ export const API_ROUTES = {
       const base = `${BASE_URL_Product}/products`;
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
     return{
+      addProduct: base,
       search:(()=>{
         const search=base+"/search";
         return{
