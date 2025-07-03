@@ -1,20 +1,24 @@
 package com.ddd.warehouse.Service.Impl;
 
+import com.ddd.warehouse.Dto.Request.BinRequest;
 import com.ddd.warehouse.Dto.Request.StackRequest;
 import com.ddd.warehouse.Dto.Response.Stack.StackResponse;
 import com.ddd.warehouse.Exception.AppException;
 import com.ddd.warehouse.Exception.ErrorCode;
 import com.ddd.warehouse.Form.StackForm;
 import com.ddd.warehouse.Mapper.StackMapper;
+import com.ddd.warehouse.Module.Bins;
 import com.ddd.warehouse.Module.Stacks;
 import com.ddd.warehouse.Module.Warehouses;
 import com.ddd.warehouse.Repo.StackRepo;
+import com.ddd.warehouse.Service.BinService;
 import com.ddd.warehouse.Service.StackService;
 import com.ddd.warehouse.Service.WarehouseService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -77,7 +81,8 @@ public class StackServiceImpl implements StackService {
         Stacks stacks=stackMapper.toEntity(stackRequest);
         stacks.setWarehouse(warehouses);
         stacks.setIsDeleted(false);
-        return stackMapper.toResponse(stackRepo.save(stacks));
+        Stacks stackCreated=stackRepo.save(stacks);
+        return stackMapper.toResponse(stackCreated);
     }
     @Override
     public StackResponse updateStack(StackForm update,String stackId) {

@@ -1,13 +1,19 @@
 "use client";
 import {  useState } from "react";
-import {Input, NumberInput, Select, SelectItem, Textarea} from "@heroui/react";
+import {Input, NumberInput, Textarea} from "@heroui/react";
 import {useFileStore} from "@/zustand/File.tsx";
-import {useProductStore} from "@/zustand/Product.tsx";
+import {ProductCreate, useProductStore} from "@/zustand/Product.tsx";
+import CategorySelect from "@/components/Admin/Product/Select/CategorySelect.tsx";
+import UnitSelect from "@/components/Admin/Product/Select/UnitSelect.tsx";
+import SupplierSelect from "@/components/Admin/Product/Select/SupplierSelect.tsx";
 
-export default function SupplierForm() {
+interface Props {
+    formData:ProductCreate;
+    setformData:(formData: (prev: any) => any) => void;
+}
+export default function ProductForm({formData,setformData}: Props) {
     const { product, setProduct } = useProductStore();
     const {setFile} =useFileStore();
-
 
 
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -15,11 +21,12 @@ export default function SupplierForm() {
 
 // Fetch wards when district changes
 
-
+    const handleChange = (key:string, value: string | number) => {
+        setformData((prev: any) => ({ ...prev, [key]: value }));
+    };
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            console.log("sssss");
             setFile(file);
             const url = URL.createObjectURL(file);
             setPreviewUrl(url);
@@ -73,8 +80,11 @@ export default function SupplierForm() {
                     aria-labelledby="Input"
                     value={product.price}
                     onValueChange={(val) => setProduct({price: val})}
-                    className="max-w-xs" placeholder="Enter the amount"
+                    placeholder="Enter the amount"
                 />
+                <SupplierSelect
+                    setFormData={(key, value) => handleChange(key, value)}
+                    formData={formData}                />
             </div>
             <Textarea
                 aria-labelledby="Input"
@@ -83,6 +93,15 @@ export default function SupplierForm() {
                 value={product.description}
                 onChange={(e) => setProduct({description: e.target.value})}
             />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CategorySelect
+                    setFormData={(key, value) => handleChange(key, value)}
+                    formData={formData}                />
+                <UnitSelect
+                    setFormData={(key, value) => handleChange(key, value)}
+                    formData={formData}                />
+            </div>
+
 
 
             {/* Province */}

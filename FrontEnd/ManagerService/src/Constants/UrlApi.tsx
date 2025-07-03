@@ -40,10 +40,11 @@ export const API_ROUTES = {
     },
   },
   product:{
-    product:((page: pageApi | null) => {
+    product:(page: pageApi | null) => {
       const base = `${BASE_URL_Product}/products`;
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
     return{
+      addProduct: base,
       search:(()=>{
         const search=base+"/search";
         return{
@@ -53,7 +54,7 @@ export const API_ROUTES = {
         }
       })
     }
-    }),
+    },
     category:(page: pageApi | null) => {
       const base = `${BASE_URL_Product}/categories`;
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
@@ -64,6 +65,7 @@ export const API_ROUTES = {
           return{
             byWarehouseId: (warehouseId: string) => ({
               getAll: `${search}/warehouseId/${warehouseId}${pageUrl}`,
+              getAllName: `${search}/warehouseId/${warehouseId}/categoryNames`,
             })
           }
         })
@@ -78,6 +80,7 @@ export const API_ROUTES = {
       search:(()=>{
         const searchUrl = `${base}/search`;
         return {
+          unitName:`${searchUrl}/UnitNames`,
           unitGroupName:((groupName: string) => {
             const GroupUnitName=searchUrl+"/groupUnitName/"+groupName;
             return{
@@ -96,7 +99,7 @@ export const API_ROUTES = {
       }
     }
   },
-user:{
+  user:{
     supplier:(page:pageApi|null)=>{
       const base = `${BASE_URL_User}/suppliers`;
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
@@ -107,6 +110,7 @@ user:{
           return {
             byWarehouseId: (warehouseId: string) => ({
               getAll: `${searchUrl}/byWarehouseId/${warehouseId}${pageUrl}`,
+              getAllName: `${searchUrl}/byWarehouseId/${warehouseId}/SuppliersName`,
             }),
           }
         })

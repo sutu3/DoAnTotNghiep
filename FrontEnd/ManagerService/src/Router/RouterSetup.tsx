@@ -13,7 +13,6 @@ import AdminLayout from "@/layouts/AdminLayout.tsx";
 import PageNotFound from "@/pages/PageNotFound.tsx";
 import { CheckAuth } from "@/Utils/CheckAuth.tsx";
 import { ProviderUI } from "@/providerUI.tsx";
-import Product from "@/pages/Product/Product.tsx";
 import User from "@/pages/User/page.tsx";
 import store from "@/Store/Store.tsx";
 import WarehousePage from "@/pages/Dashboard/page.tsx";
@@ -26,6 +25,7 @@ import CategoryPage from "@/pages/Category/page.tsx";
 import SupplierPage from "@/pages/Supplier/page.tsx";
 import AddNewSupplierPage from "@/pages/Supplier/Addnew/page.tsx";
 import ProductPage from "@/pages/Product/page.tsx";
+import AddNewProductPage from "@/pages/Product/Addnew/page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +39,7 @@ const router = createBrowserRouter([
     children: [
       { path: "*", element: <PageNotFound /> },
       { path: "admin/products", element: <ProductPage /> },
+      { path: "/admin/products/addnew", element: <AddNewProductPage /> },
       { path: "/admin/users", element: <User /> },
       { path: "/admin/", element: <WarehousePage /> },
       { path: "/admin/locations", element: <StackPage /> },
