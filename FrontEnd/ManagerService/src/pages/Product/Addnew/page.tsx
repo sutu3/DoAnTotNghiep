@@ -1,13 +1,18 @@
 "use client";
 
-import ThumbnailUI from "@/components/Admin/Supplier/Thumbnail/ThumbnailUI.tsx";
 import {Button, Spinner} from "@heroui/react";
 import {useState} from "react";
 import {ProductCreate, useProductStore} from "@/zustand/Product.tsx";
 import ProductForm from "@/components/Form/ProductForm.tsx";
 import ProductThumbnail from "@/components/Admin/Product/Thumbnail/ThumbnailUI.tsx";
+import {MiddleUploadImage, UploadResponse} from "@/Store/Thunk/UploadThunk.tsx";
+import {useDispatch} from "react-redux";
+import {MiddleAddProduct} from "@/Store/Thunk/ProductThunk.tsx";
+import {useNavigate} from "react-router-dom";
 
 export default function AddNewProductPage() {
+    const dispatch = useDispatch();
+    const navigate=useNavigate();
     const {product}=useProductStore();
     const [loading, setLoading] = useState(false);
     const [formData, setformData] = useState<ProductCreate>({
@@ -22,14 +27,27 @@ export default function AddNewProductPage() {
         urlImageProduct: "",
         warehouses: ""
     });
-    const hanldAddNewSupplier = async ()=>{
+    const hanldAddNewProduct = async ()=>{
         setLoading(true);
-        /*const imageResponse:UploadResponse=await (dispatch as any)(MiddleUploadImage());
-        setSupplier({urlSupplier:imageResponse.urlImage})
-        await (dispatch as any)(MiddleAddSupplier(supplier));
+
+
+        const imageResponse:UploadResponse=await (dispatch as any)(MiddleUploadImage());
+        const newFormData:ProductCreate = {
+            ...formData,
+            productName: product.productName,
+            description: product.description,
+            price: product.price,
+            sku: product.sku,
+            supplier: formData.supplier,
+            unit: formData.unit,
+            category: formData.category,
+            urlImageProduct: imageResponse.urlImage
+        };
+        console.log(JSON.stringify(newFormData));
+        await (dispatch as any)(MiddleAddProduct(newFormData));
 
         await new Promise(resolve => setTimeout(resolve, 2000));
-        navigate("/admin/suppliers");*/
+        navigate("/admin/products");
         setLoading(false)
     }
     return (
@@ -48,7 +66,7 @@ export default function AddNewProductPage() {
                     ) : (
                         <p className="text-gray-400 text-sm">Upload an image to preview</p>
                     )}
-                    <Button disabled={loading} className="w-full bg-primary text-white" onClick={hanldAddNewSupplier}>
+                    <Button disabled={loading} className="w-full bg-primary text-white" onClick={hanldAddNewProduct}>
                         {loading ? (
                             <div className="flex items-center gap-2 justify-center">
                                 <Spinner color="default" variant="dots" />
