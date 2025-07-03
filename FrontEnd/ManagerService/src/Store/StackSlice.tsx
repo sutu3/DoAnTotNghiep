@@ -1,14 +1,12 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {  createSlice } from "@reduxjs/toolkit";
+import {Warehouse} from "@/types";
 
-import { showToast } from "@/components/UI/Toast/ToastUI.tsx";
-import { API_ROUTES, pageApi } from "@/Constants/UrlApi.tsx";
-import {callApiThunk} from "@/Store/Store.tsx";
 // Kích thước 1 bin
 export interface Bin {
   binId: string;
-  status: "free" | "loaded" | "empty";
   binCode: string;
   capacity: number;
+  status?: "EMPTY"|"FULL"| "MAINTENANCE"
   createdAt: string;
   updatedAt: string;
   isDeleted: boolean;
@@ -19,7 +17,7 @@ export const columns = [
   { name: "Name", uid: "stackName", sortable: true },
   { name: "Description", uid: "description", sortable: true },
   { name: "Number of Bins", uid: "binCount", sortable: true },
-  { name: "Status", uid: "statusStack", sortable: true },
+  { name: "Warehouses", uid: "warehouse", sortable: true },
   { name: "Actions", uid: "actions" },
 ];
 
@@ -28,11 +26,15 @@ export interface StackType {
   stackName: string;
   description: string;
   bin: Bin[];
+  createdAt:Date|null
+  warehouse: Warehouse|null;
+
 }
 export interface StackCreate {
   stackName: string;
   description: string;
   warehouse: string;
+  binQuantity: number
 }
 
 interface StackState {
@@ -50,11 +52,14 @@ const initialState: StackState = {
     stackName: "",
     description: "",
     bin: [],
+    createdAt:null,
+    warehouse:null
   },
   StackCreate: {
     stackName: "",
     description: "",
     warehouse: "",
+    binQuantity: 0
   },
 };
 const StackSlice = createSlice({
@@ -64,95 +69,13 @@ const StackSlice = createSlice({
     initToTalPage: (state, action) => {
       state.totalPage = action.payload || 0;
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(addStack.fulfilled, (state, action) => {
-        const result = (action.payload as any)?.result;
-        const StackMapper = mappedStack(result);
-
-        state.Stacks = [...state.Stacks, StackMapper];
-      })
-      .addCase(GetAllStack.fulfilled, (state, action) => {
-        const result: StackType[] = (action.payload as any)?.result?.content;
-        state.Stacks = result.map((el: StackType) => mappedStack(el));
-      });
+    setStackList: (state, action) => {
+      state.Stacks = action.payload;
+    },
+    setAddStack: (state, action) => {
+      state.Stacks = [...state.Stacks, action.payload];
+    }
   },
 });
-export const addStack = createAsyncThunk(
-    "stack/addStack",
-    async (payload: StackCreate, { rejectWithValue }) =>
-        await callApiThunk("POST", API_ROUTES
-            .warehouse
-            .stacks(null)
-            .addStacks, payload, rejectWithValue)
-);
-
-export const GetAllStack = createAsyncThunk(
-    "stack/getAllStack",
-    async (
-        { warehouseId, page }: { warehouseId: string; page: pageApi },
-        { rejectWithValue }
-    ) =>
-        await callApiThunk(
-            "GET",
-            API_ROUTES
-                .warehouse
-                .stacks(page)
-                .search
-                .byWarehouseId( warehouseId)
-                .getAll,
-            undefined,
-            rejectWithValue
-        )
-);
-
-
-const mappedStack = (stackFromApi: StackType): StackType => {
-  return {
-    stackId: stackFromApi.stackId,
-    stackName: stackFromApi.stackName,
-    description: stackFromApi.description,
-    bin: stackFromApi.bin,
-  };
-};
-
-export const MiddleGetAllStack = (page: pageApi) => {
-  return async function check(dispatch: any, getState: any) {
-    try {
-      const { warehouse } = getState().warehouse;
-      const warehouseId = warehouse?.warehouseId;
-
-      const action = await dispatch(GetAllStack({ warehouseId, page }));
-
-      dispatch(
-        StackSlice.actions.initToTalPage(action.payload.result.totalPages),
-      );
-    } catch (error: any) {
-      showToast({
-        title: "Error",
-        description: `Message: ${error.message || error}`,
-        color: "danger",
-      });
-    }
-  };
-};
-export const MiddleAddStack = (payload: StackCreate) => {
-  return async function check(dispatch: any, getState: any) {
-    try {
-      const { warehouse } = getState().warehouse;
-
-      // Kiểm tra kỹ slice "warehouse" trong root reducer của bạn có field này không
-      await dispatch(
-        addStack({ ...payload, warehouse: warehouse.warehouseId }),
-      );
-    } catch (error) {
-      showToast({
-        title: "Error",
-        description: `Message :${error}`,
-        color: "danger",
-      });
-    }
-  };
-};
+export const {initToTalPage,setStackList,setAddStack} = StackSlice.actions;
 export default StackSlice;
