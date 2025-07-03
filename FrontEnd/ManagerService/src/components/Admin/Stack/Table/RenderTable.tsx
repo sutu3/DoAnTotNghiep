@@ -1,19 +1,16 @@
-import {Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Progress, Tooltip, User,} from "@heroui/react";
+import {Progress, Tooltip} from "@heroui/react";
 
 import {DeleteIcon, EditIcon} from "lucide-react";
 
 import React from "react";
-import {VerticalDotsIcon} from "@/components/UI/Table/IconTable.tsx";
-import {Product} from "@/Store/ProductSlice.tsx";
-import {formatVND} from "@/Utils/FormatVND.tsx";
 import {StackType} from "@/Store/StackSlice.tsx";
 
 
 export interface Props {
     item: StackType;
     columnKey: string;
+    handleDetail: (key:string) => void;
     handleDelete: (name: string) => void;
-    handleDetail: (name: string) => void;
 }
 
 const RenderCell: React.FC<Props> = ({
@@ -24,7 +21,6 @@ const RenderCell: React.FC<Props> = ({
                                      }) => {
 
     const cellValue = item[columnKey as keyof StackType];
-
     switch (columnKey) {
 
         case "createdAt":
@@ -50,7 +46,8 @@ const RenderCell: React.FC<Props> = ({
                 </div>
             );
         case "description":
-            return <Tooltip content={item?.description}>
+            return <Tooltip                 aria-labelledby="Input"
+                                            content={item?.description}>
                         <span className="text-md w-[150px] leading-snug line-clamp-3 overflow-hidden">
                             {item?.description}
                         </span>
@@ -69,6 +66,7 @@ const RenderCell: React.FC<Props> = ({
                         <span>{percent}%</span>
                     </div>
                     <Progress
+                        aria-labelledby="Input"
                         color={percent > 50 ? "success" : "primary"}
                         radius="sm"
                         size="sm"
@@ -82,39 +80,25 @@ const RenderCell: React.FC<Props> = ({
             return (
                 <div className="relative flex items-center gap-2">
 
-                    <Tooltip content="Edit">
+                    <Tooltip                 aria-labelledby="Input"
+                                             content="Edit">
                         <span onClick={()=>{
-                            handleDetail(item.stackName)
+                            handleDetail(item.stackId);
                         }}  className="text-lg text-default-400 cursor-pointer active:opacity-50">
                             <EditIcon/>
                         </span>
                     </Tooltip>
-                    <Tooltip color="danger" content="Delete user">
+                    <Tooltip                 aria-labelledby="Input"
+                                             color="danger" content="Delete user">
                         <span onClick={()=>{
-                            handleDelete(item.stackName)
+                            handleDelete( item.stackId);
                         }} className="text-lg text-danger cursor-pointer active:opacity-50">
                             <DeleteIcon/>
                         </span>
                     </Tooltip>
                 </div>
             );
-        case "actions":
-            return (
-                <div className="relative flex justify-end items-center gap-2">
-                    <Dropdown className="text-gray-800 dark:text-white bg-background border-1 border-default-200">
-                        <DropdownTrigger>
-                            <Button isIconOnly radius="full" size="sm" variant="light">
-                                <VerticalDotsIcon className="text-default-400"/>
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu>
-                            <DropdownItem key="view">View</DropdownItem>
-                            <DropdownItem key="edit">Edit</DropdownItem>
-                            <DropdownItem key="delete">Delete</DropdownItem>
-                        </DropdownMenu>
-                    </Dropdown>
-                </div>
-            );
+
 
         default:
             return <span className={"text-gray-800 dark:text-white"}>{cellValue ?? "N/A"}</span>;

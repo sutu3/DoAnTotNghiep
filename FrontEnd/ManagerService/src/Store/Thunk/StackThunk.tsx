@@ -1,9 +1,8 @@
-import {setAddStack, setStackList, StackCreate, StackType} from "@/Store/StackSlice.tsx";
+import {setAddStack, setStackList, StackCreate, StackType,initToTalPage} from "@/Store/StackSlice.tsx";
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {callApiThunk} from "@/Store/Store.tsx";
 import {API_ROUTES, pageApi} from "@/Constants/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
-import {initToTalPage} from "@/Store/Unit.tsx";
 
 export const addStack = createAsyncThunk(
     "stack/addStack",
@@ -33,15 +32,6 @@ export const GetAllStack = createAsyncThunk(
         )
 );
 
-
-export const mappedStack = (stackFromApi: StackType): StackType => {
-    return {
-        stackId: stackFromApi.stackId,
-        stackName: stackFromApi.stackName,
-        description: stackFromApi.description,
-        bin: stackFromApi.bin,
-    };
-};
 
 export const MiddleGetAllStack = (page: pageApi) => {
     return async function check(dispatch: any, getState: any) {

@@ -85,6 +85,7 @@ const StackSummaryPanel: React.FC<StackSummaryPanelProps> = ({ stack }) => {
             <span>{percent}%</span>
           </div>
           <Progress
+              aria-labelledby="Input"
               className="h-3 rounded-full bg-gray-200 dark:bg-gray-700 accent-orange-500"
               value={percent}
           />
