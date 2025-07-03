@@ -1,5 +1,6 @@
 package com.ddd.warehouse.Module;
 
+import com.ddd.warehouse.Enum.BinStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,9 @@ public class Bins extends BaseEntity{
     String binId;
     @Column(columnDefinition = "VARCHAR(100) COMMENT 'mã code của bin'", nullable = false)
     String binCode;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR(20) COMMENT 'Trạng thái của bin'", nullable = false)
+    BinStatus status;
     @Column(columnDefinition = "INTEGER COMMENT 'sức chưa của bin'", nullable = false)
     Integer capacity;
     @ManyToOne

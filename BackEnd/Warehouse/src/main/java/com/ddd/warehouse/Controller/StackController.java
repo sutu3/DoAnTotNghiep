@@ -5,6 +5,7 @@ import com.ddd.warehouse.Dto.Response.ApiResponse;
 import com.ddd.warehouse.Dto.Response.Stack.StackResponse;
 import com.ddd.warehouse.Dto.Response.Warehouse.WarehousesResponse;
 import com.ddd.warehouse.Form.StackForm;
+import com.ddd.warehouse.Service.Impl.StackBinOrchestratorService;
 import com.ddd.warehouse.Service.StackService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 public class StackController {
     StackService stackService;
+    private final StackBinOrchestratorService stackBinOrchestratorService;
 
     @GetMapping("/search")
     public ApiResponse<Page<StackResponse>> getAll(
@@ -79,7 +81,7 @@ public class StackController {
     @PostMapping
     public ApiResponse<StackResponse> create(@RequestBody StackRequest stackRequest){
         return ApiResponse.<StackResponse>builder()
-                .Result(stackService.createStack(stackRequest))
+                .Result(stackBinOrchestratorService.createStackAndBins(stackRequest))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

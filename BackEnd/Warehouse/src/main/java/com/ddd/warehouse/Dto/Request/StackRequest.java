@@ -9,6 +9,7 @@ import lombok.Builder;
 public record StackRequest(
         String stackName,
         String description,
-        String warehouse
+        String warehouse,
+        int binQuantity
 ) {
 }

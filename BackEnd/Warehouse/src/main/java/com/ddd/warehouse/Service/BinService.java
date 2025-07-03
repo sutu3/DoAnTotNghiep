@@ -2,6 +2,7 @@ package com.ddd.warehouse.Service;
 
 import com.ddd.warehouse.Dto.Request.BinRequest;
 import com.ddd.warehouse.Dto.Response.Bin.BinResponse;
+import com.ddd.warehouse.Dto.Response.Bin.BinResponseNoWarehouse;
 import com.ddd.warehouse.Form.BinForm;
 import com.ddd.warehouse.Module.Bins;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,7 @@ public interface BinService {
     Boolean exsistByBinCode(String BinName,String stackName,String warehouseId);
     Bins getById(String BinId);
     BinResponse getByIdResponse(String BinId);
-    BinResponse createBin(BinRequest BinRequest);
+    BinResponseNoWarehouse createBin(BinRequest BinRequest);
     BinResponse updateBin(BinForm update, String BinId);
     String deleteBin(String BinId);
 }
