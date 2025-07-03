@@ -1,55 +1,34 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { Layers } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
-import TableUI from "@/components/UI/Table/TableUI.tsx";
 import StackSummaryPanel from "@/components/Admin/StackSummaryPanel.tsx";
-import {
-  columns,
-  MiddleAddStack,
-  MiddleGetAllStack,
-} from "@/Store/StackSlice.tsx";
+
 import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
 import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
 import StackForm from "@/components/Form/StackForm.tsx";
-import { StacksSelector, TotalPageStack } from "@/Store/Selector.tsx";
-import { pageApi } from "@/Constants/UrlApi.tsx";
+import { StacksSelector } from "@/Store/Selector.tsx";
+import {MiddleAddStack} from "@/Store/Thunk/StackThunk.tsx";
+import {StackCreate, StackType} from "@/Store/StackSlice.tsx";
+import TableUI from "@/components/Admin/Stack/Table/TableUI.tsx";
 
 export default function StackPage() {
   const stacks = useSelector(StacksSelector);
-  const totalPageStack = useSelector(TotalPageStack);
 
   // console.log(totalPageStack);
   const dispatch = useDispatch();
-  const [selectedStack, setSelectedStack] = useState(stacks[0]);
-  const INITIAL_VISIBLE_COLUMNS = [
-    "stackName",
-    "description",
-    "binCount",
-    "statusStack",
-    "actions",
-  ];
-  const [isOpen, setIsOpen] = useState(false);
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(5);
-
-  useEffect(() => {
-    const PageApi: pageApi = { pageNumber: page - 1, pageSize: pageSize - 2 };
-    const fetchData = async () => {
-      (dispatch as any)(MiddleGetAllStack(PageApi));
-    };
-
-    fetchData();
-  }, [page, pageSize]);
-  const [formData, setFormData] = useState({
-    stackName: "",
+  const [selectedStack, setSelectedStack] = useState<StackType>(stacks[0]);
+  const [formState, setFormState] = useState<StackCreate>({
+    binQuantity: 0,
     description: "",
-    warehouse: "",
-  });
+    stackName: "",
+    warehouse: ""
+  })
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleChange = (key: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
+    setFormState((prev) => ({ ...prev, [key]: value }));
   };
   const isSidebarCollapsed = localStorage.getItem("theme") == "light";
 
@@ -57,22 +36,22 @@ export default function StackPage() {
     setIsOpen(!isOpen);
   };
   const handleAddStack = async () => {
-    await (dispatch as any)(MiddleAddStack(formData));
+    await (dispatch as any)(MiddleAddStack(formState));
     setIsOpen(false);
-    setFormData({ stackName: "", description: "", warehouse: "" });
+    setFormState({binQuantity: 0, stackName: "", description: "", warehouse: "" });
   };
   const handleStackClick = (stackId: string) => {
     const found = stacks.find((s: any) => s.stackId === stackId);
 
     if (found) setSelectedStack(found);
   };
-  const stats = selectedStack
+  let stats = selectedStack
     ? {
-        total: 12,
+        total: selectedStack?.bin?.length,
         loaded: selectedStack.bin.filter((b: any) => b.status === "loaded")
           .length,
         free: selectedStack.bin.filter((b: any) => b.status === "free").length,
-        empty: 12 - selectedStack.bin.length,
+        empty: 12 - selectedStack?.bin?.filter((b: any) => b.status === "EMPTY").length,
       }
     : { total: 0, loaded: 0, free: 0, empty: 0 };
 
@@ -105,28 +84,14 @@ export default function StackPage() {
               </div>
 
               <div className="p-0 md:p-4">
-                <TableUI
-                  columns={columns}
-                  getId={(item) =>
-                    String(item?.stackId || item?.userId || item?.id || "")
-                  }
-                  isDarkMode={isSidebarCollapsed}
-                  objects={stacks}
-                  onchange={handleOpenModel}
-                  pageNumber={page}
-                  pageSize={pageSize}
-                  totalPage={totalPageStack}
-                  visibleColumn={INITIAL_VISIBLE_COLUMNS}
-                  onGetId={(item) => handleStackClick(item)}
-                  onPageChange={setPage}
-                />
+                <TableUI setKey={handleStackClick} key={selectedStack?.stackId} open={isOpen} setOpen={handleOpenModel}/>
               </div>
             </div>
           </div>
 
           {/* RIGHT: Chart + Summary */}
           <div>
-            <StackSummaryPanel stack={selectedStack} stats={stats} />
+            <StackSummaryPanel stack={selectedStack} />
           </div>
         </div>
       </div>
@@ -147,7 +112,7 @@ export default function StackPage() {
         title="Thêm Mới nhân viên"
         onOpenChange={setIsOpen}
       >
-        <StackForm data={formData} onChange={handleChange} />
+        <StackForm data={formState} onChange={handleChange} />
       </ModalUI>
     </div>
   );
