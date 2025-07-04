@@ -36,12 +36,12 @@ public class BinController {
                 .success(true)
                 .build();
     }
-    @GetMapping("/{id}")
+    @GetMapping("search/binId/{binId}")
     public ApiResponse<BinResponse> getById(
-            @PathVariable String id
+            @PathVariable String binId
     ){
         return ApiResponse.<BinResponse>builder()
-                .Result(binService.getByIdResponse(id))
+                .Result(binService.getByIdResponse(binId))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)
