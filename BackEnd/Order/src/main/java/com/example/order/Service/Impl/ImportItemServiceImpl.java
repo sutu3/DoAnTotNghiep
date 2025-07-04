@@ -16,6 +16,7 @@ import com.example.order.Form.ImportItemForm;
 import com.example.order.Mapper.ImportItemMapper;
 import com.example.order.Module.ImportItem;
 import com.example.order.Repo.ImportItemRepo;
+import com.example.order.Repo.ImportOrderRepo;
 import com.example.order.Service.ImportItemService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -37,12 +38,20 @@ public class ImportItemServiceImpl implements ImportItemService {
     WarehouseController warehouseController;
     ImportItemMapper importItemMapper;
     ImportItemRepo importItemRepo;
+    private final ImportOrderRepo importOrderRepo;
 
     @Override
     public Page<ImportResponseItem> getAllByWarehouse(Pageable pageable, String warehouse) {
         return importItemRepo.findAllByWarehouseAndIsDeleted(warehouse, false, pageable).map(
                 this::toResponse
         );
+    }
+
+    @Override
+    public Page<ImportResponseItem> getAllByOrder(Pageable pageable, String order) {
+        importOrderRepo.findById(order).orElseThrow(()->new AppException(ErrorCode.IMPORT_ORDER_NOT_FOUND));
+        return importItemRepo.findAllByImportOrder_ImportOrderIdAndIsDeleted(order, false, pageable)
+                .map(importItemMapper::toResponse);
     }
 
     @Override
@@ -90,15 +99,12 @@ public class ImportItemServiceImpl implements ImportItemService {
                 .getSupplier(importItem.getSupplier()).getResult();
         ProductResponse productResponse=productController
                 .getProductById(importItem.getProduct()).getResult();
-        WarehousesResponse warehousesResponse=warehouseController
-                .getWarehouse(importItem.getWarehouse()).getResult();
         UnitNameResponse unitNameResponse=productController
                 .getUnitById(importItem.getUnit()).getResult();
         ImportResponseItem importResponseItem=importItemMapper.toResponse(importItem);
         importResponseItem.setCreateByUser(userResponse);
         importResponseItem.setSupplier(supplierResponse);
         importResponseItem.setProduct(productResponse);
-        importResponseItem.setWarehouse(warehousesResponse);
         importResponseItem.setUnit(unitNameResponse);
         return importResponseItem;
     }

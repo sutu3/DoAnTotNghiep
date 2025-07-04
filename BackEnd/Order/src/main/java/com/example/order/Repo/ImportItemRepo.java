@@ -10,5 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ImportItemRepo extends JpaRepository<ImportItem,String>, JpaSpecificationExecutor<ImportItem> {
     Page<ImportItem> findAllByWarehouseAndIsDeleted(String warehouse, Boolean isDeleted, Pageable pageable);
+    Page<ImportItem> findAllByImportOrder_ImportOrderIdAndIsDeleted(String orderId, Boolean isDeleted, Pageable pageable);
 
 }
