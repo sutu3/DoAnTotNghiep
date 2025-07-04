@@ -41,6 +41,17 @@ public class UnitController {
                 .success(true)
                 .build();
     }
+    @GetMapping("/search/unitId/{unitId}")
+    public ApiResponse<UnitResponse> getById(
+            @PathVariable String unitId
+    ){
+        return ApiResponse.<UnitResponse>builder()
+                .Result(unitService.getByIdResponse(unitId))
+                .code(0)
+                .message("SuccessFully")
+                .success(true)
+                .build();
+    }
     @GetMapping("/search/UnitNames")
     public ApiResponse<List<UnitNameResponse>> getAllByGroupUnitName(){
         return ApiResponse.<List<UnitNameResponse>>builder()
