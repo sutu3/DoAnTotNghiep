@@ -9,6 +9,7 @@ public record ImportRequestItem(
         String warehouse,
         String supplier,
         String unit,
+        String importOrder,
         int requestQuantity,
         String note,
         BigDecimal costUnitBase,

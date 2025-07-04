@@ -45,4 +45,7 @@ public class ImportItem extends BaseEntity {
     String createByUser;
     @Column(columnDefinition = "DATE COMMENT 'thời gian nhập sản phẩm'")
     LocalDateTime importAt;
+    @ManyToOne
+    @JoinColumn(name = "importOrderId",nullable = false)
+    ImportOrder importOrder;
 }

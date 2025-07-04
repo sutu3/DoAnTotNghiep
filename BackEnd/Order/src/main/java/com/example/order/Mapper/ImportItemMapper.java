@@ -12,11 +12,11 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 
 public interface ImportItemMapper {
+    @Mapping(target = "importOrder",ignore = true)
     ImportItem toEntity(ImportRequestItem requestItem);
     @Mapping(target = "product",ignore = true)
     @Mapping(target = "unit",ignore = true)
     @Mapping(target = "supplier",ignore = true)
-    @Mapping(target = "warehouse",ignore = true)
     @Mapping(target = "bin",ignore = true)
     @Mapping(target = "createByUser",ignore = true)
     ImportResponseItem toResponse(ImportItem importItem);

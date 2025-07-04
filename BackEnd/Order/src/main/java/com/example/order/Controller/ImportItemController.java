@@ -26,20 +26,20 @@ import java.util.List;
 public class ImportItemController {
     ImportItemService importItemService;
     // GET - Lấy tất cả items theo orderId
-//    @GetMapping("/search/order/{orderId}")
-//    public ApiResponse<Page<ImportOrderItemResponse>> getAllByOrderId(
-//            @RequestParam("pageNumber") int page,
-//            @RequestParam("pageSize") int size,
-//            @PathVariable String orderId
-//    ) {
-//        Pageable pageable = PageRequest.of(page, size);
-//        return ApiResponse.<Page<ImportOrderItemResponse>>builder()
-//                .Result(importOrderItemService.getAllByOrderId(pageable, orderId))
-//                .code(0)
-//                .message("SuccessFull")
-//                .success(true)
-//                .build();
-//    }
+    @GetMapping("/search/order/{orderId}")
+    public ApiResponse<Page<ImportResponseItem>> getAllByOrderId(
+            @RequestParam("pageNumber") int page,
+            @RequestParam("pageSize") int size,
+            @PathVariable String orderId
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ApiResponse.<Page<ImportResponseItem>>builder()
+                .Result(importItemService.getAllByOrder(pageable, orderId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
 
     // GET - Lấy items theo warehouse
     @GetMapping("/search/warehouseId/{warehouseId}")
