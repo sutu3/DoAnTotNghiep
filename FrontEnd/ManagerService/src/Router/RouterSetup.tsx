@@ -26,6 +26,7 @@ import SupplierPage from "@/pages/Supplier/page.tsx";
 import AddNewSupplierPage from "@/pages/Supplier/Addnew/page.tsx";
 import ProductPage from "@/pages/Product/page.tsx";
 import AddNewProductPage from "@/pages/Product/Addnew/page.tsx";
+import StackDetailPage from "@/pages/Stack/Bin/page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,7 @@ const router = createBrowserRouter([
       { path: "/admin/users", element: <User /> },
       { path: "/admin/", element: <WarehousePage /> },
       { path: "/admin/locations", element: <StackPage /> },
+      { path: "/admin/locations/stack", element: <StackDetailPage /> },
       { path: "/admin/taskType", element: <Task /> },
       { path: "/admin/tasks", element: <TasksPage /> },
       { path: "/admin/unitType", element: <DetailUnit /> },
