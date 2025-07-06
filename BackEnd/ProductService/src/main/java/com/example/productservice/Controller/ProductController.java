@@ -74,6 +74,16 @@ public class ProductController {
                 .success(true)
                 .build();
     }
+    @GetMapping("/search/productId/{productId}")
+    public ApiResponse<ProductResponse> getById(
+            @PathVariable String productId){
+        return ApiResponse.<ProductResponse>builder()
+                .Result(productService.getByIdResponse(productId))
+                .code(0)
+                .message("SuccessFully")
+                .success(true)
+                .build();
+    }
     @DeleteMapping("/{productId}")
     public ApiResponse<String> delete(@PathVariable String productId){
         productService.deleteByProductId(productId);
