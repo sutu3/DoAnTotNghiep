@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(
         name = "Catch",
         url = "https://doantotnghiep-r5ta.onrender.com/api/cache",
+        //url = "http://localhost:8081/api/cache",
         fallback = UserServiceFallback.class)
 public interface UserController {
     @GetMapping("/users/{id}")
