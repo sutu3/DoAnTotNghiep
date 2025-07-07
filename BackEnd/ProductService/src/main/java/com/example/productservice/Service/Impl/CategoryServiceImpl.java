@@ -1,5 +1,6 @@
 package com.example.productservice.Service.Impl;
 
+import com.example.productservice.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.productservice.Client.UserService.UserController;
 import com.example.productservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,22 +38,12 @@ public class CategoryServiceImpl implements CategoryService {
     CategoryMapper categoryMapper;
     WarehouseController warehouseController;
     UserController userController;
+    private final AsyncServiceImpl asyncServiceImpl;
 
     @Override
     public Page<CategoryResponse> getAllByWarehouseId(Pageable pageable, String warehouses) {
         return categoryRepo.findAllByIsDeletedAndWarehouses(false, warehouses,pageable)
-                .map(category -> {
-                    WarehousesResponse warehousesResponse=warehouseController
-                            .getWarehouse(category.getWarehouses())
-                            .getResult();
-                   UserResponse userResponse= userController
-                           .getUser(category.getCreateByUser())
-                           .getResult();
-                    CategoryResponse categoryResponse = categoryMapper.toResponse(category);
-                    return categoryMapper.updateCreateByUser(
-                            categoryMapper.updateWarehouse(categoryResponse, warehousesResponse)
-                            ,userResponse);
-                });
+                .map(this::enrich);
     }
 
     @Override
@@ -72,23 +64,12 @@ public class CategoryServiceImpl implements CategoryService {
                 .getWarehouse(warehouses)
                 .getResult();
         Category category=getByName(name,warehouses);
-        CategoryResponse categoryResponse=categoryMapper.toResponse(category);
-        UserResponse userResponse= userController
-                .getUser(category.getCreateByUser())
-                .getResult();
-        return categoryMapper.updateCreateByUser(
-                categoryMapper.updateWarehouse(categoryResponse, warehouse)
-                ,userResponse);
+        return enrich(category);
     }
 
     @Override
     public CategoryResponse createCategory(CategoryRequest request) {
-        WarehousesResponse warehouse = warehouseController
-                .getWarehouse(request.warehouses())
-                .getResult();
-        UserResponse userResponse= userController
-                .getUser(request.createByUser())
-                .getResult();
+
         Optional<Category> existing = categoryRepo
                 .findByCategoryNameAndWarehouses(request.categoryName(),request.warehouses());
         if(existing.isPresent()){
@@ -98,17 +79,13 @@ public class CategoryServiceImpl implements CategoryService {
             }
             category.setIsDeleted(false);
             category.setDescription(request.description());
-            CategoryResponse categoryResponse=categoryMapper.toResponse(categoryRepo.save(category));
-            return categoryMapper.updateCreateByUser(
-                    categoryMapper.updateWarehouse(categoryResponse, warehouse)
-                    ,userResponse);
+            Category savedCategory = categoryRepo.save(category);
+            return enrich(savedCategory);
         }
         Category category=categoryMapper.toEntity(request);
         category.setIsDeleted(false);
-        CategoryResponse categoryResponse=categoryMapper.toResponse(categoryRepo.save(category));
-        return categoryMapper.updateCreateByUser(
-                categoryMapper.updateWarehouse(categoryResponse, warehouse)
-                ,userResponse);
+        Category savedCategory = categoryRepo.save(category);
+        return enrich(savedCategory);
     }
 
     @Override
@@ -128,17 +105,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse getByIdResponse(String id) {
         Category category=getById(id);
-        WarehousesResponse warehousesResponse=warehouseController
-                .getWarehouse(category.getWarehouses())
-                .getResult();
-        UserResponse userResponse= userController
-                .getUser(category.getCreateByUser())
-                .getResult();
-        CategoryResponse categoryResponse=categoryMapper
-                .toResponse(category);
-        return  categoryMapper.updateCreateByUser(
-                categoryMapper.updateWarehouse(categoryResponse, warehousesResponse)
-                ,userResponse);
+        return enrich(category);
     }
 
     @Override
@@ -146,15 +113,18 @@ public class CategoryServiceImpl implements CategoryService {
         Category category=getById(id);
         getByName(update.categoryName(),category.getWarehouses());
         categoryMapper.update(category,update);
-        UserResponse userResponse= userController
-                .getUser(category.getCreateByUser())
-                .getResult();
-        WarehousesResponse warehousesResponse=warehouseController
-                .getWarehouse(category.getWarehouses())
-                .getResult();
-        CategoryResponse categoryResponse=categoryMapper.toResponse(categoryRepo.save(category));
-        return  categoryMapper.updateCreateByUser(
-                categoryMapper.updateWarehouse(categoryResponse, warehousesResponse)
-                ,userResponse);
+        Category savedCategory = categoryRepo.save(category);
+        return enrich(savedCategory);
+    }
+
+    @Override
+    public CategoryResponse enrich(Category category) {
+        CompletableFuture<UserResponse> userFuture = asyncServiceImpl.getUserAsync(category.getCreateByUser());
+        CompletableFuture<WarehousesResponse> warehouseFuture = asyncServiceImpl.getWarehouseAsync(category.getWarehouses());
+        CompletableFuture.allOf(userFuture, warehouseFuture).join();
+        CategoryResponse categoryResponse=categoryMapper.toResponse(category);
+        categoryResponse.setCreateByUser(userFuture.join());
+        categoryResponse.setWarehouses(warehouseFuture.join());
+        return categoryResponse;
     }
 }

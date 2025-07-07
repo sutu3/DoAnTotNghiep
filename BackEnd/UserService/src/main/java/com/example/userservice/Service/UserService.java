@@ -15,8 +15,8 @@ public interface UserService {
     Page<UserResponse> getAllByWarehouseId(String warehouseId,Pageable pageable);
     Page<UserResponse> getAllUserByUserName(String userName, Pageable pageable);
     UserResponse CreateUser(UserRequest request);
-    UserResponse MapperUserResponse(UserResponse response, WarehousesResponse warehousesResponse);
     String DeletedUser(String id);
     Users findById(String id);
     UserResponse getByUserId(String id);
+    UserResponse enrich(Users users);
 }

@@ -20,4 +20,5 @@ public interface TaskTypeService {
     TaskTypeResponse createTaskType(TaskTypeRequest request);
     TaskTypeResponse updateTaskType(TaskTypeForm update,String id);
     String deleteByTaskName(String taskName,String warehouses);
+    TaskTypeResponse entry(TaskType taskType);
 }
