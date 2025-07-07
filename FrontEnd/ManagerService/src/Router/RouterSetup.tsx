@@ -31,6 +31,7 @@ import MyTasksPage from "@/pages/TaskType/Tasks/Staff/page.tsx";
 import ExecuteImportPage from "@/pages/ExecuteImport/page.tsx";
 import ExecuteExportPage from "@/pages/ExecuteExport/page.tsx";
 import CreateExportOrderPage from "@/pages/OrderExport/page.tsx";
+import StackDetailPage from "@/pages/Stack/Bin/page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,7 @@ const router = createBrowserRouter([
       { path: "/admin/users", element: <User /> },
       { path: "/admin/", element: <WarehousePage /> },
       { path: "/admin/locations", element: <StackPage /> },
+      { path: "/admin/locations/stack", element: <StackDetailPage /> },
       { path: "/admin/taskType", element: <Task /> },
       { path: "/admin/tasks", element: <TasksPage /> },
       { path: "/admin/unitType", element: <DetailUnit /> },

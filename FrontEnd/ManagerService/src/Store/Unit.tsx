@@ -58,6 +58,7 @@ const UnitSlice = createSlice({
     initialState,
     reducers: {
         initToTalPage: (state, action) => {
+            console.log("state:initToTalPage "+action.payload);
             state.totalPage = action.payload || 0;
         },
         setUnitList: (state, action) => {
