@@ -8,7 +8,6 @@ import { HeroUIProvider } from "@heroui/system";
 import { Provider } from "react-redux";
 import { ToastProvider } from "@heroui/react";
 
-import LoginPage from "@/pages/LoginPage.tsx";
 import AdminLayout from "@/layouts/AdminLayout.tsx";
 import PageNotFound from "@/pages/PageNotFound.tsx";
 import { CheckAuth } from "@/Utils/CheckAuth.tsx";
@@ -26,6 +25,12 @@ import SupplierPage from "@/pages/Supplier/page.tsx";
 import AddNewSupplierPage from "@/pages/Supplier/Addnew/page.tsx";
 import ProductPage from "@/pages/Product/page.tsx";
 import AddNewProductPage from "@/pages/Product/Addnew/page.tsx";
+import LoginPage from "@/pages/Login/page.tsx";
+import OrderRequestImportForm from "@/pages/OrderImport/page.tsx";
+import MyTasksPage from "@/pages/TaskType/Tasks/Staff/page.tsx";
+import ExecuteImportPage from "@/pages/ExecuteImport/page.tsx";
+import ExecuteExportPage from "@/pages/ExecuteExport/page.tsx";
+import CreateExportOrderPage from "@/pages/OrderExport/page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -50,6 +55,11 @@ const router = createBrowserRouter([
       { path: "/admin/categories", element: <CategoryPage /> },
       { path: "/admin/suppliers", element: <SupplierPage /> },
       { path: "/admin/suppliers/addnew", element: <AddNewSupplierPage /> },
+      { path: "/staff/request-import", element: <OrderRequestImportForm /> },
+      { path: "/staff/tasks", element: <MyTasksPage /> },
+      { path: "/staff/import", element: <ExecuteImportPage /> },
+      { path: "/staff/export", element: <ExecuteExportPage /> },
+      { path: "/staff/request-export", element: <CreateExportOrderPage /> },
     ],
   },
   { path: "/login", element: <LoginPage /> },
