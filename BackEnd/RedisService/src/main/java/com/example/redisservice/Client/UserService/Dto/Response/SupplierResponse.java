@@ -21,7 +21,5 @@ public class SupplierResponse {
     String district;
     String street;
     String country;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 
 }

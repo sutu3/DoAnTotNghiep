@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
         name = "Catch",
-        url = "https://doantotnghiep-r5ta.onrender.com",
+        url = "https://doantotnghiep-r5ta.onrender.com/api/cache",
         fallback = UserServiceFallback.class)
 public interface UserController {
-    @GetMapping("/user/{id}")
+    @GetMapping("/users/{id}")
     ApiResponse<UserResponse> getUser(@PathVariable String id);
-    @GetMapping("/supplier/{id}")
+    @GetMapping("/suppliers/{id}")
     ApiResponse<SupplierResponse> getSupplier(@PathVariable String id);}

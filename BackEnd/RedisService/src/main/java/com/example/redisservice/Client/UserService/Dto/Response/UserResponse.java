@@ -19,6 +19,4 @@ public class UserResponse {
     String email;
     String urlImage;
     String phoneNumber;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 }
