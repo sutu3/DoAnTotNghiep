@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
-        name = "User",
-        url = "https://userservice-kuug.onrender.com/api",
+        name = "Catch",
+        url = "https://doantotnghiep-r5ta.onrender.com",
         fallback = UserServiceFallback.class)
 public interface UserController {
-    @GetMapping("/users/{id}")
+    @GetMapping("/user/{id}")
     ApiResponse<UserResponse> getUser(@PathVariable String id);
-    @GetMapping("/suppliers/{id}")
+    @GetMapping("/supplier/{id}")
     ApiResponse<SupplierResponse> getSupplier(@PathVariable String id);}
