@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: RedisService
+  redis:
+    uri: redis://\${REDIS_USERNAME}:\${REDIS_PASSWORD}@\${REDIS_HOST}:\${REDIS_PORT}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      username: ${REDIS_USERNAME}
+      password: ${REDIS_PASSWORD}
+      ssl:
+        enabled: ${REDIS_SSL_ENABLED:true}
+      timeout: ${REDIS_TIMEOUT:10000}ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+server:
+  port: 8081
+  address: 0.0.0.0
+
+logging:
+  level:
+    org.springframework.data.redis: DEBUG
+    io.lettuce.core: DEBUG
