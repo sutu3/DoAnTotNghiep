@@ -1,7 +1,7 @@
 const BASE_URL_Warehouse = "https://doantotnghiep-pb6y.onrender.com/api";
 const BASE_URL_User = "https://userservice-kuug.onrender.com/api";
 const BASE_URL_Product = "https://productservice-8qdv.onrender.com/api";
-const BASE_URL_File = "https://fileservice-zp3y.onrender.com";
+const BASE_URL_File = "https://fileservice-dz2g.onrender.com";
 export interface pageApi {
   pageNumber: number;
   pageSize: number;
