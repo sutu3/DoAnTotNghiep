@@ -9,6 +9,7 @@ import com.example.userservice.Form.TaskForm;
 import com.example.userservice.Model.Tasks;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,4 +24,5 @@ public interface TaskService {
     TaskResponse updateLevel(LevelRequest level, String id);
     TaskResponse updateCompletedStatus(String id);
     String deleteTask(String id);
+    TaskResponse entry(Tasks task);
 }

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +41,7 @@ public class ProductServiceImpl implements ProductService {
      UserController userController;
      CategoryService categoryService;
      UnitService unitService;
+    private final AsyncServiceImpl asyncServiceImpl;
 
     @Override
     public Page<ProductResponse> getAllByWarehouses(String warehouse, Pageable pageable) {
@@ -64,21 +66,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse getByIdResponse(String id) {
         Product product = getById(id);
-        ProductResponse productResponse=productMapper.toResponse(product);
-        UserResponse userResponse=userController.getUser(product.getCreateByUser()).getResult();
-        WarehousesResponse warehousesResponse=warehouseController.getWarehouse(product.getWarehouses()).getResult();
-        return productMapper.updateCreateByUser(
-                productMapper.updateWarehouse(productResponse,warehousesResponse),userResponse);
+        Product productSave=productRepo.save(product);
+        return  enrich(productSave);
     }
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
         Category category=categoryService.getById(request.category());
         Unit unit=unitService.getById(request.unit());
-        WarehousesResponse warehousesResponse=warehouseController
-                .getWarehouse(request.warehouses()).getResult();
-        UserResponse userResponse=userController
-                .getUser(request.createByUser()).getResult();
         Optional<Product> existing=productRepo.findBySkuAndWarehouses(request.sku(),request.warehouses());
         if(existing.isPresent()){
             Product  product=existing.get();
@@ -89,29 +84,24 @@ public class ProductServiceImpl implements ProductService {
             product.setCategory(category);
             product.setUnit(unit);
             product.setIsDeleted(false);
-            ProductResponse productResponse=productMapper.toResponse(productRepo.save(product));
-            return  productMapper.updateCreateByUser(
-                    productMapper.updateWarehouse(productResponse,warehousesResponse),userResponse);
+            Product productSave=productRepo.save(product);
+            return  enrich(productSave);
         }
         Product product=productMapper.toEntity(request);
         product.setCategory(category);
         product.setUnit(unit);
         product.setIsDeleted(false);
         product.setIsActive(true);
-        ProductResponse productResponse=productMapper.toResponse(productRepo.save(product));
-        return  productMapper.updateCreateByUser(
-                productMapper.updateWarehouse(productResponse,warehousesResponse),userResponse);
+        Product productSave=productRepo.save(product);
+        return  enrich(productSave);
     }
 
     @Override
     public ProductResponse getBySku(String sku) {
         Product product=productRepo.findBySkuAndIsDeleted(sku,false)
                 .orElseThrow(()->new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-        UserResponse userResponse=userController.getUser(product.getCreateByUser()).getResult();
-        WarehousesResponse warehousesResponse=warehouseController.getWarehouse(product.getWarehouses()).getResult();
-        ProductResponse productResponse=productMapper.toResponse(product);
-        return productMapper.updateCreateByUser(
-                productMapper.updateWarehouse(productResponse,warehousesResponse),userResponse);
+        Product productSave=productRepo.save(product);
+        return  enrich(productSave);
     }
 
     @Override
@@ -119,11 +109,8 @@ public class ProductServiceImpl implements ProductService {
         Product product = getById(productId);
         productMapper.update(product,update);
         Product productUpdate=productRepo.save(product);
-        UserResponse userResponse=userController.getUser(productUpdate.getCreateByUser()).getResult();
-        WarehousesResponse warehousesResponse=warehouseController.getWarehouse(productUpdate.getWarehouses()).getResult();
-        ProductResponse productResponse=productMapper.toResponse(productUpdate);
-        return productMapper.updateCreateByUser(
-                productMapper.updateWarehouse(productResponse,warehousesResponse),userResponse);
+        Product productSave=productRepo.save(productUpdate);
+        return  enrich(productSave);
     }
 
     @Override
@@ -136,12 +123,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse enrich(Product product) {
-        UserResponse userResponse = userController.getUser(product.getCreateByUser()).getResult();
-        WarehousesResponse warehousesResponse = warehouseController.getWarehouse(product.getWarehouses()).getResult();
-        SupplierResponse supplierResponse=userController.getSupplier(product.getSupplier()).getResult();
-        ProductResponse productResponse = productMapper.toResponse(product);
-        ProductResponse productResponseWarehouse = productMapper.updateWarehouse(productResponse, warehousesResponse);
-        ProductResponse productResponseSupplier = productMapper.updateSupplier(productResponseWarehouse, supplierResponse);
-        return productMapper.updateCreateByUser(productResponseSupplier, userResponse);
+        CompletableFuture<UserResponse> userFuture = asyncServiceImpl.getUserAsync(product.getCreateByUser());
+        CompletableFuture<WarehousesResponse> warehouseFuture = asyncServiceImpl.getWarehouseAsync(product.getWarehouses());
+        CompletableFuture<SupplierResponse> supplierFuture = asyncServiceImpl.getSupplierAsync(product.getSupplier());
+
+        CompletableFuture.allOf(userFuture, warehouseFuture, supplierFuture).join();
+
+        ProductResponse response = productMapper.toResponse(product);
+        response.setCreateByUser(userFuture.join());
+        response.setWarehouses(warehouseFuture.join());
+        response.setSupplier(supplierFuture.join());
+        return response;
     }
 }

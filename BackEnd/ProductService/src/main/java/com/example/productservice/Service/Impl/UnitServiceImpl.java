@@ -82,8 +82,6 @@ public class UnitServiceImpl implements UnitService {
 
     @Override
     public UnitResponse createUnit(UnitRequest request) {
-        log.info(request.unitName());
-        log.info(request.shortName());
         UserResponse userResponse=userController
                 .getUser(request.createByUser()).getResult();
         GroupUnit groupUnit=groupUnitService.getById(request.groupUnit());

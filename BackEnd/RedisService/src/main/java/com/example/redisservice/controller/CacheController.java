@@ -31,7 +31,7 @@ public class CacheController {
                 .success(true)
                 .build();
     }
-    @GetMapping("/supplier/{supplierId}")
+    @GetMapping("/suppliers/{supplierId}")
     public ApiResponse<SupplierResponse> getCachedSupplier(@PathVariable String supplierId) {
         return ApiResponse.<SupplierResponse>builder()
                 .Result(cacheService.getSupplier(supplierId))
