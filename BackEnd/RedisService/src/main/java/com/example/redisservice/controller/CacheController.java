@@ -1,5 +1,6 @@
 package com.example.redisservice.controller;
 
+import com.example.redisservice.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.redisservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.redisservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.redisservice.DTOs.Response.ApiResponse;
@@ -14,12 +15,21 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Cache API", description = "Redis Cache Management")
 public class CacheController {
 
-    private final CacheService cacheService;
+    CacheService cacheService;
 
     @GetMapping("/users/{userId}")
     public ApiResponse<UserResponse> getCachedUser(@PathVariable String userId) {
         return ApiResponse.<UserResponse>builder()
                 .Result(cacheService.getUser(userId))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/supplier/{supplierId}")
+    public ApiResponse<SupplierResponse> getCachedSupplier(@PathVariable String supplierId) {
+        return ApiResponse.<SupplierResponse>builder()
+                .Result(cacheService.getSupplier(supplierId))
                 .code(0)
                 .message("Success")
                 .success(true)
