@@ -2,16 +2,16 @@ spring:
   application:
     name: RedisService
   redis:
-    uri: redis-cli -u redis://default:iTWzT8rgOuxvHBx3J5p4DVk4crq98IWC@redis-16525.c8.us-east-1-3.ec2.redns.redis-cloud.com:16525
+    uri: redis://\${REDIS_USERNAME}:\${REDIS_PASSWORD}@\${REDIS_HOST}:\${REDIS_PORT}
   data:
     redis:
-      host: redis-16525.c8.us-east-1-3.ec2.redns.redis-cloud.com
-      port: 16525
-      username: default
-      password: iTWzT8rgOuxvHBx3J5p4DVk4crq98IWC
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      username: ${REDIS_USERNAME}
+      password: ${REDIS_PASSWORD}
       ssl:
-        enabled: true
-      timeout: 10000ms
+        enabled: ${REDIS_SSL_ENABLED:true}
+      timeout: ${REDIS_TIMEOUT:10000}ms
       lettuce:
         pool:
           max-active: 8
@@ -21,6 +21,7 @@ spring:
 server:
   port: 8081
   address: 0.0.0.0
+
 logging:
   level:
     org.springframework.data.redis: DEBUG
