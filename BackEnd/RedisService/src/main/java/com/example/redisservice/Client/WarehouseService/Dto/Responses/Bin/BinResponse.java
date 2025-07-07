@@ -15,7 +15,5 @@ public class BinResponse{
     String binCode;
     Integer capacity;
     String status;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 
 }

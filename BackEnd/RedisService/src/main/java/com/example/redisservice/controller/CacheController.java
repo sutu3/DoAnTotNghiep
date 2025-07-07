@@ -6,12 +6,17 @@ import com.example.redisservice.Client.WarehouseService.Dto.Responses.Warehouse.
 import com.example.redisservice.DTOs.Response.ApiResponse;
 import com.example.redisservice.Service.CacheService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/cache")
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
+@Slf4j
 @Tag(name = "Cache API", description = "Redis Cache Management")
 public class CacheController {
 

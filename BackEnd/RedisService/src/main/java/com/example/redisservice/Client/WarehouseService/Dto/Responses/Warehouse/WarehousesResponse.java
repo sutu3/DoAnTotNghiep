@@ -18,6 +18,4 @@ public class WarehousesResponse{
     String district;
     String country;
     String managerId;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 }
