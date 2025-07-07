@@ -1,0 +1,26 @@
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+spring:
+  application:
+    name: Order
+  datasource:
+    url: jdbc:mysql://mysql-32d8e507-minhdaimk111-0ea4.l.aivencloud.com:25644/orderDB?createDatabaseIfNotExist=true&serverTimezone=UTC&ssl-mode=REQUIRED
+    username: "avnadmin"
+    password: "AVNS_qlIFCPONWrpyRD8A4Rr"
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
+
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+server:
+  port: 8080
+  address: 0.0.0.0
