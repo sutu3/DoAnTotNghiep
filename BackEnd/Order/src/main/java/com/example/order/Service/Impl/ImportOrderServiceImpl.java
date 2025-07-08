@@ -1,10 +1,14 @@
 package com.example.order.Service.Impl;
 
+import com.example.order.Client.ProductService.Dto.Response.ProductResponse;
+import com.example.order.Client.ProductService.Dto.Response.UnitNameResponse;
+import com.example.order.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.order.Client.UserService.Dto.Response.UserResponse;
 import com.example.order.Client.UserService.UserController;
 import com.example.order.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.order.Client.WarehouseService.WarehouseController;
 import com.example.order.Dto.Request.ImportOrderRequest;
+import com.example.order.Dto.Response.ImportItem.ImportResponseItem;
 import com.example.order.Dto.Response.ImportOrder.ImportOrderResponse;
 import com.example.order.Enum.OrderStatus;
 import com.example.order.Enum.OrderType;
@@ -25,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -33,13 +38,13 @@ import java.time.LocalDateTime;
 public class ImportOrderServiceImpl implements ImportOrderService {
     ImportOrderMapper importOrderMapper;
     UserController userController;
-    WarehouseController warehouseController;
     ImportOrderRepo importOrderRepo;
+    AsyncServiceImpl asyncServiceImpl;
 
     @Override
     public Page<ImportOrderResponse> getAllByWarehouse(String warehouse, Pageable pageable) {
         return importOrderRepo.findAllByWarehouseAndIsDeleted(warehouse,false,pageable)
-                .map(importOrderMapper::toResponse);
+                .map(this::entry);
     }
 
     @Override
@@ -50,26 +55,28 @@ public class ImportOrderServiceImpl implements ImportOrderService {
 
     @Override
     public ImportOrderResponse getByIdResponse(String id) {
-        return toResponse(getById(id));
+        return entry(getById(id));
     }
 
     @Override
     public Page<ImportOrderResponse> getAllByStatus(String warehouse, String status, Pageable pageable) {
         OrderStatus orderStatus = OrderStatus.valueOf(status);
         return importOrderRepo.findAllByWarehouseAndStatusAndIsDeleted(warehouse, orderStatus, false, pageable)
-                .map(this::toResponse);
+                .map(this::entry);
     }
 
     @Override
     public ImportOrderResponse createOrder(ImportOrderRequest importOrderRequest) {
-
+        log.info("Create Order Request1:{}",importOrderRequest);
         ImportOrder importOrder = importOrderMapper.toEntity(importOrderRequest);
+        log.info("Create Order Request2:{}",importOrder);
         importOrder.setIsDeleted(false);
+        importOrder.setType(OrderType.Request);
         importOrder.setStatus(OrderStatus.Created);
         importOrder.setRequestDate(LocalDateTime.now());
         importOrder.setCreatedAt(LocalDateTime.now());
         ImportOrder savedOrder = importOrderRepo.save(importOrder);
-        return toResponse(savedOrder);
+        return entry(savedOrder);
     }
 
     @Override
@@ -79,7 +86,7 @@ public class ImportOrderServiceImpl implements ImportOrderService {
         importOrder.setUpdatedAt(LocalDateTime.now());
 
         ImportOrder updatedOrder = importOrderRepo.save(importOrder);
-        return toResponse(updatedOrder);
+        return entry(updatedOrder);
     }
 
     @Override
@@ -87,8 +94,8 @@ public class ImportOrderServiceImpl implements ImportOrderService {
         ImportOrder importOrder = getById(id);
         importOrder.setIsDeleted(true);
         importOrder.setDeletedAt(LocalDateTime.now());
-        importOrderRepo.save(importOrder);
-        return toResponse(importOrder);
+        ImportOrder importOrderSave=importOrderRepo.save(importOrder);
+        return entry(importOrderSave);
     }
 
     @Override
@@ -98,7 +105,7 @@ public class ImportOrderServiceImpl implements ImportOrderService {
         importOrder.setUpdatedAt(LocalDateTime.now());
 
         ImportOrder updatedOrder = importOrderRepo.save(importOrder);
-        return toResponse(updatedOrder);
+        return entry(updatedOrder);
     }
 
     @Override
@@ -110,7 +117,7 @@ public class ImportOrderServiceImpl implements ImportOrderService {
         importOrder.setUpdatedAt(LocalDateTime.now());
 
         ImportOrder approvedOrder = importOrderRepo.save(importOrder);
-        return toResponse(approvedOrder);
+        return entry(approvedOrder);
     }
 
     @Override
@@ -121,24 +128,27 @@ public class ImportOrderServiceImpl implements ImportOrderService {
         importOrder.setUpdatedAt(LocalDateTime.now());
 
         ImportOrder rejectedOrder = importOrderRepo.save(importOrder);
-        return toResponse(rejectedOrder);
+        return entry(rejectedOrder);
     }
 
     @Override
-    public ImportOrderResponse toResponse(ImportOrder importOrder) {
-        
-        ImportOrderResponse importOrderResponse = importOrderMapper.toResponse(importOrder);
-        UserResponse userResponse=userController
-                .getUser(importOrder.getCreateByUser()).getResult();
-        if(!importOrder.getAccessByAdmin().isEmpty()){
+    public ImportOrderResponse entry(ImportOrder importOrder) {
+        CompletableFuture<WarehousesResponse> warehouseFuture=asyncServiceImpl
+                .getWarehouseAsync(importOrder.getWarehouse());
+        CompletableFuture<UserResponse> userFuture = asyncServiceImpl
+                .getUserAsync(importOrder.getCreateByUser());
+        CompletableFuture.allOf( warehouseFuture,userFuture).join();
+
+        ImportOrderResponse importOrderResponse=importOrderMapper.toResponse(importOrder);
+        if (importOrder.getAccessByAdmin() != null && !importOrder.getAccessByAdmin().isEmpty()) {
             UserResponse access=userController
                     .getUser(importOrder.getAccessByAdmin()).getResult();
             importOrderResponse.setAccessByAdmin(access);
         }
-        WarehousesResponse warehouseResponse=warehouseController
-                .getWarehouse(importOrder.getWarehouse()).getResult();
-        importOrderResponse.setWarehouse(warehouseResponse);
-        importOrderResponse.setCreateByUser(userResponse);
+
+
+        importOrderResponse.setWarehouse(warehouseFuture.join());
+        importOrderResponse.setCreateByUser(userFuture.join());
         return importOrderResponse;
     }
 }
