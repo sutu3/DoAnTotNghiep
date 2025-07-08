@@ -16,6 +16,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
@@ -39,7 +41,27 @@ public class ProductController {
                 .success(true)
                 .build();
     }
-    @GetMapping("/search/groupUnitName/{groupUnitName}/supplierId/{supplierId}")
+    @GetMapping("/search")
+    public ApiResponse<List<ProductResponse>> searchProducts(
+            @RequestParam(required = false) String productName,
+            @RequestParam(required = false) String warehouseId,
+            @RequestParam(required = false) String sku,
+            @RequestParam(required = false) String supplier,
+            @RequestParam(required = false) Boolean isActive
+    ) {
+        return ApiResponse.<List<ProductResponse>>builder()
+                .Result(productService.searchProducts(
+                        productName,
+                        warehouseId,
+                        sku,
+                        supplier,
+                        isActive))
+                .code(0)
+                .message("SuccessFully")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/search/warehouseId/{warehouseId}/groupUnitName/{groupUnitName}/supplierId/{supplierId}")
     public ApiResponse<Page<ProductResponse>> getAllBySupplier(
             @RequestParam("pageNumber") int page,
             @RequestParam("pageSize") int size,
