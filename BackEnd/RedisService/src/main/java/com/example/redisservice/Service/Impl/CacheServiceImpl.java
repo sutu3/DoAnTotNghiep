@@ -51,23 +51,27 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
+    @Cacheable(value = "products", key = "#productId", unless = "#result == null")
     public ProductResponse getProduct(String productId) {
         log.info("Fetching Product from ProductService for ID: {}", productId);
         return productController.getProductById(productId).getResult();
     }
 
     @Override
+    @Cacheable(value = "units", key = "#unitId", unless = "#result == null")
     public UnitNameResponse getUnit(String unitId) {
         log.info("Fetching Unit from ProductService for ID: {}", unitId);
         return productController.getUnitById(unitId).getResult();
     }
 
     @Override
+    @Cacheable(value = "bins", key = "#binId", unless = "#result == null")
     public BinResponse getBin(String binId) {
         log.info("Fetching Bin from WarehouseService for ID: {}", binId);
         return warehouseController.getBinById(binId).getResult();            }
 
     @Override
+    @CacheEvict(value = "bins", key = "#binId")
     public void evictBin(String binId) {
         log.info("Evicting bin cache for ID: {}", binId);
     }
