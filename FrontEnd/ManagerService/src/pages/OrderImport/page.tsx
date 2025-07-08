@@ -25,28 +25,10 @@ import {MiddleGetAllSupplier} from "@/Store/Thunk/ShupplierThunk.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {ProductSelector, SupplierSelector, UnitSelector, warehouseSelector} from "@/Store/Selector.tsx";
 import {MiddleGetAllProduct} from "@/Store/Thunk/ProductThunk.tsx";
+import {ImportItem, OrderRequestImport} from "@/Store/ImportOrder.tsx";
+import SelectWarehouse from "@/components/Admin/OrderImport/SelectWarehouse.tsx";
 
-interface ImportItem {
-    itemId: string;
-    product: string;
-    productName: string;
-    supplier: string;
-    supplierName: string;
-    unit: string;
-    unitName: string;
-    bin?: string;
-    requestQuantity: number;
-    costUnitBase: number;
-    note?: string;
-    expiryDate?: string;
-}
 
-interface OrderRequestImport {
-    warehouse: string;
-    createByUser: string;
-    description: string;
-    items: ImportItem[];
-}
 
 export default function OrderRequestImportForm() {
     const [formData, setFormData] = useState<OrderRequestImport>({
@@ -68,48 +50,6 @@ export default function OrderRequestImportForm() {
                 "note": "Laptop cho văn phòng, cần kiểm tra kỹ trước khi nhập",
                 "expiryDate": "2026-12-31"
             },
-            {
-                "itemId": "item-002-uuid-string",
-                "product": "prod-002-uuid-string",
-                "productName": "Chuột không dây Logitech",
-                "supplier": "sup-002-uuid-string",
-                "supplierName": "Logitech Việt Nam",
-                "unit": "unit-001-uuid-string",
-                "unitName": "Chiếc",
-                "bin": "bin-002-uuid-string",
-                "requestQuantity": 50,
-                "costUnitBase": 250000,
-                "note": "Chuột wireless cho nhân viên",
-                "expiryDate": null
-            },
-            {
-                "itemId": "item-003-uuid-string",
-                "product": "prod-003-uuid-string",
-                "productName": "Bàn phím cơ Keychron K2",
-                "supplier": "sup-003-uuid-string",
-                "supplierName": "Keychron Official Store",
-                "unit": "unit-001-uuid-string",
-                "unitName": "Chiếc",
-                "bin": null,
-                "requestQuantity": 25,
-                "costUnitBase": 2500000,
-                "note": "Bàn phím cơ cho developer team",
-                "expiryDate": null
-            },
-            {
-                "itemId": "item-004-uuid-string",
-                "product": "prod-004-uuid-string",
-                "productName": "Giấy A4 Double A",
-                "supplier": "sup-004-uuid-string",
-                "supplierName": "Double A Việt Nam",
-                "unit": "unit-002-uuid-string",
-                "unitName": "Thùng",
-                "bin": "bin-003-uuid-string",
-                "requestQuantity": 5,
-                "costUnitBase": 120000,
-                "note": "Giấy in cho văn phòng, mỗi thùng 5 ream",
-                "expiryDate": "2025-06-30"
-            }
         ]
     });
     const dispatch = useDispatch();
@@ -224,18 +164,7 @@ export default function OrderRequestImportForm() {
                                     Hàng</h2>
                             </CardHeader>
                             <CardBody className="space-y-4">
-                                <Select
-                                    label="Kho hàng"
-                                    placeholder="Chọn kho"
-                                    selectedKeys={formData.warehouse ? [formData.warehouse] : []}
-                                    onSelectionChange={(keys) => {
-                                        const warehouseId = Array.from(keys)[0]?.toString();
-                                        setFormData(prev => ({...prev, warehouse: warehouseId}));
-                                    }}>
-                                    {/*{warehouses.map((w) => (*/}
-                                    {/*    <SelectItem key={w.id}>{w.name}</SelectItem>*/}
-                                    {/*))}*/}
-                                </Select>
+                                <SelectWarehouse formData={formData} setFormData={setFormData}/>
 
                                 <Textarea
                                     label="Mô tả đơn hàng"
