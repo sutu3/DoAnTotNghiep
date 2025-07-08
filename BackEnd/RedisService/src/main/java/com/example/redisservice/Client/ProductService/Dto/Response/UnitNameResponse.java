@@ -16,6 +16,4 @@ public class UnitNameResponse {
     String shortName;
     Float ratioToBase;
     Boolean isDefault;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 }
