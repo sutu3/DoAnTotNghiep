@@ -24,6 +24,4 @@ public class ProductResponse {
     String urlImageProduct;
     BigDecimal price;
     Boolean isActive;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 }
