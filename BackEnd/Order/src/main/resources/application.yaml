@@ -6,12 +6,11 @@ springdoc:
 spring:
   application:
     name: Order
-  datasource:
     datasource:
       url: ${MYSQL_URL}
       username: ${MYSQL_USERNAME}
       password: ${MYSQL_PASSWORD}
-    driver-class-name: "com.mysql.cj.jdbc.Driver"
+      driver-class-name: "com.mysql.cj.jdbc.Driver"
 
   jpa:
     database: mysql
