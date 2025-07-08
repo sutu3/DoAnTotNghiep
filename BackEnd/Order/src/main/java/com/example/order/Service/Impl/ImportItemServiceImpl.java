@@ -6,6 +6,7 @@ import com.example.order.Client.ProductService.ProductController;
 import com.example.order.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.order.Client.UserService.Dto.Response.UserResponse;
 import com.example.order.Client.UserService.UserController;
+import com.example.order.Client.WarehouseService.Dto.Responses.Bin.BinResponse;
 import com.example.order.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.order.Client.WarehouseService.WarehouseController;
 import com.example.order.Dto.Request.ImportRequestItem;
@@ -15,9 +16,11 @@ import com.example.order.Exception.ErrorCode;
 import com.example.order.Form.ImportItemForm;
 import com.example.order.Mapper.ImportItemMapper;
 import com.example.order.Module.ImportItem;
+import com.example.order.Module.ImportOrder;
 import com.example.order.Repo.ImportItemRepo;
 import com.example.order.Repo.ImportOrderRepo;
 import com.example.order.Service.ImportItemService;
+import com.example.order.Service.ImportOrderService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -39,19 +43,20 @@ public class ImportItemServiceImpl implements ImportItemService {
     ImportItemMapper importItemMapper;
     ImportItemRepo importItemRepo;
     private final ImportOrderRepo importOrderRepo;
+    private final AsyncServiceImpl asyncServiceImpl;
+    private final ImportOrderService importOrderService;
 
     @Override
     public Page<ImportResponseItem> getAllByWarehouse(Pageable pageable, String warehouse) {
-        return importItemRepo.findAllByWarehouseAndIsDeleted(warehouse, false, pageable).map(
-                this::toResponse
-        );
+        return importItemRepo.findAllByWarehouseAndIsDeleted(warehouse, false, pageable)
+                .map(this::entry);
     }
 
     @Override
     public Page<ImportResponseItem> getAllByOrder(Pageable pageable, String order) {
         importOrderRepo.findById(order).orElseThrow(()->new AppException(ErrorCode.IMPORT_ORDER_NOT_FOUND));
         return importItemRepo.findAllByImportOrder_ImportOrderIdAndIsDeleted(order, false, pageable)
-                .map(importItemMapper::toResponse);
+                .map(this::entry);
     }
 
     @Override
@@ -62,21 +67,25 @@ public class ImportItemServiceImpl implements ImportItemService {
 
     @Override
     public ImportResponseItem getByIdResponse(String id) {
-        return toResponse(getById(id));
+        return entry(getById(id));
     }
 
     @Override
     public ImportResponseItem createItem(ImportRequestItem requestItem) {
+        ImportOrder importOrder= importOrderService.getById(requestItem.importOrder());
         ImportItem importItem=importItemMapper.toEntity(requestItem);
+        importItem.setImportOrder(importOrder);
         importItem.setIsDeleted(false);
-        return toResponse(importItemRepo.save(importItem));
+        ImportItem importItemSave=importItemRepo.save(importItem);
+        return entry(importItemSave);
     }
 
     @Override
     public ImportResponseItem updateItem(ImportItemForm update, String id) {
         ImportItem importItem=importItemRepo.getById(id);
         importItemMapper.toUpdate(importItem,update);
-        return toResponse(importItemRepo.save(importItem));
+        ImportItem importItemSave=importItemRepo.save(importItem);
+        return entry(importItemSave);
     }
     @Override
     public List<ImportResponseItem> createItems(List<ImportRequestItem> requests) {
@@ -92,20 +101,21 @@ public class ImportItemServiceImpl implements ImportItemService {
     }
 
     @Override
-    public ImportResponseItem toResponse(ImportItem importItem) {
-        UserResponse userResponse=userController
-                .getUser(importItem.getCreateByUser()).getResult();
-        SupplierResponse supplierResponse=userController
-                .getSupplier(importItem.getSupplier()).getResult();
-        ProductResponse productResponse=productController
-                .getProductById(importItem.getProduct()).getResult();
-        UnitNameResponse unitNameResponse=productController
-                .getUnitById(importItem.getUnit()).getResult();
+    public ImportResponseItem entry(ImportItem importItem) {
+        CompletableFuture<UnitNameResponse> unitFuture=asyncServiceImpl
+                .getUnitAsync(importItem.getUnit());
+        CompletableFuture<ProductResponse> productFuture = asyncServiceImpl
+                .getProductAsync(importItem.getProduct());
+        CompletableFuture<SupplierResponse> supplierFuture = asyncServiceImpl
+                .getSupplierAsync(importItem.getSupplier());
+        CompletableFuture<UserResponse> userFuture = asyncServiceImpl
+                .getUserAsync(importItem.getCreateByUser());
+        CompletableFuture.allOf( unitFuture,productFuture,supplierFuture,userFuture).join();
         ImportResponseItem importResponseItem=importItemMapper.toResponse(importItem);
-        importResponseItem.setCreateByUser(userResponse);
-        importResponseItem.setSupplier(supplierResponse);
-        importResponseItem.setProduct(productResponse);
-        importResponseItem.setUnit(unitNameResponse);
+        importResponseItem.setCreateByUser(userFuture.join());
+        importResponseItem.setSupplier(supplierFuture.join());
+        importResponseItem.setProduct(productFuture.join());
+        importResponseItem.setUnit(unitFuture.join());
         return importResponseItem;
     }
 }
