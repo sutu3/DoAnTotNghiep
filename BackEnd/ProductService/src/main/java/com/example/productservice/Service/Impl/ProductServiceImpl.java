@@ -15,6 +15,7 @@ import com.example.productservice.Model.Category;
 import com.example.productservice.Model.Product;
 import com.example.productservice.Model.Unit;
 import com.example.productservice.Repo.ProductRepo;
+import com.example.productservice.Repo.Specification.ProductSpecification;
 import com.example.productservice.Service.CategoryService;
 import com.example.productservice.Service.ProductService;
 import com.example.productservice.Service.UnitService;
@@ -24,11 +25,14 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +58,19 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductResponse> getAllBySupplierAndWarehouse(String supplier, String warehouse, Pageable pageable) {
         return productRepo.findAllBySupplierAndWarehousesAndIsDeleted(supplier, warehouse, false, pageable)
                 .map(this::enrich);
+    }
+
+    @Override
+    public List<ProductResponse> searchProducts(String productName,String warehouses, String sku, String supplier, Boolean isActive) {
+        Specification<Product> spec = Specification.where(ProductSpecification.hasProductName(productName))
+                .and(ProductSpecification.hasSku(sku))
+                .and(ProductSpecification.hasSupplier(supplier))
+                .and(ProductSpecification.isActive(isActive))
+                .and(ProductSpecification.hasWarehouses(warehouses));
+    List<Product> listProduct=productRepo.findAll(spec);
+        return listProduct.stream()
+                .map(this::enrich)
+                .collect(Collectors.toList());
     }
 
 

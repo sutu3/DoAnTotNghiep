@@ -7,10 +7,9 @@ spring:
   application:
     name: Order
   datasource:
-    datasource:
-      url: ${MYSQL_URL}
-      username: ${MYSQL_USERNAME}
-      password: ${MYSQL_PASSWORD}
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
     driver-class-name: "com.mysql.cj.jdbc.Driver"
 
   jpa:
