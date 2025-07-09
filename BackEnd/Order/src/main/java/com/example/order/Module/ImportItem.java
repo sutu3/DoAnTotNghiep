@@ -32,7 +32,7 @@ public class ImportItem extends BaseEntity {
     @Column(columnDefinition = "VARCHAR(36) COMMENT 'mã bin đựng'")
     String bin;
     @Column(columnDefinition = "DATE COMMENT 'thời gian hết hạn'")
-    LocalDateTime ExpiredDate;
+    LocalDateTime expiredDate;
     @Column(columnDefinition = "INTEGER COMMENT 'số lượng yêu cầu nhập'",nullable = false)
     int requestQuantity;
     @Column(columnDefinition = "TEXT COMMENT 'ghi chú sản phẩm nhập'")
