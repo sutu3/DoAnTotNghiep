@@ -19,7 +19,6 @@ export interface OrderRequestImport {
     warehouse: string;
     createByUser: string;
     description: string;
-    items: ImportItem[];
 }
 interface OrderImportState{
     orderImport: OrderRequestImport[];

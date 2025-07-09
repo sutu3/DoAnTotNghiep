@@ -18,6 +18,19 @@ export const AddProduct = createAsyncThunk(
             rejectWithValue
         )
 );
+export const GetAllProductBySearch = createAsyncThunk(
+    "product/GetAllProductBySearch",
+    async (
+        { warehouseId,supplierId }: { warehouseId: string,supplierId: string|null },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES.product.product(null).search().bySupplierAndWarehouse(warehouseId, supplierId).getAll,
+            null,
+            rejectWithValue
+        )
+);
 export const MiddleAddProduct = (productCreate:ProductCreate) => {
     return async function (dispatch: any,getState: any) {
         try {
@@ -56,7 +69,22 @@ export const GetAllProductIdWarehouse = createAsyncThunk(
             rejectWithValue
         )
 );
-
+export const MiddleGetAllProductBySearch = (supplierId:string|null) => {
+    return async function (dispatch: any,getState:any) {
+        try {
+            const { warehouse } = getState().warehouse;
+            const warehouseId = warehouse?.warehouseId;
+            const action = await dispatch(GetAllProductBySearch({ warehouseId,supplierId }));
+            dispatch(setProductList(action.payload.result));
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
 export const MiddleGetAllProduct = (page: pageApi) => {
     return async function (dispatch: any,getState:any) {
         try {

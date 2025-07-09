@@ -3,6 +3,7 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
+      
       <profile name="Annotation profile for ProductService" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -15,6 +16,7 @@
         </processorPath>
         <module name="ProductService" />
       </profile>
+
       <profile name="Annotation profile for UserService" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -28,6 +30,7 @@
         <module name="UserService" />
         <module name="FileService" />
       </profile>
+
       <profile name="Annotation profile for Warehouse" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -40,6 +43,7 @@
         </processorPath>
         <module name="Warehouse" />
       </profile>
+
       <profile name="Annotation profile for RedisService" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -52,9 +56,13 @@
         </processorPath>
         <module name="RedisService" />
         <module name="Order" />
+        <module name="ProductService" />
+        <module name="Warehouse" />
       </profile>
+
     </annotationProcessing>
   </component>
+
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="FileService" options="-parameters" />

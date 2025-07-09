@@ -1,58 +1,36 @@
 "use client";
 
-import  { useState, useEffect, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal} from "react";
+import  { useState} from "react";
 import {
     Button,
     Input,
-    Select,
-    SelectItem,
     Textarea,
     Card,
     CardBody,
     CardHeader,
-    Table,
-    TableHeader,
-    TableColumn,
-    TableBody,
-    TableRow,
-    TableCell,
-    Chip,
     Divider
 } from "@heroui/react";
 import {Icon} from "@iconify/react";
-import { pageApi} from "@/Constants/UrlApi.tsx";
-import {MiddleGetAllSupplier} from "@/Store/Thunk/ShupplierThunk.tsx";
-import {useDispatch, useSelector} from "react-redux";
-import {ProductSelector, SupplierSelector, UnitSelector, warehouseSelector} from "@/Store/Selector.tsx";
-import {MiddleGetAllProduct} from "@/Store/Thunk/ProductThunk.tsx";
 import {ImportItem, OrderRequestImport} from "@/Store/ImportOrder.tsx";
-import SelectWarehouse from "@/components/Admin/OrderImport/SelectWarehouse.tsx";
+import SelectWarehouse from "@/components/Admin/OrderImport/select/SelectWarehouse.tsx";
+import {ProductSelect} from "@/components/Admin/OrderImport/select/ProductSelect.tsx";
+import {SupplierSelect} from "@/components/Admin/OrderImport/select/SupplierSelect.tsx";
+import {UnitSelect} from "@/components/Admin/OrderImport/select/UnitSelect.tsx";
+import TableUI from "@/components/Admin/OrderImport/Table/TableUI.tsx";
+import {useImportOrderStore} from "@/zustand/importOrderStore.tsx";
+import {MiddleAddOrder} from "@/Store/Thunk/ImportOrderThunk.tsx";
+import {useDispatch} from "react-redux";
 
 
 
 export default function OrderRequestImportForm() {
+    const {items,addItem,clearItems}=useImportOrderStore();
+    const dispatch=useDispatch();
     const [formData, setFormData] = useState<OrderRequestImport>({
         warehouse: "",
-        createByUser: "staff-id-placeholder", // Replace with actual user ID or auth context
-        description: "",
-        items: [
-            {
-                "itemId": "item-001-uuid-string",
-                "product": "prod-001-uuid-string",
-                "productName": "Laptop Dell Inspiron 15",
-                "supplier": "sup-001-uuid-string",
-                "supplierName": "Công ty TNHH Dell Việt Nam",
-                "unit": "unit-001-uuid-string",
-                "unitName": "Chiếc",
-                "bin": "bin-001-uuid-string",
-                "requestQuantity": 10,
-                "costUnitBase": 15000000,
-                "note": "Laptop cho văn phòng, cần kiểm tra kỹ trước khi nhập",
-                "expiryDate": "2026-12-31"
-            },
-        ]
+        createByUser: "",
+        description: ""
     });
-    const dispatch = useDispatch();
     const [currentItem, setCurrentItem] = useState<ImportItem>({
         itemId: "",
         product: "",
@@ -66,40 +44,12 @@ export default function OrderRequestImportForm() {
         note: "",
         expiryDate: ""
     });
-    const products = useSelector(ProductSelector);
-    const suppliers = useSelector(SupplierSelector);
-    const units = useSelector(UnitSelector);
-    const warehouses=useSelector(warehouseSelector)
+    console.log("Item: "+JSON.stringify(currentItem));
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const PageApi: pageApi = {pageNumber: 0, pageSize: 5};
-            try {
-                (dispatch as any)(MiddleGetAllSupplier(PageApi));
-                (dispatch as any)(MiddleGetAllProduct(PageApi));
-
-
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        fetchData();
-    }, []);
 
     const handleAddItem = () => {
         if (currentItem.product && currentItem.supplier && currentItem.requestQuantity > 0) {
-            const newItem = {
-                ...currentItem,
-                itemId: Date.now().toString()
-            };
-
-            setFormData(prev => ({
-                ...prev,
-                items: [...prev.items, newItem]
-            }));
-
+           addItem(currentItem);
             setCurrentItem({
                 itemId: "",
                 product: "",
@@ -115,25 +65,12 @@ export default function OrderRequestImportForm() {
             });
         }
     };
-
-    const handleRemoveItem = (itemId: string) => {
-        setFormData(prev => ({
-            ...prev,
-            items: prev.items.filter(item => item.itemId !== itemId)
-        }));
-    };
-
     const handleSubmit = async () => {
         setLoading(true);
         try {
-            // const response = await fetchApi({
-            //     method: "POST",
-            //     url: API_ROUTES.warehouse.importOrder.create,
-            //     data: formData
-            // });
-            // if (response.success) {
-            //     console.log("Order created successfully");
-            // }
+            (dispatch as any)(MiddleAddOrder(formData));
+            clearItems();
+
         } catch (error) {
             console.error("Error creating order:", error);
         } finally {
@@ -142,7 +79,7 @@ export default function OrderRequestImportForm() {
     };
 
     const calculateTotal = () => {
-        return formData.items.reduce((total, item) => total + (item.requestQuantity * item.costUnitBase), 0);
+        return items.reduce((total, item) => total + (item.requestQuantity * item.costUnitBase), 0);
     };
 
     return (
@@ -155,7 +92,6 @@ export default function OrderRequestImportForm() {
                     </div>
                     <p className="text-gray-600 dark:text-gray-400">Tạo yêu cầu nhập hàng mới cho kho</p>
                 </div>
-
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 space-y-6">
                         <Card>
@@ -181,57 +117,14 @@ export default function OrderRequestImportForm() {
                             </CardHeader>
                             <CardBody className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <Select
-                                        label="Sản phẩm"
-                                        placeholder="Chọn sản phẩm"
-                                        selectedKeys={currentItem.product ? [currentItem.product] : []}
-                                        onSelectionChange={(keys) => {
-                                            const productId = Array.from(keys)[0]?.toString();
-                                            const product = products.find(p => p.productId === productId);
-                                            if (product) setCurrentItem(prev => ({
-                                                ...prev,
-                                                product: productId,
-                                                productName: product.productName
-                                            }));
-                                        }}>
-                                        {products.map((p: { productId: Key | null | undefined; productName: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }) => (
-                                            <SelectItem key={p.productId}>{p.productName}</SelectItem>))}
-                                    </Select>
+                                    <ProductSelect formData={currentItem} setFormData={setCurrentItem}/>
 
-                                    <Select
-                                        label="Nhà cung cấp"
-                                        placeholder="Chọn nhà cung cấp"
-                                        selectedKeys={currentItem.supplier ? [currentItem.supplier] : []}
-                                        onSelectionChange={(keys) => {
-                                            const supplierId = Array.from(keys)[0]?.toString();
-                                            const supplier = suppliers.find(s => s.supplierId === supplierId);
-                                            if (supplier) setCurrentItem(prev => ({
-                                                ...prev,
-                                                supplier: supplierId,
-                                                supplierName: supplier.supplierName
-                                            }));
-                                        }}>
-                                        {suppliers.map((s: { supplierId: Key | null | undefined; supplierName: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }) => (
-                                            <SelectItem key={s.supplierId}>{s.supplierName}</SelectItem>))}
-                                    </Select>
+                                    <SupplierSelect formData={currentItem} setFormData={setCurrentItem}/>
 
-                                    <Select
-                                        label="Đơn vị"
-                                        placeholder="Chọn đơn vị"
-                                        selectedKeys={currentItem.unit ? [currentItem.unit] : []}
-                                        onSelectionChange={(keys) => {
-                                            const unitId = Array.from(keys)[0]?.toString();
-                                            const unit = units.find((u: { unitId: string; }) => u.unitId === unitId);
-                                            if (unit) setCurrentItem(prev => ({
-                                                ...prev,
-                                                unit: unitId,
-                                                unitName: unit.unitName
-                                            }));
-                                        }}>
-                                        {units.map((u: { unitId: Key | null | undefined; unitName: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }) => (<SelectItem key={u.unitId}>{u.unitName}</SelectItem>))}
-                                    </Select>
+                                    <UnitSelect formData={currentItem} setFormData={setCurrentItem}/>
 
                                     <Input
+                                        aria-labelledby="Input"
                                         type="number"
                                         label="Số lượng"
                                         placeholder="0"
@@ -241,6 +134,7 @@ export default function OrderRequestImportForm() {
 
                                     <Input
                                         type="number"
+                                        aria-labelledby="Input"
                                         label="Giá nhập (VNĐ)"
                                         placeholder="0"
                                         value={currentItem.costUnitBase.toString()}
@@ -249,6 +143,7 @@ export default function OrderRequestImportForm() {
 
                                     <Input
                                         type="date"
+                                        aria-labelledby="Input"
                                         label="Ngày hết hạn"
                                         value={currentItem.expiryDate || ""}
                                         onChange={(e) => setCurrentItem(prev => ({ ...prev, expiryDate: e.target.value }))}
@@ -257,6 +152,7 @@ export default function OrderRequestImportForm() {
 
                                 <Textarea
                                     label="Ghi chú"
+                                    aria-labelledby="Input"
                                     placeholder="Ghi chú cho sản phẩm..."
                                     value={currentItem.note || ""}
                                     onChange={(e) => setCurrentItem(prev => ({ ...prev, note: e.target.value }))}
@@ -264,6 +160,7 @@ export default function OrderRequestImportForm() {
 
                                 <Button
                                     color="primary"
+                                    aria-labelledby="Input"
                                     startContent={<Icon icon="mdi:plus" />}
                                     onClick={(e) => { e.preventDefault(); handleAddItem(); }}
                                     isDisabled={!currentItem.product || !currentItem.supplier || currentItem.requestQuantity <= 0}
@@ -273,38 +170,13 @@ export default function OrderRequestImportForm() {
                             </CardBody>
                         </Card>
 
-                        {formData.items.length > 0 && (
+                        {items.length > 0 && (
                             <Card>
                                 <CardHeader>
-                                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Danh Sách Sản Phẩm ({formData.items.length})</h2>
+                                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Danh Sách Sản Phẩm ({items.length})</h2>
                                 </CardHeader>
                                 <CardBody>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableColumn>Sản phẩm</TableColumn>
-                                            <TableColumn>Nhà cung cấp</TableColumn>
-                                            <TableColumn>Số lượng</TableColumn>
-                                            <TableColumn>Đơn giá</TableColumn>
-                                            <TableColumn>Thành tiền</TableColumn>
-                                            <TableColumn>Thao tác</TableColumn>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {formData.items.map(item => (
-                                                <TableRow key={item.itemId}>
-                                                    <TableCell>{item.productName}</TableCell>
-                                                    <TableCell>{item.supplierName}</TableCell>
-                                                    <TableCell><Chip size="sm" variant="flat">{item.requestQuantity} {item.unitName}</Chip></TableCell>
-                                                    <TableCell>{item.costUnitBase.toLocaleString('vi-VN')} ₫</TableCell>
-                                                    <TableCell><span className="font-semibold">{(item.requestQuantity * item.costUnitBase).toLocaleString('vi-VN')} ₫</span></TableCell>
-                                                    <TableCell>
-                                                        <Button isIconOnly size="sm" color="danger" variant="light" onClick={() => handleRemoveItem(item.itemId)}>
-                                                            <Icon icon="mdi:delete" />
-                                                        </Button>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
+                                    <TableUI />
 
                                     <Divider className="my-4" />
                                     <div className="text-right font-semibold text-lg text-gray-700 dark:text-gray-200">
@@ -315,7 +187,7 @@ export default function OrderRequestImportForm() {
                         )}
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-4 items-end">
                         <Card>
                             <CardBody>
                                 <Button
@@ -323,14 +195,13 @@ export default function OrderRequestImportForm() {
                                     className="w-full"
                                     isLoading={loading}
                                     onClick={handleSubmit}
-                                    isDisabled={formData.items.length === 0 || !formData.warehouse}
+                                    isDisabled={items.length === 0 || !formData.warehouse}
                                 >
                                     Gửi Yêu Cầu Nhập Hàng
                                 </Button>
                             </CardBody>
                         </Card>
                     </div>
-
                 </div>
             </div>
         </div>

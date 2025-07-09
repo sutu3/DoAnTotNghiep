@@ -27,6 +27,13 @@ export const API_ROUTES = {
           }
         })
       }
+    },
+    orderItems:(page: pageApi | null)=>{
+      const base = `${BASE_URL_Order}/importItems`;
+      return {
+        addOrderItemImport:base,
+        addOrderItemImportBatch:base+"/batch",
+      }
     }
   },
   warehouse: {
@@ -68,7 +75,15 @@ export const API_ROUTES = {
         return{
           byWarehouseId: (warehouseId: string) => ({
             getAll: `${search}/warehouseId/${warehouseId}${pageUrl}`,
-          })
+          }),
+          bySupplierAndWarehouse: (warehouseId: string, supplierId: string|null) =>{
+            const url = supplierId
+                ? `${search}?warehouseId=${warehouseId}&supplier=${supplierId}&isActive=${true}${pageUrl}`
+                : `${search}?warehouseId=${warehouseId}&isActive=${true}${pageUrl}`;
+            return {
+              getAll: url,
+            };
+          }
         }
       })
     }
