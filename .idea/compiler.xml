@@ -55,6 +55,8 @@
         </processorPath>
         <module name="RedisService" />
         <module name="Order" />
+        <module name="ProductService" />
+        <module name="Warehouse" />
       </profile>
 
     </annotationProcessing>
