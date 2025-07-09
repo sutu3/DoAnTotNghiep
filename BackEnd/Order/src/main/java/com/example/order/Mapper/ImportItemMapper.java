@@ -13,6 +13,7 @@ import org.mapstruct.MappingTarget;
 
 public interface ImportItemMapper {
     @Mapping(target = "importOrder",ignore = true)
+    @Mapping(target = "expiredDate",ignore = true)
     ImportItem toEntity(ImportRequestItem requestItem);
     @Mapping(target = "product",ignore = true)
     @Mapping(target = "unit",ignore = true)
