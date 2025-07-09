@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,28 +33,18 @@ public class UsersServiceImpl implements UserService {
     UserMapper userMapper;
     UserRepo userRepo;
     WarehouseController warehouseService; // Sử dụng Feign Client đúng chức năng
+    AsyncServiceImpl asyncServiceImpl;
 
     @Override
     public Page<UserResponse> getAllByWarehouseId(String warehouseId,Pageable pageable) {
         return userRepo.findByWarehouses(warehouseId,pageable)
-                .map(user -> {
-                    UserResponse response = userMapper.toResponse(user);
-                    WarehousesResponse warehouse = null;
-                    warehouse = warehouseService.getWarehouse(user.getWarehouses()).getResult();
-                    return MapperUserResponse(response, warehouse);
-                })
-                ;
+                .map(this::enrich);
     }
 
     @Override
     public Page<UserResponse> getAllUserByUserName(String userName, Pageable pageable) {
         return userRepo.findByUserName(userName, pageable)
-                .map(user -> {
-                    UserResponse response = userMapper.toResponse(user);
-                    WarehousesResponse warehouse = null;
-                    warehouse = warehouseService.getWarehouse(user.getWarehouses()).getResult();
-                    return MapperUserResponse(response, warehouse);
-                });
+                .map(this::enrich);
     }
 
     @Override
@@ -61,14 +52,12 @@ public class UsersServiceImpl implements UserService {
         if (userRepo.existsByPhoneNumberAndEmail(request.phoneNumber(), request.email())) {
             throw new AppException(ErrorCode.USER_EXIST);
         }
-        WarehousesResponse warehouses= warehouseService.getWarehouse(request.warehouses()).getResult();
         Users user = userMapper.toEntity(request);
         user.setStatus(StatusEnum.Active);
         user.setIsDeleted(false);
 
         Users savedUser = userRepo.save(user);
-        UserResponse response = userMapper.toResponse(savedUser);
-        return userMapper.updateWarehouse(response, warehouses);
+        return enrich(savedUser);
     }
     @Override
     public String DeletedUser(String id) {
@@ -87,25 +76,15 @@ public class UsersServiceImpl implements UserService {
 
     @Override
     public UserResponse getByUserId(String id) {
-        return userMapper.toResponse(findById(id));
+        return enrich(findById(id));
     }
 
     @Override
-    public UserResponse MapperUserResponse(UserResponse response, WarehousesResponse warehousesResponse) {
-        return UserResponse.builder()
-                .userId(response.getUserId())
-                .userName(response.getUserName())
-                .fullName(response.getFullName())
-                .email(response.getEmail())
-                .urlImage(response.getUrlImage())
-                .phoneNumber(response.getPhoneNumber())
-                .status(response.getStatus())
-                .taskUsers(response.getTaskUsers())
-                .warehouses(warehousesResponse)
-                .createdAt(response.getCreatedAt())
-                .updatedAt(response.getUpdatedAt())
-                .isDeleted(response.getIsDeleted())
-                .deletedAt(response.getDeletedAt())
-                .build();
+    public UserResponse enrich(Users users) {
+        CompletableFuture<WarehousesResponse> warehouseFuture = asyncServiceImpl.getWarehouseAsync(users.getWarehouses());
+        CompletableFuture.allOf( warehouseFuture).join();
+        UserResponse response = userMapper.toResponse(users);
+        response.setWarehouses(warehouseFuture.join());
+        return response;
     }
 }

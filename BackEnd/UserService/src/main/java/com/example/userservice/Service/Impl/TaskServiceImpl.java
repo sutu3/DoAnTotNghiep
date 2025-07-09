@@ -6,6 +6,7 @@ import com.example.userservice.Dto.Request.LevelRequest;
 import com.example.userservice.Dto.Request.StatusRequest;
 import com.example.userservice.Dto.Request.TaskRequest;
 import com.example.userservice.Dto.Responses.Task.TaskResponse;
+import com.example.userservice.Dto.Responses.TaskType.TaskTypeResponse;
 import com.example.userservice.Enum.LevelEnum;
 import com.example.userservice.Enum.StatusTaskEnum;
 import com.example.userservice.Exception.AppException;
@@ -23,10 +24,12 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -37,28 +40,18 @@ public class TaskServiceImpl implements TaskService {
     TaskRepo taskRepo;
     TaskTypeService taskTypeService;
     WarehouseController warehouseController;
+    AsyncServiceImpl asyncServiceImpl;
+
     @Override
     public Page<TaskResponse> getAll(Pageable pageable,String warehouseId) {
         return taskRepo.findAllByIsDeletedAndWarehouses(false,warehouseId, pageable)
-                .map(task->{
-                    TaskResponse taskResponse=taskMapper.toResponse(task);
-                    WarehousesResponse warehouse = warehouseController
-                            .getWarehouse(warehouseId)
-                            .getResult();
-                    return taskMapper.updateWarehouse(taskResponse,warehouse);
-                });
+                .map(this::entry);
     }
 
     @Override
     public Page<TaskResponse> getAllByTaskTypeId(Pageable pageable, String taskTypeId,String warehouseId) {
         return taskRepo.findAllByIsDeletedAndTaskType_TaskTypeId(false,taskTypeId, pageable)
-                .map(task->{
-                    TaskResponse taskResponse=taskMapper.toResponse(task);
-                    WarehousesResponse warehouse = warehouseController
-                            .getWarehouse(warehouseId)
-                            .getResult();
-                    return taskMapper.updateWarehouse(taskResponse,warehouse);
-                });
+                .map(this::entry);
     }
 
     @Override
@@ -70,63 +63,55 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponse getByIdToResponse(String id) {
         Tasks tasks= getById(id);
-        WarehousesResponse warehouse = warehouseController
-                .getWarehouse(tasks.getWarehouses()).getResult();
-        return taskMapper.updateWarehouse(taskMapper.toResponse(tasks),warehouse);
+        return entry(tasks);
     }
 
     @Override
     public TaskResponse createTask(TaskRequest request) {
-        WarehousesResponse warehouse = warehouseController
-                .getWarehouse(request.warehouses()).getResult();
         TaskType taskType=taskTypeService.getByTaskName(request.taskType(), request.warehouses());
         Tasks task=taskMapper.toEntity(request);
         task.setIsDeleted(false);
         task.setTaskType(taskType);
         task.setStatus(StatusTaskEnum.Pending);
         task.setWarehouses(request.warehouses());
-        taskRepo.save(task);
-        return taskMapper.updateWarehouse(taskMapper.toResponse(task),warehouse);
+        Tasks taskSave=taskRepo.save(task);
+        return entry(taskSave);
     }
 
     @Override
     public TaskResponse updateTask(TaskForm update, String id) {
 
         Tasks task=getById(id);
-        WarehousesResponse warehouse = warehouseController
-                .getWarehouse(task.getWarehouses()).getResult();
         TaskType taskType=taskTypeService.getByTaskName(update.taskType(),task.getWarehouses());
         task.setTaskType(taskType);
         taskMapper.update(task,update);
-        return taskMapper.updateWarehouse(taskMapper.toResponse(task),warehouse);
+        Tasks taskSave=taskRepo.save(task);
+        return entry(taskSave);
     }
 
     @Override
     public TaskResponse updateStatus(StatusRequest Status, String id) {
         Tasks task=getById(id);
-        WarehousesResponse warehouse = warehouseController
-                .getWarehouse(task.getWarehouses()).getResult();
         task.setStatus(StatusTaskEnum.valueOf(Status.status()));
-        return taskMapper.updateWarehouse(taskMapper.toResponse(task),warehouse);
+        Tasks taskSave=taskRepo.save(task);
+        return entry(taskSave);
     }
 
     @Override
     public TaskResponse updateLevel(LevelRequest level, String id) {
         Tasks task=getById(id);
-        WarehousesResponse warehouse = warehouseController
-                .getWarehouse(task.getWarehouses()).getResult();
         task.setLevel(LevelEnum.valueOf(level.level()));
-        return taskMapper.updateWarehouse(taskMapper.toResponse(task),warehouse);
+        Tasks taskSave=taskRepo.save(task);
+        return entry(taskSave);
     }
 
     @Override
     public TaskResponse updateCompletedStatus(String id) {
         Tasks task=getById(id);
-        WarehousesResponse warehouse = warehouseController
-                .getWarehouse(task.getWarehouses()).getResult();
         task.setStatus(StatusTaskEnum.Complete);
         task.setCompleteAt(LocalDateTime.now());
-        return taskMapper.updateWarehouse(taskMapper.toResponse(task),warehouse);
+        Tasks taskSave=taskRepo.save(task);
+        return entry(taskSave);
     }
 
     @Override
@@ -137,5 +122,13 @@ public class TaskServiceImpl implements TaskService {
         taskRepo.save(task);
         return "Deleted Completed";
     }
+
+    @Override
+    public TaskResponse entry(Tasks task) {
+        CompletableFuture<WarehousesResponse> warehouseFuture = asyncServiceImpl.getWarehouseAsync(task.getWarehouses());
+        CompletableFuture.allOf( warehouseFuture).join();
+        TaskResponse response = taskMapper.toResponse(task);
+        response.setWarehouses(warehouseFuture.join());
+        return response;    }
 
 }

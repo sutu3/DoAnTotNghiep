@@ -21,6 +21,4 @@ public interface ImportItemMapper {
     @Mapping(target = "createByUser",ignore = true)
     ImportResponseItem toResponse(ImportItem importItem);
     void toUpdate(@MappingTarget ImportItem importItem, ImportItemForm update);
-    ImportResponseItem toResponseProduct(@MappingTarget ImportResponseItem importResponseItem, ProductResponse product);
-
 }

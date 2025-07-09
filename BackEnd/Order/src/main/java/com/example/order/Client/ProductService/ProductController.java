@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
         name = "Product",
-        url = "https://productservice-8qdv.onrender.com/api",
+        url = "https://doantotnghiep-r5ta.onrender.com/api/cache",
         fallback = ProductServiceFallback.class)
 public interface ProductController {
-    @GetMapping("/products/search/productId/{productId}")
+    @GetMapping("/products/{productId}")
     ApiResponse<ProductResponse> getProductById(@PathVariable String productId);
-    @GetMapping("/units/search/unitId/{unitId}")
+    @GetMapping("/units/{unitId}")
     ApiResponse<UnitNameResponse> getUnitById( @PathVariable String unitId);
 
 

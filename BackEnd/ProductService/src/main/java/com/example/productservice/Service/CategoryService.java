@@ -22,5 +22,5 @@ public interface CategoryService {
     Category getById(String id);
     CategoryResponse getByIdResponse(String id);
     CategoryResponse updateCategory(CategoryForm update,String id);
-
+    CategoryResponse enrich(Category category);
 }

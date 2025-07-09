@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,16 +33,12 @@ public class TaskTypeServiceImpl implements TaskTypeService {
     TaskTypeMapper taskTypeMapper;
     TaskTypeRepo taskTypeRepo;
     WarehouseController warehouseController;
+    private final AsyncServiceImpl asyncServiceImpl;
+
     @Override
     public Page<TaskTypeResponse> getAll(Pageable pageable, String warehouseId) {
         return taskTypeRepo.findAllByIsDeletedAndWarehouses(false, warehouseId, pageable)
-                .map(taskType -> {
-                    TaskTypeResponse response = taskTypeMapper.toResponse(taskType);
-                    WarehousesResponse warehouse = warehouseController
-                            .getWarehouse(taskType.getWarehouses())
-                            .getResult();
-                    return taskTypeMapper.updateWarehouse(response, warehouse);
-                });
+                .map(this::entry);
     }
 
 
@@ -59,17 +56,12 @@ public class TaskTypeServiceImpl implements TaskTypeService {
 
     @Override
     public TaskTypeResponse getByTaskNametoResponse(String taskName,String warehousesId) {
-        WarehousesResponse warehouse = null;
-        warehouse = warehouseController.getWarehouse(warehousesId).getResult();
-        TaskTypeResponse taskTypeResponse=taskTypeMapper.toResponse(getByTaskName(taskName, warehousesId));
-        return taskTypeMapper.updateWarehouse(taskTypeResponse,warehouse);
+        TaskType taskType=getByTaskName(taskName, warehousesId);
+        return entry(taskType);
     }
 
     @Override
     public TaskTypeResponse createTaskType(TaskTypeRequest request) {
-
-        WarehousesResponse warehouse  = warehouseController.getWarehouse(request.warehouses()).getResult();
-        log.info("WarehousesResponse:{}",warehouse);
         Optional<TaskType> existing = taskTypeRepo.findByTaskNameAndWarehouses(request.taskName(),request.warehouses());
         if (existing.isPresent()) {
             TaskType taskType = existing.get();
@@ -78,26 +70,26 @@ public class TaskTypeServiceImpl implements TaskTypeService {
             }
             taskType.setDescription(request.description());
             taskType.setIsDeleted(false);
-            return taskTypeMapper.toResponse(taskTypeRepo.save(taskType));
+            TaskType taskTypeSave = taskTypeRepo.save(taskType);
+            return entry(taskTypeSave);
         }
         TaskType taskType=taskTypeMapper.toEntity(request);
         taskType.setIsDeleted(false);
         taskType.setWarehouses(request.warehouses());
-        TaskTypeResponse taskTypeResponse=taskTypeMapper.toResponse(taskTypeRepo.save(taskType));
-        return taskTypeMapper.updateWarehouse(taskTypeResponse, warehouse);
+        TaskType taskTypeSave = taskTypeRepo.save(taskType);
+        return entry(taskTypeSave);
     }
 
 
     @Override
     public TaskTypeResponse updateTaskType(TaskTypeForm update,String id) {
-        WarehousesResponse warehouse = null;
-        warehouse = warehouseController.getWarehouse(update.warehouses()).getResult();
         if(taskTypeRepo.existsByTaskName(update.taskName())){
             throw new AppException(ErrorCode.TASK_TYPE_EXIST);
         }
         TaskType taskType=getByid(id);
         taskTypeMapper.update(taskType,update);
-        return taskTypeMapper.updateWarehouse(taskTypeMapper.toResponse(taskTypeRepo.save(taskType)), warehouse);
+        TaskType taskTypeSave = taskTypeRepo.save(taskType);
+        return entry(taskTypeSave);
     }
 
     @Override
@@ -107,6 +99,15 @@ public class TaskTypeServiceImpl implements TaskTypeService {
         taskType.setIsDeleted(true);
         taskTypeRepo.save(taskType);
         return "Deleted Completed";
+    }
+
+    @Override
+    public TaskTypeResponse entry(TaskType taskType) {
+        CompletableFuture<WarehousesResponse> warehouseFuture = asyncServiceImpl.getWarehouseAsync(taskType.getWarehouses());
+        CompletableFuture.allOf( warehouseFuture).join();
+        TaskTypeResponse response = taskTypeMapper.toResponse(taskType);
+        response.setWarehouses(warehouseFuture.join());
+        return response;
     }
 
 }

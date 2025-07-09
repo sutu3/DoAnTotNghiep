@@ -11,6 +11,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class WarehousesResponse{
+    String warehouseId;
     String warehouseName;
+    String address;
+    String street;
+    String district;
+    String country;
     String managerId;
 }
