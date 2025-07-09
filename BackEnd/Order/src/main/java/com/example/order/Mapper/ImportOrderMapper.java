@@ -16,12 +16,9 @@ public interface ImportOrderMapper {
     @Mapping(target = "createByUser", ignore = true)
     @Mapping(target = "accessByAdmin", ignore = true)
     @Mapping(target = "warehouse", ignore = true)
-    @Mapping(target = "importItems", ignore = true)
+    @Mapping(target = "importItems", ignore = true) // Ignore vì sẽ được populate riêng
     ImportOrderResponse toResponse(ImportOrder importOrder);
 
     void toUpdate(@MappingTarget ImportOrder importOrder, ImportOrderForm update);
-
-    // Thêm mapping tay nếu cần:
-
 }
 
