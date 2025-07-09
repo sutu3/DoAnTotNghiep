@@ -2,7 +2,8 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-
+      <profile default="true" name="Default" enabled="true" />
+      
       <profile name="Annotation profile for ProductService" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -60,11 +61,6 @@
       </profile>
 
     </annotationProcessing>
-
-    <bytecodeTargetLevel>
-      <module name="Order" target="21" />
-      <module name="RedisService" target="21" />
-    </bytecodeTargetLevel>
   </component>
 
   <component name="JavacSettings">

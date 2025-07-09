@@ -21,6 +21,7 @@ import com.example.order.Repo.ImportItemRepo;
 import com.example.order.Repo.ImportOrderRepo;
 import com.example.order.Service.ImportItemService;
 import com.example.order.Service.ImportOrderService;
+import com.example.order.Utils.DateUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
 
 @Service
 @RequiredArgsConstructor
@@ -74,6 +76,7 @@ public class ImportItemServiceImpl implements ImportItemService {
     public ImportResponseItem createItem(ImportRequestItem requestItem) {
         ImportOrder importOrder= importOrderService.getById(requestItem.importOrder());
         ImportItem importItem=importItemMapper.toEntity(requestItem);
+        importItem.setExpiredDate(DateUtils.parseToLocalDateTime(requestItem.expiredDate()).get());
         importItem.setImportOrder(importOrder);
         importItem.setIsDeleted(false);
         ImportItem importItemSave=importItemRepo.save(importItem);
