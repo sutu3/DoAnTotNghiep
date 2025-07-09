@@ -57,10 +57,10 @@ public class ImportItemServiceImpl implements ImportItemService {
     }
 
     @Override
-    public Page<ImportResponseItem> getAllByOrder(Pageable pageable, String order) {
+    public List<ImportResponseItem> getAllByOrder( String order) {
         importOrderRepo.findById(order).orElseThrow(()->new AppException(ErrorCode.IMPORT_ORDER_NOT_FOUND));
-        return importItemRepo.findAllByImportOrder_ImportOrderIdAndIsDeleted(order, false, pageable)
-                .map(this::entry);
+        return importItemRepo.findAllByImportOrder_ImportOrderIdAndIsDeleted(order, false)
+                .map(this::entry).stream().toList();
     }
 
     @Override
