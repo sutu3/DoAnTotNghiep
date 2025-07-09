@@ -1,8 +1,8 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {callApiThunk} from "@/Store/Store.tsx";
-import {API_ROUTES} from "@/Constants/UrlApi.tsx";
+import {API_ROUTES, pageApi} from "@/Constants/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
-import {ImportItem, OrderRequestImport} from "@/Store/ImportOrder.tsx";
+import {ImportItemCreate, initToTalPage, OrderRequestImportCreate, setOrderImportList} from "@/Store/ImportOrder.tsx";
 import {ImportOrderRequest, mapImportItemToRequest} from "@/Utils/mapImportItemToRequest .tsx";
 
 export const AddItemOrderBatch = createAsyncThunk(
@@ -21,7 +21,7 @@ export const AddItemOrderBatch = createAsyncThunk(
 export const AddOrder = createAsyncThunk(
     "importOrder/AddOrder",
     async (
-        { payload }: { payload: OrderRequestImport },
+        { payload }: { payload: OrderRequestImportCreate },
         { rejectWithValue }
     ) =>
         await callApiThunk(
@@ -31,7 +31,7 @@ export const AddOrder = createAsyncThunk(
             rejectWithValue
         )
 );
-export const MiddleAddOrder = (orderImport:OrderRequestImport,items:ImportItem[]) => {
+export const MiddleAddOrder = (orderImport:OrderRequestImportCreate, items:ImportItemCreate[]) => {
     return async function (dispatch: any,getState: any) {
         try {
 
@@ -52,6 +52,37 @@ export const MiddleAddOrder = (orderImport:OrderRequestImport,items:ImportItem[]
                 description: `Message: Add New Order Request Import Successfully`,
                 color: "Success",
             });
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
+export const GetAllOrder = createAsyncThunk(
+    "importOrder/GetAllOrder",
+    async (
+        { page,warehouseId }: {page:pageApi, warehouseId: string },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES.order.importOrder(page).search().byWarehouseId(warehouseId).getAll,
+            null,
+            rejectWithValue
+        )
+);
+export const MiddleGetAllOrder = (page: pageApi) => {
+    return async function (dispatch: any,getState:any) {
+        try {
+            const { warehouse } = getState().warehouse;
+            const warehouseId = warehouse?.warehouseId;
+            const action = await dispatch(GetAllOrder({ page,warehouseId }));
+            dispatch(setOrderImportList(action.payload.result.content));
+            dispatch(initToTalPage(action.payload.result.totalPages));
+
         } catch (error: any) {
             showToast({
                 title: "Error",

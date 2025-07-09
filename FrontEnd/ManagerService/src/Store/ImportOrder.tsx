@@ -1,6 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
+import {User} from "@/types";
 
-export interface ImportItem {
+export interface ImportItemCreate {
     itemId: string;
     product: string;
     productName: string;
@@ -14,15 +15,36 @@ export interface ImportItem {
     note?: string;
     expiryDate?: string;
 }
-
-export interface OrderRequestImport {
+export interface ImportOrderItem {
+    itemId: string;
+    productName: string;
+    supplierName: string;
+    requestQuantity: number;
+    costUnitBase: number;
+    unitName: string;
+    note?: string;
+    expiryDate?: string;
+}
+export interface ImportOrder {
+    importOrderId: string;
+    warehouse: string;
+    createByUser: User;
+    description: string;
+    status: "Created" | "InProgress" | "Completed" | "Cancel";
+    type: "Request" | "Accept";
+    requestDate: string;
+    accessDate?: string;
+    items: ImportOrderItem[];
+    totalValue: number;
+}
+export interface OrderRequestImportCreate {
     warehouse: string;
     createByUser: string;
     description: string;
 }
 interface OrderImportState{
-    orderImport: OrderRequestImport[];
-    orderItem:ImportItem[],
+    orderImport: ImportOrder[];
+    orderItem:ImportItemCreate[],
     totalPage: number;
 }
 const initialState:OrderImportState = {
