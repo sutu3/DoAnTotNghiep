@@ -27,15 +27,12 @@ import java.util.List;
 public class ImportItemController {
     ImportItemService importItemService;
     // GET - Lấy tất cả items theo orderId
-    @GetMapping("/search/order/{orderId}")
-    public ApiResponse<Page<ImportResponseItem>> getAllByOrderId(
-            @RequestParam("pageNumber") int page,
-            @RequestParam("pageSize") int size,
+    @GetMapping("/search/orderId/{orderId}")
+    public ApiResponse<List<ImportResponseItem>> getAllByOrderId(
             @PathVariable String orderId
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ApiResponse.<Page<ImportResponseItem>>builder()
-                .Result(importItemService.getAllByOrder(pageable, orderId))
+        return ApiResponse.<List<ImportResponseItem>>builder()
+                .Result(importItemService.getAllByOrder( orderId))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

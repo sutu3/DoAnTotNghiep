@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public interface ImportItemService {
     Page<ImportResponseItem> getAllByWarehouse(Pageable pageable,String warehouse);
-    Page<ImportResponseItem> getAllByOrder(Pageable pageable,String order);
+    List<ImportResponseItem> getAllByOrder(String order);
     ImportItem getById(String id);
     ImportResponseItem getByIdResponse(String id);
     ImportResponseItem createItem(ImportRequestItem importResponseItem);
