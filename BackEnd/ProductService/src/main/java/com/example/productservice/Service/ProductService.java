@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public interface ProductService {
     /**
@@ -30,7 +32,7 @@ public interface ProductService {
      * @return Danh sách trang của {@link ProductResponse}.
      */
     Page<ProductResponse> getAllBySupplierAndWarehouse(String supplier, String warehouse, Pageable pageable);
-
+    List<ProductResponse> searchProducts(String productName,String warehouses, String sku, String supplier, Boolean isActive);
     /**
      * Lấy thực thể sản phẩm từ ID.
      *

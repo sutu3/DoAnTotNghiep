@@ -20,16 +20,6 @@ public interface ProductMapper {
     @Mapping(target = "warehouses",ignore = true)
     @Mapping(target = "supplier",ignore = true)
     ProductResponse toResponse(Product product);
-    ProductResponse updateWarehouse(
-            @MappingTarget ProductResponse productResponse,
-            WarehousesResponse warehouses);
-    ProductResponse updateCreateByUser(
-            @MappingTarget ProductResponse productResponse,
-            UserResponse createByUser);
-    ProductResponse updateSupplier(
-            @MappingTarget ProductResponse productResponse,
-            SupplierResponse supplier
-    );
     @Mapping(target = "unit",ignore = true)
     @Mapping(target = "category",ignore = true)
     void updateResquest(@MappingTarget Product product,ProductRequest request);

@@ -20,6 +20,6 @@ public interface ImportItemService {
     List<ImportResponseItem> createItems(List<ImportRequestItem> requests);
     ImportResponseItem updateItem(ImportItemForm update,String id);
     void deleteItem(String id);
-    ImportResponseItem toResponse(ImportItem importItem);
+    ImportResponseItem entry(ImportItem importItem);
     
 }

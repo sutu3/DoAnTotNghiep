@@ -21,5 +21,5 @@ public interface ImportOrderService {
     ImportOrderResponse updateStatus(String id, StatusForm status);
     ImportOrderResponse updateApprove(String id);
     ImportOrderResponse updateReject(String id);
-    ImportOrderResponse toResponse(ImportOrder importOrder);
+    ImportOrderResponse entry(ImportOrder importOrder);
 }

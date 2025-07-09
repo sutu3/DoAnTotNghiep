@@ -39,7 +39,6 @@ public class GroupUnitServiceImpl implements GroupUnitService {
             return groupUnitMapper.updateCreateByUser(groupUnitResponse,userResponse);
         });
     }
-
     @Override
     public GroupUnitResponse getByIdResponse(String id) {
         GroupUnitResponse groupUnitResponse=groupUnitMapper.toResponse(getById(id));

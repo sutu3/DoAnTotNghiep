@@ -13,17 +13,14 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
+
     Category toEntity(CategoryRequest request);
+
     @Mapping(target = "createByUser", ignore = true)
-    @Mapping(target = "warehouses",ignore = true)
+    @Mapping(target = "warehouses", ignore = true)
     CategoryResponse toResponse(Category category);
+
     CategoryNameResponse toNameResponse(Category category);
-    CategoryResponse updateWarehouse(
-            @MappingTarget CategoryResponse category,
-            WarehousesResponse warehouses);
-    CategoryResponse updateCreateByUser(
-            @MappingTarget CategoryResponse category,
-            UserResponse createByUser);
-    @Mapping(target = "warehouses",ignore = true)
+    @Mapping(target = "warehouses", ignore = true)
     void update(@MappingTarget Category category, CategoryForm categoryUpdate);
 }
