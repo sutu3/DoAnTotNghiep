@@ -1,13 +1,11 @@
-import { create } from 'zustand';
 import {ImportItem} from "@/Store/ImportOrder.tsx";
-
-
+import {create} from "zustand";
 
 interface ImportOrderState {
     items: ImportItem[];
     addItem: (item: ImportItem) => void;
-    removeItem: (itemId: string) => void;
-    updateItem: (item: ImportItem) => void;
+    removeItemByIndex: (index: number) => void;
+    updateItemByIndex: (index: number, item: ImportItem) => void;
     clearItems: () => void;
 }
 
@@ -19,16 +17,14 @@ export const useImportOrderStore = create<ImportOrderState>((set) => ({
             items: [...state.items, item],
         })),
 
-    removeItem: (itemId) =>
+    removeItemByIndex: (index) =>
         set((state) => ({
-            items: state.items.filter((item) => item.itemId !== itemId),
+            items: state.items.filter((_, i) => i !== index),
         })),
 
-    updateItem: (updatedItem) =>
+    updateItemByIndex: (index, newItem) =>
         set((state) => ({
-            items: state.items.map((item) =>
-                item.itemId === updatedItem.itemId ? updatedItem : item
-            ),
+            items: state.items.map((item, i) => (i === index ? newItem : item)),
         })),
 
     clearItems: () => set({ items: [] }),

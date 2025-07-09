@@ -4,6 +4,7 @@ import {Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal, useEff
 import {useDispatch, useSelector} from "react-redux";
 import {MiddleGetAllProductBySearch} from "@/Store/Thunk/ProductThunk.tsx";
 import {ProductSelector} from "@/Store/Selector.tsx";
+import {setUnitList} from "@/Store/Unit.tsx";
 
 interface SelectProps {
     formData:  ImportItem;
@@ -13,9 +14,9 @@ interface SelectProps {
 export const ProductSelect = ({ formData, setFormData}:SelectProps) => {
     const dispatch = useDispatch();
     const products=useSelector(ProductSelector);
-    console.log(products);
     useEffect(() => {
         (dispatch as any)(MiddleGetAllProductBySearch(formData?.supplier.length!=0?formData?.supplier:null));
+        dispatch(setUnitList([]))
     }, [formData?.supplier])
     return (<Select
         aria-labelledby="Input"

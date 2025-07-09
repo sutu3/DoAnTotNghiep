@@ -27,6 +27,13 @@ export const API_ROUTES = {
           }
         })
       }
+    },
+    orderItems:(page: pageApi | null)=>{
+      const base = `${BASE_URL_Order}/importItems`;
+      return {
+        addOrderItemImport:base,
+        addOrderItemImportBatch:base+"/batch",
+      }
     }
   },
   warehouse: {
