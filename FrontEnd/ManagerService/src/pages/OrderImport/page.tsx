@@ -68,7 +68,7 @@ export default function OrderRequestImportForm() {
     const handleSubmit = async () => {
         setLoading(true);
         try {
-            (dispatch as any)(MiddleAddOrder(formData));
+            await (dispatch as any)(MiddleAddOrder(formData,items));
             clearItems();
 
         } catch (error) {
