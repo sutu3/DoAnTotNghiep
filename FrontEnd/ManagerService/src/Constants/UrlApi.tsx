@@ -68,7 +68,15 @@ export const API_ROUTES = {
         return{
           byWarehouseId: (warehouseId: string) => ({
             getAll: `${search}/warehouseId/${warehouseId}${pageUrl}`,
-          })
+          }),
+          bySupplierAndWarehouse: (warehouseId: string, supplierId: string|null) =>{
+            const url = supplierId
+                ? `${search}?warehouseId=${warehouseId}&supplier=${supplierId}&isActive=${true}${pageUrl}`
+                : `${search}?warehouseId=${warehouseId}&isActive=${true}${pageUrl}`;
+            return {
+              getAll: url,
+            };
+          }
         }
       })
     }

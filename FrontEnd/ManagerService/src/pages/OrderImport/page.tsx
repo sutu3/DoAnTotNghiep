@@ -23,10 +23,10 @@ import {Icon} from "@iconify/react";
 import { pageApi} from "@/Constants/UrlApi.tsx";
 import {MiddleGetAllSupplier} from "@/Store/Thunk/ShupplierThunk.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {ProductSelector, SupplierSelector, UnitSelector, warehouseSelector} from "@/Store/Selector.tsx";
-import {MiddleGetAllProduct} from "@/Store/Thunk/ProductThunk.tsx";
+import { SupplierSelector, UnitSelector} from "@/Store/Selector.tsx";
 import {ImportItem, OrderRequestImport} from "@/Store/ImportOrder.tsx";
 import SelectWarehouse from "@/components/Admin/OrderImport/SelectWarehouse.tsx";
+import {ProductSelect} from "@/components/Admin/OrderImport/ProductSelect.tsx";
 
 
 
@@ -66,10 +66,9 @@ export default function OrderRequestImportForm() {
         note: "",
         expiryDate: ""
     });
-    const products = useSelector(ProductSelector);
+    console.log("Item: "+JSON.stringify(currentItem));
     const suppliers = useSelector(SupplierSelector);
     const units = useSelector(UnitSelector);
-    const warehouses=useSelector(warehouseSelector)
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -77,7 +76,6 @@ export default function OrderRequestImportForm() {
             const PageApi: pageApi = {pageNumber: 0, pageSize: 5};
             try {
                 (dispatch as any)(MiddleGetAllSupplier(PageApi));
-                (dispatch as any)(MiddleGetAllProduct(PageApi));
 
 
             } catch (error) {
@@ -181,22 +179,7 @@ export default function OrderRequestImportForm() {
                             </CardHeader>
                             <CardBody className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <Select
-                                        label="Sản phẩm"
-                                        placeholder="Chọn sản phẩm"
-                                        selectedKeys={currentItem.product ? [currentItem.product] : []}
-                                        onSelectionChange={(keys) => {
-                                            const productId = Array.from(keys)[0]?.toString();
-                                            const product = products.find(p => p.productId === productId);
-                                            if (product) setCurrentItem(prev => ({
-                                                ...prev,
-                                                product: productId,
-                                                productName: product.productName
-                                            }));
-                                        }}>
-                                        {products.map((p: { productId: Key | null | undefined; productName: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }) => (
-                                            <SelectItem key={p.productId}>{p.productName}</SelectItem>))}
-                                    </Select>
+                                    <ProductSelect formData={currentItem} setFormData={setCurrentItem}/>
 
                                     <Select
                                         label="Nhà cung cấp"

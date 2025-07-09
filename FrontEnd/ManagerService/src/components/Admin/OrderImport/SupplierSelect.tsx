@@ -4,34 +4,32 @@ import {Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal, useEff
 import {useDispatch, useSelector} from "react-redux";
 import {MiddleGetAllProductBySearch} from "@/Store/Thunk/ProductThunk.tsx";
 import {ProductSelector} from "@/Store/Selector.tsx";
+import {MiddleGetAllSupplier} from "@/Store/Thunk/ShupplierThunk.tsx";
 
 interface SelectProps {
     formData:  ImportItem;
     setFormData: (formData: (prev: any) => any) => void;
 }
 
-export const ProductSelect = ({ formData, setFormData}:SelectProps) => {
+export const SupplierSelect = ({ formData, setFormData}:SelectProps) => {
     const dispatch = useDispatch();
     const products=useSelector(ProductSelector);
     console.log(products);
     useEffect(() => {
-        (dispatch as any)(MiddleGetAllProductBySearch(formData?.supplier.length!=0?formData?.supplier:null));
+        (dispatch as any)(MiddleGetAllSupplier(formData?.supplier.length!=0?formData?.supplier:null));
     }, [formData?.supplier])
     return (<Select
         aria-labelledby="Input"
-        label="Sản phẩm"
-        placeholder="Chọn sản phẩm"
-        selectedKeys={formData?.product ? [formData.product] : []}
+        label="Nhà cung cấp"
+        placeholder="Chọn nhà cung cấp"
+        selectedKeys={formData?.supplier ? [formData.supplier] : []}
         onSelectionChange={(keys) => {
             const productId = Array.from(keys)[0]?.toString();
             const product = products.find((p: { productId: string; }) => p.productId === productId);
-            console.log("IDSupplier:" +product.supplierId)
             if (product) setFormData((prev: any) => ({
                 ...prev,
                 product: productId,
-                productName: product.productName,
-                supplier: product.supplier.supplierId,
-                supplierName: product.supplier.supplierName
+                productName: product.productName
             }));
         }}>
         {products.map((p: {
