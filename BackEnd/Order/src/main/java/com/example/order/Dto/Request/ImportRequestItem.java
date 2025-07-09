@@ -3,6 +3,8 @@ package com.example.order.Dto.Request;
 import lombok.Builder;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @Builder
 public record ImportRequestItem(
         String product,
@@ -13,5 +15,6 @@ public record ImportRequestItem(
         int requestQuantity,
         String note,
         BigDecimal costUnitBase,
-        String createByUser) {
+        String createByUser,
+        String expiredDate) {
 }

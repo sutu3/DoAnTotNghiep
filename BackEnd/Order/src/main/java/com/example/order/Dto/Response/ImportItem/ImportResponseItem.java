@@ -29,7 +29,7 @@ public class ImportResponseItem {
     UnitNameResponse unit;
     UserResponse createByUser;
     BinResponse bin;
-    LocalDateTime ExpiredDate;
+    LocalDateTime expiredDate;
     int requestQuantity;
     String note;
     int realityQuantity;
