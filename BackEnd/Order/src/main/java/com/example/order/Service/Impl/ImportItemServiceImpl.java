@@ -22,6 +22,7 @@ import com.example.order.Repo.ImportOrderRepo;
 import com.example.order.Service.ImportItemService;
 import com.example.order.Service.ImportOrderService;
 import com.example.order.Utils.DateUtils;
+import com.example.order.Utils.UpdateOrderTotalPrice;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -44,6 +45,7 @@ public class ImportItemServiceImpl implements ImportItemService {
     WarehouseController warehouseController;
     ImportItemMapper importItemMapper;
     ImportItemRepo importItemRepo;
+    UpdateOrderTotalPrice updateOrderTotalPrice;
     private final ImportOrderRepo importOrderRepo;
     private final AsyncServiceImpl asyncServiceImpl;
     private final ImportOrderService importOrderService;
@@ -88,13 +90,23 @@ public class ImportItemServiceImpl implements ImportItemService {
         ImportItem importItem=importItemRepo.getById(id);
         importItemMapper.toUpdate(importItem,update);
         ImportItem importItemSave=importItemRepo.save(importItem);
+        updateOrderTotalPrice.updateTotalPrice(importItem.getImportOrder());
         return entry(importItemSave);
     }
     @Override
     public List<ImportResponseItem> createItems(List<ImportRequestItem> requests) {
-        return requests.stream()
+        List<ImportResponseItem> results = requests.stream()
                 .map(this::createItem)
                 .toList();
+
+        // Nếu tất cả items thuộc cùng một order, chỉ cần update totalPrice một lần
+        if (!requests.isEmpty()) {
+            String orderId = requests.get(0).importOrder();
+            ImportOrder importOrder = importOrderService.getById(orderId);
+            updateOrderTotalPrice.updateTotalPrice(importOrder);
+        }
+
+        return results;
     }
 
     @Override
