@@ -7,7 +7,7 @@ import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
 import {useDispatch} from "react-redux";
 import {pageApi} from "@/Constants/UrlApi.tsx";
 import TableUI from "@/components/Admin/Supplier/Table/TableUI.tsx";
-import {MiddleGetAllSupplier} from "@/Store/Thunk/ShupplierThunk.tsx";
+import {MiddleGetAllSupplierPage} from "@/Store/Thunk/ShupplierThunk.tsx";
 
 
 
@@ -26,7 +26,7 @@ const SupplierPage = () => {
     useEffect(() => {
         const PageApi: pageApi = { pageNumber: 0, pageSize:  5 };
         const fetch=async ()=>{
-            (dispatch as any)(MiddleGetAllSupplier(PageApi));
+            (dispatch as any)(MiddleGetAllSupplierPage(PageApi));
         }
         fetch();
     },[])

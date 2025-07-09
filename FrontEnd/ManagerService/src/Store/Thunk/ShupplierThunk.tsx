@@ -39,8 +39,8 @@ export const MiddleAddSupplier = (SupplierCreate:SupplierCreate) => {
         }
     };
 };
-export const GetAllSupplierByIdWarehouse = createAsyncThunk(
-    "Supplier/GetAllSupplierByIdSupplierGroup",
+export const GetAllSupplierPageByIdWarehouse = createAsyncThunk(
+    "Supplier/GetAllSupplierPageByIdWarehouse",
     async (
         { page,warehouseId }: { page: pageApi,warehouseId: string },
         { rejectWithValue }
@@ -53,12 +53,42 @@ export const GetAllSupplierByIdWarehouse = createAsyncThunk(
         )
 );
 
-export const MiddleGetAllSupplier = (page: pageApi) => {
+export const GetAllSupplierListByIdWarehouse = createAsyncThunk(
+    "Supplier/GetAllSupplierListByIdWarehouse",
+    async (
+        { warehouseId }: { warehouseId: string },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES.user.supplier(null).search().byWarehouseId(warehouseId).getAllName,
+            undefined,
+            rejectWithValue
+        )
+);
+export const MiddleGetAllSupplierList = () => {
     return async function (dispatch: any,getState:any) {
         try {
             const { warehouse } = getState().warehouse;
             const warehouseId = warehouse?.warehouseId;
-            const action = await dispatch(GetAllSupplierByIdWarehouse({ page,warehouseId }));
+            const action = await dispatch(GetAllSupplierListByIdWarehouse({ warehouseId }));
+            dispatch(setSupplierList(action.payload.result));
+
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
+export const MiddleGetAllSupplierPage = (page: pageApi) => {
+    return async function (dispatch: any,getState:any) {
+        try {
+            const { warehouse } = getState().warehouse;
+            const warehouseId = warehouse?.warehouseId;
+            const action = await dispatch(GetAllSupplierPageByIdWarehouse({ page,warehouseId }));
             dispatch(setSupplierList(action.payload.result.content));
             dispatch(initToTalPage(action.payload.result.totalPages));
 
