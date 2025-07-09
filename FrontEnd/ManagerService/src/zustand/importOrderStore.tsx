@@ -1,11 +1,11 @@
-import {ImportItem} from "@/Store/ImportOrder.tsx";
+import {ImportItemCreate} from "@/Store/ImportOrder.tsx";
 import {create} from "zustand";
 
 interface ImportOrderState {
-    items: ImportItem[];
-    addItem: (item: ImportItem) => void;
+    items: ImportItemCreate[];
+    addItem: (item: ImportItemCreate) => void;
     removeItemByIndex: (index: number) => void;
-    updateItemByIndex: (index: number, item: ImportItem) => void;
+    updateItemByIndex: (index: number, item: ImportItemCreate) => void;
     clearItems: () => void;
 }
 

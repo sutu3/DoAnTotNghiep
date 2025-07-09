@@ -2,7 +2,7 @@ const BASE_URL_Warehouse = "https://doantotnghiep-pb6y.onrender.com/api";
 const BASE_URL_User = "https://userservice-kuug.onrender.com/api";
 const BASE_URL_Product = "https://productservice-8qdv.onrender.com/api";
 const BASE_URL_File = "https://fileservice-dz2g.onrender.com";
-const BASE_URL_Order = "https://orderservice-3u1b.onrender.com";
+const BASE_URL_Order = "https://orderservice-3u1b.onrender.com/api";
 export interface pageApi {
   pageNumber: number;
   pageSize: number;
@@ -22,7 +22,7 @@ export const API_ROUTES = {
           const search=base+"/search";
           return{
             byWarehouseId:(warehouseId: string)=>({
-              getAll: `${search}/ByWarehouse/${warehouseId}${pageUrl}`,
+              getAll: `${search}/warehouse/${warehouseId}${pageUrl}`,
             })
           }
         })

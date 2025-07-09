@@ -1,0 +1,21 @@
+{
+  "importOrderId": "a1c44b0a-5609-46a7-a9a7-016ddcdcfe84",
+  "warehouse": {
+    "warehouseName": "Warehouse A",
+    "managerId": "1"
+  },
+  "status": "Created",
+  "type": "Request",
+  "createByUser": {
+    "userId": "3126d2f9-3810-44d3-8714-a6870855681d",
+    "userName": "Dai",
+    "email": "minhdaimk112@gmail.com",
+    "urlImage": "https://www.w3schools.com/howto/howto_css_image_avatar.asp"
+  },
+  "accessByAdmin": null,
+  "note": null,
+  "imageCheckUrl": null,
+  "requestDate": "2025-07-09T05:16:06",
+  "accessDate": null,
+  "importItems": null
+},

@@ -1,5 +1,5 @@
 import {Select, SelectItem} from "@heroui/react";
-import {ImportItem} from "@/Store/ImportOrder.tsx";
+import {ImportItemCreate} from "@/Store/ImportOrder.tsx";
 import {Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal, useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {MiddleGetAllProductBySearch} from "@/Store/Thunk/ProductThunk.tsx";
@@ -7,7 +7,7 @@ import {ProductSelector} from "@/Store/Selector.tsx";
 import {setUnitList} from "@/Store/Unit.tsx";
 
 interface SelectProps {
-    formData:  ImportItem;
+    formData:  ImportItemCreate;
     setFormData: (formData: (prev: any) => any) => void;
 }
 
