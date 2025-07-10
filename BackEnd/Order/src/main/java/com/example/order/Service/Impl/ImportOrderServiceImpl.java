@@ -131,12 +131,12 @@ public class ImportOrderServiceImpl implements ImportOrderService {
     }
 
     @Override
-    public ImportOrderResponse updateReject(String id) {
+    public ImportOrderResponse updateReject(String id,ImportOrderForm form) {
         ImportOrder importOrder = getById(id);
         importOrder.setStatus(OrderStatus.Cancel);
         importOrder.setAccessDate(LocalDateTime.now());
         importOrder.setUpdatedAt(LocalDateTime.now());
-
+        importOrder.setNote(importOrder.getNote()+"   Reason:"+form.note());
         ImportOrder rejectedOrder = importOrderRepo.save(importOrder);
         return entry(rejectedOrder);
     }
