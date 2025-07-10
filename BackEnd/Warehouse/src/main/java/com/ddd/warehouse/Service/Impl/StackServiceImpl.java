@@ -24,7 +24,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +46,13 @@ public class StackServiceImpl implements StackService {
     public Page<StackResponse> getAllByWarehouseId(Pageable pageable, String warehouseId) {
         return stackRepo.findAllByWarehouse_WarehouseId(pageable, warehouseId).map(stackMapper::toResponse);
     }
+
+    @Override
+    public List<StackResponse> getAllListByWarehouseId(String warehouseId) {
+        return stackRepo.findAllByWarehouse_WarehouseId( warehouseId)
+                .stream().map(stackMapper::toResponse).collect(Collectors.toList());
+    }
+
     @Override
     public Boolean exsistByStack(String stackName,String warehouseId) {
         return stackRepo.existsByStackNameAndWarehouse_WarehouseId(stackName,warehouseId);

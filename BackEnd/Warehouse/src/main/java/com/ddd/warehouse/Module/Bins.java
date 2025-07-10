@@ -26,6 +26,8 @@ public class Bins extends BaseEntity{
     BinStatus status;
     @Column(columnDefinition = "INTEGER COMMENT 'sức chưa của bin'", nullable = false)
     Integer capacity;
+    @Column(columnDefinition = "INTEGER COMMENT 'sức chưa còn lại'", nullable = false)
+    Integer currentOccupancy;
     @ManyToOne
     @JoinColumn(name = "stackId",nullable = false)
     Stacks stack;
