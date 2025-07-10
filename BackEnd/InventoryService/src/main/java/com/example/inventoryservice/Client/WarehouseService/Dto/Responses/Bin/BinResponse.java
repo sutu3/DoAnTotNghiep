@@ -14,6 +14,7 @@ public class BinResponse{
     String binId;
     String binCode;
     Integer capacity;
+    Integer currentOccupancy;
     String status;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
