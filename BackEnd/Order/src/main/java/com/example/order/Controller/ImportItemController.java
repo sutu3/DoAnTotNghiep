@@ -39,6 +39,25 @@ public class ImportItemController {
                 .build();
     }
 
+    /**
+     * Lấy danh sách nhà cung cấp gần đây của một sản phẩm trong warehouse
+     * @param productId ID của sản phẩm
+     * @param warehouseId ID của warehouse
+     * @return List<String> - Danh sách tên các nhà cung cấp gần đây (tối đa 5)
+     */
+    @GetMapping("/recent-suppliers/product/{productId}/warehouse/{warehouseId}")
+    public ApiResponse<List<String>> getRecentSuppliersByProduct(
+            @PathVariable String productId,
+            @PathVariable String warehouseId
+    ) {
+        return ApiResponse.<List<String>>builder()
+                .Result(importItemService.getRecentSuppliersByProduct(productId, warehouseId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+
     // GET - Lấy items theo warehouse
     @GetMapping("/search/warehouseId/{warehouseId}")
     public ApiResponse<Page<ImportResponseItem>> getAllByWarehouse(

@@ -26,7 +26,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.ddd.warehouse.Utils.CheckNumber.IsLessThanOrEqualZero;
 
@@ -40,8 +42,6 @@ public class BinServiceImpl implements BinService {
     @Lazy
     StackService stackService;
      WarehouseRepo warehouseRepo;
-    CheckNumber checkNumber;
-
     @Override
     public Page<BinResponse> getAll(Pageable pageable) {
         return binRepo.findAllByIsDeleted(pageable,false).map(binMapper::toResponse);
@@ -51,7 +51,11 @@ public class BinServiceImpl implements BinService {
     public Page<BinResponse> getAllByWarehouseId(Pageable pageable, String warehouseId) {
         return binRepo.findAllByWarehouse_WarehouseId(pageable,warehouseId).map(binMapper::toResponse);
     }
-
+    @Override
+    public List<BinResponse> getAllListByWarehouseId( String warehouseId) {
+        return binRepo.findAllByWarehouse_WarehouseIdAndIsDeleted(warehouseId, false).stream()
+                .map(binMapper::toResponse).collect(Collectors.toList());
+    }
     @Override
     public Page<BinResponse> getAllByStackName(Pageable pageable, String stackName) {
         return binRepo.findAllByStack_StackName(pageable,stackName).map(binMapper::toResponse);
