@@ -111,6 +111,7 @@ public class BinServiceImpl implements BinService {
         bin.setStatus(BinStatus.EMPTY);
         bin.setBinCode(binCode);
         bin.setStack(stack);
+        bin.setCurrentOccupancy(0);
         bin.setWarehouse(warehouses);
         bin.setIsDeleted(false);
         return binMapper.toDto(binRepo.save(bin));
