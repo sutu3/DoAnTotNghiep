@@ -108,4 +108,13 @@ public class StackController {
                 .success(true)
                 .build();
     }
+    @GetMapping("/by-bin/{binId}")
+    public ApiResponse<StackResponse> getStackByBin(@PathVariable String binId) {
+        return ApiResponse.<StackResponse>builder()
+                .Result(stackBinOrchestratorService.getStackByBinId(binId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
 }

@@ -21,5 +21,6 @@ public interface ImportItemService {
     ImportResponseItem updateItem(ImportItemForm update,String id);
     void deleteItem(String id);
     ImportResponseItem entry(ImportItem importItem);
-    
+    List<String> getRecentSuppliersByProduct(String productId, String warehouseId);
+
 }

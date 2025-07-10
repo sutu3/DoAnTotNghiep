@@ -15,6 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/bins")
 @RequiredArgsConstructor
@@ -91,6 +93,17 @@ public class BinController {
         Pageable pageable = PageRequest.of(page, size);
         return ApiResponse.<Page<BinResponse>>builder()
                 .Result(binService.getAllByWarehouseId(pageable,warehouseId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/byWarehouse/{warehouseId}/list")
+    public ApiResponse<List<BinResponse>> getAllListBinByWarehouseId(
+            @PathVariable String warehouseId
+    ){
+        return ApiResponse.<List<BinResponse>>builder()
+                .Result(binService.getAllListByWarehouseId(warehouseId))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

@@ -15,6 +15,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/cache")
 @RequiredArgsConstructor
@@ -80,7 +82,15 @@ public class CacheController {
                 .success(true)
                 .build();
     }
-
+    @GetMapping("/bins/byWarehouse/{warehouseId}/list")
+    public ApiResponse<List<BinResponse>> getAllListBinByWarehouseId(@PathVariable String warehouseId){
+        return ApiResponse.<List<BinResponse>>builder()
+                .Result(cacheService.getAllListBinByWarehouseId(warehouseId))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
     @DeleteMapping("/bins/{userId}")
     public ApiResponse<String> evictBin(@PathVariable String binId) {
         cacheService.evictBin(binId);
