@@ -11,6 +11,7 @@ public record BinResponseNoWarehouse(
         String binId,
         String binCode,
         Integer capacity,
+        Integer currentOccupancy,
         BinStatus status,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
