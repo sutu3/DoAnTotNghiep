@@ -22,4 +22,5 @@ public interface ImportOrderService {
     ImportOrderResponse updateApprove(String id);
     ImportOrderResponse updateReject(String id);
     ImportOrderResponse entry(ImportOrder importOrder);
+    Integer getPendingOrdersByProduct(String productId, String warehouseId);
 }

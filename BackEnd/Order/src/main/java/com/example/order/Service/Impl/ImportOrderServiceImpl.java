@@ -34,6 +34,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -159,5 +160,16 @@ public class ImportOrderServiceImpl implements ImportOrderService {
         importOrderResponse.setCreateByUser(userFuture.join());
 
         return importOrderResponse;
+    }
+
+    @Override
+    public Integer getPendingOrdersByProduct(String productId, String warehouseId) {
+        // Lấy tất cả orders có status Created hoặc InProgress trong warehouse
+        List<OrderStatus> pendingStatuses = Arrays.asList(OrderStatus.Created, OrderStatus.InProgress);
+
+        // Query để đếm số lượng items đang pending cho product cụ thể
+        return importItemRepo.countPendingItemsByProductAndWarehouse(
+                productId, warehouseId, pendingStatuses, false
+        );
     }
 }

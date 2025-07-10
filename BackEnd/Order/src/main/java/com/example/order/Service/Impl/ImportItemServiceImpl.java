@@ -31,8 +31,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -57,10 +59,10 @@ public class ImportItemServiceImpl implements ImportItemService {
     }
 
     @Override
-    public Page<ImportResponseItem> getAllByOrder(Pageable pageable, String order) {
+    public List<ImportResponseItem> getAllByOrder( String order) {
         importOrderRepo.findById(order).orElseThrow(()->new AppException(ErrorCode.IMPORT_ORDER_NOT_FOUND));
-        return importItemRepo.findAllByImportOrder_ImportOrderIdAndIsDeleted(order, false, pageable)
-                .map(this::entry);
+        return importItemRepo.findAllByImportOrder_ImportOrderIdAndIsDeleted(order, false)
+                .map(this::entry).stream().toList();
     }
 
     @Override
@@ -132,5 +134,31 @@ public class ImportItemServiceImpl implements ImportItemService {
         importResponseItem.setProduct(productFuture.join());
         importResponseItem.setUnit(unitFuture.join());
         return importResponseItem;
+    }
+
+    @Override
+    public List<String> getRecentSuppliersByProduct(String productId, String warehouseId) {
+        LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
+
+        // Query để lấy suppliers gần đây nhất
+        List<ImportItem> recentItems = importItemRepo.findRecentImportItemsByProductAndWarehouse(
+                productId, warehouseId, sixMonthsAgo, false
+        );
+
+        // Extract supplier IDs và lấy thông tin chi tiết
+        return recentItems.stream()
+                .map(ImportItem::getSupplier)
+                .distinct()
+                .limit(5) // Giới hạn 5 suppliers gần nhất
+                .map(supplierId -> {
+                    try {
+                        SupplierResponse supplier = userController.getSupplier(supplierId).getResult();
+                        return supplier.getSupplierName();
+                    } catch (Exception e) {
+                        log.warn("Cannot fetch supplier info for ID: {}", supplierId);
+                        return "Unknown Supplier";
+                    }
+                })
+                .collect(Collectors.toList());
     }
 }

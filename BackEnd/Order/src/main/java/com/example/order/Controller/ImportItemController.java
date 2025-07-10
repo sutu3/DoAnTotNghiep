@@ -27,15 +27,31 @@ import java.util.List;
 public class ImportItemController {
     ImportItemService importItemService;
     // GET - Lấy tất cả items theo orderId
-    @GetMapping("/search/order/{orderId}")
-    public ApiResponse<Page<ImportResponseItem>> getAllByOrderId(
-            @RequestParam("pageNumber") int page,
-            @RequestParam("pageSize") int size,
+    @GetMapping("/search/orderId/{orderId}")
+    public ApiResponse<List<ImportResponseItem>> getAllByOrderId(
             @PathVariable String orderId
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ApiResponse.<Page<ImportResponseItem>>builder()
-                .Result(importItemService.getAllByOrder(pageable, orderId))
+        return ApiResponse.<List<ImportResponseItem>>builder()
+                .Result(importItemService.getAllByOrder( orderId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+
+    /**
+     * Lấy danh sách nhà cung cấp gần đây của một sản phẩm trong warehouse
+     * @param productId ID của sản phẩm
+     * @param warehouseId ID của warehouse
+     * @return List<String> - Danh sách tên các nhà cung cấp gần đây (tối đa 5)
+     */
+    @GetMapping("/recent-suppliers/product/{productId}/warehouse/{warehouseId}")
+    public ApiResponse<List<String>> getRecentSuppliersByProduct(
+            @PathVariable String productId,
+            @PathVariable String warehouseId
+    ) {
+        return ApiResponse.<List<String>>builder()
+                .Result(importItemService.getRecentSuppliersByProduct(productId, warehouseId))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

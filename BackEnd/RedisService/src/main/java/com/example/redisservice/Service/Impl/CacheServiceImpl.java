@@ -9,6 +9,7 @@ import com.example.redisservice.Client.UserService.UserController;
 import com.example.redisservice.Client.WarehouseService.Dto.Responses.Bin.BinResponse;
 import com.example.redisservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.redisservice.Client.WarehouseService.WarehouseController;
+import com.example.redisservice.DTOs.Response.ApiResponse;
 import com.example.redisservice.Service.CacheService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -69,6 +72,11 @@ public class CacheServiceImpl implements CacheService {
     public BinResponse getBin(String binId) {
         log.info("Fetching Bin from WarehouseService for ID: {}", binId);
         return warehouseController.getBinById(binId).getResult();            }
+
+    @Cacheable(value = "warehouse-bins", key = "#warehouseId", unless = "#result == null")
+    public List<BinResponse> getAllListBinByWarehouseId(String warehouseId) {
+        return warehouseController.getAllListBinByWarehouseId(warehouseId).getResult();
+    }
 
     @Override
     @CacheEvict(value = "bins", key = "#binId")

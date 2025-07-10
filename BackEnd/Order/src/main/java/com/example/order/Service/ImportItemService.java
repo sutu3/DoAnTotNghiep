@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public interface ImportItemService {
     Page<ImportResponseItem> getAllByWarehouse(Pageable pageable,String warehouse);
-    Page<ImportResponseItem> getAllByOrder(Pageable pageable,String order);
+    List<ImportResponseItem> getAllByOrder(String order);
     ImportItem getById(String id);
     ImportResponseItem getByIdResponse(String id);
     ImportResponseItem createItem(ImportRequestItem importResponseItem);
@@ -21,5 +21,6 @@ public interface ImportItemService {
     ImportResponseItem updateItem(ImportItemForm update,String id);
     void deleteItem(String id);
     ImportResponseItem entry(ImportItem importItem);
-    
+    List<String> getRecentSuppliersByProduct(String productId, String warehouseId);
+
 }

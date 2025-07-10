@@ -6,6 +6,9 @@ import com.example.redisservice.Client.UserService.Dto.Response.SupplierResponse
 import com.example.redisservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.redisservice.Client.WarehouseService.Dto.Responses.Bin.BinResponse;
 import com.example.redisservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
+import com.example.redisservice.DTOs.Response.ApiResponse;
+
+import java.util.List;
 
 public interface CacheService {
     UserResponse getUser(String userId);
@@ -14,6 +17,7 @@ public interface CacheService {
     ProductResponse getProduct(String productId);
     UnitNameResponse getUnit(String unitId);
     BinResponse getBin(String binId);
+    List<BinResponse> getAllListBinByWarehouseId(String warehouseId);
     void evictBin(String binId);
     void evictUser(String userId);
     void evictWarehouse(String warehouseId);

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @FeignClient(
         name = "Warehouse",
         url = "https://doantotnghiep-pb6y.onrender.com/api",
@@ -23,6 +25,7 @@ public interface WarehouseController {
     ApiResponse<WarehousesResponse> getWarehousesByName(@RequestParam String name);
     @GetMapping("/bins/search/binId/{binId}")
     ApiResponse<BinResponse> getBinById(@PathVariable String binId);
-
+    @GetMapping("/bins/byWarehouse/{warehouseId}/list")
+    ApiResponse<List<BinResponse>> getAllListBinByWarehouseId(@PathVariable String warehouseId);
 
 }
