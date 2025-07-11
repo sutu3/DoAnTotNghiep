@@ -8,11 +8,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 
 public interface StackService {
     Page<StackResponse> getAll(Pageable pageable);
     Page<StackResponse> getAllByWarehouseId(Pageable pageable, String warehouseId);
+    List<StackResponse> getAllListByWarehouseId( String warehouseId);
     Boolean exsistByStack(String stackName,String warehouseId);
     StackResponse getByStackNameResponse(String stackName,String warehouseId);
     Stacks getByStackName(String stackName,String warehouseId);
@@ -21,4 +24,5 @@ public interface StackService {
     StackResponse createStack(StackRequest stackRequest);
     StackResponse updateStack(StackForm update,String stackId);
     String deleteStack(String stackId);
+
 }

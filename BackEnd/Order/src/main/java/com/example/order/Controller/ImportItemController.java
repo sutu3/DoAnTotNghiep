@@ -4,6 +4,9 @@ import com.example.order.Dto.Request.ImportRequestItem;
 import com.example.order.Dto.Response.ApiResponse;
 import com.example.order.Dto.Response.ImportItem.ImportResponseItem;
 import com.example.order.Form.ImportItemForm;
+import com.example.order.Form.UpdateBinRequest;
+import com.example.order.Form.UpdateQuantityRequest;
+import com.example.order.Module.ImportOrder;
 import com.example.order.Service.ImportItemService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -26,15 +29,31 @@ import java.util.List;
 public class ImportItemController {
     ImportItemService importItemService;
     // GET - Lấy tất cả items theo orderId
-    @GetMapping("/search/order/{orderId}")
-    public ApiResponse<Page<ImportResponseItem>> getAllByOrderId(
-            @RequestParam("pageNumber") int page,
-            @RequestParam("pageSize") int size,
+    @GetMapping("/search/orderId/{orderId}")
+    public ApiResponse<List<ImportResponseItem>> getAllByOrderId(
             @PathVariable String orderId
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ApiResponse.<Page<ImportResponseItem>>builder()
-                .Result(importItemService.getAllByOrder(pageable, orderId))
+        return ApiResponse.<List<ImportResponseItem>>builder()
+                .Result(importItemService.getAllByOrder( orderId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+
+    /**
+     * Lấy danh sách nhà cung cấp gần đây của một sản phẩm trong warehouse
+     * @param productId ID của sản phẩm
+     * @param warehouseId ID của warehouse
+     * @return List<String> - Danh sách tên các nhà cung cấp gần đây (tối đa 5)
+     */
+    @GetMapping("/recent-suppliers/product/{productId}/warehouse/{warehouseId}")
+    public ApiResponse<List<String>> getRecentSuppliersByProduct(
+            @PathVariable String productId,
+            @PathVariable String warehouseId
+    ) {
+        return ApiResponse.<List<String>>builder()
+                .Result(importItemService.getRecentSuppliersByProduct(productId, warehouseId))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)
@@ -104,33 +123,33 @@ public class ImportItemController {
                 .build();
     }
 
-//    // PUT - Cập nhật số lượng thực nhập
-//    @PutMapping("/{itemId}/reality-quantity")
-//    public ApiResponse<ImportOrderItemResponse> updateRealityQuantity(
-//            @PathVariable String itemId,
-//            @RequestBody UpdateQuantityRequest request
-//    ) {
-//        return ApiResponse.<ImportOrderItemResponse>builder()
-//                .Result(importOrderItemService.updateRealityQuantity(itemId, request))
-//                .code(0)
-//                .message("SuccessFull")
-//                .success(true)
-//                .build();
-//    }
-//
-//    // PUT - Cập nhật bin location
-//    @PutMapping("/{itemId}/bin")
-//    public ApiResponse<ImportOrderItemResponse> updateBinLocation(
-//            @PathVariable String itemId,
-//            @RequestBody UpdateBinRequest request
-//    ) {
-//        return ApiResponse.<ImportOrderItemResponse>builder()
-//                .Result(importOrderItemService.updateBinLocation(itemId, request))
-//                .code(0)
-//                .message("SuccessFull")
-//                .success(true)
-//                .build();
-//    }
+    // PUT - Cập nhật số lượng thực nhập
+    @PutMapping("/{itemId}/reality-quantity")
+    public ApiResponse<ImportResponseItem> updateRealityQuantity(
+            @PathVariable String itemId,
+            @RequestBody UpdateQuantityRequest request
+    ) {
+        return ApiResponse.<ImportResponseItem>builder()
+                .Result(importItemService.updateRealityQuantity(itemId, request))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+
+    // PUT - Cập nhật bin location
+    @PutMapping("/{itemId}/bin")
+    public ApiResponse<ImportResponseItem> updateBinLocation(
+            @PathVariable String itemId,
+            @RequestBody UpdateBinRequest request
+    ) {
+        return ApiResponse.<ImportResponseItem>builder()
+                .Result(importItemService.updateBinLocation(itemId, request))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
 
     // DELETE - Xóa mềm item
     @DeleteMapping("/{itemId}")

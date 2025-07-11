@@ -57,7 +57,24 @@ public class ImportOrderController {
                 .success(true)
                 .build();
     }
-
+    /**
+     * Lấy số lượng đơn hàng đang chờ xử lý cho một sản phẩm trong warehouse
+     * @param productId ID của sản phẩm
+     * @param warehouseId ID của warehouse
+     * @return Integer - Tổng số lượng sản phẩm trong các đơn hàng đang chờ
+     */
+    @GetMapping("/pending-orders/product/{productId}/warehouse/{warehouseId}")
+    public ApiResponse<Integer> getPendingOrdersByProduct(
+            @PathVariable String productId,
+            @PathVariable String warehouseId
+    ) {
+        return ApiResponse.<Integer>builder()
+                .Result(importOrderService.getPendingOrdersByProduct(productId, warehouseId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
     // GET - Lấy order theo ID
     @GetMapping("/{orderId}")
     public ApiResponse<ImportOrderResponse> getById(@PathVariable String orderId) {
@@ -121,9 +138,12 @@ public class ImportOrderController {
 
     // PUT - Từ chối order (Reject)
     @PutMapping("/{orderId}/reject")
-    public ApiResponse<ImportOrderResponse> rejectOrder(@PathVariable String orderId) {
+    public ApiResponse<ImportOrderResponse> rejectOrder(
+            @PathVariable String orderId,
+            @RequestBody ImportOrderForm form
+    ) {
         return ApiResponse.<ImportOrderResponse>builder()
-                .Result(importOrderService.updateReject(orderId))
+                .Result(importOrderService.updateReject(orderId,form))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

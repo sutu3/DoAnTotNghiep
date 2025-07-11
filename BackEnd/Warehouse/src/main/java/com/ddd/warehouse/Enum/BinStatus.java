@@ -1,5 +1,5 @@
 package com.ddd.warehouse.Enum;
 
 public enum BinStatus {
-    EMPTY, FULL, MAINTENANCE
+    EMPTY, FULL, MAINTENANCE,AVAILABLE
 }

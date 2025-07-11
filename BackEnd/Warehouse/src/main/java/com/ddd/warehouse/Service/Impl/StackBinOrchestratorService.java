@@ -5,6 +5,8 @@ import com.ddd.warehouse.Dto.Request.StackRequest;
 import com.ddd.warehouse.Dto.Response.Bin.BinResponse;
 import com.ddd.warehouse.Dto.Response.Bin.BinResponseNoWarehouse;
 import com.ddd.warehouse.Dto.Response.Stack.StackResponse;
+import com.ddd.warehouse.Exception.AppException;
+import com.ddd.warehouse.Exception.ErrorCode;
 import com.ddd.warehouse.Mapper.StackMapper;
 import com.ddd.warehouse.Module.Bins;
 import com.ddd.warehouse.Module.Stacks;
@@ -53,6 +55,17 @@ public class StackBinOrchestratorService {
         StackResponse response = stackMapper.toResponse(fullStack);
         response.setBin(bins);
         return response;
+    }
+    public StackResponse getStackByBinId(String binId) {
+        Bins bin = binService.getById(binId);
+
+        Stacks stack = bin.getStack();
+
+        if (stack == null) {
+            throw new AppException(ErrorCode.STACK_NOT_FOUND);
+        }
+
+        return stackMapper.toResponse(stack);
     }
 
 }

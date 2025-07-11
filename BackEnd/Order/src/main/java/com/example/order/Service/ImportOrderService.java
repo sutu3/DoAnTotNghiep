@@ -20,6 +20,7 @@ public interface ImportOrderService {
     ImportOrderResponse deleteOrder(String id);
     ImportOrderResponse updateStatus(String id, StatusForm status);
     ImportOrderResponse updateApprove(String id);
-    ImportOrderResponse updateReject(String id);
+    ImportOrderResponse updateReject(String id,ImportOrderForm form);
     ImportOrderResponse entry(ImportOrder importOrder);
+    Integer getPendingOrdersByProduct(String productId, String warehouseId);
 }

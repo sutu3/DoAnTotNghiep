@@ -26,7 +26,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.ddd.warehouse.Utils.CheckNumber.IsLessThanOrEqualZero;
 
@@ -40,8 +42,6 @@ public class BinServiceImpl implements BinService {
     @Lazy
     StackService stackService;
      WarehouseRepo warehouseRepo;
-    CheckNumber checkNumber;
-
     @Override
     public Page<BinResponse> getAll(Pageable pageable) {
         return binRepo.findAllByIsDeleted(pageable,false).map(binMapper::toResponse);
@@ -51,7 +51,11 @@ public class BinServiceImpl implements BinService {
     public Page<BinResponse> getAllByWarehouseId(Pageable pageable, String warehouseId) {
         return binRepo.findAllByWarehouse_WarehouseId(pageable,warehouseId).map(binMapper::toResponse);
     }
-
+    @Override
+    public List<BinResponse> getAllListByWarehouseId( String warehouseId) {
+        return binRepo.findAllByWarehouse_WarehouseIdAndIsDeleted(warehouseId, false).stream()
+                .map(binMapper::toResponse).collect(Collectors.toList());
+    }
     @Override
     public Page<BinResponse> getAllByStackName(Pageable pageable, String stackName) {
         return binRepo.findAllByStack_StackName(pageable,stackName).map(binMapper::toResponse);
@@ -72,6 +76,45 @@ public class BinServiceImpl implements BinService {
     @Override
     public Boolean exsistByBinCode(String BinName, String stackName, String warehouseId) {
         return binRepo.existsByBinCodeAndStack_StackNameAndWarehouse_WarehouseId(BinName,stackName,warehouseId);
+    }
+
+    @Override
+    public void updateCurrentOccupancy(String binId, Integer occupancyChange) {
+        Bins bin = getById(binId);
+
+        // Tính toán occupancy mới
+        Integer newOccupancy = bin.getCurrentOccupancy() + occupancyChange;
+
+        // Validate không vượt quá capacity
+        if (newOccupancy > bin.getCapacity()) {
+            throw new AppException(ErrorCode.BIN_CAPACITY_EXCEEDED);
+        }
+
+        // Validate không âm
+        if (newOccupancy < 0) {
+            throw new AppException(ErrorCode.INVALID_OCCUPANCY);
+        }
+
+        bin.setCurrentOccupancy(newOccupancy);
+
+        // Cập nhật status dựa trên occupancy
+        if (newOccupancy == 0) {
+            bin.setStatus(BinStatus.EMPTY);
+        } else if (newOccupancy >= bin.getCapacity()) {
+            bin.setStatus(BinStatus.FULL);
+        } else {
+            bin.setStatus(BinStatus.AVAILABLE);
+        }
+
+        binRepo.save(bin);
+    }
+
+    @Override
+    public void resetCurrentOccupancy(String binId) {
+        Bins bin = getById(binId);
+        bin.setCurrentOccupancy(0);
+        bin.setStatus(BinStatus.EMPTY);
+        binRepo.save(bin);
     }
 
     @Override
@@ -107,6 +150,7 @@ public class BinServiceImpl implements BinService {
         bin.setStatus(BinStatus.EMPTY);
         bin.setBinCode(binCode);
         bin.setStack(stack);
+        bin.setCurrentOccupancy(0);
         bin.setWarehouse(warehouses);
         bin.setIsDeleted(false);
         return binMapper.toDto(binRepo.save(bin));

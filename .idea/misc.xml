@@ -10,6 +10,7 @@
         <option value="$PROJECT_DIR$/BackEnd/FileService/pom.xml" />
         <option value="$PROJECT_DIR$/BackEnd/Order/pom.xml" />
         <option value="$PROJECT_DIR$/BackEnd/RedisService/pom.xml" />
+        <option value="$PROJECT_DIR$/BackEnd/InventoryService/pom.xml" />
       </list>
     </option>
   </component>
