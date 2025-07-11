@@ -131,6 +131,11 @@ public class ImportItemServiceImpl implements ImportItemService {
                 .getUserAsync(importItem.getCreateByUser());
         CompletableFuture.allOf( unitFuture,productFuture,supplierFuture,userFuture).join();
         ImportResponseItem importResponseItem=importItemMapper.toResponse(importItem);
+        if(importItem.getBin()!=null){
+            CompletableFuture<BinResponse> binFurute = asyncServiceImpl
+                    .getBinAsync(importItem.getBin());
+            importResponseItem.setBin(binFurute.join());
+        }
         importResponseItem.setCreateByUser(userFuture.join());
         importResponseItem.setSupplier(supplierFuture.join());
         importResponseItem.setProduct(productFuture.join());
