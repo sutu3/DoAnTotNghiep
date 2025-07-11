@@ -21,6 +21,8 @@ public interface BinService {
     BinResponse getByBinCodeResponse(String BinName,String stackName,String warehouseId);
     Bins getByBinCode(String BinName,String stackName,String warehouseId);
     Boolean exsistByBinCode(String BinName,String stackName,String warehouseId);
+    void updateCurrentOccupancy(String binId, Integer occupancyChange);
+    void resetCurrentOccupancy(String binId);
     Bins getById(String BinId);
     BinResponse getByIdResponse(String BinId);
     BinResponseNoWarehouse createBin(BinRequest BinRequest);

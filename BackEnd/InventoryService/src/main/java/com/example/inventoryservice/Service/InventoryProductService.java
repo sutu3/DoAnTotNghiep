@@ -16,7 +16,8 @@ public interface InventoryProductService {
     Page<InventoryProductResponse> getAllByWarehouse(Pageable pageable, String warehouse);
     InventoryProduct getById(String id);
     InventoryProductResponse getByIdResponse(String id);
-    InventoryProductResponse getByProductAndWarehouse(String product, String warehouse);
+    InventoryProduct getByProductAndWarehouse(String product, String warehouse);
+    InventoryProductResponse getByProductAndWarehouseResponse(String product, String warehouse);
     InventoryProductResponse createInventoryProduct(InventoryProductRequest request);
     InventoryProductResponse updateInventoryProduct(InventoryProductForm form, String id);
     void deleteInventoryProduct(String id);

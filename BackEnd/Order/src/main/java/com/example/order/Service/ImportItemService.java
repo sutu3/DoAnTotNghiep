@@ -3,6 +3,8 @@ package com.example.order.Service;
 import com.example.order.Dto.Request.ImportRequestItem;
 import com.example.order.Dto.Response.ImportItem.ImportResponseItem;
 import com.example.order.Form.ImportItemForm;
+import com.example.order.Form.UpdateBinRequest;
+import com.example.order.Form.UpdateQuantityRequest;
 import com.example.order.Module.ImportItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,5 +24,7 @@ public interface ImportItemService {
     void deleteItem(String id);
     ImportResponseItem entry(ImportItem importItem);
     List<String> getRecentSuppliersByProduct(String productId, String warehouseId);
+    ImportResponseItem updateRealityQuantity(String itemId, UpdateQuantityRequest request);
+    ImportResponseItem updateBinLocation(String itemId, UpdateBinRequest request);
 
 }
