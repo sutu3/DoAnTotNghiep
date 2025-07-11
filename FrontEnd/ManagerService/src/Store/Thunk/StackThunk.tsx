@@ -1,4 +1,4 @@
-import {setAddStack, setStackList, StackCreate, StackType,initToTalPage} from "@/Store/StackSlice.tsx";
+import {setAddStack, setStackList, StackCreate,initToTalPage} from "@/Store/StackSlice.tsx";
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {callApiThunk} from "@/Store/Store.tsx";
 import {API_ROUTES, pageApi} from "@/Constants/UrlApi.tsx";
@@ -31,7 +31,24 @@ export const GetAllStack = createAsyncThunk(
             rejectWithValue
         )
 );
-
+export const GetAllStackList = createAsyncThunk(
+    "stack/GetAllStackList",
+    async (
+        { warehouseId }: { warehouseId: string },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES
+                .warehouse
+                .stacks(null)
+                .search
+                .byWarehouseId( warehouseId)
+                .getAllList,
+            undefined,
+            rejectWithValue
+        )
+);
 
 export const MiddleGetAllStack = (page: pageApi) => {
     return async function check(dispatch: any, getState: any) {
@@ -42,6 +59,23 @@ export const MiddleGetAllStack = (page: pageApi) => {
             const action = await dispatch(GetAllStack({ warehouseId, page }));
             dispatch(setStackList(action.payload.result.content));
             dispatch(initToTalPage(action.payload.result.totalPages));
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
+export const MiddleGetAllStackList = () => {
+    return async function check(dispatch: any, getState: any) {
+        try {
+            const { warehouse } = getState().warehouse;
+            const warehouseId = warehouse?.warehouseId;
+
+            const action = await dispatch(GetAllStackList({ warehouseId }));
+            dispatch(setStackList(action.payload.result));
         } catch (error: any) {
             showToast({
                 title: "Error",

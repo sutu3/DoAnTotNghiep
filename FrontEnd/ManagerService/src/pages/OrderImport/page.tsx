@@ -29,7 +29,7 @@ export default function OrderRequestImportForm() {
     const [formData, setFormData] = useState<OrderRequestImportCreate>({
         warehouse: "",
         createByUser: "",
-        description: ""
+        note: ""
     });
     const [currentItem, setCurrentItem] = useState<ImportItemCreate>({
         itemId: "",
@@ -105,8 +105,8 @@ export default function OrderRequestImportForm() {
                                 <Textarea
                                     label="Mô tả đơn hàng"
                                     placeholder="Nhập mô tả cho đơn nhập hàng..."
-                                    value={formData.description}
-                                    onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
+                                    value={formData.note}
+                                    onChange={(e) => setFormData(prev => ({...prev, note: e.target.value}))}
                                 />
                             </CardBody>
                         </Card>
