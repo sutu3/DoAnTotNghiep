@@ -12,6 +12,7 @@ public record BinResponse(
         String binId,
         String binCode,
         Integer capacity,
+        Integer currentOccupancy,
         BinStatus status,
         WarehousesResponse warehouse,
         LocalDateTime createdAt,

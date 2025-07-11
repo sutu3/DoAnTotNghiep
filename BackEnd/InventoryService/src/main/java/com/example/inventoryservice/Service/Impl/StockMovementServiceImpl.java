@@ -4,8 +4,12 @@ import com.example.inventoryservice.Client.ProductService.Dto.Response.ProductRe
 import com.example.inventoryservice.Client.ProductService.Redis.ProductController;
 import com.example.inventoryservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.inventoryservice.Client.UserService.Redis.UserController;
+import com.example.inventoryservice.Client.WarehouseService.Dto.Form.UpdateOccupancyRequest;
+import com.example.inventoryservice.Client.WarehouseService.Redis.WarehouseController;
+import com.example.inventoryservice.Client.WarehouseService.WarehouseClient;
 import com.example.inventoryservice.Dtos.Request.StockMovementRequest;
 import com.example.inventoryservice.Dtos.Response.StockMovementResponse;
+import com.example.inventoryservice.Enum.MovementType;
 import com.example.inventoryservice.Exception.AppException;
 import com.example.inventoryservice.Exception.ErrorCode;
 import com.example.inventoryservice.Form.InventoryWarehouseForm;
@@ -40,6 +44,8 @@ public class StockMovementServiceImpl implements StockMovementService {
     ProductController productController;
     UserController userController;
     AsyncServiceImpl asyncServiceImpl;
+    private final WarehouseController warehouseController;
+    private final WarehouseClient warehouseClient;
 
     @Override
     public Page<StockMovementResponse> getAllByProduct(Pageable pageable, String product) {
@@ -97,7 +103,7 @@ public class StockMovementServiceImpl implements StockMovementService {
                 stockMovement.setQuantityAfter(inventoryWarehouse.getQuantity() - request.quantity());
                 break;
         }
-
+        updateBinOccupancy(inventoryWarehouse.getBin(), inventoryWarehouse.getQuantity(),stockMovement.getMovementType());
         stockMovement.setIsDeleted(false);
         StockMovement savedMovement = stockMovementRepo.save(stockMovement);
 
@@ -106,7 +112,24 @@ public class StockMovementServiceImpl implements StockMovementService {
 
         return enrich(savedMovement);
     }
-
+    @Override
+    public void updateBinOccupancy(String binId, Integer quantityChange, MovementType movementType) {
+        try {
+            Integer occupancyChange = switch (movementType) {
+                case IMPORT -> quantityChange;
+                case EXPORT -> -quantityChange;
+                case TRANSFER -> 0; // Sẽ xử lý riêng cho from/to bins
+                case ADJUSTMENT -> quantityChange; // Có thể âm hoặc dương
+            };
+            UpdateOccupancyRequest request= UpdateOccupancyRequest.builder()
+                    .occupancyChange(occupancyChange)
+                    .build();
+            warehouseClient.updateBinOccupancy(binId, request);
+        } catch (Exception e) {
+            log.warn("Failed to update bin occupancy for bin: {}", binId, e);
+            // Không throw exception để không ảnh hưởng đến stock movement
+        }
+    }
     @Override
     public List<StockMovementResponse> getMovementsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         return stockMovementRepo.findByDateRange(startDate, endDate)

@@ -138,9 +138,12 @@ public class ImportOrderController {
 
     // PUT - Từ chối order (Reject)
     @PutMapping("/{orderId}/reject")
-    public ApiResponse<ImportOrderResponse> rejectOrder(@PathVariable String orderId) {
+    public ApiResponse<ImportOrderResponse> rejectOrder(
+            @PathVariable String orderId,
+            @RequestBody ImportOrderForm form
+    ) {
         return ApiResponse.<ImportOrderResponse>builder()
-                .Result(importOrderService.updateReject(orderId))
+                .Result(importOrderService.updateReject(orderId,form))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

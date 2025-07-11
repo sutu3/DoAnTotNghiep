@@ -57,10 +57,16 @@ public class InventoryProductServiceImpl implements InventoryProductService {
     }
 
     @Override
-    public InventoryProductResponse getByProductAndWarehouse(String product, String warehouse) {
+    public InventoryProduct getByProductAndWarehouse(String product, String warehouse) {
         InventoryProduct inventoryProduct = inventoryProductRepo
                 .findByProductAndWarehouseAndIsDeleted(product, warehouse, false)
                 .orElseThrow(() -> new AppException(ErrorCode.INVENTORY_PRODUCT_NOT_FOUND));
+        return inventoryProduct;
+    }
+
+    @Override
+    public InventoryProductResponse getByProductAndWarehouseResponse(String product, String warehouse) {
+        InventoryProduct inventoryProduct=getByProductAndWarehouse(product, warehouse);
         return enrich(inventoryProduct);
     }
 

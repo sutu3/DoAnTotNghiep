@@ -14,6 +14,8 @@ import com.example.order.Dto.Response.ImportItem.ImportResponseItem;
 import com.example.order.Exception.AppException;
 import com.example.order.Exception.ErrorCode;
 import com.example.order.Form.ImportItemForm;
+import com.example.order.Form.UpdateBinRequest;
+import com.example.order.Form.UpdateQuantityRequest;
 import com.example.order.Mapper.ImportItemMapper;
 import com.example.order.Module.ImportItem;
 import com.example.order.Module.ImportOrder;
@@ -160,5 +162,53 @@ public class ImportItemServiceImpl implements ImportItemService {
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ImportResponseItem updateRealityQuantity(String itemId, UpdateQuantityRequest request) {
+        // Lấy ImportItem theo ID
+        ImportItem importItem = getById(itemId);
+
+        // Validate quantity không âm
+        if (request.realityQuantity() < 0) {
+            throw new AppException(ErrorCode.INVALID_QUANTITY);
+        }
+
+        // Cập nhật reality quantity
+        importItem.setRealityQuantity(request.realityQuantity());
+        importItem.setImportAt(LocalDateTime.now());
+        importItem.setUpdatedAt(LocalDateTime.now());
+
+        // Lưu vào database
+        ImportItem savedItem = importItemRepo.save(importItem);
+
+        // Cập nhật total price của order
+        updateOrderTotalPrice.updateTotalPrice(importItem.getImportOrder());
+
+        return entry(savedItem);
+    }
+
+    @Override
+    public ImportResponseItem updateBinLocation(String itemId, UpdateBinRequest request) {
+        // Lấy ImportItem theo ID
+        ImportItem importItem = getById(itemId);
+
+        // Validate bin tồn tại thông qua WarehouseService
+        if (request.binId() != null && !request.binId().isEmpty()) {
+            try {
+                warehouseController.getBinById(request.binId());
+            } catch (Exception e) {
+                throw new AppException(ErrorCode.IMPORT_ORDER_NOT_FOUND);
+            }
+        }
+
+        // Cập nhật bin location
+        importItem.setBin(request.binId());
+        importItem.setUpdatedAt(LocalDateTime.now());
+
+        // Lưu vào database
+        ImportItem savedItem = importItemRepo.save(importItem);
+
+        return entry(savedItem);
     }
 }

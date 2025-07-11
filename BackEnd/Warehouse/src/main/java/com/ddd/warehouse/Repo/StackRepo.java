@@ -8,12 +8,14 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import javax.swing.text.html.Option;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface StackRepo extends JpaRepository<Stacks,String>, JpaSpecificationExecutor<Stacks> {
     Page<Stacks> findAllByIsDeleted(Pageable pageable, boolean isDeleted);
     Page<Stacks> findAllByWarehouse_WarehouseId(Pageable pageable, String warehouseId);
+    List<Stacks> findAllByWarehouse_WarehouseId(String warehouseId);
     Optional<Stacks> findByStackNameAndWarehouse_WarehouseId(String stackName,String warehouseId);
     boolean existsByStackNameAndWarehouse_WarehouseId(String stackName,String warehouseId);
 }
