@@ -4,6 +4,7 @@ import com.ddd.warehouse.Dto.Request.BinRequest;
 import com.ddd.warehouse.Dto.Response.ApiResponse;
 import com.ddd.warehouse.Dto.Response.Bin.BinResponse;
 import com.ddd.warehouse.Form.BinForm;
+import com.ddd.warehouse.Form.UpdateOccupancyRequest;
 import com.ddd.warehouse.Service.BinService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -106,6 +107,18 @@ public class BinController {
                 .Result(binService.getAllListByWarehouseId(warehouseId))
                 .code(0)
                 .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @PutMapping("/{binId}/occupancy")
+    public ApiResponse<Void> updateCurrentOccupancy(
+            @PathVariable String binId,
+            @RequestBody UpdateOccupancyRequest request
+    ) {
+        binService.updateCurrentOccupancy(binId, request.occupancyChange());
+        return ApiResponse.<Void>builder()
+                .code(0)
+                .message("Bin occupancy updated successfully")
                 .success(true)
                 .build();
     }
