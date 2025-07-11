@@ -37,6 +37,8 @@ export const TotalPageUser = (state: { users: { totalPage: number } }) =>
 
 export const OrderSelector = (state: { importOrder: {orderImport: any} }) =>
     state.importOrder.orderImport;
+export const OrderItemSelector = (state: { importOrder: {orderItem: any} }) =>
+    state.importOrder.orderItem;
 export const TotalPageOrder = (state: { importOrder: { totalPage: number } }) =>
     state.importOrder.totalPage;
 

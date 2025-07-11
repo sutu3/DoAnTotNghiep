@@ -47,7 +47,7 @@ export default function ImportOrderTable({
     useEffect(() => {
         const PageApi: pageApi = { pageNumber: currentPage - 1, pageSize: 5 };
         const fetchData = async () => {
-            (dispatch as any)(MiddleGetAllOrder(PageApi));
+            await (dispatch as any)(MiddleGetAllOrder(PageApi));
         };
         fetchData();
 
@@ -164,12 +164,12 @@ export default function ImportOrderTable({
                                         color="primary"
                                         startContent={<Icon icon="mdi:package-variant" className="text-xs" />}
                                     >
-                                        {order.items?.length || 0} sản phẩm
+                                        {order.itemCount || 0} sản phẩm
                                     </Chip>
                                 </TableCell>
                                 <TableCell>
                                     <div className="font-semibold text-green-600 dark:text-green-400">
-                                        {order.totalValue?.toLocaleString('vi-VN')} ₫
+                                        {order.totalPrice?.toLocaleString('vi-VN')} ₫
                                     </div>
                                 </TableCell>
                                 <TableCell>

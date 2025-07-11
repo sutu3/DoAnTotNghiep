@@ -7,6 +7,9 @@ import {Icon} from "@iconify/react";
 import ImportOrderDetailModal from "@/components/Admin/OrderImport/Modal/ImportOrderDetailModal";
 import RejectReasonModal from "@/components/Admin/OrderImport/Modal/RejectReasonModal.tsx";
 import {ImportOrder, ImportOrderItem} from "@/Store/ImportOrder.tsx";
+import ProductInventoryStatsModal from "@/components/Admin/OrderImport/Modal/ProductInventoryStatsModal.tsx";
+import {MiddleChangeTypeOrderItem} from "@/Store/Thunk/ImportOrderThunk.tsx";
+import {useDispatch} from "react-redux";
 
 export interface BinLocation {
     binId: string;
@@ -25,29 +28,23 @@ export interface StackLocation {
     availableBins: number;
 }
 export default function AdminImportOrderManagement() {
-
+    const dispatch = useDispatch();
     const [selectedOrder, setSelectedOrder] = useState<ImportOrder | null>(null);
     const [statusFilter, setStatusFilter] = useState<string>("all");
     const [rejectReason, setRejectReason] = useState("");
     const [searchValue, setSearchValue] = useState("");
-
+    const [selectedItem,setSelectedItem] = useState<ImportOrderItem | null>(null);
     const { isOpen: isDetailOpen, onOpen: onDetailOpen, onClose: onDetailClose } = useDisclosure();
     const { isOpen: isRejectOpen, onOpen: onRejectOpen, onClose: onRejectClose } = useDisclosure();
+    const { isOpen: isLocationOpen, onOpen: onLocationOpen, onClose: onLocationClose } = useDisclosure();
 
     const isSidebarCollapsed = localStorage.getItem("theme") !== "light";
 
 
     const handleApprove = async (orderId: string) => {
         try {
-            // const response = await fetchApi({
-            //     method: "PUT",
-            //     url: `${API_ROUTES.order.importOrder(null).addOrderImport}/${orderId}/approve`
-            // });
+            await (dispatch as any)(MiddleChangeTypeOrderItem(orderId,true,null));
 
-            // if (response.success) {
-            //     fetchOrders(currentPage, statusFilter);
-            //     onDetailClose();
-            // }
         } catch (error) {
             console.error("Error approving order:", error);
         }
@@ -55,17 +52,8 @@ export default function AdminImportOrderManagement() {
 
     const handleReject = async (orderId: string) => {
         try {
-            // const response = await fetchApi({
-            //     method: "PUT",
-            //     url: `${API_ROUTES.order.importOrder(null).addOrderImport}/${orderId}/reject`,
-            //     data: { reason: rejectReason }
-            // });
-            //
-            // if (response.success) {
-            //     fetchOrders(currentPage, statusFilter);
-            //     onRejectClose();
-            //     setRejectReason("");
-            // }
+            const reason="Admin: "+rejectReason
+            await (dispatch as any)(MiddleChangeTypeOrderItem(orderId,false,reason));
         } catch (error) {
             console.error("Error rejecting order:", error);
         }
@@ -76,7 +64,9 @@ export default function AdminImportOrderManagement() {
 
     //Cập nhật handleItemClick
     const handleItemClick = async (item: ImportOrderItem) => {
-
+        console.log(item);
+        setSelectedItem(item)
+        onLocationOpen()
     };
 
 
@@ -140,12 +130,11 @@ export default function AdminImportOrderManagement() {
                         }
                     }}
                 />
-                {/*<ProductInventoryStatsModal*/}
-                {/*    isOpen={isLocationOpen}*/}
-                {/*    onClose={onLocationClose}*/}
-                {/*    selectedItem={selectedItem}*/}
-                {/*    inventoryStats={inventoryStats}*/}
-                {/*/>*/}
+                <ProductInventoryStatsModal
+                    isOpen={isLocationOpen}
+                    onClose={onLocationClose}
+                    selectedItem={selectedItem}
+                />
                 {/*<ProductLocationModal*/}
                 {/*    isOpen={isLocationOpen}*/}
                 {/*    onClose={onLocationClose}*/}

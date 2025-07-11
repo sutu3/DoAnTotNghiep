@@ -14,11 +14,15 @@ import {
     TableBody,
     TableRow,
     TableCell,
-    Chip
+    Chip, Avatar
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { getStatusColor, getStatusText } from "@/Utils/statusHelpers.tsx";
 import {ImportOrder, ImportOrderItem} from "@/Store/ImportOrder.tsx";
+import {useEffect} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import { MiddleGetAllOrderItem} from "@/Store/Thunk/ImportOrderThunk.tsx";
+import {OrderItemSelector} from "@/Store/Selector.tsx";
 
 interface ImportOrderDetailModalProps {
     isOpen: boolean;
@@ -37,6 +41,19 @@ export default function ImportOrderDetailModal({
                                                    onReject,
                                                    onItemClick
                                                }: ImportOrderDetailModalProps) {
+    const dispatch = useDispatch();
+    const items:ImportOrderItem[]=useSelector(OrderItemSelector);
+    console.log(items);
+    useEffect(() => {
+        if(selectedOrder?.importOrderId!=null)
+        {
+            const fetchData = async () => {
+                await (dispatch as any)(MiddleGetAllOrderItem(selectedOrder?.importOrderId));
+            };
+            fetchData();
+        }
+
+    },[selectedOrder])
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="5xl">
             <ModalContent>
@@ -84,10 +101,14 @@ export default function ImportOrderDetailModal({
                                             <div className="flex justify-between">
                                                 <span className="text-gray-600 dark:text-gray-400">Người tạo:</span>
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                                                        <Icon icon="mdi:account" className="text-xs text-blue-600 dark:text-blue-400" />
-                                                    </div>
-                                                    <span className="font-medium">{selectedOrder.createByUser}</span>
+                                                    {selectedOrder?.createByUser?
+                                                        <Avatar size="sm" isBordered color="primary" src={`https://dummyimage.com/300.png/09f/fff&text=${selectedOrder?.createByUser?.userName}`} />
+                                                        :
+                                                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                                            <Icon icon="mdi:account" className="text-blue-600 dark:text-blue-400" />
+                                                        </div>
+                                                    }
+                                                    <span className="font-medium">{selectedOrder?.createByUser?.userName}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -111,13 +132,13 @@ export default function ImportOrderDetailModal({
                                             <div className="flex justify-between">
                                                 <span className="text-gray-600 dark:text-gray-400">Tổng giá trị:</span>
                                                 <span className="font-bold text-lg text-green-600 dark:text-green-400">
-                          {selectedOrder.totalValue?.toLocaleString('vi-VN')} ₫
+                          {selectedOrder.totalPrice?.toLocaleString('vi-VN')} ₫
                         </span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-gray-600 dark:text-gray-400">Số sản phẩm:</span>
                                                 <Chip size="sm" variant="flat" color="primary">
-                                                    {selectedOrder.items?.length || 0} items
+                                                    {selectedOrder?.itemCount || 0} items
                                                 </Chip>
                                             </div>
                                         </div>
@@ -165,10 +186,9 @@ export default function ImportOrderDetailModal({
                                             <TableColumn>SỐ LƯỢNG</TableColumn>
                                             <TableColumn>ĐƠN GIÁ</TableColumn>
                                             <TableColumn>THÀNH TIỀN</TableColumn>
-                                            <TableColumn>XEM THỐNG KÊ</TableColumn>
                                         </TableHeader>
                                         <TableBody>
-                                            {selectedOrder.items?.map((item) => (
+                                            {items?.map((item) => (
                                                 <TableRow
                                                     key={item.itemId}
                                                     onClick={() => onItemClick(item)}
@@ -177,11 +197,17 @@ export default function ImportOrderDetailModal({
                                                     <TableCell>
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                                                                <Icon icon="mdi:cube-outline" className="text-blue-600 dark:text-blue-400" />
+                                                                {item?.product?
+                                                                    <Avatar size="sm" isBordered color="primary" src={item?.product.urlImageProduct} />
+                                                                    :
+                                                                    <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                                                        <Icon icon="mdi:cube-outline" className="text-blue-600 dark:text-blue-400" />
+                                                                    </div>
+                                                                }
                                                             </div>
                                                             <div>
                                                                 <p className="font-medium text-gray-800 dark:text-white">
-                                                                    {item.productName}
+                                                                    {item.product?.productName}
                                                                 </p>
                                                                 {item.note && (
                                                                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -193,12 +219,12 @@ export default function ImportOrderDetailModal({
                                                     </TableCell>
                                                     <TableCell>
                             <span className="text-gray-700 dark:text-gray-300">
-                              {item.supplierName}
+                              {item.supplier.supplierName}
                             </span>
                                                     </TableCell>
                                                     <TableCell>
                                                         <Chip size="sm" variant="flat" color="default">
-                                                            {item.requestQuantity} {item.unitName}
+                                                            {item.requestQuantity} {item.unit.unitName}
                                                         </Chip>
                                                     </TableCell>
                                                     <TableCell>
@@ -211,16 +237,16 @@ export default function ImportOrderDetailModal({
                               {(item.requestQuantity * item.costUnitBase).toLocaleString('vi-VN')} ₫
                             </span>
                                                     </TableCell>
-                                                    <TableCell>
-                                                        <Button
-                                                            size="sm"
-                                                            variant="light"
-                                                            color="primary"
-                                                            startContent={<Icon icon="mdi:chart-box" />}
-                                                        >
-                                                            Xem thống kê
-                                                        </Button>
-                                                    </TableCell>
+                                                    {/*<TableCell>*/}
+                                                    {/*    <Button*/}
+                                                    {/*        size="sm"*/}
+                                                    {/*        variant="light"*/}
+                                                    {/*        color="primary"*/}
+                                                    {/*        startContent={<Icon icon="mdi:chart-box" />}*/}
+                                                    {/*    >*/}
+                                                    {/*        Xem thống kê*/}
+                                                    {/*    </Button>*/}
+                                                    {/*</TableCell>*/}
                                                 </TableRow>
                                             ))}
                                         </TableBody>
