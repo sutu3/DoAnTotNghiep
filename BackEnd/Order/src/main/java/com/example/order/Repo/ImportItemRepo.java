@@ -17,7 +17,7 @@ import java.util.Optional;
 @Repository
 public interface ImportItemRepo extends JpaRepository<ImportItem,String>, JpaSpecificationExecutor<ImportItem> {
     Page<ImportItem> findAllByWarehouseAndIsDeleted(String warehouse, Boolean isDeleted, Pageable pageable);
-    Optional<ImportItem> findAllByImportOrder_ImportOrderIdAndIsDeleted(String orderId, Boolean isDeleted);
+    List<ImportItem> findAllByImportOrder_ImportOrderIdAndIsDeleted(String orderId, Boolean isDeleted);
     Integer countByImportOrder_ImportOrderIdAndIsDeleted(String orderId, Boolean isDeleted);
     @Query("SELECT ii FROM ImportItem ii WHERE ii.product = :productId AND ii.warehouse = :warehouseId " +
             "AND ii.importAt >= :fromDate AND ii.isDeleted = :isDeleted " +
