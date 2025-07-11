@@ -73,7 +73,8 @@ public class InventoryWarehouseServiceImpl implements InventoryWarehouseService 
     @Override
     public InventoryWarehouseResponse createInventoryWarehouse(InventoryWarehouseRequest request) {
         // Validate references
-        InventoryProduct inventoryProduct = inventoryProductService.getById(request.inventoryProductId());
+        InventoryProduct inventoryProduct = inventoryProductService
+                .getByProductAndWarehouse(request.product(), request.warehouse());
         productController.getProductById(request.product());
         warehouseController.getWarehouse(request.warehouse());
         warehouseController.getBinById(request.bin());

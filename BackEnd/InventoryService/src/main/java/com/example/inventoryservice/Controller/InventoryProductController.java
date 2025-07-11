@@ -77,7 +77,7 @@ public class InventoryProductController {
             @PathVariable String warehouseId
     ) {
         return ApiResponse.<InventoryProductResponse>builder()
-                .Result(inventoryProductService.getByProductAndWarehouse(productId, warehouseId))
+                .Result(inventoryProductService.getByProductAndWarehouseResponse(productId, warehouseId))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

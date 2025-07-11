@@ -79,6 +79,45 @@ public class BinServiceImpl implements BinService {
     }
 
     @Override
+    public void updateCurrentOccupancy(String binId, Integer occupancyChange) {
+        Bins bin = getById(binId);
+
+        // Tính toán occupancy mới
+        Integer newOccupancy = bin.getCurrentOccupancy() + occupancyChange;
+
+        // Validate không vượt quá capacity
+        if (newOccupancy > bin.getCapacity()) {
+            throw new AppException(ErrorCode.BIN_CAPACITY_EXCEEDED);
+        }
+
+        // Validate không âm
+        if (newOccupancy < 0) {
+            throw new AppException(ErrorCode.INVALID_OCCUPANCY);
+        }
+
+        bin.setCurrentOccupancy(newOccupancy);
+
+        // Cập nhật status dựa trên occupancy
+        if (newOccupancy == 0) {
+            bin.setStatus(BinStatus.EMPTY);
+        } else if (newOccupancy >= bin.getCapacity()) {
+            bin.setStatus(BinStatus.FULL);
+        } else {
+            bin.setStatus(BinStatus.AVAILABLE);
+        }
+
+        binRepo.save(bin);
+    }
+
+    @Override
+    public void resetCurrentOccupancy(String binId) {
+        Bins bin = getById(binId);
+        bin.setCurrentOccupancy(0);
+        bin.setStatus(BinStatus.EMPTY);
+        binRepo.save(bin);
+    }
+
+    @Override
     public Bins getById(String BinId) {
         return binRepo.findById(BinId)
                 .orElseThrow(()->new AppException(ErrorCode.BIN_NOT_FOUND));

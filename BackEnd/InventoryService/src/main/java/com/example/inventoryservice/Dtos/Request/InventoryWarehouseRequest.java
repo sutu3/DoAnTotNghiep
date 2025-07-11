@@ -6,7 +6,6 @@ import java.time.LocalDate;
 
 @Builder
 public record InventoryWarehouseRequest(
-        String inventoryProductId,
         String product,
         String warehouse,
         String bin,

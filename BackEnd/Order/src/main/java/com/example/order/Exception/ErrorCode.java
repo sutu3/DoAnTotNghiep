@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatusCode;
 @NoArgsConstructor
 public enum ErrorCode {
     INVALID_KEY(1001,"Invalid key", HttpStatus.BAD_REQUEST),
+    INVALID_QUANTITY(1002,"Invalid quantity", HttpStatus.BAD_REQUEST),
     WAREHOUSE_SERVICE_NOT_WORKING(1005,"WarehouseService not connected", HttpStatus.SERVICE_UNAVAILABLE),
     PRODUCT_SERVICE_NOT_WORKING(1005,"ProductService not connected", HttpStatus.SERVICE_UNAVAILABLE),
     USER_SERVICE_NOT_WORKING(1005,"UserService not connected", HttpStatus.SERVICE_UNAVAILABLE),
