@@ -64,7 +64,7 @@ public class ImportItemServiceImpl implements ImportItemService {
     public List<ImportResponseItem> getAllByOrder( String order) {
         importOrderRepo.findById(order).orElseThrow(()->new AppException(ErrorCode.IMPORT_ORDER_NOT_FOUND));
         return importItemRepo.findAllByImportOrder_ImportOrderIdAndIsDeleted(order, false)
-                .map(this::entry).stream().toList();
+                .stream().map(this::entry).collect(Collectors.toList());
     }
 
     @Override
