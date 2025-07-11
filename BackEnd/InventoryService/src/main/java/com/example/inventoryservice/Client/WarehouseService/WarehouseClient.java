@@ -7,6 +7,7 @@ import com.example.inventoryservice.Dtos.ApiResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name = "warehouse-service", url = "https://doantotnghiep-pb6y.onrender.com"
@@ -14,6 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface WarehouseClient {
     @GetMapping("/api/stacks/by-bin/{binId}")
     ApiResponse<StackResponse> getStackByBin(@PathVariable String binId);
-    @GetMapping("/api/bins/{binId}/occupancy")
+    @PutMapping("/api/bins/{binId}/occupancy")
     ApiResponse<StackResponse> updateBinOccupancy(@PathVariable String binId, @RequestBody UpdateOccupancyRequest request);
 }
