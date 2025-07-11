@@ -12,8 +12,9 @@ import {
     Progress,
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import {BinLocation, ImportOrderItem, StackLocation} from "@/pages/ApproveOrderImport/page.tsx";
+import {BinLocation, StackLocation} from "@/pages/ApproveOrderImport/page.tsx";
 import {getBinStatusColor, getBinStatusText} from "@/Utils/statusHelpers.tsx";
+import {ImportOrderItem} from "@/Store/ImportOrder.tsx";
 
 interface ProductLocationModalProps {
     isOpen: boolean;
@@ -48,7 +49,7 @@ export default function ProductLocationModal({
                                 Vị Trí Sản Phẩm Trong Kho
                             </h3>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {selectedItem?.productName}
+                                {selectedItem?.product?.productName}
                             </p>
                         </div>
                     </div>
@@ -69,16 +70,16 @@ export default function ProductLocationModal({
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <p className="text-sm text-gray-600 dark:text-gray-400">Tên sản phẩm:</p>
-                                            <p className="font-medium">{selectedItem.productName}</p>
+                                            <p className="font-medium">{selectedItem?.product?.productName}</p>
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-600 dark:text-gray-400">Nhà cung cấp:</p>
-                                            <p className="font-medium">{selectedItem.supplierName}</p>
+                                            <p className="font-medium">{selectedItem?.supplier?.supplierName}</p>
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-600 dark:text-gray-400">Số lượng yêu cầu:</p>
                                             <Chip size="sm" variant="flat" color="primary">
-                                                {selectedItem.requestQuantity} {selectedItem.unitName}
+                                                {selectedItem.requestQuantity} {selectedItem?.unit?.unitName}
                                             </Chip>
                                         </div>
                                         <div>
