@@ -35,6 +35,13 @@ export const UserSelector = (state: { users: {userList: any} }) =>
 export const TotalPageUser = (state: { users: { totalPage: number } }) =>
     state.users.totalPage;
 
+export const OrderSelector = (state: { importOrder: {orderImport: any} }) =>
+    state.importOrder.orderImport;
+export const OrderItemSelector = (state: { importOrder: {orderItem: any} }) =>
+    state.importOrder.orderItem;
+export const TotalPageOrder = (state: { importOrder: { totalPage: number } }) =>
+    state.importOrder.totalPage;
+
 export const UnitSelector = (state: { unit: {unitList: any} }) =>
     state.unit.unitList;
 export const TotalPageUnit = (state: { unit: { totalPage: number } }) =>

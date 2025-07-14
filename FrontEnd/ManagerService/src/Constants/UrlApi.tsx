@@ -2,7 +2,8 @@ const BASE_URL_Warehouse = "https://doantotnghiep-pb6y.onrender.com/api";
 const BASE_URL_User = "https://userservice-kuug.onrender.com/api";
 const BASE_URL_Product = "https://productservice-8qdv.onrender.com/api";
 const BASE_URL_File = "https://fileservice-dz2g.onrender.com";
-const BASE_URL_Order = "https://orderservice-3u1b.onrender.com";
+const BASE_URL_Order = "https://orderservice-3u1b.onrender.com/api";
+const BASE_URL_Inventory = "https://inventoryservice-0kl2.onrender.com/api";
 export interface pageApi {
   pageNumber: number;
   pageSize: number;
@@ -12,17 +13,41 @@ export const API_ROUTES = {
   file:{
     uploadImage: BASE_URL_File+"/images/upload",
   },
+  inventory:{
+    InventoryWarehouse:(page:pageApi|null)=>{
+      const base=`${BASE_URL_Inventory}/inventory/warehouses`
+      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      return{
+        addInventoryWarehouse: base
+      }
+    },
+    movements:(page:pageApi|null)=>{
+      const base=`${BASE_URL_Inventory}/inventory/movements`
+      const pageUrl = page ? `?pageNumber=${page.pageNumber}` : "";
+      return{
+        addMovement: base
+      }
+    }
+  },
   order:{
     importOrder:(page: pageApi | null)=>{
       const base = `${BASE_URL_Order}/importOrders`;
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
       return {
         addOrderImport:base,
+        changeStatus:(orderId: string) => {
+          return{
+            approve:`${base}/${orderId}/approve`,
+            reject:`${base}/${orderId}/reject`,
+            ChangeStatus:`${base}/${orderId}/status`,
+          }
+        },
         search:(()=>{
           const search=base+"/search";
           return{
-            byWarehouseId:(warehouseId: string)=>({
-              getAll: `${search}/ByWarehouse/${warehouseId}${pageUrl}`,
+            byWarehouseId:(warehouseId: string,status:string|null)=>({
+              getAll: `${search}/warehouse/${warehouseId}${pageUrl}`,
+              byStatus:`${search}/warehouse/${warehouseId}/status/${status}${pageUrl}`,
             })
           }
         })
@@ -33,6 +58,20 @@ export const API_ROUTES = {
       return {
         addOrderItemImport:base,
         addOrderItemImportBatch:base+"/batch",
+        updateItem:((ordetId:string)=>{
+          return{
+            byQuantity:`${base}/${ordetId}/reality-quantity`,
+            byBin:`${base}/${ordetId}/bin`,
+          }
+        }),
+        search:(()=>{
+          const search=base+"/search";
+          return{
+            byOrderId:(orderId: string)=>({
+              getAll:`${search}/orderId/${orderId}`,
+            })
+          }
+        }),
       }
     }
   },
@@ -45,6 +84,7 @@ export const API_ROUTES = {
         search: {
           byWarehouseId: (warehouseId: string) => ({
             getAll: `${base}/ByWarehouse/${warehouseId}${pageUrl}`,
+            getAllList: `${base}/ByWarehouse/${warehouseId}/list`,
           }),
         },
       };

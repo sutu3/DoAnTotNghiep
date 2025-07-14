@@ -32,6 +32,7 @@ import ExecuteImportPage from "@/pages/ExecuteImport/page.tsx";
 import ExecuteExportPage from "@/pages/ExecuteExport/page.tsx";
 import CreateExportOrderPage from "@/pages/OrderExport/page.tsx";
 import StackDetailPage from "@/pages/Stack/Bin/page.tsx";
+import AdminImportOrderManagement from "@/pages/ApproveOrderImport/page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -57,6 +58,7 @@ const router = createBrowserRouter([
       { path: "/admin/categories", element: <CategoryPage /> },
       { path: "/admin/suppliers", element: <SupplierPage /> },
       { path: "/admin/suppliers/addnew", element: <AddNewSupplierPage /> },
+      { path: "/admin/import-approvals", element: <AdminImportOrderManagement /> },
       { path: "/staff/request-import", element: <OrderRequestImportForm /> },
       { path: "/staff/tasks", element: <MyTasksPage /> },
       { path: "/staff/import", element: <ExecuteImportPage /> },
