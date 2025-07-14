@@ -1,4 +1,4 @@
-import {ImportItem} from "@/Store/ImportOrder.tsx";
+import {ImportItemCreate} from "@/Store/ImportOrder.tsx";
 
 export interface ImportOrderRequest {
     product: string;
@@ -10,11 +10,11 @@ export interface ImportOrderRequest {
     note?: string;
     costUnitBase: number;
     createByUser: string;
-    expiryDate?:string,
+    expiredDate?:string,
 }
 
 export const mapImportItemToRequest = (
-    item: ImportItem,
+    item: ImportItemCreate,
     warehouseId: string,
     importOrderId: string,
     userId: string
@@ -29,6 +29,6 @@ export const mapImportItemToRequest = (
         note: item.note,
         costUnitBase: item.costUnitBase,
         createByUser: userId,
-        expiryDate:item.expiryDate
+        expiredDate:item.expiryDate
     };
 };

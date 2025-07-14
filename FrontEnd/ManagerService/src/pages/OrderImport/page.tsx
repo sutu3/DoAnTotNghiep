@@ -11,7 +11,7 @@ import {
     Divider
 } from "@heroui/react";
 import {Icon} from "@iconify/react";
-import {ImportItem, OrderRequestImport} from "@/Store/ImportOrder.tsx";
+import {ImportItemCreate, OrderRequestImportCreate} from "@/Store/ImportOrder.tsx";
 import SelectWarehouse from "@/components/Admin/OrderImport/select/SelectWarehouse.tsx";
 import {ProductSelect} from "@/components/Admin/OrderImport/select/ProductSelect.tsx";
 import {SupplierSelect} from "@/components/Admin/OrderImport/select/SupplierSelect.tsx";
@@ -26,12 +26,12 @@ import {useDispatch} from "react-redux";
 export default function OrderRequestImportForm() {
     const {items,addItem,clearItems}=useImportOrderStore();
     const dispatch=useDispatch();
-    const [formData, setFormData] = useState<OrderRequestImport>({
+    const [formData, setFormData] = useState<OrderRequestImportCreate>({
         warehouse: "",
         createByUser: "",
-        description: ""
+        note: ""
     });
-    const [currentItem, setCurrentItem] = useState<ImportItem>({
+    const [currentItem, setCurrentItem] = useState<ImportItemCreate>({
         itemId: "",
         product: "",
         productName: "",
@@ -68,7 +68,7 @@ export default function OrderRequestImportForm() {
     const handleSubmit = async () => {
         setLoading(true);
         try {
-            (dispatch as any)(MiddleAddOrder(formData));
+            await (dispatch as any)(MiddleAddOrder(formData,items));
             clearItems();
 
         } catch (error) {
@@ -105,8 +105,8 @@ export default function OrderRequestImportForm() {
                                 <Textarea
                                     label="Mô tả đơn hàng"
                                     placeholder="Nhập mô tả cho đơn nhập hàng..."
-                                    value={formData.description}
-                                    onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
+                                    value={formData.note}
+                                    onChange={(e) => setFormData(prev => ({...prev, note: e.target.value}))}
                                 />
                             </CardBody>
                         </Card>

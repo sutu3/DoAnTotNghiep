@@ -1,0 +1,45 @@
+[
+  {
+    "itemId": "d727d520-f2fe-427b-a27d-248ff38cbf83",
+    "product": {
+      "productId": "29b8281e-93e8-4689-89fb-fca1a9b239dc",
+      "productName": "Bếp Hồng Ngoại Kangaroo KG499N",
+      "sku": "KANGAROO-KG499N",
+      "description": "Bếp đơn, công suất 2000W, mặt kính chịu nhiệt, điều khiển cảm ứng.",
+      "urlImageProduct": "http://res.cloudinary.com/dclib4xzd/image/upload/e0049482-40e1-427d-a190-a076579b7014.B%E1%BA%BFp%20H%E1%BB%93ng%20Ngo%E1%BA%A1i%20Kangaroo%20KG499N.jpg",
+      "price": 890000.00,
+      "isActive": true,
+      "createdAt": null,
+      "updatedAt": null
+    },
+    "supplier": {
+      "supplierId": "e0a522d4-5d03-4261-af67-931d3acd77a5",
+      "urlSupplier": "blob:http://localhost:5173/7cc10787-627a-4c47-bdb0-4b94993f2a67",
+      "supplierName": "Công ty TNHH Thiết Bị Điện Gia Dụng Minh Anh"
+    },
+    "unit": {
+      "unitID": "c6a85560-596b-4cb0-944e-b658c689d090",
+      "unitName": "Box",
+      "shortName": "box",
+      "ratioToBase": 1.0,
+      "isDefault": true,
+      "createdAt": null,
+      "updatedAt": null
+    },
+    "createByUser": {
+      "userId": "3126d2f9-3810-44d3-8714-a6870855681d",
+      "userName": "Dai",
+      "email": "minhdaimk112@gmail.com",
+      "urlImage": "https://www.w3schools.com/howto/howto_css_image_avatar.asp"
+    },
+    "bin": null,
+    "expiredDate": "2025-07-31T00:00:00",
+    "requestQuantity": 20,
+    "note": "Nhập hàng Test",
+    "realityQuantity": 0,
+    "costUnitBase": 120000.00,
+    "importAt": null,
+    "createdAt": "2025-07-09T15:22:44",
+    "updatedAt": "2025-07-09T15:22:44"
+  }
+]

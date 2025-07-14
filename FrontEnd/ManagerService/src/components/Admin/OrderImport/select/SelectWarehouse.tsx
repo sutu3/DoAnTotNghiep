@@ -1,12 +1,12 @@
 import {Select, SelectItem} from "@heroui/react";
-import {OrderRequestImport} from "@/Store/ImportOrder.tsx";
+import {OrderRequestImportCreate} from "@/Store/ImportOrder.tsx";
 import {useSelector} from "react-redux";
 import {warehouseSelector} from "@/Store/Selector.tsx";
 import {useEffect} from "react";
 import {Warehouse} from "@/Store/WarehouseSlice.tsx";
 
 interface SelectProps {
-    formData: OrderRequestImport;
+    formData: OrderRequestImportCreate;
     setFormData: (formData: (prev: any) => any) => void;
 }
 
