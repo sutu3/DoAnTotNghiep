@@ -1,5 +1,7 @@
 package com.example.productservice.Service.Impl;
 
+import com.example.productservice.Client.Inventory.Dto.Resquest.InventoryProductRequest;
+import com.example.productservice.Client.Inventory.InventoryController;
 import com.example.productservice.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.productservice.Client.UserService.UserController;
@@ -46,6 +48,7 @@ public class ProductServiceImpl implements ProductService {
      CategoryService categoryService;
      UnitService unitService;
     private final AsyncServiceImpl asyncServiceImpl;
+    private final InventoryController inventoryController;
 
     @Override
     public Page<ProductResponse> getAllByWarehouses(String warehouse, Pageable pageable) {
@@ -102,6 +105,13 @@ public class ProductServiceImpl implements ProductService {
             product.setUnit(unit);
             product.setIsDeleted(false);
             Product productSave=productRepo.save(product);
+            InventoryProductRequest inventoryProductRequest=new InventoryProductRequest(productSave.getProductId(),
+                    request.warehouses(),
+                    0,
+                    request.minStockLevel(),
+                    request.maxStockLevel(),
+                    "ACTIVE");
+            inventoryController.createInventoryProduct(inventoryProductRequest);
             return  enrich(productSave);
         }
         Product product=productMapper.toEntity(request);
@@ -110,6 +120,14 @@ public class ProductServiceImpl implements ProductService {
         product.setIsDeleted(false);
         product.setIsActive(true);
         Product productSave=productRepo.save(product);
+        InventoryProductRequest inventoryProductRequest=new InventoryProductRequest(
+                productSave.getProductId(),
+                request.warehouses(),
+                0,
+                request.minStockLevel(),
+                request.maxStockLevel(),
+                "ACTIVE");
+        inventoryController.createInventoryProduct(inventoryProductRequest);
         return  enrich(productSave);
     }
 
