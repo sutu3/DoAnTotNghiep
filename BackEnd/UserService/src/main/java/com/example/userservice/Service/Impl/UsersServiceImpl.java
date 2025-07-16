@@ -75,6 +75,12 @@ public class UsersServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse findByEmail(String email) {
+        Users users=userRepo.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return  userMapper.toResponse(users);
+    }
+
+    @Override
     public UserResponse getByUserId(String id) {
         return enrich(findById(id));
     }

@@ -79,4 +79,13 @@ public class UserController {
                 .code(0)
                 .build();
     }
+    @GetMapping("/search/email/{email}")
+    public ApiResponse<UserResponse> getByEmal(@PathVariable String email){
+        return ApiResponse.<UserResponse>builder()
+                .Result(userService.findByEmail(email))
+                .message("SuccessFull")
+                .success(true)
+                .code(0)
+                .build();
+    }
 }
