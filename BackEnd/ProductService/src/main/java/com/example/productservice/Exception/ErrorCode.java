@@ -12,7 +12,6 @@ public enum ErrorCode {
     WAREHOUSE_SERVICE_NOT_WORKING(1005,"WarehouseService not connected", HttpStatus.SERVICE_UNAVAILABLE),
     USER_SERVICE_NOT_WORKING(1005,"UserService not connected", HttpStatus.SERVICE_UNAVAILABLE),
     CATEGORY_NOT_FOUND(1002,"Category not found", HttpStatus.NOT_FOUND),
-    INVENTORY_SERVICE_NOT_WORKING(1002,"Inventory service not connected", HttpStatus.SERVICE_UNAVAILABLE),
     CATEGORY_EXISTS(1003,"Category already exists", HttpStatus.CONFLICT),
     PRODUCT_NOT_FOUND(1002,"Product not found", HttpStatus.NOT_FOUND),
     PRODUCT_EXISTS(1003,"Product already exists", HttpStatus.CONFLICT),

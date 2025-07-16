@@ -28,7 +28,7 @@ public class Users extends BaseEntity{
     String urlImage;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'số điện thoại của user'", nullable = false,unique = true)
     String phoneNumber;
-    @Column(columnDefinition = "VARCHAR(36) COMMENT 'mã id của warehouse của nhân viên'")
+    @Column(columnDefinition = "VARCHAR(36) COMMENT 'mã id của warehouse của nhân viên'",nullable = false)
     String warehouses;
     @Enumerated(EnumType.STRING)
     StatusEnum status;
