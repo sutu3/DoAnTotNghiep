@@ -17,6 +17,7 @@ public interface UserService {
     UserResponse CreateUser(UserRequest request);
     String DeletedUser(String id);
     Users findById(String id);
+    UserResponse findByEmail(String email);
     UserResponse getByUserId(String id);
     UserResponse enrich(Users users);
 }
