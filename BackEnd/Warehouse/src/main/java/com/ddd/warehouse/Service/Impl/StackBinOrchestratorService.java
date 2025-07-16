@@ -40,7 +40,7 @@ public class StackBinOrchestratorService {
             for (int i = 1; i <= stackRequest.binQuantity(); i++) {
                 BinRequest bin = BinRequest.builder()
                         .binCode(stackRequest.stackName() + "-BIN-" + i)
-                        .capacity(100)
+                        .capacity(1)
                         .stack(stackCreated.getStackId())
                         .warehouse(stackRequest.warehouse())
                         .build();
