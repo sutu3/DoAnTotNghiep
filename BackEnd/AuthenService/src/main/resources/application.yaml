@@ -1,12 +1,11 @@
 spring:
   application:
     name: AuthenService
-
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql-169f260-minhdaimk112-2627.e.aivencloud.com:20605/authenDB?createDatabaseIfNotExist=true&serverTimezone=UTC&ssl-mode=REQUIRED
+    username: avnadmin
+    password: AVNS_G3GnbbZBxGNpakW4PMx
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
     hikari:
       maximum-pool-size: 10
       minimum-idle: 5
@@ -15,7 +14,6 @@ spring:
       max-lifetime: 1800000
       validation-timeout: 5000
       leak-detection-threshold: 60000
-
   jpa:
     database: mysql
     hibernate:
@@ -25,18 +23,15 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
-
-server:
-  port: 8080
-  address: 0.0.0.0
-
-jwt:
-  signedJWT: ${JWT_SECRET}
-  valid-duration: ${JWT_VALID_DURATION}
-  refreshable-duration: ${JWT_REFRESHABLE_DURATION}
-
 springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+server:
+  port: 8080
+  address: 0.0.0.0
+jwt:
+  signedJWT: "aGUDzL2OOlvQcHJE5fpfzxv0w6MUZtFhF4IRZo+Tc/z5FnKjn8xxJvoot4OVj6LP"
+  valid-duration: 3600
+  refreshable-duration: 360000
