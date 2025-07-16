@@ -1,6 +1,5 @@
 package com.example.authenservice.Security;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,10 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+// Xóa reactive imports và thay bằng servlet-based imports
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.reactive.CorsWebFilter;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +28,7 @@ import java.util.List;
 public class SecurityConfig {
     @Autowired
     private CustumJwtDecoder custumJwtDecoder;
+
     private static final String[] PUBLIC_ENDPOINTS = {
             "/users",
             "/authentication/token",
@@ -41,25 +41,24 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/favicon.ico"
     };
-    private static final String[] ADMIN_ENDPOINTS = {
-            "/users"
-    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-
         httpSecurity.authorizeHttpRequests(request ->
                 request.requestMatchers(HttpMethod.POST,PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET,PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.PUT,PUBLIC_ENDPOINTS).permitAll()
                         .anyRequest().authenticated());
-        httpSecurity.cors(Customizer.withDefaults());
+
+        // Tắt CORS vì Gateway đã xử lý
+        httpSecurity.cors(AbstractHttpConfigurer::disable);
+
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
                         .decoder(custumJwtDecoder).jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 .authenticationEntryPoint(new JwtAuthenticationEntrypoint())
-        )
-        ;
-        httpSecurity.csrf(AbstractHttpConfigurer::disable);
+        );
 
+        httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }
 
@@ -71,28 +70,8 @@ public class SecurityConfig {
         jwtConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
         return jwtConverter;
     }
-    @Bean
-    CorsWebFilter corsWebFilter(){
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173")); // Thay vì "*"
-        corsConfiguration.setAllowedHeaders(List.of("*"));
-        corsConfiguration.setAllowedMethods(List.of("*"));
-        corsConfiguration.setAllowCredentials(true); // Thêm dòng này
 
-        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
-        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
-
-        return new CorsWebFilter(urlBasedCorsConfigurationSource);
-    }
-
-
-   /* @Bean
-    JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "HS512");
-        return NimbusJwtDecoder.withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    }*/
+    // XÓA corsWebFilter() method hoàn toàn
 
     @Bean
     PasswordEncoder passwordEncoder() {
