@@ -27,8 +27,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ApplicationInitConfig {
     PasswordEncoder passwordEncoder;
+    UserClient userClient;
     @Bean
-    ApplicationRunner applicationRunner(UserRepo userRepository, RoleRepo roleRepository, UserClient userClient){
+    ApplicationRunner applicationRunner(UserRepo userRepository, RoleRepo roleRepository){
         return args -> {
             // Initial data setup
             if(userRepository.findByUsername("admin").isEmpty()) {
