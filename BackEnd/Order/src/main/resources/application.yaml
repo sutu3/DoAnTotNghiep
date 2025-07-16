@@ -6,6 +6,7 @@ springdoc:
 spring:
   application:
     name: Order
+
   datasource:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
