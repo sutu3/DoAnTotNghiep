@@ -1,6 +1,7 @@
 package com.example.order.Service;
 
 import com.example.order.Dto.Request.ImportOrderRequest;
+import com.example.order.Dto.Request.ImportRequestItem;
 import com.example.order.Dto.Response.ImportOrder.ImportOrderResponse;
 import com.example.order.Form.ImportOrderForm;
 import com.example.order.Form.StatusForm;
@@ -8,6 +9,8 @@ import com.example.order.Module.ImportOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public interface ImportOrderService {

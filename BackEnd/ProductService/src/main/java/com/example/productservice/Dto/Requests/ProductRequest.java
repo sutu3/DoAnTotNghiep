@@ -15,6 +15,8 @@ public record ProductRequest(
         String warehouses,
         String createByUser,
         String category,
-        String unit
+        String unit,
+        Integer minStockLevel,
+        Integer maxStockLevel
 ) {
 }
