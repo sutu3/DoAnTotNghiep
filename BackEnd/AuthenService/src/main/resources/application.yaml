@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: AuthenService
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      validation-timeout: 5000
+      leak-detection-threshold: 60000
+
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+server:
+  port: 8080
+  address: 0.0.0.0
+
+jwt:
+  signedJWT: ${JWT_SECRET}
+  valid-duration: ${JWT_VALID_DURATION}
+  refreshable-duration: ${JWT_REFRESHABLE_DURATION}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
