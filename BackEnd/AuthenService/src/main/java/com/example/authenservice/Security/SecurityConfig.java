@@ -72,23 +72,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:8080",
-                "http://192.168.x.x:8080",
-                "http://26.144.191.229:5173",
-                "http://localhost:5173",
-                "http://26.144.191.229:5173",
-                "http://26.232.136.42:5173",
-                "http://localhost:5174"
-        ));
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173")); // ✅ dùng pattern thay vì origin
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true); // Cho phép thông tin xác thực (credentials)
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 
    /* @Bean
     JwtDecoder jwtDecoder() {
