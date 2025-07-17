@@ -6,6 +6,7 @@ import com.example.productservice.Client.UserService.UserController;
 import com.example.productservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.productservice.Client.WarehouseService.WarehouseController;
 import com.example.productservice.Service.AsyncService;
+import com.example.productservice.Util.TokenContextHolder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,17 +24,41 @@ public class AsyncServiceImpl implements AsyncService {
     WarehouseController warehouseController;
     @Override
     public CompletableFuture<UserResponse> getUserAsync(String userId) {
-        return CompletableFuture.supplyAsync(() -> userController.getUser(userId).getResult());
+        String token = TokenContextHolder.getCurrentToken();
+        return CompletableFuture.supplyAsync(() -> {
+            TokenContextHolder.setToken(token);
+            try {
+                return userController.getUser(userId).getResult();
+            } finally {
+                TokenContextHolder.clear();
+            }
+        });
 
     }
 
     @Override
     public CompletableFuture<WarehousesResponse> getWarehouseAsync(String warehouseId) {
-        return CompletableFuture.supplyAsync(() -> warehouseController.getWarehouse(warehouseId).getResult());
+        String token = TokenContextHolder.getCurrentToken();
+        return CompletableFuture.supplyAsync(() -> {
+            TokenContextHolder.setToken(token);
+            try {
+                return warehouseController.getWarehouse(warehouseId).getResult();
+            } finally {
+                TokenContextHolder.clear();
+            }
+        });
     }
 
     @Override
     public CompletableFuture<SupplierResponse> getSupplierAsync(String supplierId) {
-        return CompletableFuture.supplyAsync(() -> userController.getSupplier(supplierId).getResult());
+        String token = TokenContextHolder.getCurrentToken();
+        return CompletableFuture.supplyAsync(() -> {
+            TokenContextHolder.setToken(token);
+            try {
+                return userController.getSupplier(supplierId).getResult();
+            } finally {
+                TokenContextHolder.clear();
+            }
+        });
     }
 }

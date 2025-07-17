@@ -1,4 +1,3 @@
-
 app:
   api-prefix: ""
 server:
@@ -36,11 +35,21 @@ spring:
             - Path=/api/orders/**
           filters:
             - StripPrefix=2
-
         - id: file-service
           uri: ${FILE_SERVICE_URI}
           predicates:
             - Path=/api/file/**
           filters:
             - StripPrefix=2
-
+        - id: warehouse-service
+          uri: ${WAREHOUSE_SERVICE_URI}
+          predicates:
+            - Path=/api/warehouses/**
+          filters:
+            - StripPrefix=2
+        - id: warehouse-service
+          uri: ${INVENTORY_SERVICE_URI}
+          predicates:
+            - Path=/api/inventories/**
+          filters:
+            - StripPrefix=2
