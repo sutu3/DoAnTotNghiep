@@ -85,10 +85,10 @@ public class ExportOrderServiceImpl implements ExportOrderService {
     }
 
     @Override
-    public ExportOrderResponse updateExportOrderStatus(String exportOrderId, ExportOrderStatus status, String userId) {
+    public ExportOrderResponse updateExportOrderStatus(String exportOrderId, ExportOrderStatus status) {
         ExportOrder exportOrder = exportOrderRepo.findByExportOrderIdAndIsDeletedFalse(exportOrderId)
                 .orElseThrow(() -> new AppException(ErrorCode.EXPORT_ORDER_NOT_FOUND));
-
+        String userId = GetCurrentUserId.getCurrentUserId();
         exportOrder.setStatus(status);
         exportOrder.setUpdatedAt(LocalDateTime.now());
 
@@ -102,8 +102,8 @@ public class ExportOrderServiceImpl implements ExportOrderService {
     }
 
     @Override
-    public ExportOrderResponse approveExportOrder(String exportOrderId, String managerId) {
-        return updateExportOrderStatus(exportOrderId, ExportOrderStatus.APPROVED, managerId);
+    public ExportOrderResponse approveExportOrder(String exportOrderId) {
+        return updateExportOrderStatus(exportOrderId, ExportOrderStatus.APPROVED);
     }
 
     @Override

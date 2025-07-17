@@ -94,11 +94,10 @@ public class ExportOrderController {
 
     @PutMapping("/{orderId}/approve")
     public ApiResponse<ExportOrderResponse> approveOrder(
-            @PathVariable String orderId,
-            @RequestParam String managerId
+            @PathVariable String orderId
     ) {
         return ApiResponse.<ExportOrderResponse>builder()
-                .Result(exportOrderService.approveExportOrder(orderId, managerId))
+                .Result(exportOrderService.approveExportOrder(orderId))
                 .code(0)
                 .message("Export order approved successfully")
                 .success(true)
@@ -110,7 +109,7 @@ public class ExportOrderController {
             @PathVariable String orderId
     ) {
         return ApiResponse.<ExportOrderResponse>builder()
-                .Result(exportOrderService.updateExportOrderStatus(orderId, ExportOrderStatus.CANCELLED, null))
+                .Result(exportOrderService.updateExportOrderStatus(orderId, ExportOrderStatus.CANCELLED))
                 .code(0)
                 .message("Export order rejected")
                 .success(true)
@@ -149,7 +148,7 @@ public class ExportOrderController {
     ) {
         ExportOrderStatus status = ExportOrderStatus.valueOf(statusForm.status());
         return ApiResponse.<ExportOrderResponse>builder()
-                .Result(exportOrderService.updateExportOrderStatus(orderId, status, userId))
+                .Result(exportOrderService.updateExportOrderStatus(orderId, status))
                 .code(0)
                 .message("Status updated successfully")
                 .success(true)
