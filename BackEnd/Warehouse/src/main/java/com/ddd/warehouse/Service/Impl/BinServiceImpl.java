@@ -16,6 +16,7 @@ import com.ddd.warehouse.Repo.WarehouseRepo;
 import com.ddd.warehouse.Service.BinService;
 import com.ddd.warehouse.Service.StackService;
 import com.ddd.warehouse.Utils.CheckNumber;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -79,34 +80,26 @@ public class BinServiceImpl implements BinService {
     }
 
     @Override
+    @Transactional
     public void updateCurrentOccupancy(String binId, Integer occupancyChange) {
         Bins bin = getById(binId);
 
-        // Tính toán occupancy mới
-//        Integer newOccupancy = bin.getCurrentOccupancy() + occupancyChange;
-//
-//        // Validate không vượt quá capacity
-//        if (newOccupancy > bin.getCapacity()) {
-//            throw new AppException(ErrorCode.BIN_CAPACITY_EXCEEDED);
-//        }
-//        // Validate không âm
-//        if (newOccupancy < 0) {
-//            throw new AppException(ErrorCode.INVALID_OCCUPANCY);
-//        }
+        // Tính toán occupancy mới dựa trên số lượng thực tế
+        Integer newOccupancy = bin.getCurrentOccupancy() + occupancyChange;
 
-        bin.setCurrentOccupancy(0);
-        bin.setStatus(BinStatus.AVAILABLE);
+        // Validate không âm
+        if (newOccupancy < 0) {
+            throw new AppException(ErrorCode.INVALID_OCCUPANCY);
+        }
 
-//        // Cập nhật status dựa trên occupancy
-//        if (newOccupancy == 0) {
-//            bin.setStatus(BinStatus.EMPTY);
-//        } else if (newOccupancy >= bin.getCapacity()) {
-//            bin.setStatus(BinStatus.FULL);
-//        } else {
-//            bin.setStatus(BinStatus.AVAILABLE);
-//        }
+        bin.setCurrentOccupancy(newOccupancy);
 
-        binRepo.save(bin);
+        // Cập nhật status dựa trên occupancy
+        if (newOccupancy == 0) {
+            bin.setStatus(BinStatus.EMPTY);
+        } else {
+            bin.setStatus(BinStatus.AVAILABLE);
+        }
     }
     @Override
     public void resetCurrentOccupancy(String binId) {
