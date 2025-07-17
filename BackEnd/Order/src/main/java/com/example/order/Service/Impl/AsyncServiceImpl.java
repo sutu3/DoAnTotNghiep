@@ -12,6 +12,7 @@ import com.example.order.Client.WarehouseService.Dto.Responses.Bin.BinResponse;
 import com.example.order.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.order.Client.WarehouseService.WarehouseController;
 import com.example.order.Service.AsyncService;
+import com.example.order.Utils.TokenContextHolder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,43 +23,88 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class AsyncServiceImpl implements AsyncService {
     WarehouseController warehouseController;
-    private final UserController userController;
-    private final ProductController productController;
-
+    UserController userController;
+    ProductController productController;
 
     @Override
     public CompletableFuture<WarehousesResponse> getWarehouseAsync(String warehouseId) {
-        return CompletableFuture.supplyAsync(() -> warehouseController.getWarehouse(warehouseId).getResult());
+        String token = TokenContextHolder.getCurrentToken();
+        return CompletableFuture.supplyAsync(() -> {
+            TokenContextHolder.setToken(token);
+            try {
+                return warehouseController.getWarehouse(warehouseId).getResult();
+            } finally {
+                TokenContextHolder.clear();
+            }
+        });
     }
 
     @Override
     public CompletableFuture<BinResponse> getBinAsync(String binId) {
-        return CompletableFuture.supplyAsync(() -> warehouseController.getBinById(binId).getResult());
+        String token = TokenContextHolder.getCurrentToken();
+        return CompletableFuture.supplyAsync(() -> {
+            TokenContextHolder.setToken(token);
+            try {
+                return warehouseController.getBinById(binId).getResult();
+            } finally {
+                TokenContextHolder.clear();
+            }
+        });
     }
 
     @Override
     public CompletableFuture<UserResponse> getUserAsync(String userId) {
-        return CompletableFuture.supplyAsync(() -> userController.getUser(userId).getResult());
+        String token = TokenContextHolder.getCurrentToken();
+        return CompletableFuture.supplyAsync(() -> {
+            TokenContextHolder.setToken(token);
+            try {
+                return userController.getUser(userId).getResult();
+            } finally {
+                TokenContextHolder.clear();
+            }
+        });
     }
 
     @Override
     public CompletableFuture<SupplierResponse> getSupplierAsync(String supplierId) {
-        return CompletableFuture.supplyAsync(() -> userController.getSupplier(supplierId).getResult());
+        String token = TokenContextHolder.getCurrentToken();
+        return CompletableFuture.supplyAsync(() -> {
+            TokenContextHolder.setToken(token);
+            try {
+                return userController.getSupplier(supplierId).getResult();
+            } finally {
+                TokenContextHolder.clear();
+            }
+        });
     }
 
     @Override
     public CompletableFuture<ProductResponse> getProductAsync(String productId) {
-        return CompletableFuture.supplyAsync(() -> productController.getProductById(productId).getResult());
+        String token = TokenContextHolder.getCurrentToken();
+        return CompletableFuture.supplyAsync(() -> {
+            TokenContextHolder.setToken(token);
+            try {
+                return productController.getProductById(productId).getResult();
+            } finally {
+                TokenContextHolder.clear();
+            }
+        });
     }
 
     @Override
     public CompletableFuture<UnitNameResponse> getUnitAsync(String unitId) {
-        return CompletableFuture.supplyAsync(() -> productController.getUnitById(unitId).getResult());
+        String token = TokenContextHolder.getCurrentToken();
+        return CompletableFuture.supplyAsync(() -> {
+            TokenContextHolder.setToken(token);
+            try {
+                return productController.getUnitById(unitId).getResult();
+            } finally {
+                TokenContextHolder.clear();
+            }
+        });
     }
-
-
 }

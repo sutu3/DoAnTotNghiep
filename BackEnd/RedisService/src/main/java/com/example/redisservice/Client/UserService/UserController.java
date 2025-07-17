@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(
         name = "User",
         url = "https://userservice-kuug.onrender.com/api",
-        //url = "http://localhost:8080/api",
+        //url = "http://localhost:8083/api",
         fallback = UserServiceFallback.class,
         configuration = {AuthenticationRequestInterceptor.class}
 )

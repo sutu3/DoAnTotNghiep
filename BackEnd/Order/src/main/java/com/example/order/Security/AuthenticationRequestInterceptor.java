@@ -1,11 +1,13 @@
 package com.example.order.Security;
 
+import com.example.order.Utils.TokenContextHolder;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
 
 @Slf4j
 public class AuthenticationRequestInterceptor implements RequestInterceptor {
@@ -14,14 +16,22 @@ public class AuthenticationRequestInterceptor implements RequestInterceptor {
         ServletRequestAttributes servletRequestAttributes =
                 (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 
-        if (servletRequestAttributes != null) {
-            var authHeader = servletRequestAttributes.getRequest().getHeader("Authorization");
+        String authHeader = null;
 
-            log.info("Header: {}", authHeader);
-            if (StringUtils.hasText(authHeader))
-                template.header("Authorization", authHeader);
+        if (servletRequestAttributes != null) {
+            authHeader = servletRequestAttributes.getRequest().getHeader("Authorization");
+            log.info("Header from ServletRequestAttributes: {}", authHeader);
         } else {
-            log.warn("No ServletRequestAttributes found in RequestContextHolder");
+            // Fallback to ThreadLocal token
+            authHeader = TokenContextHolder.getToken();
+            log.info("Header from TokenContextHolder: {}", authHeader);
+            log.warn("No ServletRequestAttributes found in RequestContextHolder, using ThreadLocal token");
+        }
+
+        if (StringUtils.hasText(authHeader)) {
+            template.header("Authorization", authHeader);
+        } else {
+            log.warn("No Authorization header available");
         }
     }
 }
