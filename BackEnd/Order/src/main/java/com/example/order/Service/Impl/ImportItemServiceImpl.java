@@ -234,7 +234,7 @@ public class ImportItemServiceImpl implements ImportItemService {
                     item.getProduct().getProductId(),
                     orderResponse.getWarehouse().getWarehouseId(),
                     item.getBin().getBinId(),
-                    item.getRealityQuantity(),
+                    0,
                     item.getExpiredDate().toLocalDate(),
                     "AVAILABLE"
             );
