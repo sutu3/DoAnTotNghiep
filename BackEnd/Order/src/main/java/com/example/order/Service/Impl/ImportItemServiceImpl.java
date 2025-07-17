@@ -238,7 +238,6 @@ public class ImportItemServiceImpl implements ImportItemService {
                     item.getExpiredDate().toLocalDate(),
                     "AVAILABLE"
             );
-
             var inventoryResponse = inventoryController.createInventoryWarehouse(inventoryWarehouseRequest);
             log.info("Created inventory warehouse record with ID: {}",
                     inventoryResponse.getResult().getInventoryWarehouseId());

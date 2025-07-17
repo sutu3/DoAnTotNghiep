@@ -39,6 +39,7 @@ public class ExportOrderServiceImpl implements ExportOrderService {
         ExportOrder exportOrder = ExportOrder.builder()
                 .warehouse(request.warehouse())
                 .createByUser(request.createByUser())
+                .isDeleted(false)
                 .customer(request.customer())
                 .description(request.description())
                 .deliveryDate(request.deliveryDate())
