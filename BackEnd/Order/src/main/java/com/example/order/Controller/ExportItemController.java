@@ -33,6 +33,7 @@ public class ExportItemController {
     public ApiResponse<List<ExportItemResponse>> getAllByOrderId(
             @PathVariable String orderId
     ) {
+        log.info(orderId);
         return ApiResponse.<List<ExportItemResponse>>builder()
                 .Result(exportItemService.getAllByOrder(orderId))
                 .code(0)
