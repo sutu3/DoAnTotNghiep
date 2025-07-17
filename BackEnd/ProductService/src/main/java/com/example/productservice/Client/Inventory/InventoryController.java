@@ -7,6 +7,7 @@ import com.example.productservice.Client.Inventory.Dto.Resquest.InventoryWarehou
 import com.example.productservice.Client.Inventory.Dto.Resquest.StockMovementRequest;
 import com.example.productservice.Client.Inventory.Fallbacks.InventoryFallbacks;
 import com.example.productservice.Dto.Responses.ApiResponse;
+import com.example.productservice.Security.AuthenticationRequestInterceptor;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(
         name = "Inventory",
         url = "https://inventoryservice-0kl2.onrender.com/api",
-        fallback = InventoryFallbacks.class)
+        fallback = InventoryFallbacks.class,configuration = {AuthenticationRequestInterceptor.class})
 public interface InventoryController {
     @PostMapping("/inventory/warehouses")
     ApiResponse<InventoryWarehouseResponse> createInventoryWarehouse(@RequestBody InventoryWarehouseRequest request);

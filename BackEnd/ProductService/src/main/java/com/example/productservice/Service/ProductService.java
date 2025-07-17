@@ -8,6 +8,7 @@ import com.example.productservice.Form.ProductForm;
 import com.example.productservice.Model.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,6 +57,7 @@ public interface ProductService {
      * @param request Thông tin sản phẩm cần tạo.
      * @return {@link ProductResponse} của sản phẩm vừa tạo.
      */
+    @PreAuthorize("hasRole('MANAGER')")
     ProductResponse createProduct(ProductRequest request);
 
     /**
@@ -73,6 +75,7 @@ public interface ProductService {
      * @param productId  ID sản phẩm cần cập nhật.
      * @return {@link ProductResponse} sau khi cập nhật.
      */
+    @PreAuthorize("hasRole('MANAGER')")
     ProductResponse updateProduct(ProductForm update, String productId);
 
     /**
@@ -80,6 +83,7 @@ public interface ProductService {
      *
      * @param productId ID của sản phẩm cần xóa.
      */
+    @PreAuthorize("hasRole('MANAGER')")
     void deleteByProductId(String productId);
     ProductResponse enrich(Product product);
 }
