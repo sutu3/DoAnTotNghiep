@@ -3,6 +3,7 @@ package com.example.order.Dto.Response.Exporttem;
 import com.example.order.Client.ProductService.Dto.Response.ProductResponse;
 import com.example.order.Client.ProductService.Dto.Response.UnitNameResponse;
 import com.example.order.Client.UserService.Dto.Response.UserResponse;
+import com.example.order.Client.WarehouseService.Dto.Responses.Bin.BinResponse;
 import com.example.order.Enum.ExportItemStatus;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,7 @@ public class ExportItemResponse {
     UnitNameResponse unit;
     Integer quantity;
     BigDecimal unitPrice;
-    String binLocation;
+    BinResponse bin;
     String batchNumber;
     ExportItemStatus status;
     UserResponse createByUser;

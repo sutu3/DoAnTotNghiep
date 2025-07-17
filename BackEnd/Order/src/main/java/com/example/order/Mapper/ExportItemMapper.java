@@ -15,6 +15,7 @@ public interface ExportItemMapper {
     @Mapping(target = "product",ignore = true)
     @Mapping(target = "unit",ignore = true)
     @Mapping(target = "createByUser",ignore = true)
+    @Mapping(target = "bin",ignore = true)
     ExportItemResponse toResponse(ExportItem entity);
     void toUpdate(@MappingTarget ExportItem exportItem, UpdateExportItemForm form);
 }

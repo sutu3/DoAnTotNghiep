@@ -5,11 +5,13 @@ import com.example.order.Client.Inventory.InventoryController;
 import com.example.order.Client.ProductService.Dto.Response.ProductResponse;
 import com.example.order.Client.ProductService.Dto.Response.UnitNameResponse;
 import com.example.order.Client.UserService.Dto.Response.UserResponse;
+import com.example.order.Client.WarehouseService.Dto.Responses.Bin.BinResponse;
 import com.example.order.Dto.Request.ExportItemRequest;
 import com.example.order.Dto.Response.Exporttem.ExportItemResponse;
 import com.example.order.Dto.Response.ImportItem.ImportResponseItem;
 import com.example.order.Enum.ExportItemStatus;
 import com.example.order.Enum.ExportOrderStatus;
+import com.example.order.Enum.OrderStatus;
 import com.example.order.Exception.AppException;
 import com.example.order.Exception.ErrorCode;
 import com.example.order.Form.UpdateExportItemForm;
@@ -58,7 +60,8 @@ public class ExportItemServiceImpl implements ExportItemService {
 
     @Override
     public List<ExportItemResponse> getAllByOrder(String orderId) {
-        return exportItemRepo.findByExportOrder_ExportOrderIdAndIsDeletedFalse(orderId)
+        log.info(orderId);
+        return exportItemRepo.findAllByExportOrder_ExportOrderIdAndIsDeleted(orderId,false)
                 .stream().map(this::entry).collect(Collectors.toList());
     }
 
@@ -196,12 +199,15 @@ public class ExportItemServiceImpl implements ExportItemService {
                 .getUserAsync(exportItem.getExportOrder().getCreateByUser());
         CompletableFuture<UnitNameResponse> unitFuture = asyncServiceImpl
                 .getUnitAsync(exportItem.getUnit());
-        CompletableFuture.allOf(productFuture, userFuture).join();
+        CompletableFuture<BinResponse> binFuture = asyncServiceImpl
+                .getBinAsync(exportItem.getBinLocation());
+        CompletableFuture.allOf(productFuture, userFuture,binFuture).join();
 
         ExportItemResponse response = exportItemMapper.toResponse(exportItem);
         response.setProduct(productFuture.join());
         response.setCreateByUser(userFuture.join());
         response.setUnit(unitFuture.join());
+        response.setBin(binFuture.join());
         return response;
     }
 }
