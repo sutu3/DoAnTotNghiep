@@ -10,12 +10,10 @@ import com.example.order.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.order.Client.UserService.Dto.Response.UserResponse;
 import com.example.order.Client.UserService.UserController;
 import com.example.order.Client.WarehouseService.Dto.Responses.Bin.BinResponse;
-import com.example.order.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.order.Client.WarehouseService.WarehouseController;
 import com.example.order.Dto.Request.ImportRequestItem;
 import com.example.order.Dto.Response.ImportItem.ImportResponseItem;
 import com.example.order.Dto.Response.ImportOrder.ImportOrderResponse;
-import com.example.order.Enum.OrderStatus;
 import com.example.order.Exception.AppException;
 import com.example.order.Exception.ErrorCode;
 import com.example.order.Form.ImportItemForm;
@@ -102,7 +100,7 @@ public class ImportItemServiceImpl implements ImportItemService {
         ImportItem importItem=importItemRepo.getById(id);
         importItemMapper.toUpdate(importItem,update);
         ImportItem importItemSave=importItemRepo.save(importItem);
-        updateOrderTotalPrice.updateTotalPrice(importItem.getImportOrder());
+        updateOrderTotalPrice.updateTotalPriceImport(importItem.getImportOrder());
         return entry(importItemSave);
     }
     @Override
@@ -115,7 +113,7 @@ public class ImportItemServiceImpl implements ImportItemService {
         if (!requests.isEmpty()) {
             String orderId = requests.get(0).importOrder();
             ImportOrder importOrder = importOrderService.getById(orderId);
-            updateOrderTotalPrice.updateTotalPrice(importOrder);
+            updateOrderTotalPrice.updateTotalPriceImport(importOrder);
         }
 
         return results;
@@ -196,7 +194,7 @@ public class ImportItemServiceImpl implements ImportItemService {
         ImportItem savedItem = importItemRepo.save(importItem);
 
         // Cập nhật total price của order
-        updateOrderTotalPrice.updateTotalPrice(importItem.getImportOrder());
+        updateOrderTotalPrice.updateTotalPriceImport(importItem.getImportOrder());
 
         return entry(savedItem);
     }
