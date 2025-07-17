@@ -18,10 +18,9 @@ public class WebClientConfiguration {
     @Bean
     WebClient webClient(){
         return WebClient.builder()
-                .baseUrl("https://doantotnghiep-3a2x.onrender.com/api/authen")
+                .baseUrl("https://doantotnghiep-3a2x.onrender.com/api/")
                 .build();
     }
-
     @Bean
     CorsWebFilter corsWebFilter(){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
