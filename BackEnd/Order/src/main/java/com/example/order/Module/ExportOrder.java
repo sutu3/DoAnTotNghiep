@@ -45,7 +45,7 @@ public class ExportOrder extends BaseEntity{
     @Column(columnDefinition = "VARCHAR(20) COMMENT 'Trạng thái đơn xuất hàng'", nullable = false)
     ExportOrderStatus status = ExportOrderStatus.CREATED;
 
-    @Column(columnDefinition = "DECIMAL(15,2) COMMENT 'Tổng giá trị đơn hàng'")
+    @Column(columnDefinition = "DECIMAL(18,2) COMMENT 'Tổng giá trị đơn hàng'")
     BigDecimal totalAmount = BigDecimal.ZERO;
 
     @Column(columnDefinition = "VARCHAR(36) COMMENT 'ID người phê duyệt'")
