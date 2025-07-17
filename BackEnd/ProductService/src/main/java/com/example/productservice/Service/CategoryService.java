@@ -7,6 +7,7 @@ import com.example.productservice.Form.CategoryForm;
 import com.example.productservice.Model.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,10 +18,12 @@ public interface CategoryService {
     List<CategoryNameResponse> getAllCategoryName(String warehouses);
     Category getByName(String name, String warehouses);
     CategoryResponse getByNameResponse(String name,String warehouses);
+    @PreAuthorize("hasRole('MANAGER')")
     CategoryResponse createCategory(CategoryRequest request);
     void DeleteCategory(String id);
     Category getById(String id);
     CategoryResponse getByIdResponse(String id);
+    @PreAuthorize("hasRole('MANAGER')")
     CategoryResponse updateCategory(CategoryForm update,String id);
     CategoryResponse enrich(Category category);
 }
