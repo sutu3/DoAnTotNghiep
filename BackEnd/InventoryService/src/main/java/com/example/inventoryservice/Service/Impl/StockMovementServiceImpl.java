@@ -19,6 +19,7 @@ import com.example.inventoryservice.Module.StockMovement;
 import com.example.inventoryservice.Repo.StockMovementRepo;
 import com.example.inventoryservice.Service.InventoryWarehouseService;
 import com.example.inventoryservice.Service.StockMovementService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -71,6 +72,7 @@ public class StockMovementServiceImpl implements StockMovementService {
     }
 
     @Override
+    @Transactional
     public StockMovementResponse createStockMovement(StockMovementRequest request) {
         // Validate references
         InventoryWarehouse inventoryWarehouse = inventoryWarehouseService.getById(request.inventoryWarehouseId());
@@ -103,7 +105,7 @@ public class StockMovementServiceImpl implements StockMovementService {
                 stockMovement.setQuantityAfter(inventoryWarehouse.getQuantity() - request.quantity());
                 break;
         }
-        updateBinOccupancy(inventoryWarehouse.getBin(), inventoryWarehouse.getQuantity(),stockMovement.getMovementType());
+        updateBinOccupancy(inventoryWarehouse.getBin(), request.quantity(), stockMovement.getMovementType());
         stockMovement.setIsDeleted(false);
         StockMovement savedMovement = stockMovementRepo.save(stockMovement);
 
@@ -113,6 +115,7 @@ public class StockMovementServiceImpl implements StockMovementService {
         return enrich(savedMovement);
     }
     @Override
+    @Transactional
     public void updateBinOccupancy(String binId, Integer quantityChange, MovementType movementType) {
         try {
             Integer occupancyChange = switch (movementType) {
