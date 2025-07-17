@@ -7,6 +7,7 @@ import com.example.order.Client.ProductService.Dto.Response.UnitNameResponse;
 import com.example.order.Client.UserService.Dto.Response.UserResponse;
 import com.example.order.Dto.Request.ExportItemRequest;
 import com.example.order.Dto.Response.Exporttem.ExportItemResponse;
+import com.example.order.Dto.Response.ImportItem.ImportResponseItem;
 import com.example.order.Enum.ExportItemStatus;
 import com.example.order.Enum.ExportOrderStatus;
 import com.example.order.Exception.AppException;
@@ -15,10 +16,12 @@ import com.example.order.Form.UpdateExportItemForm;
 import com.example.order.Mapper.ExportItemMapper;
 import com.example.order.Module.ExportItem;
 import com.example.order.Module.ExportOrder;
+import com.example.order.Module.ImportOrder;
 import com.example.order.Repo.ExportItemRepo;
 import com.example.order.Repo.ExportOrderRepo;
 import com.example.order.Service.ExportItemService;
 import com.example.order.Service.ExportOrderService;
+import com.example.order.Utils.UpdateOrderTotalPrice;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +48,7 @@ public class ExportItemServiceImpl implements ExportItemService {
     ExportOrderRepo exportOrderRepo;
     ExportOrderService exportOrderService;
     InventoryController inventoryController;
+    UpdateOrderTotalPrice updateOrderTotalPrice;
 
     @Override
     public Page<ExportItemResponse> getAllByWarehouse(Pageable pageable, String warehouse) {
@@ -92,9 +96,16 @@ public class ExportItemServiceImpl implements ExportItemService {
     @Override
     @Transactional
     public List<ExportItemResponse> createItems(List<ExportItemRequest> requests) {
-        return requests.stream()
+        List<ExportItemResponse> results = requests.stream()
                 .map(this::createItem)
                 .toList();
+        if (!requests.isEmpty()) {
+            String orderId = requests.get(0).exportOrderId();
+            ExportOrder importOrder = exportOrderService.getExportOrderById(orderId);
+            updateOrderTotalPrice.updateTotalPriceExport(importOrder);
+        }
+
+        return results;
     }
 
     @Override
