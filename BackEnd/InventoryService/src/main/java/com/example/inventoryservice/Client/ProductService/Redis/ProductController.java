@@ -6,6 +6,7 @@ import com.example.inventoryservice.Client.ProductService.Dto.Response.ProductRe
 import com.example.inventoryservice.Client.ProductService.Dto.Response.UnitNameResponse;
 import com.example.inventoryservice.Client.ProductService.Fallbacks.ProductServiceFallback;
 import com.example.inventoryservice.Dtos.ApiResponse;
+import com.example.inventoryservice.Security.AuthenticationRequestInterceptor;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(
         name = "Product",
         url = "https://doantotnghiep-r5ta.onrender.com/api/cache",
-        fallback = ProductServiceFallback.class)
+        fallback = ProductServiceFallback.class,configuration = {AuthenticationRequestInterceptor.class})
 public interface ProductController {
     @GetMapping("/products/{productId}")
     ApiResponse<ProductResponse> getProductById(@PathVariable String productId);
