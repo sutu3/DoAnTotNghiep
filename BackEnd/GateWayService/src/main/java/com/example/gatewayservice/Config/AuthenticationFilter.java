@@ -39,6 +39,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/notification/email/send",
             "/file/media/download/.*",
             "/api/authen/api/auth/login",
+            "/api/authen/api/auth/logout",
             "/api/users/*",
             "/api/authen/.*",
             "/api/orders/*",
