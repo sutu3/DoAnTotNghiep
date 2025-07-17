@@ -40,13 +40,13 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/file/media/download/.*",
             "/api/authen/api/auth/login",
             "/api/authen/api/auth/logout",
-            "/api/users/*",
+            "/api/users/.*",
             "/api/authen/.*",
-            "/api/orders/*",
+            "/api/orders/.*",
             "/swagger-ui/.*",
-            "/api/file/*",
-            "/v3/api-docs/*",
-            "/api/products/*",
+            "/api/file/.*",
+            "/v3/api-docs/.*",
+            "/api/products/.*",
     };
 
     @Value("${app.api-prefix}")
@@ -55,39 +55,85 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.info("Enter authentication filter...."+exchange.getRequest().getURI().getPath());
+        String path = exchange.getRequest().getURI().getPath();
+        String method = exchange.getRequest().getMethod().toString();
 
-        if (isPublicEndpoint(exchange.getRequest()))
-            return chain.filter(exchange);
+        log.info("=== AUTHENTICATION FILTER START ===");
+        log.info("Request Path: {}", path);
+        log.info("Request Method: {}", method);
+        log.info("Request Headers: {}", exchange.getRequest().getHeaders());
+
+        // Check if public endpoint
+        boolean isPublic = isPublicEndpoint(exchange.getRequest());
+        log.info("Is Public Endpoint: {}", isPublic);
+
+        if (isPublic) {
+            log.info("Public endpoint detected, skipping authentication");
+            return chain.filter(exchange).then(Mono.fromRunnable(() -> {
+                log.info("Response status: {}", exchange.getResponse().getStatusCode());
+                log.info("Response headers: {}", exchange.getResponse().getHeaders());
+            }));
+        }
 
         // Get token from authorization header
         List<String> authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION);
-        if (CollectionUtils.isEmpty(authHeader))
+        log.info("Authorization Header: {}", authHeader);
+
+        if (CollectionUtils.isEmpty(authHeader)) {
+            log.warn("No Authorization header found");
             return unauthenticated(exchange.getResponse());
+        }
 
         String token = authHeader.getFirst().replace("Bearer ", "");
-        log.info("Token: {}", token);
+        log.info("Extracted Token: {}", token.substring(0, Math.min(token.length(), 50)) + "...");
 
-        return identityService.introspect(token).flatMap(introspectResponse -> {
-            if (introspectResponse.getResult().isValid())
-                return chain.filter(exchange);
-            else
-                return unauthenticated(exchange.getResponse());
-        }).onErrorResume(throwable -> unauthenticated(exchange.getResponse()));
-    }
-
-    @Override
-    public int getOrder() {
-        return -1;
+        log.info("Calling identity service introspect...");
+        return identityService.introspect(token)
+                .doOnNext(introspectResponse -> {
+                    log.info("Introspect Response received: {}", introspectResponse);
+                    log.info("Token is valid: {}", introspectResponse.getResult().isValid());
+                })
+                .flatMap(introspectResponse -> {
+                    if (introspectResponse.getResult().isValid()) {
+                        log.info("Token validation successful, proceeding to next filter");
+                        return chain.filter(exchange);
+                    } else {
+                        log.warn("Token validation failed");
+                        return unauthenticated(exchange.getResponse());
+                    }
+                })
+                .doOnError(throwable -> {
+                    log.error("Error during token introspection: ", throwable);
+                })
+                .onErrorResume(throwable -> {
+                    log.error("Fallback to unauthenticated due to error");
+                    return unauthenticated(exchange.getResponse());
+                })
+                .doFinally(signalType -> {
+                    log.info("=== AUTHENTICATION FILTER END === Signal: {}", signalType);
+                });
     }
 
     private boolean isPublicEndpoint(ServerHttpRequest request){
         String path = request.getURI().getPath();
-        return Arrays.stream(publicEndpoints)
-                .anyMatch(path::matches);
+        log.info("Checking if path '{}' is public endpoint", path);
+
+        for (String endpoint : publicEndpoints) {
+            boolean matches = path.matches(endpoint);
+            log.info("Path '{}' matches pattern '{}': {}", path, endpoint, matches);
+            if (matches) {
+                log.info("Public endpoint match found: {}", endpoint);
+                return true;
+            }
+        }
+
+        log.info("No public endpoint match found for path: {}", path);
+        return false;
     }
 
     Mono<Void> unauthenticated(ServerHttpResponse response){
+        log.warn("Returning unauthenticated response");
+
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .code(1401)
                 .message("Unauthenticated")
@@ -95,14 +141,24 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         String body = null;
         try {
             body = objectMapper.writeValueAsString(apiResponse);
+            log.info("Unauthenticated response body: {}", body);
         } catch (JsonProcessingException e) {
+            log.error("Error serializing unauthenticated response", e);
             throw new RuntimeException(e);
         }
 
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
+        log.info("Response headers set: {}", response.getHeaders());
+        log.info("Response status: {}", response.getStatusCode());
+
         return response.writeWith(
                 Mono.just(response.bufferFactory().wrap(body.getBytes())));
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
     }
 }
