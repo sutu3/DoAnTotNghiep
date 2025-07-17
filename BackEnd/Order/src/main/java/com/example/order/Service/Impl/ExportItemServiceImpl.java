@@ -153,7 +153,7 @@ public class ExportItemServiceImpl implements ExportItemService {
 
         try {
             // Update order status to IN_PROGRESS
-            exportOrderService.updateExportOrderStatus(orderId, ExportOrderStatus.IN_PROGRESS, null);
+            exportOrderService.updateExportOrderStatus(orderId, ExportOrderStatus.IN_PROGRESS);
 
             // Process each item
             for (ExportItemResponse item : items) {
@@ -180,13 +180,13 @@ public class ExportItemServiceImpl implements ExportItemService {
             }
 
             // Update order status to COMPLETED
-            exportOrderService.updateExportOrderStatus(orderId, ExportOrderStatus.COMPLETED, null);
+            exportOrderService.updateExportOrderStatus(orderId, ExportOrderStatus.COMPLETED);
 
             log.info("Export execution completed for order: {}", orderId);
 
         } catch (Exception e) {
             log.error("Export execution failed for order: {}", orderId, e);
-            exportOrderService.updateExportOrderStatus(orderId, ExportOrderStatus.CANCELLED, null);
+            exportOrderService.updateExportOrderStatus(orderId, ExportOrderStatus.CANCELLED);
             throw new AppException(ErrorCode.EXPORT_EXECUTION_FAILED);
         }
     }
