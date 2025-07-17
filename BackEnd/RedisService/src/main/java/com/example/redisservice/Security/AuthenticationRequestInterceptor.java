@@ -1,4 +1,4 @@
-package com.example.order.Security;
+package com.example.redisservice.Security;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -14,14 +14,10 @@ public class AuthenticationRequestInterceptor implements RequestInterceptor {
         ServletRequestAttributes servletRequestAttributes =
                 (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 
-        if (servletRequestAttributes != null) {
-            var authHeader = servletRequestAttributes.getRequest().getHeader("Authorization");
+        var authHeader = servletRequestAttributes.getRequest().getHeader("Authorization");
 
-            log.info("Header: {}", authHeader);
-            if (StringUtils.hasText(authHeader))
-                template.header("Authorization", authHeader);
-        } else {
-            log.warn("No ServletRequestAttributes found in RequestContextHolder");
-        }
+        log.info("Header: {}", authHeader);
+        if (StringUtils.hasText(authHeader))
+            template.header("Authorization", authHeader);
     }
 }

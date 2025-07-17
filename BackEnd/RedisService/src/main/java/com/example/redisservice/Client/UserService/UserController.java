@@ -6,6 +6,7 @@ import com.example.redisservice.Client.UserService.Dto.Response.SupplierResponse
 import com.example.redisservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.redisservice.Client.UserService.Fallbacks.UserServiceFallback;
 import com.example.redisservice.DTOs.Response.ApiResponse;
+import com.example.redisservice.Security.AuthenticationRequestInterceptor;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.PathVariable;
         name = "User",
         url = "https://userservice-kuug.onrender.com/api",
         //url = "http://localhost:8080/api",
-        fallback = UserServiceFallback.class)
+        fallback = UserServiceFallback.class,
+        configuration = {AuthenticationRequestInterceptor.class}
+)
 public interface UserController {
     @GetMapping("/users/{id}")
     ApiResponse<UserResponse> getUser(@PathVariable String id);
