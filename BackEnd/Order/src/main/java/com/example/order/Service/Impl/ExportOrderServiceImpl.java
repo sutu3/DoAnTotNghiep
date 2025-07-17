@@ -129,6 +129,13 @@ public class ExportOrderServiceImpl implements ExportOrderService {
                 .toList();
     }
 
+    @Override
+    public Page<ExportOrderResponse> getExportOrdersForApprovalByWarehouse(String warehouse, Pageable pageable) {
+        return exportOrderRepo.findAllByStatusAndWarehouseAndIsDeletedFalse(
+                 ExportOrderStatus.PENDING_APPROVAL,warehouse,
+                pageable).map(this::entry);
+    }
+
 
     @Override
     public ExportOrderResponse entry(ExportOrder exportOrder) {

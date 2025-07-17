@@ -34,5 +34,7 @@ public interface ExportOrderService {
     void deleteExportOrder(String exportOrderId);
 
     List<ExportOrderResponse> getExportOrdersForApproval();
+    Page<ExportOrderResponse> getExportOrdersForApprovalByWarehouse(String warehouse, Pageable pageable);
+
     ExportOrderResponse entry(ExportOrder exportOrder);
 }
