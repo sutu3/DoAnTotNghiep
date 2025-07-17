@@ -126,6 +126,20 @@ public class ExportOrderController {
                 .success(true)
                 .build();
     }
+    @GetMapping("/pending-approvals/search/warehouse/{warehouseId}")
+    public ApiResponse<Page<ExportOrderResponse>> getPendingApprovalsByWarehouse(
+            @PathVariable String warehouseId,
+            @RequestParam("pageNumber") int page,
+            @RequestParam("pageSize") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ApiResponse.<Page<ExportOrderResponse>>builder()
+                .Result(exportOrderService.getExportOrdersForApprovalByWarehouse(warehouseId,pageable))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
 
     @PutMapping("/{orderId}/status")
     public ApiResponse<ExportOrderResponse> updateStatus(

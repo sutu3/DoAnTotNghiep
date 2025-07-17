@@ -17,6 +17,7 @@ import java.util.Optional;
 public interface ExportOrderRepo extends JpaRepository<ExportOrder, String> {
 
     Page<ExportOrder> findAllByWarehouseAndIsDeletedFalse(String warehouse, Pageable pageable);
+    Page<ExportOrder> findAllByStatusAndWarehouseAndIsDeletedFalse(ExportOrderStatus status, String warehouse, Pageable pageable);
 
     Page<ExportOrder> findAllByCreateByUserAndIsDeletedFalse(String createByUser, Pageable pageable);
 
