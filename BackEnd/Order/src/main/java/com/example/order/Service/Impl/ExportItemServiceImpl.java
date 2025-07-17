@@ -3,6 +3,7 @@ package com.example.order.Service.Impl;
 import com.example.order.Client.Inventory.Dto.Resquest.StockMovementRequest;
 import com.example.order.Client.Inventory.InventoryController;
 import com.example.order.Client.ProductService.Dto.Response.ProductResponse;
+import com.example.order.Client.ProductService.Dto.Response.UnitNameResponse;
 import com.example.order.Client.UserService.Dto.Response.UserResponse;
 import com.example.order.Dto.Request.ExportItemRequest;
 import com.example.order.Dto.Response.Exporttem.ExportItemResponse;
@@ -76,16 +77,11 @@ public class ExportItemServiceImpl implements ExportItemService {
         ExportOrder exportOrder = exportOrderRepo.findByExportOrderIdAndIsDeletedFalse(request.exportOrderId())
                 .orElseThrow(() -> new AppException(ErrorCode.EXPORT_ORDER_NOT_FOUND));
 
-        ExportItem exportItem = ExportItem.builder()
-                .exportOrder(exportOrder)
-                .product(request.product())
-                .unit(request.unit())
-                .quantity(request.quantity())
-                .unitPrice(request.unitPrice())
-                .binLocation(request.binLocation())
-                .batchNumber(request.batchNumber())
-                .status(ExportItemStatus.PENDING)
-                .build();
+        ExportItem exportItem = exportItemMapper.toEntity(request);
+        exportItem.setIsDeleted(false);
+        exportItem.setExportOrder(exportOrder);
+        exportItem.setStatus(ExportItemStatus.PENDING);
+
 
         ExportItem savedItem = exportItemRepo.save(exportItem);
         log.info("Export item created with ID: {}", savedItem.getExportItemId());
@@ -187,13 +183,14 @@ public class ExportItemServiceImpl implements ExportItemService {
                 .getProductAsync(exportItem.getProduct());
         CompletableFuture<UserResponse> userFuture = asyncServiceImpl
                 .getUserAsync(exportItem.getExportOrder().getCreateByUser());
-
+        CompletableFuture<UnitNameResponse> unitFuture = asyncServiceImpl
+                .getUnitAsync(exportItem.getUnit());
         CompletableFuture.allOf(productFuture, userFuture).join();
 
         ExportItemResponse response = exportItemMapper.toResponse(exportItem);
         response.setProduct(productFuture.join());
         response.setCreateByUser(userFuture.join());
-
+        response.setUnit(unitFuture.join());
         return response;
     }
 }

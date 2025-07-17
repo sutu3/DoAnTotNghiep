@@ -10,6 +10,7 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface ExportItemMapper {
+    @Mapping(target = "exportOrder",ignore = true)
     ExportItem toEntity(ExportItemRequest exportItemRequest);
     @Mapping(target = "product",ignore = true)
     @Mapping(target = "unit",ignore = true)

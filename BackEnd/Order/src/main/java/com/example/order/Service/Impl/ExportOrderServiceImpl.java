@@ -12,6 +12,7 @@ import com.example.order.Mapper.ExportOrderMapper;
 import com.example.order.Module.ExportOrder;
 import com.example.order.Repo.ExportOrderRepo;
 import com.example.order.Service.ExportOrderService;
+import com.example.order.Utils.DateUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -42,7 +43,7 @@ public class ExportOrderServiceImpl implements ExportOrderService {
                 .isDeleted(false)
                 .customer(request.customer())
                 .description(request.description())
-                .deliveryDate(request.deliveryDate())
+                .deliveryDate( DateUtils.parseToLocalDateTime(request.deliveryDate().toString()).get())
                 .status(ExportOrderStatus.CREATED)
                 .build();
         ExportOrder savedOrder = exportOrderRepo.save(exportOrder);
