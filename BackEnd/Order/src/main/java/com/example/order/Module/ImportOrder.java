@@ -46,7 +46,7 @@ public class ImportOrder extends BaseEntity {
     @Column(columnDefinition = "TEXT COMMENT 'Ghi chú cho đơn nhập'")
     String note;
 
-    @Column(columnDefinition = "DECIMAL(10,2) COMMENT 'tổng giá đơn hàng'")
+    @Column(columnDefinition = "DECIMAL(18,2) COMMENT 'tổng giá đơn hàng'")
     BigDecimal totalPrice;
 
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'URL hình ảnh kiểm tra đơn nhập'")
