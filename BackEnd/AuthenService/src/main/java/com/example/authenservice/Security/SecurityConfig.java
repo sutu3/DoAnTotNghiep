@@ -35,6 +35,8 @@ public class SecurityConfig {
             "/authentication/introspect",
             "/authentication/logout",
             "/api/auth/login",
+            "/api/authen/introspect",
+            "/api/authen/logout",
             "/api/authen/roles",
             "/swagger-ui/**",
             "/v3/api-docs/**",
