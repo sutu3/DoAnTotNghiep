@@ -12,6 +12,7 @@ import com.ddd.warehouse.Module.Bins;
 import com.ddd.warehouse.Module.Stacks;
 import com.ddd.warehouse.Service.BinService;
 import com.ddd.warehouse.Service.StackService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,15 +32,21 @@ public class StackBinOrchestratorService {
 
     StackService stackService;
     BinService binService;
-
+    @Transactional
     public StackResponse createStackAndBins(StackRequest stackRequest) {
         StackResponse stackCreated = stackService.createStack(stackRequest);
 
         List<BinResponseNoWarehouse> bins = new ArrayList<>();
         if (stackRequest.binQuantity() > 0) {
             for (int i = 1; i <= stackRequest.binQuantity(); i++) {
+                String sanitizedStackName = stackRequest.stackName()
+                        .toUpperCase()
+                        .replaceAll("[^A-Z0-9]", "")
+                        .substring(0, Math.min(10, stackRequest.stackName().length()));
+
+                String binCode = String.format("%s-BIN-%03d", sanitizedStackName, i);
                 BinRequest bin = BinRequest.builder()
-                        .binCode(stackRequest.stackName() + "-BIN-" + i)
+                        .binCode(binCode)
                         .capacity(1)
                         .stack(stackCreated.getStackId())
                         .warehouse(stackRequest.warehouse())
