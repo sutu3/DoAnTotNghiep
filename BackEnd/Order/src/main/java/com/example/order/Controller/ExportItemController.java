@@ -129,7 +129,7 @@ public class ExportItemController {
     @PostMapping("/{orderId}/execute-export")
     public ApiResponse<Void> executeExport(
             @PathVariable String orderId,
-            @RequestBody List<ExportItemResponse> items
+            @RequestBody List<ExportItemRequest> items
     ) {
         exportItemService.executeExport(orderId, items);
         return ApiResponse.<Void>builder()

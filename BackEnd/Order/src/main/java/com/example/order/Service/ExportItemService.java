@@ -33,7 +33,7 @@ public interface ExportItemService {
 
     ExportItemResponse updateBinLocation(String itemId, String binLocation);
 
-    void executeExport(String orderId, List<ExportItemResponse> items);
+    void executeExport(String orderId, List<ExportItemRequest> items);
 
     ExportItemResponse entry(ExportItem exportItem);
 }
