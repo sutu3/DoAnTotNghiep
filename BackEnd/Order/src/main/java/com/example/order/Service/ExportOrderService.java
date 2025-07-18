@@ -26,6 +26,8 @@ public interface ExportOrderService {
     Page<ExportOrderResponse> getExportOrdersByUser(String userId, Pageable pageable);
 
     Page<ExportOrderResponse> getExportOrdersByStatus(ExportOrderStatus status, Pageable pageable);
+    Page<ExportOrderResponse> getExportOrdersByStatusAndWarehouse(ExportOrderStatus status,String warehouseId, Pageable pageable);
+
 
     ExportOrderResponse updateExportOrderStatus(String exportOrderId, ExportOrderStatus status);
     @PreAuthorize("hasRole('MANAGER')")

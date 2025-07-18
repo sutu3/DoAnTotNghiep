@@ -85,6 +85,12 @@ public class ExportOrderServiceImpl implements ExportOrderService {
     }
 
     @Override
+    public Page<ExportOrderResponse> getExportOrdersByStatusAndWarehouse(ExportOrderStatus status, String warehouseId, Pageable pageable) {
+        return exportOrderRepo.findAllByStatusAndIsDeletedFalseAndWarehouse(status,warehouseId,pageable)
+                .map(this::entry);
+    }
+
+    @Override
     public ExportOrderResponse updateExportOrderStatus(String exportOrderId, ExportOrderStatus status) {
         ExportOrder exportOrder = exportOrderRepo.findByExportOrderIdAndIsDeletedFalse(exportOrderId)
                 .orElseThrow(() -> new AppException(ErrorCode.EXPORT_ORDER_NOT_FOUND));
