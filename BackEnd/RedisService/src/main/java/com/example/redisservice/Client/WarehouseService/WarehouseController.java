@@ -8,6 +8,7 @@ import com.example.redisservice.Client.WarehouseService.Dto.Responses.Warehouse.
 import com.example.redisservice.Client.WarehouseService.Fallbacks.WarehouseServiceFallback;
 import com.example.redisservice.DTOs.Response.ApiResponse;
 import com.example.redisservice.Security.AuthenticationRequestInterceptor;
+import com.example.redisservice.config.FeignConfiguration;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +20,7 @@ import java.util.List;
         name = "Warehouse",
         url = "https://doantotnghiep-pb6y.onrender.com/api",
         fallback = WarehouseServiceFallback.class,
-        configuration = {AuthenticationRequestInterceptor.class}
+        configuration = {AuthenticationRequestInterceptor.class, FeignConfiguration.class}
 )
 public interface WarehouseController {
     @GetMapping("/warehouses/{id}")
