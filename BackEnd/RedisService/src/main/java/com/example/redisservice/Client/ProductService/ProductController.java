@@ -7,6 +7,7 @@ import com.example.redisservice.Client.ProductService.Dto.Response.UnitNameRespo
 import com.example.redisservice.Client.ProductService.Fallbacks.ProductServiceFallback;
 import com.example.redisservice.DTOs.Response.ApiResponse;
 import com.example.redisservice.Security.AuthenticationRequestInterceptor;
+import com.example.redisservice.config.FeignConfiguration;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
         name = "Product",
         url = "https://productservice-8qdv.onrender.com/api",
         fallback = ProductServiceFallback.class,
-        configuration = {AuthenticationRequestInterceptor.class}
+        configuration = {AuthenticationRequestInterceptor.class, FeignConfiguration.class}
 )
 public interface ProductController {
     @GetMapping("/products/search/productId/{productId}")
