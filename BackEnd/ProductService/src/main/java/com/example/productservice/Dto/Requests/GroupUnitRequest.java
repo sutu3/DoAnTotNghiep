@@ -7,7 +7,5 @@ public record GroupUnitRequest(
                 String groupName,
                 String description,
                 Float baseUnitRatio,
-                String unitType,
-                String createByUser
-) {
+                String unitType) {
 }

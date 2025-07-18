@@ -69,6 +69,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponse createCategory(CategoryRequest request) {
+        var idUser=GetCurrentUserId.getCurrentUserId();
 
         Optional<Category> existing = categoryRepo
                 .findByCategoryNameAndWarehouses(request.categoryName(),request.warehouses());
@@ -78,12 +79,14 @@ public class CategoryServiceImpl implements CategoryService {
                 throw  new AppException(ErrorCode.CATEGORY_EXISTS);
             }
             category.setIsDeleted(false);
+            category.setCreateByUser(idUser);
             category.setDescription(request.description());
             Category savedCategory = categoryRepo.save(category);
             return enrich(savedCategory);
         }
         Category category=categoryMapper.toEntity(request);
         category.setIsDeleted(false);
+        category.setCreateByUser(idUser);
         Category savedCategory = categoryRepo.save(category);
         return enrich(savedCategory);
     }

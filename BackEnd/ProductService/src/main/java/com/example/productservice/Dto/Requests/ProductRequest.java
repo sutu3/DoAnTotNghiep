@@ -13,7 +13,6 @@ public record ProductRequest(
         String urlImageProduct,
         String supplier,
         String warehouses,
-        String createByUser,
         String category,
         String unit,
         Integer minStockLevel,

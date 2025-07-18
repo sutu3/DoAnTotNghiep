@@ -82,8 +82,9 @@ public class UnitServiceImpl implements UnitService {
 
     @Override
     public UnitResponse createUnit(UnitRequest request) {
+        var idUser=GetCurrentUserId.getCurrentUserId();
         UserResponse userResponse=userController
-                .getUser(request.createByUser()).getResult();
+                .getUser(idUser).getResult();
         GroupUnit groupUnit=groupUnitService.getById(request.groupUnit());
         Optional<Unit> existing=unitRepo.findByShortNameAndUnitName(request.shortName(), request.unitName());
         if(existing.isPresent()){
