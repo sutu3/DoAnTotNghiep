@@ -17,6 +17,11 @@ public class InventoryFallbacks implements InventoryController {
     }
 
     @Override
+    public ApiResponse<InventoryWarehouseResponse> getInventoryWarehouse(String binId) {
+        throw new AppException(ErrorCode.INVENTORY_SERVICE_NOT_WORKING);
+    }
+
+    @Override
     public ApiResponse<StockMovementResponse> createStockMovement(StockMovementRequest request) {
         throw new AppException(ErrorCode.INVENTORY_SERVICE_NOT_WORKING);
     }
