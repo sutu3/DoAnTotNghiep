@@ -14,6 +14,7 @@ import com.ddd.warehouse.Repo.StackRepo;
 import com.ddd.warehouse.Service.BinService;
 import com.ddd.warehouse.Service.StackService;
 import com.ddd.warehouse.Service.WarehouseService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -74,7 +75,9 @@ public class StackServiceImpl implements StackService {
     public StackResponse getByIdResponse(String stackId) {
         return stackMapper.toResponse(getById(stackId));
     }
+
     @Override
+    @Transactional
     public StackResponse createStack(StackRequest stackRequest) {
         Warehouses warehouses=warehouseService.getById(stackRequest.warehouse());
         if(exsistByStack(stackRequest.warehouse(),stackRequest.warehouse())){
