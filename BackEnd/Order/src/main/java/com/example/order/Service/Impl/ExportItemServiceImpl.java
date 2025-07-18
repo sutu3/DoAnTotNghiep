@@ -106,8 +106,9 @@ public class ExportItemServiceImpl implements ExportItemService {
                 .toList();
         if (!requests.isEmpty()) {
             String orderId = requests.get(0).exportOrderId();
+            log.info("orderId: {}", orderId);
             ExportOrder importOrder = exportOrderService.getExportOrderById(orderId);
-            updateOrderTotalPrice.updateTotalPriceExport(importOrder);
+            updateOrderTotalPrice.updateTotalPriceExport(importOrder,results);
         }
 
         return results;

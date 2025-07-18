@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface InventoryController {
     @PostMapping(value = "/inventory/warehouses", consumes = "application/json")
     ApiResponse<InventoryWarehouseResponse> createInventoryWarehouse(@RequestBody InventoryWarehouseRequest request);
-    @GetMapping("/inventory/warehouses/search/bin/{binId}/singer")
+    @GetMapping(value = "/inventory/warehouses/search/bin/{binId}/singer", consumes = "application/json")
     ApiResponse<InventoryWarehouseResponse> getInventoryWarehouse(@PathVariable String binId);
 
     @PostMapping(value = "/inventory/movements", consumes = "application/json")
