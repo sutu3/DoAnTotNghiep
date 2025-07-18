@@ -95,6 +95,7 @@ public class ProductServiceImpl implements ProductService {
         Category category=categoryService.getById(request.category());
         Unit unit=unitService.getById(request.unit());
         Optional<Product> existing=productRepo.findBySkuAndWarehouses(request.sku(),request.warehouses());
+        var idUser=GetCurrentUserId.getCurrentUserId();
         if(existing.isPresent()){
             Product  product=existing.get();
             if(!product.getIsDeleted()){
@@ -104,6 +105,7 @@ public class ProductServiceImpl implements ProductService {
             product.setCategory(category);
             product.setUnit(unit);
             product.setIsDeleted(false);
+            product.setCreateByUser(idUser);
             Product productSave=productRepo.save(product);
             InventoryProductRequest inventoryProductRequest=new InventoryProductRequest(productSave.getProductId(),
                     request.warehouses(),
@@ -119,6 +121,7 @@ public class ProductServiceImpl implements ProductService {
         product.setUnit(unit);
         product.setIsDeleted(false);
         product.setIsActive(true);
+        product.setCreateByUser(idUser);
         Product productSave=productRepo.save(product);
         InventoryProductRequest inventoryProductRequest=new InventoryProductRequest(
                 productSave.getProductId(),

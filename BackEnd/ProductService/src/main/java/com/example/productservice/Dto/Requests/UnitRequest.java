@@ -8,7 +8,5 @@ public record UnitRequest(
         String shortName,
         Float RatioToBase,
         Boolean IsDefault,
-        String groupUnit,
-        String createByUser
-) {
+        String groupUnit) {
 }
