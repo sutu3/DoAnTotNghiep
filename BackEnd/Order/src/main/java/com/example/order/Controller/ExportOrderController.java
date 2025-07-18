@@ -58,7 +58,23 @@ public class ExportOrderController {
                 .success(true)
                 .build();
     }
+    @GetMapping("/search/status/{status}/warehouseId/{warehouseId}")
+    public ApiResponse<Page<ExportOrderResponse>> getAllByStatus(
+            @RequestParam("pageNumber") int page,
+            @RequestParam("pageSize") int size,
+            @PathVariable String status,
+            @PathVariable String warehouseId
 
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        ExportOrderStatus orderStatus = ExportOrderStatus.valueOf(status);
+        return ApiResponse.<Page<ExportOrderResponse>>builder()
+                .Result(exportOrderService.getExportOrdersByStatusAndWarehouse(orderStatus,warehouseId, pageable))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
     @GetMapping("/{orderId}")
     public ApiResponse<ExportOrderResponse> getById(@PathVariable String orderId) {
         return ApiResponse.<ExportOrderResponse>builder()
