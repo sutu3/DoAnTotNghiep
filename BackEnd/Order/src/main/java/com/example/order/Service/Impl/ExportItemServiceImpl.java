@@ -148,7 +148,7 @@ public class ExportItemServiceImpl implements ExportItemService {
 
     @Override
     @Transactional
-    public void executeExport(String orderId, List<ExportItemResponse> items) {
+    public void executeExport(String orderId, List<ExportItemRequest> items) {
         log.info("Executing export for order: {}", orderId);
 
         try {
@@ -156,17 +156,17 @@ public class ExportItemServiceImpl implements ExportItemService {
             exportOrderService.updateExportOrderStatus(orderId, ExportOrderStatus.IN_PROGRESS);
 
             // Process each item
-            for (ExportItemResponse item : items) {
+            for (ExportItemRequest item : items) {
                 // Update item status
-                ExportItem exportItem = getById(item.getExportItemId());
+                ExportItem exportItem = getById(item.exportOrderId());
                 exportItem.setStatus(ExportItemStatus.PICKED);
                 exportItemRepo.save(exportItem);
 
                 // Create stock movement for export (decrease inventory)
                 StockMovementRequest stockMovementRequest = StockMovementRequest.builder()
-                        .product(item.getProduct().getProductId())
+                        .product(item.product())
                         .inventoryWarehouseId(exportItem.getExportOrder().getWarehouse())
-                        .quantity(item.getQuantity())
+                        .quantity(item.quantity())
                         .movementType("EXPORT")
                         .note("Export execution for order: " + orderId)
                         .build();
