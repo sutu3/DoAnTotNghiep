@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
         name = "AuthenService",
-        url = "https://doantotnghiep-1-netj.onrender.com/api",
+        url = "https://doantotnghiep-3a2x.onrender.com/api",
         //url = "http://localhost:8081/api/cache",
         fallback = WarehouseServiceFallback.class,
         configuration = {AuthenticationRequestInterceptor.class, FeignConfiguration.class}
 )
 public interface AuthenController {
-    @PostMapping(value = "/auth/authen/users", consumes = "application/json")
+    @PostMapping(value = "/authen/users", consumes = "application/json")
     ApiResponse<UserResponse> createUser(@RequestBody UserRequestAuthen request);
 }
