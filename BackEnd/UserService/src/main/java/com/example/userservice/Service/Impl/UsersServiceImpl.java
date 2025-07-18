@@ -1,5 +1,7 @@
 package com.example.userservice.Service.Impl;
 
+import com.example.userservice.Client.Authen.AuthenController;
+import com.example.userservice.Client.Authen.Dto.Request.UserRequestAuthen;
 import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.userservice.Client.WarehouseService.WarehouseController;
 import com.example.userservice.Dto.Request.UserRequest;
@@ -34,6 +36,7 @@ public class UsersServiceImpl implements UserService {
     UserRepo userRepo;
     WarehouseController warehouseService; // Sử dụng Feign Client đúng chức năng
     AsyncServiceImpl asyncServiceImpl;
+    private final AuthenController authenController;
 
     @Override
     public Page<UserResponse> getAllByWarehouseId(String warehouseId,Pageable pageable) {
@@ -57,6 +60,7 @@ public class UsersServiceImpl implements UserService {
         user.setIsDeleted(false);
 
         Users savedUser = userRepo.save(user);
+        authenController.createUser(new UserRequestAuthen(savedUser.getUserName(), user.getEmail(), user.getEmail(), savedUser.getUserId()));
         return enrich(savedUser);
     }
     @Override
