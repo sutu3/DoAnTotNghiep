@@ -50,7 +50,7 @@ public class ExportOrderController {
             @PathVariable String status
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        ExportOrderStatus orderStatus = ExportOrderStatus.valueOf(status);
+        ExportOrderStatus orderStatus = ExportOrderStatus.valueOf(status.toUpperCase());
         return ApiResponse.<Page<ExportOrderResponse>>builder()
                 .Result(exportOrderService.getExportOrdersByStatus(orderStatus, pageable))
                 .code(0)
@@ -67,7 +67,7 @@ public class ExportOrderController {
 
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        ExportOrderStatus orderStatus = ExportOrderStatus.valueOf(status);
+        ExportOrderStatus orderStatus = ExportOrderStatus.valueOf(status.toUpperCase());
         return ApiResponse.<Page<ExportOrderResponse>>builder()
                 .Result(exportOrderService.getExportOrdersByStatusAndWarehouse(orderStatus,warehouseId, pageable))
                 .code(0)
