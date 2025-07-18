@@ -65,6 +65,15 @@ public class InventoryWarehouseController {
                 .success(true)
                 .build();
     }
+    @GetMapping("/search/bin/{binId}/singer")
+    public ApiResponse<InventoryWarehouseResponse> getByBin(@PathVariable String binId) {
+        return ApiResponse.<InventoryWarehouseResponse>builder()
+                .Result(inventoryWarehouseService.getByBin(binId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
 
     /**
      * Lấy thông tin inventory warehouse theo ID
