@@ -60,6 +60,11 @@ public class InventoryWarehouseServiceImpl implements InventoryWarehouseService 
     }
 
     @Override
+    public InventoryWarehouseResponse getByBin(String bin) {
+        return enrich(inventoryWarehouseRepo.findByBinAndIsDeleted(bin,false));
+    }
+
+    @Override
     public List<InventoryWarehouseResponse> getAllByProduct(String product) {
         return inventoryWarehouseRepo.findAllByProductAndIsDeleted(product, false)
                 .stream().map(this::enrich).collect(Collectors.toList());

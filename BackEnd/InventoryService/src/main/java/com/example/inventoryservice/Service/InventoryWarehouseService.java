@@ -15,6 +15,7 @@ import java.util.List;
 public interface InventoryWarehouseService {
     Page<InventoryWarehouseResponse> getAllByWarehouse(Pageable pageable, String warehouse);
     List<InventoryWarehouseResponse> getAllByBin(String bin);
+    InventoryWarehouseResponse getByBin(String bin);
     List<InventoryWarehouseResponse> getAllByProduct(String product);
     InventoryWarehouse getById(String id);
     InventoryWarehouseResponse getByIdResponse(String id);
