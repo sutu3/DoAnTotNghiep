@@ -244,7 +244,7 @@ public class ImportItemServiceImpl implements ImportItemService {
             StockMovementRequest stockMovementRequest = new StockMovementRequest(
                     inventoryResponse.getResult().getInventoryWarehouseId(), // Sử dụng ID từ response
                     item.getProduct().getProductId(),
-                    "IMPORT",
+                    "Import",
                     item.getRealityQuantity(),
                     orderResponse.getImportOrderId(),
                     item.getCreateByUser().getUserId(), // Thêm user thực hiện

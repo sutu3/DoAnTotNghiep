@@ -4,6 +4,7 @@ package com.example.order.Client.Inventory.Dto.Response;
 import com.example.order.Client.ProductService.Dto.Response.ProductResponse;
 import com.example.order.Client.WarehouseService.Dto.Responses.Bin.BinResponse;
 import com.example.order.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class InventoryWarehouseResponse {
     String inventoryWarehouseId;
     String product;
