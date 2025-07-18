@@ -1,15 +1,22 @@
 package com.example.order.Utils;
 
+import com.example.order.Dto.Response.Exporttem.ExportItemResponse;
+import com.example.order.Module.ExportItem;
 import com.example.order.Module.ExportOrder;
 import com.example.order.Module.ImportOrder;
 import com.example.order.Repo.ExportOrderRepo;
 import com.example.order.Repo.ImportOrderRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class UpdateOrderTotalPrice {
     private final ImportOrderRepo importOrderRepo;
     private final ExportOrderRepo exportOrderRepo;
@@ -24,13 +31,17 @@ public class UpdateOrderTotalPrice {
         importOrder.setTotalPrice(totalPrice);
         importOrderRepo.save(importOrder);
     }
-    public void updateTotalPriceExport(ExportOrder exportOrder) {
-        BigDecimal totalPrice = exportOrder.getExportItems().stream()
+    public void updateTotalPriceExport(ExportOrder exportOrder, List<ExportItemResponse> newItems) {
+        BigDecimal existingTotal = exportOrder.getExportItems().stream()
                 .filter(item -> !item.getIsDeleted())
                 .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        exportOrder.setTotalAmount(totalPrice);
+        BigDecimal newItemsTotal = newItems.stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        exportOrder.setTotalAmount(existingTotal.add(newItemsTotal));
         exportOrderRepo.save(exportOrder);
     }
 }

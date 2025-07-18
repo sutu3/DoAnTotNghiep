@@ -159,8 +159,7 @@ public class ExportOrderController {
     @PutMapping("/{orderId}/status")
     public ApiResponse<ExportOrderResponse> updateStatus(
             @PathVariable String orderId,
-            @RequestBody StatusForm statusForm,
-            @PathVariable String userId
+            @RequestBody StatusForm statusForm
     ) {
         ExportOrderStatus status = ExportOrderStatus.valueOf(statusForm.status());
         return ApiResponse.<ExportOrderResponse>builder()
