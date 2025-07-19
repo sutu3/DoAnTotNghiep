@@ -16,6 +16,7 @@ public interface InventoryProductMapper {
     @Mapping(target = "lastImportDate", ignore = true)
     @Mapping(target = "lastExportDate", ignore = true)
     @Mapping(target = "inventoryWarehouses", ignore = true)
+    @Mapping(target = "status",ignore = true)
     InventoryProduct toEntity(InventoryProductRequest request);
 
     // Convert entity to response (ignore related objects - will be populated separately)

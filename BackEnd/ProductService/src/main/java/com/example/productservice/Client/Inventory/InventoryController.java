@@ -16,14 +16,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(
         name = "Inventory",
         url = "https://inventoryservice-0kl2.onrender.com/api",
+        //url = "http://localhost:8081/api",
         fallback = InventoryFallbacks.class,
         configuration = {AuthenticationRequestInterceptor.class, FeignConfiguration.class}
 )
 public interface InventoryController {
-    @PostMapping("/inventory/warehouses")
+    @PostMapping(value = "/inventory/warehouses", consumes = "application/json")
     ApiResponse<InventoryWarehouseResponse> createInventoryWarehouse(@RequestBody InventoryWarehouseRequest request);
-    @PostMapping("/inventory/movements")
+    @PostMapping(value = "/inventory/movements", consumes = "application/json")
     ApiResponse<StockMovementResponse> createStockMovement(@RequestBody StockMovementRequest request);
-    @PostMapping("/inventory/products")
+    @PostMapping(value = "/inventory/products", consumes = "application/json")
     void createInventoryProduct(@RequestBody InventoryProductRequest request);
 }

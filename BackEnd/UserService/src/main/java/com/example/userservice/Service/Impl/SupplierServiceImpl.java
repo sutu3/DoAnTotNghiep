@@ -61,6 +61,7 @@ public class SupplierServiceImpl implements SupplierService {
                 supplierRequest.email(),
                 supplierRequest.warehouses(),
                 supplierRequest.phoneNumber());
+        var idUser=GetCurrentUserId.getCurrentUserId();
         if(existing.isPresent()){
             Supplier supplier=existing.get();
             if(!supplier.getIsDeleted()){

@@ -94,12 +94,17 @@ public class UnitServiceImpl implements UnitService {
             }
             unitMapper.updateEntity(unit,request);
             unit.setIsDefault(false);
+            unit.setRatioToBase(request.RatioToBase());
             unit.setGroupUnit(groupUnit);
+            unit.setCreateByUser(idUser);
             UnitResponse unitResponse=unitMapper.toResponse(unitRepo.save(unit));
             return unitMapper.updateCreateByUser(unitResponse,userResponse);        }
         Unit unit=unitMapper.toEntity(request);
+        unit.setRatioToBase(request.RatioToBase());
         unit.setIsDeleted(false);
+        unit.setIsDefault(false);
         unit.setGroupUnit(groupUnit);
+        unit.setCreateByUser(idUser);
         UnitResponse unitResponse=unitMapper.toResponse(unitRepo.save(unit));
         return unitMapper.updateCreateByUser(unitResponse,userResponse);
     }
