@@ -6,6 +6,7 @@ import com.example.inventoryservice.Client.WarehouseService.Dto.Responses.Wareho
 import com.example.inventoryservice.Client.WarehouseService.Redis.WarehouseController;
 import com.example.inventoryservice.Dtos.Request.InventoryProductRequest;
 import com.example.inventoryservice.Dtos.Response.InventoryProductResponse;
+import com.example.inventoryservice.Enum.InventoryStatus;
 import com.example.inventoryservice.Exception.AppException;
 import com.example.inventoryservice.Exception.ErrorCode;
 import com.example.inventoryservice.Form.InventoryProductForm;
@@ -85,6 +86,7 @@ public class InventoryProductServiceImpl implements InventoryProductService {
         }
 
         InventoryProduct inventoryProduct = inventoryProductMapper.toEntity(request);
+        inventoryProduct.setStatus(InventoryStatus.valueOf(request.status().toUpperCase()));
         inventoryProduct.setIsDeleted(false);
         InventoryProduct savedProduct = inventoryProductRepo.save(inventoryProduct);
 

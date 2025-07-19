@@ -112,7 +112,7 @@ public class ProductServiceImpl implements ProductService {
                     0,
                     request.minStockLevel(),
                     request.maxStockLevel(),
-                    "ACTIVE");
+                    "Active");
             inventoryController.createInventoryProduct(inventoryProductRequest);
             return  enrich(productSave);
         }
