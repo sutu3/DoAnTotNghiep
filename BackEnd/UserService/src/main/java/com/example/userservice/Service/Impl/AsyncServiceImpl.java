@@ -2,7 +2,7 @@ package com.example.userservice.Service.Impl;
 
 
 import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
-import com.example.userservice.Client.WarehouseService.WarehouseController;
+import com.example.userservice.Client.WarehouseService.Redis.WarehouseController;
 import com.example.userservice.Service.AsyncService;
 import com.example.userservice.Util.TokenContextHolder;
 import lombok.AccessLevel;

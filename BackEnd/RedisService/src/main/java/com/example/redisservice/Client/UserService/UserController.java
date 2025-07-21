@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
         name = "User",
-        url = "https://userservice-kuug.onrender.com/api",
-        //url = "http://localhost:8083/api",
+        //url = "https://userservice-kuug.onrender.com/api",
+        url = "http://localhost:8081/api",
         fallback = UserServiceFallback.class,
         configuration = {AuthenticationRequestInterceptor.class, FeignConfiguration.class}
 )
 public interface UserController {
-    @GetMapping("/users/{id}")
+    @GetMapping(value = "/users/{id}",consumes="application/json")
     ApiResponse<UserResponse> getUser(@PathVariable String id);
-    @GetMapping("/suppliers/{id}")
+    @GetMapping(value = "/suppliers/{id}",consumes = "application/json")
     ApiResponse<SupplierResponse> getSupplier(@PathVariable String id);}

@@ -7,9 +7,15 @@ import com.example.productservice.Client.Inventory.Dto.Resquest.InventoryProduct
 import com.example.productservice.Client.Inventory.Dto.Resquest.InventoryWarehouseRequest;
 import com.example.productservice.Client.Inventory.Dto.Resquest.StockMovementRequest;
 import com.example.productservice.Client.Inventory.InventoryController;
+import com.example.productservice.Dto.Requests.ProductClientRequest;
+import com.example.productservice.Dto.Requests.ProductFilterRequest;
 import com.example.productservice.Dto.Responses.ApiResponse;
+import com.example.productservice.Dto.Responses.Product.ProductResponse;
 import com.example.productservice.Exception.AppException;
 import com.example.productservice.Exception.ErrorCode;
+import com.example.productservice.Model.Product;
+
+import java.util.List;
 
 public class InventoryFallbacks implements InventoryController {
 
@@ -27,4 +33,11 @@ public class InventoryFallbacks implements InventoryController {
     public void createInventoryProduct(InventoryProductRequest request) {
         throw new AppException(ErrorCode.INVENTORY_SERVICE_NOT_WORKING);
     }
+
+    @Override
+    public ApiResponse<List<ProductClientRequest>> filterProductsByWarehouse(ProductFilterRequest request) {
+        throw new AppException(ErrorCode.INVENTORY_SERVICE_NOT_WORKING);
+    }
+
+
 }

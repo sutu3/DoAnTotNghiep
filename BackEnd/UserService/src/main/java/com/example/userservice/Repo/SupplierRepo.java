@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface SupplierRepo extends JpaRepository<Supplier,String>, JpaSpecificationExecutor<Supplier> {
-    Optional<Supplier> findAllByEmailAndWarehousesAndPhoneNumber(String email, String warehouses, String phoneNumber);
-    List<Supplier> findAllByWarehousesAndIsDeleted(String warehouse, boolean deleted);
-    Page<Supplier> findAllByWarehousesAndIsDeleted(String warehouse,boolean deleted, Pageable pageable);
+    Optional<Supplier> findAllByEmailAndPhoneNumber(String email,  String phoneNumber);
+    List<Supplier> findAllByIsDeleted(boolean deleted);
+    Page<Supplier> findAllByIsDeleted(boolean deleted, Pageable pageable);
 }

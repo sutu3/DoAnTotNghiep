@@ -39,12 +39,16 @@ public class StackBinOrchestratorService {
         List<BinResponseNoWarehouse> bins = new ArrayList<>();
         if (stackRequest.binQuantity() > 0) {
             for (int i = 1; i <= stackRequest.binQuantity(); i++) {
+                // Sanitize trước
                 String sanitizedStackName = stackRequest.stackName()
                         .toUpperCase()
-                        .replaceAll("[^A-Z0-9]", "")
-                        .substring(0, Math.min(10, stackRequest.stackName().length()));
+                        .replaceAll("[^A-Z0-9]", "");
 
-                String binCode = String.format("%s-BIN-%03d", sanitizedStackName, i);
+                // Fix lỗi substring bằng cách cắt theo độ dài của chuỗi đã sanitize
+                String trimmedName = sanitizedStackName.substring(0, Math.min(10, sanitizedStackName.length()));
+
+                String binCode = String.format("%s-BIN-%03d", trimmedName, i);
+
                 BinRequest bin = BinRequest.builder()
                         .binCode(binCode)
                         .capacity(1)
@@ -55,14 +59,15 @@ public class StackBinOrchestratorService {
             }
         }
 
-        // B3: Lấy lại Stack từ DB
+        // Lấy lại Stack từ DB
         Stacks fullStack = stackService.getById(stackCreated.getStackId());
 
-        // B4: Map sang response và set danh sách bin
+        // Map sang response và set danh sách bin
         StackResponse response = stackMapper.toResponse(fullStack);
         response.setBin(bins);
         return response;
     }
+
     public StackResponse getStackByBinId(String binId) {
         Bins bin = binService.getById(binId);
 

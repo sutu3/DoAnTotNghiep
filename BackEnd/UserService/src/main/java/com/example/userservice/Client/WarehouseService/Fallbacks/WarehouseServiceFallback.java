@@ -1,7 +1,7 @@
 package com.example.userservice.Client.WarehouseService.Fallbacks;
 
 import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
-import com.example.userservice.Client.WarehouseService.WarehouseController;
+import com.example.userservice.Client.WarehouseService.Redis.WarehouseController;
 import com.example.userservice.Dto.Responses.ApiResponse;
 import com.example.userservice.Exception.AppException;
 import com.example.userservice.Exception.ErrorCode;

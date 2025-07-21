@@ -12,7 +12,6 @@ public record ProductRequest(
         BigDecimal price,
         String urlImageProduct,
         String supplier,
-        String warehouses,
         String category,
         String unit,
         Integer minStockLevel,

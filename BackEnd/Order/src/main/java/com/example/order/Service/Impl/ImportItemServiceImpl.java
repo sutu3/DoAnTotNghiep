@@ -86,8 +86,10 @@ public class ImportItemServiceImpl implements ImportItemService {
 
     @Override
     public ImportResponseItem createItem(ImportRequestItem requestItem) {
+        var idUser=GetCurrentUserId.getCurrentUserId();
         ImportOrder importOrder= importOrderService.getById(requestItem.importOrder());
         ImportItem importItem=importItemMapper.toEntity(requestItem);
+        importItem.setCreateByUser(idUser);
         importItem.setExpiredDate(DateUtils.parseToLocalDateTime(requestItem.expiredDate()).get());
         importItem.setImportOrder(importOrder);
         importItem.setIsDeleted(false);

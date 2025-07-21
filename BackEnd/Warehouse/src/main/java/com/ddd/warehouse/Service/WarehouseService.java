@@ -9,10 +9,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public interface WarehouseService {
     Page<WarehousesResponse> getAll(Pageable pageable);
+    List<WarehousesResponse> getAllList();
     WarehousesResponse getByManagerId(String managerId);
+    WarehousesResponse getByStaffId();
     Warehouses getById(String warehouseId);
     Boolean exsistByManagerId(String managerId);
     WarehousesResponse getByIdResponse(String warehouseId);

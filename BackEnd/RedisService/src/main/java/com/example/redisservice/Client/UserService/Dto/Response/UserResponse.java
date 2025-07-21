@@ -1,5 +1,6 @@
 package com.example.redisservice.Client.UserService.Dto.Response;
 
+import com.example.redisservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -21,4 +22,5 @@ public class UserResponse {
     String email;
     String urlImage;
     String phoneNumber;
+    WarehousesResponse warehouses;
 }

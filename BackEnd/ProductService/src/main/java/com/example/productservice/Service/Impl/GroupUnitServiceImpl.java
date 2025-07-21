@@ -73,6 +73,7 @@ public class GroupUnitServiceImpl implements GroupUnitService {
         }
         GroupUnit groupUnit=groupUnitMapper.toEntity(request);
         groupUnit.setIsDeleted(false);
+        groupUnit.setCreateByUser(idUser);
         GroupUnitResponse groupUnitResponse=groupUnitMapper
                 .toResponse(groupUnitRepo.save(groupUnit));
         return groupUnitMapper.updateCreateByUser(groupUnitResponse,userResponse);

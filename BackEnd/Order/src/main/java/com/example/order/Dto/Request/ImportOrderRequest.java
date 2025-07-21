@@ -4,7 +4,6 @@ import lombok.Builder;
 
 public record ImportOrderRequest(
         String warehouse,
-        String createByUser,
         String note
         ) {
 }

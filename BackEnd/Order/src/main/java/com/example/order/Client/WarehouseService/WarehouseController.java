@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(
         name = "Warehouse",
-        url = "https://doantotnghiep-r5ta.onrender.com/api/cache",
+        //url = "https://doantotnghiep-r5ta.onrender.com/api/cache",
+        url = "http://localhost:8087/api/cache",
         fallback = WarehouseServiceFallback.class,
         configuration = {AuthenticationRequestInterceptor.class, FeignConfiguration.class}
 )

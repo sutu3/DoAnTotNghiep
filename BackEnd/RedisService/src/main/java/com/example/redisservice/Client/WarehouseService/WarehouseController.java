@@ -18,7 +18,8 @@ import java.util.List;
 
 @FeignClient(
         name = "Warehouse",
-        url = "https://doantotnghiep-pb6y.onrender.com/api",
+        //url = "https://doantotnghiep-pb6y.onrender.com/api",
+        url = "http://localhost:8082/api",
         fallback = WarehouseServiceFallback.class,
         configuration = {AuthenticationRequestInterceptor.class, FeignConfiguration.class}
 )

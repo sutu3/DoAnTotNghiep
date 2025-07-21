@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
         name = "Product",
-        url = "https://productservice-8qdv.onrender.com/api",
+        //url = "https://productservice-8qdv.onrender.com/api",
+        url = "http://localhost:8083/api",
         fallback = ProductServiceFallback.class,
         configuration = {AuthenticationRequestInterceptor.class, FeignConfiguration.class}
 )

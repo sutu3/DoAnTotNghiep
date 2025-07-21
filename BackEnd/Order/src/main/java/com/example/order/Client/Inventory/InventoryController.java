@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
         name = "Inventory",
-        url = "https://inventoryservice-0kl2.onrender.com/api",
-        //url = "http://localhost:8081/api",
+        //url = "https://inventoryservice-0kl2.onrender.com/api",
+        url = "http://localhost:8086/api",
         fallback = InventoryFallbacks.class,
         configuration = {
                 AuthenticationRequestInterceptor.class,

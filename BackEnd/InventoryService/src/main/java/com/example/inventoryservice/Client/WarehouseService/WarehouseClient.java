@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "warehouse-service", url = "https://doantotnghiep-pb6y.onrender.com"
+@FeignClient(name = "warehouse-service",
+        //url = "https://doantotnghiep-pb6y.onrender.com"
+        url = "http://localhost:8082"
         ,fallback = WarehouseServiceFallbackClient.class,
         configuration = {AuthenticationRequestInterceptor.class, FeignConfiguration.class}
 )

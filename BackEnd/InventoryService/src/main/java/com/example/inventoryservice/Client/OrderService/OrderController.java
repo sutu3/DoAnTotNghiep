@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 
 @FeignClient(name = "order-service",
-        url = "https://orderservice-3u1b.onrender.com",
+        //url = "https://orderservice-3u1b.onrender.com",
+        url = "http://localhost:8085",
         fallback = OrderServiceFallback.class,
         configuration = {AuthenticationRequestInterceptor.class, FeignConfiguration.class}
 )

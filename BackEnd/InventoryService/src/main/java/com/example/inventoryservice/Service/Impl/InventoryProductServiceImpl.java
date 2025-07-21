@@ -1,5 +1,6 @@
 package com.example.inventoryservice.Service.Impl;
 
+import com.example.inventoryservice.Client.ProductService.Dto.Response.Product.ProductClientRequest;
 import com.example.inventoryservice.Client.ProductService.Dto.Response.ProductResponse;
 import com.example.inventoryservice.Client.ProductService.Redis.ProductController;
 import com.example.inventoryservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
@@ -50,6 +51,18 @@ public class InventoryProductServiceImpl implements InventoryProductService {
     public InventoryProduct getById(String id) {
         return inventoryProductRepo.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.INVENTORY_PRODUCT_NOT_FOUND));
+    }
+
+    @Override
+    public List<ProductClientRequest> getFilterProductByWarehouse(String warehouse, List<ProductClientRequest> products) {
+        List<String> idProductByWarehouse = inventoryProductRepo.findAllListIdProduct(warehouse);
+
+        if (idProductByWarehouse != null && !idProductByWarehouse.isEmpty()) {
+            return products.stream()
+                    .filter(productClient -> idProductByWarehouse.contains(productClient.getProductId()))
+                    .toList();
+        }
+        return null;
     }
 
     @Override
