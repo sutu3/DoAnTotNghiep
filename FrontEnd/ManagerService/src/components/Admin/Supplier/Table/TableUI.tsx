@@ -5,7 +5,7 @@ import {
     DropdownMenu,
     DropdownTrigger,
     Input,
-    Pagination,
+    Pagination, Spinner,
     Table,
     TableBody,
     TableCell,
@@ -19,7 +19,7 @@ import {SupplierSelector, TotalPageSelector, TotalPageUnit} from "@/Store/Select
 import {columns, Supplier} from "@/Store/SupplierSlice.tsx";
 import RenderTable, {Props} from "@/components/Admin/Supplier/Table/RenderTable.tsx";
 import {useNavigate} from "react-router-dom";
-import {useCallback, useMemo, useState} from "react";
+import React, {useCallback, useMemo, useState} from "react";
 
 
 export const statusOptions = [
@@ -42,10 +42,11 @@ const INITIAL_VISIBLE_COLUMNS = [
     "createdAt","action"
 ];
 interface Pros{
+    loading: boolean;
     setOpen: (open: boolean) => void;
     open: boolean;
 }
-const TableUI=({setOpen,open}:Pros)=> {
+const TableUI=({loading,setOpen,open}:Pros)=> {
     const object = useSelector(SupplierSelector);
     const navigate = useNavigate(); // ✅ tạo hàm navigate từ hook
     const [filterValue, setFilterValue] = useState("");
@@ -301,7 +302,10 @@ const TableUI=({setOpen,open}:Pros)=> {
                     </TableColumn>
                 )}
             </TableHeader>
-            <TableBody emptyContent={"No object found"} items={sortedItems}>
+            <TableBody  className="bg-white dark:bg-gray-900 text-gray-800 dark:text-white"
+                        isLoading={loading}
+                        loadingContent={<Spinner label="Loading..." />}
+                         emptyContent={"No object found"} items={sortedItems}>
                 {(item: Supplier) => (
                     <TableRow key={item.supplierId}>
                         {(columnKey) => <TableCell>

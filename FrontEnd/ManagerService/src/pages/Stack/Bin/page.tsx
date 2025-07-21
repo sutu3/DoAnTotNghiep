@@ -1,65 +1,128 @@
-import { useState } from "react";
-import {Input} from "@heroui/input";
-import {Card} from "@heroui/react";
-import {useSearchParams} from "react-router-dom";
-import {useSelector} from "react-redux";
-import {StacksSelector} from "@/Store/Selector.tsx";
-import {StackType} from "@/Store/StackSlice.tsx";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import { StacksSelector } from "@/Store/Selector.tsx";
+import { StackType } from "@/Store/StackSlice.tsx";
+import {PageHeader} from "@/components/Admin/Bin/PageHeader.tsx";
+import {StackInfo} from "@/components/Admin/Bin/StackInfor.tsx";
+import {BinGrid} from "@/components/Admin/Bin/BinGrid.tsx";
+import {ProductList} from "@/components/Admin/Bin/ProductList.tsx";
+import {updateStack} from "@/Store/Thunk/StackThunk.tsx";
 
 export default function StackDetailPage() {
-    const [searchParams]=useSearchParams()
+    const [searchParams] = useSearchParams();
     const stackId = searchParams.get("stackId");
-    const StackDisplay=useSelector(StacksSelector).find((el)=>el.stackId===stackId);
-    console.log(StackDisplay)
-    const [stackInfo, setStackInfo] = useState<StackType>(StackDisplay);
+    const stackDisplay = useSelector(StacksSelector).find((el: { stackId: string | null; }) => el.stackId == stackId);
 
+    const [stackInfo, setStackInfo] = useState<StackType | null>(stackDisplay || null);
+    const [selectedBinId, setSelectedBinId] = useState<string>("");
+    const [isEditing, setIsEditing] = useState(false);
+    const [originalStackInfo, setOriginalStackInfo] = useState<StackType | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const dispatch = useDispatch();
+    // Set default selected bin to first bin
+    useEffect(() => {
+        if (stackInfo?.bin && stackInfo.bin.length > 0 && !selectedBinId) {
+            setSelectedBinId(stackInfo.bin[0].binId);
+        }
+    }, [stackInfo, selectedBinId]);
 
-    const handleChange = (key, value) => {
-        setStackInfo((prev) => ({ ...prev, [key]: value }));
+    const handleStackChange = (key: string, value: string) => {
+        if (!isEditing) return;
+        setStackInfo((prev) => prev ? { ...prev, [key]: value } : null);
     };
 
-    return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 sm:p-2 lg:p-4 grid grid-cols-10 gap-6">
-            {/* LEFT SIDE: Stack Info & Bins */}
-            <div className="col-span-4 dark:bg-gray-800 p-1 flex flex-col gap-3 rounded-xl">
-                <Card className="p-6">
-                    <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Stack Information</h2>
-                    <div className="space-y-4">
-                        <Input
-                            label="Stack Name"
-                            value={stackInfo.stackName}
-                            onChange={(e) => handleChange("stackName", e.target.value)}
-                        />
-                        <Input
-                            label="Description"
-                            value={stackInfo.description}
-                            onChange={(e) => handleChange("description", e.target.value)}
-                        />
-                    </div>
-                </Card>
+    const handleBinSelect = (binId: string) => {
+        setSelectedBinId(binId);
+    };
 
-                <Card className="p-6">
-                    <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Bin Layout</h2>
-                    <div className="grid grid-cols-4 gap-4">
-                        {stackInfo?.bin?.map((bin) => (
-                            <div
-                                key={bin?.binId}
-                                className={`w-14 h-14 rounded-md cursor-pointer ${
-                                    bin.status !== "EMPTY" ? "bg-yellow-400" : "bg-yellow-100"
-                                }`}
-                            ></div>
-                        ))}
-                    </div>
-                    <div className="mt-4 text-sm text-gray-500">
-                        <span className="inline-block w-4 h-4 bg-yellow-400 rounded mr-2"></span> Full Bin
-                        <span className="inline-block w-4 h-4 bg-yellow-100 rounded ml-4 mr-2"></span> Empty Bin
-                    </div>
-                </Card>
+    const handleToggleEdit = () => {
+        if (!isEditing) {
+            setOriginalStackInfo(stackInfo);
+        }
+        setIsEditing(!isEditing);
+    };
+
+    const handleSave = async () => {
+        try {
+            // TODO: Implement API call to save stack changes
+            const fetch=async ()=>{
+                setLoading(true)
+                console.log("Saving stack changes:", stackInfo);
+                (dispatch as any)(updateStack({
+                    stackName: stackInfo?.stackName||"",
+                    description: stackInfo?.description||"",
+                    stackId: stackInfo?.stackId||""
+                }));
+                setLoading(true)
+                setIsEditing(false);
+                setOriginalStackInfo(null);
+            }
+            fetch()
+        } catch (error) {
+            console.error("Error saving stack:", error);
+        }
+    };
+
+    const handleCancel = () => {
+        setStackInfo(originalStackInfo);
+        setIsEditing(false);
+        setOriginalStackInfo(null);
+    };
+
+    const selectedBin = stackInfo?.bin?.find(bin => bin.binId === selectedBinId);
+
+    if (!stackInfo) {
+        return (
+            <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+                <div className="text-center">
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
+                        Stack not found
+                    </h2>
+                    <p className="text-gray-500 dark:text-gray-400">
+                        The requested stack could not be found.
+                    </p>
+                </div>
             </div>
+        );
+    }
 
-            {/* RIGHT SIDE: Empty */}
-            <div className="col-span-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
-                {/* Reserved for future content */}
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+            <div className="max-w-7xl mx-auto p-4 lg:p-6">
+                <PageHeader
+                    loading={loading}
+                    stackName={stackInfo.stackName}
+                    isEditing={isEditing}
+                    onToggleEdit={handleToggleEdit}
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                />
+
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    {/* LEFT SIDE: Stack Info & Bins */}
+                    <div className="lg:col-span-2 space-y-6">
+                        <StackInfo
+                            stack={stackInfo}
+                            onStackChange={handleStackChange}
+                            isEditable={isEditing}
+                        />
+
+                        <BinGrid
+                            bins={stackInfo.bin || []}
+                            selectedBinId={selectedBinId}
+                            onBinSelect={handleBinSelect}
+                        />
+                    </div>
+
+                    {/* RIGHT SIDE: Product List */}
+                    <div className="lg:col-span-3">
+                        <ProductList
+                            selectedBinId={selectedBinId}
+                            binCode={selectedBin?.binCode}
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     );

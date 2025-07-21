@@ -7,7 +7,7 @@ export interface Bin {
   binCode: string;
   capacity: number;
   currentOccupancy: number;
-  status?: "EMPTY"|"FULL"| "MAINTENANCE"
+  status?: "EMPTY"|"FULL"| "MAINTENANCE"|"AVAILABLE"
   createdAt: string;
   updatedAt: string;
   isDeleted: boolean;

@@ -1,7 +1,7 @@
 import TableUI from "@/components/UI/Table/TableUI.tsx";
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 import {useEffect, useState} from "react";
-import {pageApi} from "@/Constants/UrlApi.tsx";
+import {pageApi} from "@/Api/UrlApi.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {columns, MiddleAddTask, MiddleGetAllTask, Task, TaskCreated} from "@/Store/TaskSlice.tsx";
 import { useSearchParams} from "react-router-dom";

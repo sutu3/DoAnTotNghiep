@@ -1,7 +1,7 @@
 import {Select, SelectItem} from "@heroui/react";
 import {useEffect, useState} from "react";
 import {fetchApi} from "@/Api/FetchApi.tsx";
-import {API_ROUTES} from "@/Constants/UrlApi.tsx";
+import {API_ROUTES} from "@/Api/UrlApi.tsx";
 import {useSelector} from "react-redux";
 import {warehouseSelector} from "@/Store/Selector.tsx";
 import {ProductCreate, useProductStore} from "@/zustand/Product.tsx";
@@ -26,7 +26,7 @@ const SupplierSelect = ({formData,setFormData}: Props) => {
                 url: API_ROUTES.user
                     .supplier(null)
                     .search()
-                    .byWarehouseId(warehouse)
+                    .byWarehouseId()
                     .getAllName,
             });
             setListSupplier(SupplierList.result);
@@ -38,7 +38,7 @@ const SupplierSelect = ({formData,setFormData}: Props) => {
         <Select
             aria-labelledby="Input"
             label="Supplier"
-            selectedKeys={[formData.supplier]}
+            selectedKeys={[formData?.supplier]}
             onSelectionChange={(keys) => {
                 const selectedId = Array.from(keys)[0].toString();
                 const selectedUnit = listSupplier.find(supplier => supplier.supplierId === selectedId);

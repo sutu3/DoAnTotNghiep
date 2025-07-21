@@ -1,6 +1,6 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {callApiThunk} from "@/Store/Store.tsx";
-import {API_ROUTES, pageApi} from "@/Constants/UrlApi.tsx";
+import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {initToTalPage, setAddUnit, setUnitList, UnitCreate} from "@/Store/Unit.tsx";
 
@@ -18,11 +18,9 @@ export const AddUnit = createAsyncThunk(
         )
 );
 export const MiddleAddUnit = (unitCreate:UnitCreate) => {
-    return async function (dispatch: any,getState: any) {
+    return async function (dispatch: any) {
         try {
-            const {user}= getState().user;
-            const userId= user?.userId;
-            const action = await dispatch(AddUnit({ payload:{...unitCreate,createByUser:userId,IsDefault:false} }));
+            const action = await dispatch(AddUnit({ payload:{...unitCreate,IsDefault:false} }));
             dispatch(setAddUnit(action.payload.result));
         } catch (error: any) {
             showToast({

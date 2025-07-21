@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import  { useState } from "react";
 import { useSelector } from "react-redux";
 import {
   Card,
@@ -14,6 +14,7 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { StacksSelector } from "@/Store/Selector.tsx";
+import {useNavigate} from "react-router-dom";
 
 interface DashboardStats {
   totalOrders: number;
@@ -26,9 +27,10 @@ interface DashboardStats {
   warehouseCapacity: number;
 }
 
-export default function WarehousePage() {
+export default function Daskboard() {
   const stacks = useSelector(StacksSelector);
   const [timeFilter, setTimeFilter] = useState("today");
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats>({
     totalOrders: 3432,
     pendingOrders: 156,
@@ -41,10 +43,13 @@ export default function WarehousePage() {
   });
 
   const quickActions = [
-    { label: "Tạo đơn nhập", icon: "mdi:package-down", color: "success", path: "/admin/import/create" },
-    { label: "Tạo đơn xuất", icon: "mdi:package-up", color: "warning", path: "/admin/export/create" },
+    { label: "Tạo đơn nhập", icon: "mdi:package-down", color: "success", path: "/staff/request-import" },
+    { label: "Tạo đơn xuất", icon: "mdi:package-up", color: "warning", path: "/staff/request-export" },
     { label: "Kiểm kê kho", icon: "mdi:clipboard-list", color: "primary", path: "/admin/inventory/check" },
-    { label: "Quản lý bin", icon: "mdi:grid", color: "secondary", path: "/admin/locations" }
+    { label: "Quản lý bin", icon: "mdi:grid", color: "secondary", path: "/admin/locations" },
+    { label: "Nhập hàng vào kho", icon: "mdi:package-variant", color: "primary", path: "/staff/import"},
+    { label: "Xuất hàng khỏi kho", icon: "mdi:package-variant-remove", color: "danger", path: "/staff/export"},
+
   ];
 
   const recentActivities = [
@@ -192,6 +197,10 @@ export default function WarehousePage() {
                         variant="flat"
                         color={action.color as any}
                         className="h-20 flex-col gap-2"
+                        onClick={()=>{
+                          navigate(action.path)
+                        }}
+
                         startContent={<Icon icon={action.icon} className="text-2xl" />}
                     >
                       {action.label}

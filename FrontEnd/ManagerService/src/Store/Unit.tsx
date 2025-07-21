@@ -33,7 +33,6 @@ export interface UnitCreate{
     RatioToBase: number,
     IsDefault: boolean,
     groupUnit: string,
-    createByUser: string
 }
 export interface UnitState {
     unitList: Unit[];
@@ -49,7 +48,6 @@ const initialState:UnitState = {
         RatioToBase: 0,
         IsDefault: false,
         groupUnit: "",
-        createByUser: ""
 
     },
 };

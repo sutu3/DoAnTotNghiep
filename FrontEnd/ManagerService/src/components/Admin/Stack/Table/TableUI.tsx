@@ -20,7 +20,7 @@ import {
     StacksSelector,
     TotalPageProduct, TotalPageStack,
 } from "@/Store/Selector.tsx";
-import {pageApi} from "@/Constants/UrlApi.tsx";
+import {pageApi} from "@/Api/UrlApi.tsx";
 import RenderTable, {Props} from "@/components/Admin/Stack/Table/RenderTable.tsx";
 import {MiddleGetAllStack} from "@/Store/Thunk/StackThunk.tsx";
 import {columns, StackType} from "@/Store/StackSlice.tsx";

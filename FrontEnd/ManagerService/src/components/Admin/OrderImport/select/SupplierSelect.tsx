@@ -25,8 +25,8 @@ export const SupplierSelect = ({ formData, setFormData}:SelectProps) => {
         placeholder="Chọn nhà cung cấp"
         selectedKeys={formData?.supplier ? [formData.supplier] : []}
         onSelectionChange={(keys) => {
-            const supplierId = Array.from(keys)[0]?.toString();
-            const supplier = suppliers.find((p: { supplierId: string; }) => p.supplierId === supplierId);
+            const supplierId = Array?.from(keys)[0]?.toString();
+            const supplier = suppliers?.find((p: { supplierId: string; }) => p.supplierId === supplierId)||[];
             if (supplier) setFormData((prev: any) => ({
                 ...prev,
                 supplier: supplierId,

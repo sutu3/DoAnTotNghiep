@@ -1,38 +1,70 @@
-import {Select, SelectItem} from "@heroui/react";
-import {OrderRequestImportCreate} from "@/Store/ImportOrder.tsx";
-import {useSelector} from "react-redux";
-import {warehouseSelector} from "@/Store/Selector.tsx";
-import {useEffect} from "react";
-import {Warehouse} from "@/Store/WarehouseSlice.tsx";
+import { Select, SelectItem } from "@heroui/react";
+import { OrderRequestImportCreate } from "@/Store/ImportOrder.tsx";
+import { useDispatch, useSelector } from "react-redux";
+import { warehouseListSelector } from "@/Store/Selector.tsx";
+import React, { useEffect } from "react";
+import { Warehouse } from "@/Store/WarehouseSlice.tsx";
+import { MiddleGetWarehouseByUser } from "@/Store/Thunk/WarehouseThunk.tsx";
+import { pageApi } from "@/Api/UrlApi.tsx";
+import { Building2 } from "lucide-react";
 
 interface SelectProps {
     formData: OrderRequestImportCreate;
     setFormData: (formData: (prev: any) => any) => void;
 }
 
-const SelectWarehouse = ({formData, setFormData}: SelectProps) => {
-    const defaultWarehouse:Warehouse = useSelector(warehouseSelector);
-
-
-    // Set mặc định warehouse vào formData khi component mount hoặc warehouse thay đổi
+const SelectWarehouse = ({ formData, setFormData }: SelectProps) => {
+    const defaultWarehouse: Warehouse[] = useSelector(warehouseListSelector);
+    const dispatch = useDispatch();
+    // Gọi API lấy danh sách kho
     useEffect(() => {
-        if (defaultWarehouse && !formData.warehouse) {
-            setFormData((prev: any) => ({...prev, warehouse: defaultWarehouse?.warehouseId}));
+        const fetch = async () => {
+            const page: pageApi = { pageNumber: 0, pageSize: 10 };
+            await (dispatch as any)(MiddleGetWarehouseByUser(page));
+        };
+        fetch();
+    }, [dispatch]);
+
+    // Gán kho mặc định sau khi fetch xong
+    useEffect(() => {
+        if (defaultWarehouse.length > 0 && !formData.warehouse) {
+            setFormData((prev: any) => ({
+                ...prev,
+                warehouse: defaultWarehouse[0].warehouseId,
+            }));
         }
     }, [defaultWarehouse, formData.warehouse, setFormData]);
+
+    // Xử lý khi user chọn kho khác
+    const handleSelectionChange = (keys: any) => {
+        const selectedId = Array.from(keys)[0]?.toString();
+        if (selectedId) {
+            setFormData((prev: any) => ({
+                ...prev,
+                warehouse: selectedId,
+            }));
+        }
+    };
 
     return (
         <Select
             label="Kho hàng"
             placeholder="Chọn kho"
             selectedKeys={formData.warehouse ? [formData.warehouse] : []}
-            isDisabled // Khóa dropdown - không cho chọn
+            onSelectionChange={handleSelectionChange}
         >
-            {defaultWarehouse && (
-                <SelectItem key={defaultWarehouse.warehouseId}>
-                    {defaultWarehouse.warehouseName}
+            {defaultWarehouse?.map((warehouse) => (
+                <SelectItem
+                    key={warehouse.warehouseId}
+                    value={warehouse.warehouseId}
+                    textValue={warehouse.warehouseName}
+                >
+                    <div className="flex items-center gap-2">
+                        <Building2 className="w-4 h-4 text-blue-600" />
+                        <span>{warehouse.warehouseName}</span>
+                    </div>
                 </SelectItem>
-            )}
+            ))}
         </Select>
     );
 };

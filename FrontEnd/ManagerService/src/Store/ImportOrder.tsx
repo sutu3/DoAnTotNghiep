@@ -19,6 +19,7 @@ export interface ImportItemCreate {
     costUnitBase: number;
     note?: string;
     expiryDate?: string;
+
 }
 export interface ImportOrderItem {
     itemId: string;
@@ -56,7 +57,6 @@ export interface ImportOrder {
 }
 export interface OrderRequestImportCreate {
     warehouse: string;
-    createByUser: string;
     note: string;
 }
 interface OrderImportState{

@@ -89,7 +89,6 @@ export default function AdminImportOrderManagement() {
                         </p>
                     </div>
                 </div>
-
                 <ImportOrderTable
                     searchValue={searchValue}
                     setSearchValue={setSearchValue}

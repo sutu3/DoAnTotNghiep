@@ -1,19 +1,15 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {callApiThunk} from "@/Store/Store.tsx";
-import {API_ROUTES, pageApi} from "@/Constants/UrlApi.tsx";
+import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {
     ImportItemCreate, ImportOrderItem,
     initToTalPage,
     OrderRequestImportCreate,
     setOrderImportItemList,
-    setOrderImportList, setRemoveOrderByOrderId, setUpdateOrderImport
+    setOrderImportList, setUpdateOrderImport
 } from "@/Store/ImportOrder.tsx";
 import {ImportOrderRequest, mapImportItemToRequest} from "@/Utils/mapImportItemToRequest .tsx";
-import {InventoryWarehouseCreate} from "@/Store/InventoryWarehouseSlice.tsx";
-import {AddInventoryWarehouse} from "@/Store/Thunk/InventoryWarehouseThunk.tsx";
-import {StockMovement, StockMovementCreate} from "@/Store/StockMovementSlice.tsx";
-import {AddStockMovement} from "@/Store/Thunk/StockMovementThunk.tsx";
 
 export const AddItemOrderBatch = createAsyncThunk(
     "importOrder/AddItemOrderBatch",
@@ -42,21 +38,19 @@ export const AddOrder = createAsyncThunk(
         )
 );
 
-export const MiddleAddOrder = (orderImport:OrderRequestImportCreate, items:ImportItemCreate[]) => {
-    return async function (dispatch: any,getState: any) {
+export const MiddleAddOrderImport = (orderImport:OrderRequestImportCreate, items:ImportItemCreate[]) => {
+    return async function (dispatch: any) {
         try {
 
-            const {user}= getState().users;
-            const userId= user?.userId;
             const note=`Staff: `+orderImport.note
             const action = await dispatch(
                 AddOrder({ payload: {
-                        ...orderImport, createByUser: userId,note:note
+                        ...orderImport,note:note
                     }
                 }));
             const orderId=action.payload.result.importOrderId;
             const ListItem: ImportOrderRequest[] = items?.map((el) =>
-                mapImportItemToRequest(el, orderImport.warehouse, orderId, userId)
+                mapImportItemToRequest(el, orderImport.warehouse, orderId)
             );
             await dispatch(AddItemOrderBatch({ payload: ListItem }));
             showToast({
@@ -125,45 +119,20 @@ export const RejectOrderItemByOrderId = createAsyncThunk(
             rejectWithValue
         )
 );
-export const ChangeStatusOrderItemByOrderId = createAsyncThunk(
-    "importOrder/ChangeStatusOrderItemByOrderId",
+export const ImportOrderItemForOrder = createAsyncThunk(
+    "importOrder/ImportOrderItemForOrder",
     async (
-        { orderId,status }: { orderId: string,status:string|null },
+        { orderId,items }: { orderId: string,items: ImportOrderItem[]},
         { rejectWithValue }
     ) =>
         await callApiThunk(
-            "PUT",
-            API_ROUTES.order.importOrder(null).changeStatus(orderId).ChangeStatus,
-            {status:status},
+            "POST",
+            API_ROUTES.order.orderItems(null).AddItemForOrder(orderId).byOrderId,
+            items,
             rejectWithValue
         )
 );
-export const ChangeQuantityOrderItemByOrderId = createAsyncThunk(
-    "importOrder/ChangeStatusOrderItemByOrderId",
-    async (
-        { orderId,realityQuantity }: { orderId: string,realityQuantity:number },
-        { rejectWithValue }
-    ) =>
-        await callApiThunk(
-            "PUT",
-            API_ROUTES.order.orderItems(null).updateItem(orderId).byQuantity,
-            {realityQuantity:realityQuantity},
-            rejectWithValue
-        )
-);
-export const ChangeBinOrderItemByOrderId = createAsyncThunk(
-    "importOrder/ChangeBinOrderItemByOrderId",
-    async (
-        { orderId,bin }: { orderId: string,bin:string|undefined },
-        { rejectWithValue }
-    ) =>
-        await callApiThunk(
-            "PUT",
-            API_ROUTES.order.orderItems(null).updateItem(orderId).byBin,
-            {binId:bin},
-            rejectWithValue
-        )
-);
+
 export const GetAllOrderByStatus = createAsyncThunk(
     "importOrder/GetAllOrderByStatus",
     async (
@@ -172,7 +141,7 @@ export const GetAllOrderByStatus = createAsyncThunk(
     ) =>
         await callApiThunk(
             "GET",
-            API_ROUTES.order.importOrder(page).search().byWarehouseId(warehouseId,status).getAll,
+            API_ROUTES.order.importOrder(page).search().byWarehouseId(warehouseId,status).byStatus,
             null,
             rejectWithValue
         )
@@ -191,12 +160,10 @@ export const MiddleGetAllOrderItem = (orderId:string) => {
         }
     };
 };
-export const MiddleGetAllOrderByStatus = (status:string,page:pageApi) => {
-    return async function (dispatch: any,getState: any) {
+export const MiddleGetAllImportOrderByStatus = (warehouse:string,status:string, page:pageApi) => {
+    return async function (dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-            const action = await dispatch(GetAllOrderByStatus({ page,warehouseId,status }));
+            const action = await dispatch(GetAllOrderByStatus({ page,warehouseId:warehouse,status }));
             const orderId=action?.payload?.result?.content[0]?.importOrderId
             if(orderId){
                 const action2 = await dispatch(GetAllOrderItemByOrderId({ orderId }));
@@ -236,44 +203,23 @@ export const MiddleChangeTypeOrderItem = (orderId:string,access:boolean,note:str
         }
     };
 };
-export const MiddleImportOrder = (orderId:string,ListOrderItem:ImportOrderItem[]) => {
-    return async function (dispatch: any,getState:any) {
+export const MiddleImportOrder = (orderId: string, ListOrderItem: ImportOrderItem[]) => {
+    return async function (dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-            const {user}= getState().user;
-            const userId= user?.userId;
-            await dispatch(ChangeStatusOrderItemByOrderId({status: "Done", orderId }));
-            dispatch(setRemoveOrderByOrderId(orderId));
+            console.log(ListOrderItem)
+             await dispatch(ImportOrderItemForOrder({orderId,items:ListOrderItem}));
 
-            for (const el of ListOrderItem) {
-                await dispatch(ChangeQuantityOrderItemByOrderId({ orderId, realityQuantity: el.realityQuantity }));
-                await dispatch(ChangeBinOrderItemByOrderId({ orderId, bin: el.bin?.binId }));
-                const baseInventoryWarehouse: InventoryWarehouseCreate = {
-                    product: el.product.productId,
-                    bin: el?.bin?.binId,
-                    quantity: el.realityQuantity,
-                    expiryDate: el.expiryDate,
-                    warehouse: warehouseId,
-                    status: "AVAILABLE",
-                };
-                const action=await dispatch(AddInventoryWarehouse({payload:baseInventoryWarehouse }));
-                const baseInventoryMovement: StockMovementCreate = {
-                    inventoryWarehouseId: action.payload.result.inventoryWarehouseId,
-                    product: el.product.productId,
-                    movementType: "IMPORT",
-                    quantity: el.realityQuantity,
-                    referenceOrderId: orderId,
-                    performedBy: userId,
-                    note: "",
-                    unitCost: el.costUnitBase
-                };
-                await dispatch(AddStockMovement({payload:baseInventoryMovement }));
-            }
+            // Final success notification
+            showToast({
+                title: "Import Complete",
+                description: `Successfully imported ${ListOrderItem.length} items to warehouse`,
+                color: "success",
+            })
+
         } catch (error: any) {
             showToast({
-                title: "Error",
-                description: `Message: ${error.message || error}`,
+                title: "Import Failed",
+                description: `Import process failed: ${error.message || error}`,
                 color: "danger",
             });
         }

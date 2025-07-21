@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     Table,
     TableHeader,
@@ -6,173 +6,294 @@ import {
     TableBody,
     TableRow,
     TableCell,
+    Button,
+    Pagination,
+    Chip,
+    Tooltip,
+    Progress, Spinner
 } from "@heroui/react";
+import {
+    Eye,
+} from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { StacksSelector, TotalPageStack } from "@/Store/Selector.tsx";
+import { MiddleGetAllStack } from "@/Store/Thunk/StackThunk.tsx";
+import StackSlice, {StackCreate, StackType} from "@/Store/StackSlice.tsx";
+import { pageApi } from "@/Api/UrlApi.tsx";
+import {useNavigate} from "react-router-dom";
 
-import RenderCell from "@/components/UI/Table/RenderTable.tsx";
-import BottomContent from "@/components/UI/Table/BottomContent.tsx";
-import TopContent from "@/components/UI/Table/TopContent.tsx";
-import { TableClassNames } from "@/components/UI/Table/TableCss.tsx";
-import { User } from "@/types";
-import { StackType } from "@/Store/StackSlice.tsx";
-import {Task} from "@/Store/TaskSlice.tsx";
-import {GroupUnit} from "@/Store/GroupUnit.tsx";
-
-interface DataObject {
-    id: number | string;
-    [key: string]: any;
+interface StackTableProps {
+    data:StackCreate,
+    onStackSelect: (stackId: string) => void;
+    onAddNew: () => void;
+    selectedStackId?: string;
 }
 
-interface Column {
-    uid: keyof DataObject | "actions";
-    name: string;
-    sortable?: boolean;
-}
+const columns = [
+    { name: "Stack Name", uid: "stackName", sortable: true },
+    { name: "Description", uid: "description", sortable: false },
+    { name: "Warehouse", uid: "warehouse", sortable: true },
+    { name: "Bin Status", uid: "binStatus", sortable: false },
+    { name: "Created Date", uid: "createdAt", sortable: true },
+    { name: "Actions", uid: "actions", sortable: false }
+];
 
-interface TableProductProps {
-    isDarkMode: boolean;
-    visibleColumn: string[];
-    objects: DataObject[] | User[] | StackType[]|Task[]|GroupUnit[];
-    columns: Column[];
-    onGetId: (item: string) => void;
-    getId: (item: DataObject | User | StackType|Task|GroupUnit) => string;
-    onchange?: (data: any) => void;
-    pageNumber: number;
-    pageSize: number;
-    totalPage: number;
-
-    onPageChange: (page: number) => void;
-}
-
-const TableUI: React.FC<TableProductProps> = ({
-                                                  isDarkMode,
-                                                  objects,
-                                                  columns,
-                                                  onGetId,
-                                                  visibleColumn,
-                                                  getId,
-                                                  totalPage,
-                                                  pageNumber,
-                                                  onPageChange,
-                                                  onchange,
-                                              }) => {
-    const [filterValue, setFilterValue] = React.useState("");
-    const [selectedKeys, setSelectedKeys] = React.useState<Set<number | string>>(
-        new Set(),
-    );
-    const [visibleColumns, setVisibleColumns] = React.useState<Set<string>>(
-        new Set(visibleColumn),
-    );
-    const [statusFilter, setStatusFilter] = React.useState("all");
-    // const [rowsPerPage, setRowsPerPage] = React.useState(pageSize);
-    const [sortDescriptor, setSortDescriptor] = React.useState<{
-        column: string;
-        direction: "ascending" | "descending";
-    }>({
-        column: "id",
-        direction: "ascending",
+export const StackTable: React.FC<StackTableProps> = ({
+    data,
+                                                          onStackSelect,
+                                                          selectedStackId
+                                                      }) => {
+    const dispatch = useDispatch();
+    const stacks = useSelector(StacksSelector);
+    const totalPages = useSelector(TotalPageStack);
+    const navigate = useNavigate();
+    const [filterValue, setFilterValue] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [sortDescriptor, setSortDescriptor] = useState({
+        column: "stackName",
+        direction: "ascending" as "ascending" | "descending"
     });
 
-    // console.log(totalPage);
-    const pages = totalPage;
-    const hasSearchFilter = Boolean(filterValue);
+    // Fetch data when page changes
+    
+    useEffect(() => {
+        setLoading(true);
+        const fetch=async()=>{
+            dispatch(StackSlice.actions.setStackList([]))
+            const pageApi: pageApi = {
+                pageNumber: page - 1,
+                pageSize: rowsPerPage
+            };
+            if(data.warehouse.length!=0){
+                await dispatch(MiddleGetAllStack(pageApi,data.warehouse) as any);
+                setLoading(false)
+            }
+        }
+        fetch()
 
-    const headerColumns = React.useMemo(() => {
-        if (visibleColumns.has("all")) return columns;
+    }, [page, rowsPerPage, dispatch,data?.warehouse]);
 
-        return columns.filter((column) =>
-            visibleColumns.has(column.uid.toString()),
+    // Filter and sort data
+    const filteredItems = useMemo(() => {
+        let filtered = [...stacks];
+
+        if (filterValue) {
+            filtered = filtered.filter(stack =>
+                stack.stackName.toLowerCase().includes(filterValue.toLowerCase()) ||
+                stack.description?.toLowerCase().includes(filterValue.toLowerCase()) ||
+                stack.warehouse?.warehouseName?.toLowerCase().includes(filterValue.toLowerCase())
+            );
+        }
+
+        return filtered;
+    }, [stacks, filterValue]);
+
+    const sortedItems = useMemo(() => {
+        return [...filteredItems].sort((a, b) => {
+            const first = a[sortDescriptor.column as keyof StackType];
+            const second = b[sortDescriptor.column as keyof StackType];
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [filteredItems, sortDescriptor]);
+
+    // Render cell content
+    const renderCell = (stack: StackType, columnKey: string) => {
+        switch (columnKey) {
+            case "stackName":
+                return (
+                    <div className="flex flex-col">
+                        <p className="text-bold text-sm capitalize text-default-900">
+                            {stack.stackName}
+                        </p>
+                        <p className="text-bold text-sm capitalize text-default-500">
+                            ID: {stack.stackId.slice(0, 8)}...
+                        </p>
+                    </div>
+                );
+
+            case "description":
+                return (
+                    <Tooltip content={stack.description}>
+                        <p className="text-sm text-default-600 max-w-[200px] truncate">
+                            {stack.description || "No description"}
+                        </p>
+                    </Tooltip>
+                );
+
+            case "warehouse":
+                return (
+                    <Chip
+                        className="capitalize"
+                        color="primary"
+                        size="sm"
+                        variant="flat"
+                    >
+                        {stack.warehouse?.warehouseName || "N/A"}
+                    </Chip>
+                );
+
+            case "binStatus":
+                const totalBins = stack.bin?.length || 0;
+                const emptyBins = stack.bin?.filter(b => b.status === "EMPTY").length || 0;
+                const fullBins = stack.bin?.filter(b => b.status === "FULL").length || 0;
+                const maintenanceBins = stack.bin?.filter(b => b.status === "MAINTENANCE").length || 0;
+                const usagePercent = totalBins > 0 ? Math.round(((totalBins - emptyBins) / totalBins) * 100) : 0;
+
+                return (
+                    <div className="flex flex-col gap-2 min-w-[120px]">
+                        <div className="flex gap-1">
+                            <Chip size="sm" color="success" variant="dot">
+                                {emptyBins} Empty
+                            </Chip>
+                            <Chip size="sm" color="warning" variant="dot">
+                                {fullBins} Full
+                            </Chip>
+                            {maintenanceBins > 0 && (
+                                <Chip size="sm" color="danger" variant="dot">
+                                    {maintenanceBins} Maintenance
+                                </Chip>
+                            )}
+                        </div>
+                        <Progress
+                            size="sm"
+                            value={usagePercent}
+                            color={usagePercent > 80 ? "danger" : usagePercent > 50 ? "warning" : "success"}
+                            className="max-w-md"
+                        />
+                        <p className="text-xs text-default-500">
+                            {usagePercent}% utilized ({totalBins} total bins)
+                        </p>
+                    </div>
+                );
+
+            case "createdAt":
+                return (
+                    <div className="flex flex-col">
+                        <p className="text-sm">
+                            {stack.createdAt
+                                ? new Date(stack.createdAt).toLocaleDateString("vi-VN")
+                                : "N/A"
+                            }
+                        </p>
+                        <p className="text-xs text-default-500">
+                            {stack.createdAt
+                                ? new Date(stack.createdAt).toLocaleTimeString("vi-VN", {
+                                    hour: "2-digit",
+                                    minute: "2-digit"
+                                })
+                                : ""
+                            }
+                        </p>
+                    </div>
+                );
+
+            case "actions":
+                return (
+                    <div className="relative flex items-center gap-2">
+                        <Tooltip content="View details">
+                            <Button
+                                isIconOnly
+                                size="sm"
+                                variant="light"
+                                onClick={()=>{
+                                    navigate(`/admin/locations/stack?stackId=${stack.stackId}`)
+                                }}
+                            >
+                                <Eye className="w-4 h-4" />
+                            </Button>
+                        </Tooltip>
+                    </div>
+                );
+
+            default:
+                return <span>{stack[columnKey as keyof StackType] as string}</span>;
+        }
+    };
+
+  //  Bottom content with pagination
+    const bottomContent = useMemo(() => {
+        return (
+            <div className="py-2 px-2 flex justify-between items-center">
+                <Pagination
+                    isCompact
+                    showControls
+                    showShadow
+                    color="primary"
+                    page={page}
+                    total={totalPages}
+                    onChange={setPage}
+                />
+                <span className="w-[30%] text-small text-default-400">
+          Showing {((page - 1) * rowsPerPage) + 1} to {Math.min(page * rowsPerPage, stacks.length)} of {stacks.length} entries
+        </span>
+            </div>
         );
-    }, [visibleColumns, columns]);
-
-    const tableClassNames = TableClassNames({ isDarkMode });
-
-    const onRowsPerPageChange = React.useCallback(
-        (_e: React.ChangeEvent<HTMLSelectElement>) => {
-            // setRowsPerPage(Number(e.target.value)); // Currently not used
-            onPageChange(1);
-        },
-        [onPageChange],
-    );
-
-    const onSearchChange = React.useCallback((value: string) => {
-        setFilterValue(value);
-        onPageChange(1);
-    }, []);
+    }, [page, totalPages, rowsPerPage, stacks.length]);
 
     return (
         <Table
-
-            isCompact
-            removeWrapper
-            aria-label="Custom table with cells, pagination and sorting"
-            bottomContent={
-                <BottomContent
-                    hasSearchFilter={hasSearchFilter}
-                    itemsLength={0}
-                    page={pageNumber}
-                    pages={pages}
-                    selectedKeys={selectedKeys}
-                    setPage={(p) => onPageChange(p)}
-                />
-            }
+            aria-label="Stack management table"
+            isHeaderSticky
+            bottomContent={bottomContent}
             bottomContentPlacement="outside"
-            classNames={tableClassNames}
-            selectionMode="multiple"
+            classNames={{
+                wrapper: "max-h-[600px]",
+            }}
+            selectedKeys={selectedStackId ? [selectedStackId] : []}
+            selectionMode="single"
             sortDescriptor={sortDescriptor}
-            topContent={
-                <TopContent
-                    columns={columns}
-                    filterValue={filterValue}
-                    hasSearchFilter={hasSearchFilter}
-                    onchange={onchange}
-                    setFilterValue={setFilterValue}
-                    setStatusFilter={setStatusFilter}
-                    setVisibleColumns={setVisibleColumns}
-                    statusFilter={statusFilter}
-                    usersLength={objects.length}
-                    visibleColumns={visibleColumns}
-                    onRowsPerPageChange={onRowsPerPageChange}
-                    onSearchChange={onSearchChange}
-                />
-            }
+             //topContent={topContent}
             topContentPlacement="outside"
-            onRowAction={(key) => onGetId(String(key))}
             onSelectionChange={(keys) => {
-                setSelectedKeys(new Set(Array.from(keys as Set<string | number>)));
+                const selectedKey = Array.from(keys)[0] as string;
+                if (selectedKey) {
+                    onStackSelect(selectedKey);
+                }
             }}
             onSortChange={(descriptor) => {
                 setSortDescriptor({
-                    column: String(descriptor.column),
-                    direction: descriptor.direction as "ascending" | "descending",
+                    column: descriptor.column as string,
+                    direction: descriptor.direction as "ascending" | "descending"
                 });
             }}
         >
-            <TableHeader columns={headerColumns}>
+            <TableHeader columns={columns}>
                 {(column) => (
                     <TableColumn
-                        key={column.uid.toString()}
+                        key={column.uid}
                         align={column.uid === "actions" ? "center" : "start"}
-                        allowsSorting={!!column.sortable}
+                        allowsSorting={column.sortable}
                     >
                         {column.name}
                     </TableColumn>
                 )}
             </TableHeader>
-            <TableBody className={"bg-white dark:bg-gray-900 text-gray-800 dark:text-white"} emptyContent="No data found" items={objects}>
-                {(item) => {
-                    return (
-                        <TableRow key={getId(item)}>
-                            {(columnKey) => (
-                                <TableCell onClick={() => onGetId(getId(item))}>
-                                    {RenderCell(item, columnKey.toString())}
-                                </TableCell>
-                            )}
-                        </TableRow>
-                    );
-                }}
+            <TableBody
+                className="bg-white dark:bg-gray-900 text-gray-800 dark:text-white"
+                isLoading={loading}
+                loadingContent={<Spinner label="Loading..." />}
+                emptyContent="No stacks found"
+                items={sortedItems}
+            >
+                {(item) => (
+                    <TableRow
+                        key={item.stackId}
+                        className="hover:bg-default-100 cursor-pointer"
+                    >
+                        {(columnKey) => (
+                            <TableCell>
+                                {renderCell(item, columnKey as string)}
+                            </TableCell>
+                        )}
+                    </TableRow>
+                )}
             </TableBody>
         </Table>
     );
 };
 
-export default TableUI;
+export default StackTable;

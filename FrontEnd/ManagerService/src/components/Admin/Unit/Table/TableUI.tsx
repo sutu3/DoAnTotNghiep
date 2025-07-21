@@ -6,7 +6,7 @@ import {
     DropdownMenu,
     DropdownTrigger,
     Input,
-    Pagination,
+    Pagination, Spinner,
     Table,
     TableBody,
     TableCell,
@@ -17,7 +17,7 @@ import {
 import {ChevronDownIcon, SearchIcon} from "lucide-react";
 import {columns, GroupUnit} from "@/Store/GroupUnit.tsx";
 import {useSelector} from "react-redux";
-import {GroupUnitSelector, TotalPageGroupUnit, TotalPageUnit} from "@/Store/Selector.tsx";
+import {GroupUnitSelector, TotalPageGroupUnit} from "@/Store/Selector.tsx";
 import RenderTable, {Props} from "@/components/Admin/Unit/Table/RenderTable.tsx";
 import {useNavigate} from "react-router-dom";
 
@@ -43,7 +43,11 @@ const INITIAL_VISIBLE_COLUMNS = [
     "createByUser",
     "actions",
     "createdAt","action"
-];const TableUI=()=> {
+];
+interface GroupUnitProg{
+    loading:boolean
+}
+const TableUI=({loading}:GroupUnitProg)=> {
     const navigate = useNavigate();
     const object = useSelector(GroupUnitSelector);
     const [event, setEvent] = useState("");
@@ -294,7 +298,10 @@ const INITIAL_VISIBLE_COLUMNS = [
                     </TableColumn>
                 )}
             </TableHeader>
-            <TableBody emptyContent={"No object found"} items={sortedItems}>
+            <TableBody   className="bg-white dark:bg-gray-900 text-gray-800 dark:text-white"
+                         isLoading={loading}
+                         loadingContent={<Spinner label="Loading..." />}
+                         emptyContent={"No object found"} items={sortedItems}>
                 {(item: GroupUnit) => (
                     <TableRow key={item.groupUnitID}>
                         {(columnKey) => <TableCell>

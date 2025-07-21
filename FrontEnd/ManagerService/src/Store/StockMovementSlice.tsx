@@ -1,9 +1,10 @@
 import {createSlice} from "@reduxjs/toolkit";
+import {Product} from "@/Store/ProductSlice.tsx";
 
 export interface StockMovement {
     stockMovementId: string;
     inventoryWarehouseId: string;
-    product: string;
+    product: Product;
     movementType: "IMPORT" | "EXPORT" | "TRANSFER" | "ADJUSTMENT";
     quantity: number;
     quantityBefore: number;
