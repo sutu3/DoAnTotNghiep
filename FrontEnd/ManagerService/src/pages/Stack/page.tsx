@@ -1,116 +1,99 @@
-import {  useState } from "react";
-import { Layers } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-
-import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
-import StackSummaryPanel from "@/components/Admin/StackSummaryPanel.tsx";
-
-import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
-import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
-import StackForm from "@/components/Form/StackForm.tsx";
-import { StacksSelector } from "@/Store/Selector.tsx";
-import {MiddleAddStack} from "@/Store/Thunk/StackThunk.tsx";
+import {useDispatch, useSelector} from "react-redux";
+import {StacksSelector} from "@/Store/Selector.tsx";
+import {useState} from "react";
 import {StackCreate, StackType} from "@/Store/StackSlice.tsx";
-import TableUI from "@/components/Admin/Stack/Table/TableUI.tsx";
+import {MiddleAddStack} from "@/Store/Thunk/StackThunk.tsx";
+import {StackPageHeader} from "@/components/Admin/Stack/StackPageHeader.tsx";
+import {StackTableSection} from "@/components/Admin/Stack/StackTableSection.tsx";
+import {StackSummarySection} from "@/components/Admin/Stack/StackSummarySection.tsx";
+import {AddStackModal} from "@/components/Admin/Stack/Modal/AddStackModal.tsx";
+import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 
 export default function StackPage() {
   const stacks = useSelector(StacksSelector);
-
-  // console.log(totalPageStack);
   const dispatch = useDispatch();
-  const [selectedStack, setSelectedStack] = useState<StackType>(stacks[0]);
+
+  const [selectedStack, setSelectedStack] = useState<StackType | null>(stacks[0] || null);
   const [formState, setFormState] = useState<StackCreate>({
     binQuantity: 0,
     description: "",
     stackName: "",
     warehouse: ""
-  })
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleChange = (key: string, value: string) => {
-    setFormState((prev) => ({ ...prev, [key]: value }));
-  };
-  const isSidebarCollapsed = localStorage.getItem("theme") == "light";
-
-  const handleOpenModel = () => {
-    setIsOpen(!isOpen);
-  };
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleAddStack = async () => {
-    setLoading(true);  // Bắt đầu loading
-    await (dispatch as any)(MiddleAddStack(formState));
+  const isSidebarCollapsed = localStorage.getItem("theme") === "light";
 
-    setIsOpen(false);
-    setFormState({ binQuantity: 0, stackName: "", description: "", warehouse: "" });
-
-    setTimeout(() => {
-      setLoading(false);  // Kết thúc loading sau 1 giây
-    }, 1000);
+  const handleFormChange = (key: string, value: string|number) => {
+    setFormState((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleStackClick = (stackId: string) => {
-    const found = stacks.find((s: any) => s.stackId === stackId);
-
+    const found = stacks.find((s: StackType) => s.stackId === stackId);
     if (found) setSelectedStack(found);
   };
 
+  const handleAddStack = async () => {
+    setLoading(true);
+    try {
+      if(formState.stackName.length>3&&formState.description.length>5){
+        await (dispatch as any)(MiddleAddStack(formState));
+        setIsModalOpen(false);
+        setFormState({
+          binQuantity: 0,
+          stackName: "",
+          description: "",
+          warehouse: ""
+        });
+      }
+      else{
+        showToast({
+          title: "Invalid Input",
+          description: "Stack name must be > 3 characters and description > 5 characters.",
+          color: "danger",
+        });
+      }
+
+    } catch (error) {
+      console.error("Error adding stack:", error);
+    } finally {
+      setTimeout(() => setLoading(false), 1000);
+    }
+  };
+  console.log(formState.warehouse)
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 sm:p-2 lg:p-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header + Breadcrumb */}
-        <div className="mb-6 md:mb-8 flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
-          <BreadcrumbsUI isDarkMode={isSidebarCollapsed} />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="max-w-7xl mx-auto p-4 lg:p-6">
+          <StackPageHeader isDarkMode={isSidebarCollapsed} />
 
-          <div className="sm:text-right">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">
-              Stack Page
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Manage and monitor stacks.
-            </p>
-          </div>
-        </div>
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            <div className="xl:col-span-3">
+              <StackTableSection
+                  data={formState}
+                  onChange={handleFormChange}
+                  selectedStack={selectedStack}
+                  onStackClick={handleStackClick}
+                  onOpenModal={() => setIsModalOpen(true)}
+                  isModalOpen={isModalOpen}
+              />
+            </div>
 
-        {/* Grid 2 cột */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* LEFT: Table */}
-          <div className="md:col-span-2">
-            <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
-                  Stack List
-                </h2>
-              </div>
-
-              <div className="p-0 md:p-4">
-                <TableUI setKey={handleStackClick} key={selectedStack?.stackId} open={isOpen} setOpen={handleOpenModel}/>
-              </div>
+            <div className="xl:col-span-1">
+              <StackSummarySection selectedStack={selectedStack} />
             </div>
           </div>
 
-          {/* RIGHT: Chart + Summary */}
-          <div>
-            <StackSummaryPanel  stack={selectedStack} />
-          </div>
+          <AddStackModal
+              warehouse={formState.warehouse}
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              formState={formState}
+              onFormChange={handleFormChange}
+              onSubmit={handleAddStack}
+              loading={loading}
+          />
         </div>
       </div>
-
-      <ModalUI
-        footer={
-          <ButtonUI
-              className={"bg-gradient-to-tr from-green-500 to-green-300 text-green-100 shadow-lg"}
-              label={"Add Stack"}
-              loading={loading}
-              startContent={<Layers/>}
-              onClick={handleAddStack} variant={undefined}          />
-        }
-        isOpen={isOpen}
-        title="Thêm Mới nhân viên"
-        onOpenChange={setIsOpen}
-      >
-        <StackForm data={formState} onChange={handleChange} />
-      </ModalUI>
-    </div>
   );
 }

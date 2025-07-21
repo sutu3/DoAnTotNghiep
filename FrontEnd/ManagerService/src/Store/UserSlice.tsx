@@ -1,4 +1,5 @@
 import { createSlice} from "@reduxjs/toolkit";
+import {Warehouse} from "@/types";
 
 
 export const columns = [
@@ -20,6 +21,7 @@ export interface User {
   phoneNumber: string;
   status: "Active" | "InActive";
   taskUsers: [];
+  warehouses: Warehouse;
 }
 export interface UserCreate {
   userName: string;
@@ -47,6 +49,15 @@ const initialState:UserState = {
     phoneNumber: "",
     status: "Active",
     taskUsers: [],
+    warehouses: {
+      warehouseId: "",
+      warehouseName: "",
+      address: "",
+      street: "",
+      district: "",
+      country: "",
+      managerId: ""
+    }
   },
 };
 const UserSlice = createSlice({

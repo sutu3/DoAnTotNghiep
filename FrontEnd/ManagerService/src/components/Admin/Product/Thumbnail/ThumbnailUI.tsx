@@ -3,7 +3,6 @@ import {Card, Tooltip} from "@heroui/react";
 import { Badge } from "@heroui/react";
 import { Skeleton } from "@heroui/react";
 import { useProductStore } from "@/zustand/Product.tsx";
-import React from "react"; // Kiểm tra lại đường dẫn chính xác
 
 const ProductThumbnail = () => {
     const { product } = useProductStore();

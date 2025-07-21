@@ -1,164 +1,122 @@
 "use client";
 
-import  { useState, useEffect } from "react";
+import {useEffect, useState} from "react";
 import {
     Button,
     Input,
-    Select,
-    SelectItem,
     Textarea,
     Card,
     CardBody,
     CardHeader,
-    Table,
-    TableHeader,
-    TableColumn,
-    TableBody,
-    TableRow,
-    TableCell,
-    Chip,
     Divider,
-    DatePicker
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import {Product} from "@/Store/ProductSlice.tsx";
-import {Supplier} from "@/Store/SupplierSlice.tsx";
+import {ProductSelect} from "@/components/Admin/OrderExport/select/ProductSelect.tsx";
+import ExportOrderSlice, {ExportItemCreateUI, OrderRequestExportCreate} from "@/Store/ExportOrderSlice.tsx";
+import {SupplierSelect} from "@/components/Admin/OrderExport/select/SupplierSelect.tsx";
+import {useDispatch, useSelector} from "react-redux";
+import {ExportItemCreateSelector} from "@/Store/Selector.tsx";
+import TableUI from "@/components/Admin/OrderExport/Table/TableUI.tsx";
+import SelectBinLocation from "@/components/Admin/OrderExport/select/SelectWarehouse.tsx";
+import {BatchNumber} from "@/components/Admin/OrderExport/select/BatchNumber.tsx";
+import {MiddleAddOrderImport} from "@/Store/Thunk/ImportOrderThunk.tsx";
+import {MiddleAddOrderExport} from "@/Store/Thunk/ExportOrderThunk.tsx";
+import OrderExportSlice from "@/Store/ExportOrderSlice.tsx";
 
-interface ExportItem {
-    itemId: string;
-    product: string;
-    productName: string;
-    unit: string;
-    unitName: string;
-    binLocation?: string;
-    quantity: number;
-    unitPrice: number;
-    batchNumber?: string;
-    availableQuantity: number;
-}
 
-interface CreateExportOrder {
-    warehouse: string;
-    createByUser: string;
-    customer?: string;
-    description: string;
-    deliveryDate?: string;
-    items: ExportItem[];
-}
 
 export default function CreateExportOrderPage() {
-    const [formData, setFormData] = useState<CreateExportOrder>({
+    const dispatch = useDispatch();
+    const items=useSelector(ExportItemCreateSelector)
+    const [availableQuantity,setAvailableQuantity] = useState<number>(0)
+    const [formData, setFormData] = useState<OrderRequestExportCreate>({
         warehouse: "",
         createByUser: "",
         customer: "",
         description: "",
         deliveryDate: "",
-        items: []
     });
 
-    const [currentItem, setCurrentItem] = useState<ExportItem>({
+    const [currentItem, setCurrentItem] = useState<ExportItemCreateUI>({
+        batchNumber: "",
+        bin: "",
+        customer: "",
+        customerName: "",
         itemId: "",
+        note: "",
         product: "",
         productName: "",
+        requestQuantity: 0,
         unit: "",
         unitName: "",
-        quantity: 0,
-        unitPrice: 0,
-        availableQuantity: 0
+        unitPrice: 0
     });
-
-    const [products, setProducts] = useState<Product[]>([]);
-    const [customers, setCustomers] = useState<Supplier[]>([]);
-    const [units, setUnits] = useState([]);
+    useEffect(() => {
+        setFormData(prev=>({...prev,customer:currentItem.customer}));
+    }, [currentItem.customer]);
+    useEffect(() => {
+        setAvailableQuantity(0);
+    }, [currentItem.product]);
+    const generateBatchNumber = (productId: string, binId: string) => {
+        const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        const productCode = productId.substring(0, 6).toUpperCase();
+        const binCode = binId.substring(0, 3).toUpperCase();
+        return `EXP-${productCode}-${binCode}-${date}`;
+    };
+    useEffect(() => {
+        if (currentItem.product && currentItem.bin) {
+            const autoBatch = generateBatchNumber(currentItem.product, currentItem.bin);
+            setCurrentItem(prev => ({
+                ...prev,
+                batchNumber: autoBatch
+            }));
+        }
+    }, [currentItem.bin]);
     const [loading, setLoading] = useState(false);
 
-    // Sample data tương tự như pattern trong ProductForm
-    useEffect(() => {
-        const sampleProducts = [
-            {
-                productId: "prod-001-uuid-string",
-                productName: "Laptop Dell Inspiron 15",
-                availableQuantity: 25,
-                price: 15000000,
-                unit: { unitID: "unit-001", unitName: "Chiếc" }
-            },
-            {
-                productId: "prod-002-uuid-string",
-                productName: "Chuột không dây Logitech",
-                availableQuantity: 150,
-                price: 250000,
-                unit: { unitID: "unit-001", unitName: "Chiếc" }
-            },
-            {
-                productId: "prod-003-uuid-string",
-                productName: "Bàn phím cơ Keychron K2",
-                availableQuantity: 75,
-                price: 2500000,
-                unit: { unitID: "unit-001", unitName: "Chiếc" }
-            }
-        ];
-
-        const sampleCustomers = [
-            { supplierId: "cust-001", supplierName: "Công ty ABC" },
-            { supplierId: "cust-002", supplierName: "Công ty XYZ" },
-            { supplierId: "cust-003", supplierName: "Công ty DEF" }
-        ];
-
-        setProducts(sampleProducts);
-        setCustomers(sampleCustomers);
-    }, []);
-
     const handleAddItem = () => {
-        if (currentItem.product && currentItem.quantity > 0) {
-            const newItem = {
-                ...currentItem,
-                itemId: Date.now().toString()
-            };
-
-            setFormData(prev => ({
-                ...prev,
-                items: [...prev.items, newItem]
-            }));
-
+        if (currentItem.product && currentItem.requestQuantity > 0) {
+                dispatch(ExportOrderSlice.actions.setAddItemOrderCreate(currentItem));
             // Reset current item
             setCurrentItem({
+                batchNumber: "",
+                bin: "",
+                customer: currentItem.customer,
+                customerName: currentItem.customerName,
                 itemId: "",
+                note: "",
                 product: "",
                 productName: "",
+                requestQuantity: 0,
                 unit: "",
                 unitName: "",
-                quantity: 0,
-                unitPrice: 0,
-                availableQuantity: 0
+                unitPrice: 0
             });
         }
-    };
-
-    const handleRemoveItem = (itemId: string) => {
-        setFormData(prev => ({
-            ...prev,
-            items: prev.items.filter(item => item.itemId !== itemId)
-        }));
     };
 
     const handleSubmit = async () => {
         setLoading(true);
         try {
             // Submit export order logic
-            console.log("Creating export order:", formData);
+            await (dispatch as any)(MiddleAddOrderExport(formData,items));
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            dispatch(OrderExportSlice.actions.setCleanItemOrderCreate());
+            setFormData({createByUser: "", customer: "", deliveryDate: "", description: "", warehouse: ""})
             // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            alert("Đơn xuất hàng đã được tạo thành công!");
         } catch (error) {
             console.error("Error creating export order:", error);
         } finally {
             setLoading(false);
         }
     };
+    const handleBinSelect = (availableQty: number) => {
+        setAvailableQuantity(availableQty);
+    };
 
     const calculateTotal = () => {
-        return formData.items.reduce((total, item) =>
-            total + (item.quantity * item.unitPrice), 0
+        return items.reduce((total: number, item: { requestQuantity: number; unitPrice: number; }) =>
+            total + (item.requestQuantity * item.unitPrice), 0
         );
     };
 
@@ -183,39 +141,27 @@ export default function CreateExportOrderPage() {
                     <div className="lg:col-span-2 space-y-6">
                         {/* Order Information */}
                         <Card>
-                            <CardHeader>
+                            <CardHeader  aria-labelledby="Input">
                                 <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
                                     Thông Tin Đơn Xuất Hàng
                                 </h2>
                             </CardHeader>
                             <CardBody className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <Select
-                                        label="Khách hàng"
-                                        placeholder="Chọn khách hàng"
-                                        selectedKeys={formData.customer ? [formData.customer] : []}
-                                        onSelectionChange={(keys) => {
-                                            const customerId = Array.from(keys)[0]?.toString();
-                                            setFormData(prev => ({ ...prev, customer: customerId }));
-                                        }}
-                                    >
-                                        {customers.map((customer) => (
-                                            <SelectItem key={customer.supplierId}>
-                                                {customer.supplierName}
-                                            </SelectItem>
-                                        ))}
-                                    </Select>
+                                   <SupplierSelect formData={currentItem} setFormData={setCurrentItem}/>
 
-                                    {/*<DatePicker*/}
-                                    {/*    label="Ngày giao hàng"*/}
-                                    {/*    value={formData.deliveryDate}*/}
-                                    {/*    onChange={(date) =>*/}
-                                    {/*        setFormData(prev => ({ ...prev, deliveryDate: date }))*/}
-                                    {/*    }*/}
-                                    {/*/>*/}
+                                    <Input
+                                        aria-labelledby="Input"
+                                        type="date"
+                                        label="Ngày giao hàng"
+                                        value={formData.deliveryDate || ""}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, deliveryDate: e.target.value }))}
+                                    />
+
                                 </div>
 
                                 <Textarea
+                                    aria-labelledby="Input"
                                     label="Mô tả đơn hàng"
                                     placeholder="Nhập mô tả cho đơn xuất hàng..."
                                     value={formData.description}
@@ -228,54 +174,23 @@ export default function CreateExportOrderPage() {
 
                         {/* Add Item Form */}
                         <Card>
-                            <CardHeader>
+                            <CardHeader  aria-labelledby="Input">
                                 <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
                                     Thêm Sản Phẩm Xuất
                                 </h2>
                             </CardHeader>
                             <CardBody className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <Select
-                                        label="Sản phẩm"
-                                        placeholder="Chọn sản phẩm"
-                                        selectedKeys={currentItem.product ? [currentItem.product] : []}
-                                        onSelectionChange={(keys) => {
-                                            const productId = Array.from(keys)[0]?.toString();
-                                            const product = products.find(p => p.productId === productId);
-                                            if (product) {
-                                                setCurrentItem(prev => ({
-                                                    ...prev,
-                                                    product: productId,
-                                                    productName: product.productName,
-                                                    availableQuantity: product.availableQuantity,
-                                                    unit: product.unit.unitID,
-                                                    unitName: product.unit.unitName
-                                                }));
-                                            }
-                                        }}
-                                    >
-                                        {products.map((product) => (
-                                            <SelectItem key={product.productId}>
-                                                {product.productName} (Còn: {product.availableQuantity})
-                                            </SelectItem>
-                                        ))}
-                                    </Select>
-
-                                    <Input
-                                        type="number"
-                                        label="Số lượng xuất"
-                                        placeholder="0"
-                                        value={currentItem.quantity.toString()}
-                                        onValueChange={(value) =>
-                                            setCurrentItem(prev => ({
-                                                ...prev,
-                                                quantity: parseInt(value) || 0
-                                            }))
-                                        }
-                                        description={`Có sẵn: ${currentItem.availableQuantity} ${currentItem.unitName}`}
+                                    <ProductSelect formData={currentItem} setFormData={setCurrentItem}/>
+                                    <SelectBinLocation
+                                        formData={currentItem}
+                                        setFormData={setCurrentItem}
+                                        onBinSelect={handleBinSelect}
                                     />
 
+
                                     <Input
+                                        aria-labelledby="Input"
                                         type="number"
                                         label="Đơn giá (VNĐ)"
                                         placeholder="0"
@@ -288,104 +203,56 @@ export default function CreateExportOrderPage() {
                                         }
                                         isReadOnly
                                     />
-
                                     <Input
-                                        label="Vị trí bin"
-                                        placeholder="Nhập vị trí bin"
-                                        value={currentItem.binLocation || ""}
+                                        aria-labelledby="Input"
+                                        type="number"
+                                        label="Số lượng xuất"
+                                        placeholder="0"
+                                        disabled={availableQuantity==0}
+                                        value={currentItem.requestQuantity.toString()}
                                         onValueChange={(value) =>
                                             setCurrentItem(prev => ({
                                                 ...prev,
-                                                binLocation: value
+                                                requestQuantity: parseInt(value) || 0
                                             }))
                                         }
+                                        description={availableQuantity > 0 ? `Có sẵn: ${availableQuantity} ${currentItem.unitName}` : "Chọn bin để xem số lượng có sẵn"}
+                                        color={currentItem.requestQuantity > availableQuantity ? "danger" : "default"}
+                                        errorMessage={currentItem.requestQuantity > availableQuantity ? "Số lượng xuất vượt quá số lượng có sẵn" : ""}
                                     />
+                                    <BatchNumber formData={currentItem} setFormData={setCurrentItem}/>
                                 </div>
 
                                 <Button
+                                    aria-labelledby="Input"
                                     color="primary"
                                     startContent={<Icon icon="mdi:plus" />}
                                     onClick={handleAddItem}
                                     isDisabled={
                                         !currentItem.product ||
-                                        currentItem.quantity <= 0 ||
-                                        currentItem.quantity > currentItem.availableQuantity
+                                        currentItem.requestQuantity <= 0
                                     }
                                 >
                                     Thêm Sản Phẩm
                                 </Button>
                             </CardBody>
                         </Card>
-
-                        {/* Items List */}
-                        {formData.items.length > 0 && (
-                            <Card>
-                                <CardHeader>
-                                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-                                        Danh Sách Sản Phẩm Xuất ({formData.items.length})
-                                    </h2>
-                                </CardHeader>
-                                <CardBody>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableColumn>Sản phẩm</TableColumn>
-                                            <TableColumn>Số lượng</TableColumn>
-                                            <TableColumn>Đơn giá</TableColumn>
-                                            <TableColumn>Thành tiền</TableColumn>
-                                            <TableColumn>Vị trí</TableColumn>
-                                            <TableColumn>Thao tác</TableColumn>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {formData.items.map((item) => (
-                                                <TableRow key={item.itemId}>
-                                                    <TableCell>{item.productName}</TableCell>
-                                                    <TableCell>
-                                                        <Chip size="sm" variant="flat">
-                                                            {item.quantity} {item.unitName}
-                                                        </Chip>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {item.unitPrice.toLocaleString('vi-VN')} ₫
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <span className="font-semibold">
-                                                            {(item.quantity * item.unitPrice).toLocaleString('vi-VN')} ₫
-                                                        </span>
-                                                    </TableCell>
-                                                    <TableCell>{item.binLocation || "N/A"}</TableCell>
-                                                    <TableCell>
-                                                        <Button
-                                                            isIconOnly
-                                                            size="sm"
-                                                            color="danger"
-                                                            variant="light"
-                                                            onClick={() => handleRemoveItem(item.itemId)}
-                                                        >
-                                                            <Icon icon="mdi:delete" />
-                                                        </Button>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </CardBody>
-                            </Card>
-                        )}
+                        <TableUI/>
                     </div>
 
                     {/* Right: Order Summary */}
                     <div className="space-y-6">
-                        <Card>
-                            <CardHeader>
+                        <Card  aria-labelledby="Input">
+                            <CardHeader  aria-labelledby="Input">
                                 <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
                                     Tóm Tắt Đơn Hàng
                                 </h2>
                             </CardHeader>
-                            <CardBody className="space-y-4">
+                            <CardBody  aria-labelledby="Input" className="space-y-4">
                                 <div className="flex justify-between text-gray-600 dark:text-gray-400">
                                     <span>Số lượng sản phẩm:</span>
                                     <span className="font-medium text-gray-800 dark:text-white">
-                                        {formData.items.length}
+                                        {items.length}
                                     </span>
                                 </div>
 
@@ -399,11 +266,12 @@ export default function CreateExportOrderPage() {
                                 <Divider />
 
                                 <Button
+                                    aria-labelledby="Input"
                                     color="success"
                                     fullWidth
                                     onClick={handleSubmit}
                                     isLoading={loading}
-                                    isDisabled={!formData.customer || formData.items.length === 0}
+                                    isDisabled={items.length === 0}
                                     startContent={<Icon icon="mdi:check-bold" />}
                                 >
                                     {loading ? "Đang lưu..." : "Tạo Đơn Xuất"}

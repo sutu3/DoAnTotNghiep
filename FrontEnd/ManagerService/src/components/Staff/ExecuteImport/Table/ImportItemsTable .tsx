@@ -18,6 +18,7 @@ import {ImportOrderItem} from "@/Store/ImportOrder.tsx";
 import {getStatusFromBinAndQuantity} from "@/Utils/GetStatusOrder.tsx";
 
 interface ImportItemsTableProps {
+    warehouse:string
     items: ImportOrderItem[];
     onItemCheck: (itemId: string, actualQuantity: number) => void;
     onSelectLocation: (item: any) => void;
@@ -25,7 +26,7 @@ interface ImportItemsTableProps {
     loading: boolean;
 }
 
-export default function ImportItemsTable({
+export default function ImportItemsTable({warehouse,
                                              items,
                                              onItemCheck,
                                              onSelectLocation,

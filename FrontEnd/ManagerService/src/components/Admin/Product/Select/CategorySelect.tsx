@@ -1,7 +1,7 @@
 import {Select, SelectItem} from "@heroui/react";
 import {useEffect, useState} from "react";
 import {fetchApi} from "@/Api/FetchApi.tsx";
-import {API_ROUTES} from "@/Constants/UrlApi.tsx";
+import {API_ROUTES} from "@/Api/UrlApi.tsx";
 import {useSelector} from "react-redux";
 import {warehouseSelector} from "@/Store/Selector.tsx";
 import {Category} from "@/Store/CategorySlice.tsx";
@@ -37,7 +37,7 @@ const CategorySelect = ({formData,setFormData}: Props) => {
         <Select
             aria-labelledby="Input"
             label="Category"
-            selectedKeys={[formData.category]}
+            selectedKeys={[formData?.category]}
             onSelectionChange={(keys) => {
                 const selectedId = Array.from(keys)[0].toString();
                 const selectedCategory = listCategory.find(cat => cat.categoryId === selectedId);

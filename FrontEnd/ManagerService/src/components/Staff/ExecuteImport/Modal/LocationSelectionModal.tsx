@@ -9,6 +9,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {StacksSelector} from "@/Store/Selector.tsx";
 
 interface LocationSelectionModalProps {
+    warehouse: string;
     isOpen: boolean;
     onClose: () => void;
     selectedItem: any;
@@ -17,6 +18,7 @@ interface LocationSelectionModalProps {
 }
 
 export default function LocationSelectionModal({
+    warehouse,
                                                    isOpen,
                                                    onClose,
                                                    selectedItem,
@@ -31,7 +33,7 @@ export default function LocationSelectionModal({
     useEffect(() => {
         if (isOpen && warehouseId) {
             const fetchData = async () => {
-                await (dispatch as any)(MiddleGetAllStackList());
+                await (dispatch as any)(MiddleGetAllStackList(warehouse));
             };
             fetchData();
         }

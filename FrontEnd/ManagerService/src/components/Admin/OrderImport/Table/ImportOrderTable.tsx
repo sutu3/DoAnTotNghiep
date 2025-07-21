@@ -8,18 +8,17 @@ import {
     Chip,
     Button,
     Input,
-    Select,
-    SelectItem,
-    Pagination, Avatar
+    Pagination, Avatar, Spinner
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import {getStatusColor, getStatusText} from "@/Utils/statusHelpers.tsx";
 import {useEffect, useState} from "react";
-import {pageApi} from "@/Constants/UrlApi.tsx";
+import {pageApi} from "@/Api/UrlApi.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {MiddleGetAllOrder} from "@/Store/Thunk/ImportOrderThunk.tsx";
-import {ImportOrder} from "@/Store/ImportOrder.tsx";
+import { MiddleGetAllImportOrderByStatus} from "@/Store/Thunk/ImportOrderThunk.tsx";
+import OrderImportSlice, {ImportOrder} from "@/Store/ImportOrder.tsx";
 import {OrderSelector, TotalPageOrder} from "@/Store/Selector.tsx";
+import SelectWarehouseApprove from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
 
 interface ImportOrderTableProps {
     searchValue: string;
@@ -32,10 +31,6 @@ interface ImportOrderTableProps {
 }
 
 export default function ImportOrderTable({
-                                             searchValue,
-                                             setSearchValue,
-                                             statusFilter,
-                                             setStatusFilter,
                                              onViewOrder,
                                              onApproveOrder,
                                              onRejectOrder
@@ -44,14 +39,19 @@ export default function ImportOrderTable({
     const [currentPage, setCurrentPage] = useState(1);
     const totalPages=useSelector(TotalPageOrder);
     const orders=useSelector(OrderSelector);
+    const [loading,setLoading] = useState(false);
+    const [warehouse,setWarehouse] = useState<string>("");
+
     useEffect(() => {
+        setLoading(true);
         const PageApi: pageApi = { pageNumber: currentPage - 1, pageSize: 5 };
+        dispatch(OrderImportSlice.actions.setOrderImportList([]))
         const fetchData = async () => {
-            await (dispatch as any)(MiddleGetAllOrder(PageApi));
+            await (dispatch as any)(MiddleGetAllImportOrderByStatus(warehouse,"Created",PageApi));
+            setLoading(false)
         };
         fetchData();
-
-    }, []);
+    }, [warehouse]);
 
 
     return (
@@ -61,40 +61,23 @@ export default function ImportOrderTable({
                     <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
                         Danh Sách Yêu     </h2>
 
-                    <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                        <Input
-                            isClearable
-                            classNames={{
-                                base: "w-full sm:max-w-[300px]",
-                                inputWrapper: "border-1",
-                            }}
-                            placeholder="Tìm kiếm theo mã đơn, người tạo..."
-                            size="sm"
-                            startContent={<Icon icon="mdi:magnify" className="text-default-300"/>}
-                            value={searchValue}
-                            variant="bordered"
-                            onClear={() => setSearchValue("")}
-                            onValueChange={setSearchValue}
-                        />
+                    <div className="flex flex-col sm:flex-row gap-3 w-[300px] items-start sm:items-center">
+                        {/*<Input*/}
+                        {/*    isClearable*/}
+                        {/*    classNames={{*/}
+                        {/*        base: "w-full sm:max-w-[300px]",*/}
+                        {/*        inputWrapper: "border-1",*/}
+                        {/*    }}*/}
+                        {/*    placeholder="Tìm kiếm theo mã đơn, người tạo..."*/}
+                        {/*    size="sm"*/}
+                        {/*    startContent={<Icon icon="mdi:magnify" className="text-default-300"/>}*/}
+                        {/*    value={searchValue}*/}
+                        {/*    variant="bordered"*/}
+                        {/*    onClear={() => setSearchValue("")}*/}
+                        {/*    onValueChange={setSearchValue}*/}
+                        {/*/>*/}
 
-                        <Select
-                            label="Trạng thái"
-                            selectedKeys={[statusFilter]}
-                            onSelectionChange={(keys) => {
-                                const status = Array.from(keys)[0]?.toString() || "all";
-                                setStatusFilter(status);
-                                setCurrentPage(1);
-                            }}
-                            className="w-full sm:max-w-[200px]"
-                            size="sm"
-                            variant="bordered"
-                        >
-                            <SelectItem key="all">Tất cả</SelectItem>
-                            <SelectItem key="Created">Chờ duyệt</SelectItem>
-                            <SelectItem key="InProgress">Đang xử lý</SelectItem>
-                            <SelectItem key="Completed">Hoàn thành</SelectItem>
-                            <SelectItem key="Cancel">Đã hủy</SelectItem>
-                        </Select>
+                        <SelectWarehouseApprove warehouse={warehouse} setWarehouse={setWarehouse}/>
                     </div>
                 </div>
             </div>
@@ -120,6 +103,8 @@ export default function ImportOrderTable({
                         <TableColumn align="center">THAO TÁC</TableColumn>
                     </TableHeader>
                     <TableBody
+                        isLoading={loading}
+                        loadingContent={<Spinner label="Loading..." />}
                         className="bg-white dark:bg-gray-900 text-gray-800 dark:text-white"
                         emptyContent="Không có yêu cầu nào"
                     >

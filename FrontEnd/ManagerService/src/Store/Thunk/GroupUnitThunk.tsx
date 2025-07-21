@@ -1,6 +1,6 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {callApiThunk} from "@/Store/Store.tsx";
-import {API_ROUTES, pageApi} from "@/Constants/UrlApi.tsx";
+import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {initToTalPage, setUnitGroup} from "@/Store/GroupUnit.tsx";
 

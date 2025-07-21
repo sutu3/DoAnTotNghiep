@@ -17,7 +17,6 @@ export interface SupplierCreate {
     district: string;
     street: string;
     country: string;
-    warehouses: string;
 }
 export interface Supplier{
     supplierId: string,

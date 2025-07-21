@@ -20,7 +20,6 @@ const useSupplierStore = create<SupplierStore>((set) => ({
         district: "",
         street: "",
         country: "",
-        warehouses: "",
     },
     setSupplier: (partial) =>
         set((state) => ({ supplier: { ...state.supplier, ...partial } })),
@@ -35,7 +34,6 @@ const useSupplierStore = create<SupplierStore>((set) => ({
                 district: "",
                 street: "",
                 country: "",
-                warehouses: "",
             },
         })),
 }));

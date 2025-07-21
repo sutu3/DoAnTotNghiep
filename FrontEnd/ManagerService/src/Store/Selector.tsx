@@ -1,5 +1,9 @@
 export const warehouseSelector = (state: { warehouse: { warehouse: any } }) =>
   state.warehouse.warehouse;
+export const warehouseListSelector = (state: { warehouse: { warehouseList: any } }) =>
+    state.warehouse.warehouseList;
+export const TotalPageWarehouse = (state: { warehouse: { totalPage: number } }) =>
+    state.warehouse.totalPage;
 
 export const userSelector = (state: { user: { user: any } }) =>
     state.user.user;
@@ -42,6 +46,12 @@ export const OrderItemSelector = (state: { importOrder: {orderItem: any} }) =>
 export const TotalPageOrder = (state: { importOrder: { totalPage: number } }) =>
     state.importOrder.totalPage;
 
+export const ExportItemCreateSelector = (state: { exportOrder: {exportItemCreate:any} }) =>
+    state.exportOrder.exportItemCreate;
+export const ExportOrderSelector = (state: { exportOrder: {orderExport:any} }) =>
+    state.exportOrder.orderExport;
+export const ExportOrderItemSelector = (state: { exportOrder: {orderItem:any} }) =>
+    state.exportOrder.orderItem;
 export const UnitSelector = (state: { unit: {unitList: any} }) =>
     state.unit.unitList;
 export const TotalPageUnit = (state: { unit: { totalPage: number } }) =>
@@ -54,3 +64,26 @@ export const TotalPageGroupUnit = (state: { groupUnit: { totalPage: number } }) 
 
 export const TaskSelector = (state: { tasks: any }) =>
     state.tasks.tasks;
+
+export const InventoryStatsSelector = (state: { inventory: { stats: any } }) =>
+    state.inventory.stats;
+
+export const LowStockProductsSelector = (state: { inventory: { lowStockProducts: any } }) =>
+    state.inventory.lowStockProducts;
+
+export const ExpiringProductsSelector = (state: { inventory: { expiringProducts: any } }) =>
+    state.inventory.expiringProducts;
+
+export const RecentMovementsSelector = (state: { inventory: { recentMovements: any } }) =>
+    state.inventory.recentMovements;
+
+export const WarehouseCapacitySelector = (state: { inventory: { warehouseCapacity: any } }) =>
+    state.inventory.warehouseCapacity;
+
+export const InventoryLoadingSelector = (state: { inventory: { loading: any } }) =>
+    state.inventory.loading;
+
+export const InventoryErrorsSelector = (state: { inventory: { errors: any } }) =>
+    state.inventory.errors;
+export const InventoryWarehouseSelector = (state: { inventoryWarehouse: { inventoryWarehouses: any } }) =>
+    state.inventoryWarehouse.inventoryWarehouses;

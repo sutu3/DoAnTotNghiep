@@ -13,12 +13,45 @@ import { Menu, Transition } from "@headlessui/react";
 import HomeIconNavBar from "../../assets/HomeIconNavBar.png";
 
 import { useTheme } from "@/Utils/ThemeContext.tsx";
+import {API_ROUTES} from "@/Api/UrlApi.tsx";
+import {fetchApi} from "@/Api/FetchApi.tsx";
+import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
+import {useNavigate} from "react-router-dom";
 
 // @ts-ignore
 const NavbarAdmin = ({ collapsed, setCollapsed }) => {
   // @ts-ignore
   const { setTheme } = useTheme();
+  const navigate = useNavigate();
 
+  const handleLogOut = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      await fetchApi({
+        method: "POST",
+        url: API_ROUTES.Authen.Authen().logout,
+        body:{token:token},
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      showToast({
+        title: "Success",
+        description: "GoodBye",
+        color: "success",
+      });
+
+      // Đợi 2 giây rồi mới xóa token và chuyển trang
+      setTimeout(() => {
+        localStorage.removeItem("token");
+        navigate("/login"); // hoặc window.location.href = "/login";
+      }, 2000);
+    } catch (error: any) {
+      console.error("Lỗi khi đăng xuất:", error.message);
+      alert("Đăng xuất thất bại: " + error.message);
+    }
+  };
   return (
     <header className="relative z-10 flex h-14 items-center justify-between bg-white px-4 shadow-sm dark:bg-slate-900">
       {/* Left Side */}
@@ -185,6 +218,7 @@ const NavbarAdmin = ({ collapsed, setCollapsed }) => {
               <Menu.Item>
                 {({ active }) => (
                   <button
+                      onClick={()=>handleLogOut()}
                     className={`flex w-full items-center px-4 py-2 text-sm text-red-600 ${
                       active ? "bg-gray-100 dark:bg-blue-950" : ""
                     }`}

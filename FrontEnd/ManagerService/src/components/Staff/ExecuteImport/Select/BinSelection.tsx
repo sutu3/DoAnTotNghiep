@@ -35,7 +35,7 @@ export default function BinSelection({
         <div>
             <h4 className="text-lg font-semibold mb-3">Chọn Bin</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {availableBins.map((bin) => (
+                {availableBins.map((bin) => ( bin.status!="AVAILABLE"&&
                     <Card
                         key={bin.binId}
                         className={`cursor-pointer transition-all ${

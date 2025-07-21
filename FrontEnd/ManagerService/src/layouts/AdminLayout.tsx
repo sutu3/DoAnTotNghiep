@@ -8,6 +8,9 @@ import NavbarAdmin from "@/components/Admin/NavbarAdmin";
 import { useClickOutside } from "@/Hooks/use-click-outside"; // Đảm bảo import đúng
 import { ThemeProvider } from "@/Utils/ThemeContext";
 import { LayoutProvider, useLayout } from "@/layouts/LayoutContext.tsx";
+import {ManagerLink} from "@/Constants/ManagerLink.tsx";
+import {Staff} from "@/Constants/Staff.tsx";
+import {useAuth} from "@/Hooks/useAuth.ts";
 // @ts-ignore
 
 const AdminLayoutContent = () => {
@@ -15,8 +18,10 @@ const AdminLayoutContent = () => {
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const isActuallyDesktop = useMediaQuery({ query: "(min-width: 768px)" });
+    const { userRole, isAuthenticated } = useAuth();
+    const navbarLinks = userRole === "manager" ? ManagerLink : Staff;
 
-  useClickOutside(sidebarRef, () => {
+    useClickOutside(sidebarRef, () => {
     if (!isActuallyDesktop && !isSidebarCollapsed) {
       setIsSidebarCollapsed(true);
     }
@@ -24,22 +29,28 @@ const AdminLayoutContent = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 transition-colors dark:bg-slate-950">
-      <div
-        aria-label="Close sidebar"
-        className={`pointer-events-none fixed inset-0 z-40 bg-black opacity-0 transition-opacity md:hidden
-                  ${!isSidebarCollapsed && "pointer-events-auto opacity-30"}`}
-        role="button"
-        tabIndex={0}
-        onClick={() => setIsSidebarCollapsed(true)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            setIsSidebarCollapsed(true);
-          }
-        }}
-      />
+        <div
+            // Chỉ sử dụng inert khi sidebar đang đóng (collapsed)
+            {...(isSidebarCollapsed ? { inert: true } : {})}
+            aria-label="Close sidebar"
+            className={`pointer-events-none fixed inset-0 z-40 bg-black opacity-0 transition-opacity md:hidden  
+              ${!isSidebarCollapsed && "pointer-events-auto opacity-30"}`}
+            role="button"
+            tabIndex={!isSidebarCollapsed ? 0 : -1}  // Chỉ focusable khi sidebar mở
+            onClick={() => setIsSidebarCollapsed(true)}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    setIsSidebarCollapsed(true);
+                }
+            }}
+        />
 
       {/* 1. Thanh Sidebar */}
-      <AppSidebar ref={sidebarRef} collapsed={isSidebarCollapsed} />
+        <AppSidebar
+            ref={sidebarRef}
+            collapsed={isSidebarCollapsed}
+            navbarLinks={navbarLinks}
+        />
 
       {/* 2. Phần Navbar và Content */}
       <div

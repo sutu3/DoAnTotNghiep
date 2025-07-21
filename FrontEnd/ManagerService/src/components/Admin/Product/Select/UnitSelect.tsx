@@ -1,7 +1,7 @@
 import {Select, SelectItem} from "@heroui/react";
 import {useEffect, useState} from "react";
 import {fetchApi} from "@/Api/FetchApi.tsx";
-import {API_ROUTES} from "@/Constants/UrlApi.tsx";
+import {API_ROUTES} from "@/Api/UrlApi.tsx";
 import {useSelector} from "react-redux";
 import {warehouseSelector} from "@/Store/Selector.tsx";
 import {ProductCreate, useProductStore} from "@/zustand/Product.tsx";
@@ -36,7 +36,7 @@ const unitSelect = ({formData,setFormData}: Props) => {
     return (
         <Select
             label="unit"
-            selectedKeys={[formData.unit]}
+            selectedKeys={[formData?.unit]}
             aria-labelledby="Input"
 
             onSelectionChange={(keys) => {
