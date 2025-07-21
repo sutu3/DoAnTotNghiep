@@ -1,5 +1,8 @@
 package com.example.order.Service.Impl;
 
+import com.example.order.Client.Inventory.Dto.Resquest.InventoryWarehouseRequest;
+import com.example.order.Client.Inventory.Dto.Resquest.StockMovementRequest;
+import com.example.order.Client.Inventory.InventoryController;
 import com.example.order.Client.ProductService.Dto.Response.ProductResponse;
 import com.example.order.Client.ProductService.Dto.Response.UnitNameResponse;
 import com.example.order.Client.ProductService.ProductController;
@@ -7,13 +10,14 @@ import com.example.order.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.order.Client.UserService.Dto.Response.UserResponse;
 import com.example.order.Client.UserService.UserController;
 import com.example.order.Client.WarehouseService.Dto.Responses.Bin.BinResponse;
-import com.example.order.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.order.Client.WarehouseService.WarehouseController;
 import com.example.order.Dto.Request.ImportRequestItem;
 import com.example.order.Dto.Response.ImportItem.ImportResponseItem;
+import com.example.order.Dto.Response.ImportOrder.ImportOrderResponse;
 import com.example.order.Exception.AppException;
 import com.example.order.Exception.ErrorCode;
 import com.example.order.Form.ImportItemForm;
+import com.example.order.Form.StatusForm;
 import com.example.order.Form.UpdateBinRequest;
 import com.example.order.Form.UpdateQuantityRequest;
 import com.example.order.Mapper.ImportItemMapper;
@@ -25,6 +29,7 @@ import com.example.order.Service.ImportItemService;
 import com.example.order.Service.ImportOrderService;
 import com.example.order.Utils.DateUtils;
 import com.example.order.Utils.UpdateOrderTotalPrice;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -53,6 +58,7 @@ public class ImportItemServiceImpl implements ImportItemService {
     private final ImportOrderRepo importOrderRepo;
     private final AsyncServiceImpl asyncServiceImpl;
     private final ImportOrderService importOrderService;
+    private final InventoryController inventoryController;
 
     @Override
     public Page<ImportResponseItem> getAllByWarehouse(Pageable pageable, String warehouse) {
@@ -64,7 +70,7 @@ public class ImportItemServiceImpl implements ImportItemService {
     public List<ImportResponseItem> getAllByOrder( String order) {
         importOrderRepo.findById(order).orElseThrow(()->new AppException(ErrorCode.IMPORT_ORDER_NOT_FOUND));
         return importItemRepo.findAllByImportOrder_ImportOrderIdAndIsDeleted(order, false)
-                .map(this::entry).stream().toList();
+                .stream().map(this::entry).collect(Collectors.toList());
     }
 
     @Override
@@ -80,8 +86,10 @@ public class ImportItemServiceImpl implements ImportItemService {
 
     @Override
     public ImportResponseItem createItem(ImportRequestItem requestItem) {
+        var idUser=GetCurrentUserId.getCurrentUserId();
         ImportOrder importOrder= importOrderService.getById(requestItem.importOrder());
         ImportItem importItem=importItemMapper.toEntity(requestItem);
+        importItem.setCreateByUser(idUser);
         importItem.setExpiredDate(DateUtils.parseToLocalDateTime(requestItem.expiredDate()).get());
         importItem.setImportOrder(importOrder);
         importItem.setIsDeleted(false);
@@ -94,7 +102,7 @@ public class ImportItemServiceImpl implements ImportItemService {
         ImportItem importItem=importItemRepo.getById(id);
         importItemMapper.toUpdate(importItem,update);
         ImportItem importItemSave=importItemRepo.save(importItem);
-        updateOrderTotalPrice.updateTotalPrice(importItem.getImportOrder());
+        updateOrderTotalPrice.updateTotalPriceImport(importItem.getImportOrder());
         return entry(importItemSave);
     }
     @Override
@@ -107,7 +115,7 @@ public class ImportItemServiceImpl implements ImportItemService {
         if (!requests.isEmpty()) {
             String orderId = requests.get(0).importOrder();
             ImportOrder importOrder = importOrderService.getById(orderId);
-            updateOrderTotalPrice.updateTotalPrice(importOrder);
+            updateOrderTotalPrice.updateTotalPriceImport(importOrder);
         }
 
         return results;
@@ -131,6 +139,11 @@ public class ImportItemServiceImpl implements ImportItemService {
                 .getUserAsync(importItem.getCreateByUser());
         CompletableFuture.allOf( unitFuture,productFuture,supplierFuture,userFuture).join();
         ImportResponseItem importResponseItem=importItemMapper.toResponse(importItem);
+        if(importItem.getBin()!=null){
+            CompletableFuture<BinResponse> binFurute = asyncServiceImpl
+                    .getBinAsync(importItem.getBin());
+            importResponseItem.setBin(binFurute.join());
+        }
         importResponseItem.setCreateByUser(userFuture.join());
         importResponseItem.setSupplier(supplierFuture.join());
         importResponseItem.setProduct(productFuture.join());
@@ -183,7 +196,7 @@ public class ImportItemServiceImpl implements ImportItemService {
         ImportItem savedItem = importItemRepo.save(importItem);
 
         // Cập nhật total price của order
-        updateOrderTotalPrice.updateTotalPrice(importItem.getImportOrder());
+        updateOrderTotalPrice.updateTotalPriceImport(importItem.getImportOrder());
 
         return entry(savedItem);
     }
@@ -210,5 +223,84 @@ public class ImportItemServiceImpl implements ImportItemService {
         ImportItem savedItem = importItemRepo.save(importItem);
 
         return entry(savedItem);
+    }
+
+    private void createInventoryRecords(ImportResponseItem item, ImportOrderResponse orderResponse) {
+        try {
+            log.info("Creating inventory records for item: {}", item.getProduct().getProductName());
+
+            // Tạo inventory warehouse record
+            InventoryWarehouseRequest inventoryWarehouseRequest = new InventoryWarehouseRequest(
+                    item.getProduct().getProductId(),
+                    orderResponse.getWarehouse().getWarehouseId(),
+                    item.getBin().getBinId(),
+                    0,
+                    item.getExpiredDate().toLocalDate(),
+                    "AVAILABLE"
+            );
+            var inventoryResponse = inventoryController.createInventoryWarehouse(inventoryWarehouseRequest);
+            log.info("Created inventory warehouse record with ID: {}",
+                    inventoryResponse.getResult().getInventoryWarehouseId());
+
+            // Tạo stock movement record
+            StockMovementRequest stockMovementRequest = new StockMovementRequest(
+                    inventoryResponse.getResult().getInventoryWarehouseId(), // Sử dụng ID từ response
+                    item.getProduct().getProductId(),
+                    "Import",
+                    item.getRealityQuantity(),
+                    orderResponse.getImportOrderId(),
+                    item.getCreateByUser().getUserId(), // Thêm user thực hiện
+                    "Import from order: " + orderResponse.getImportOrderId(), // Thêm note
+                    item.getCostUnitBase()
+            );
+
+            var movementResponse = inventoryController.createStockMovement(stockMovementRequest);
+            log.info("Created stock movement record with ID: {}",
+                    movementResponse.getResult().getMovementId());
+
+        } catch (Exception e) {
+            log.error("Failed to create inventory records for item: {}", item.getItemId(), e);
+            throw new AppException(ErrorCode.INVENTORY_CREATION_FAILED);
+        }
+    }
+    @Override
+    @Transactional
+    public void executeImport(String orderId, List<ImportResponseItem> items) {
+        try {
+            log.info("Starting import execution for order: {}", orderId);
+
+            // Update order status
+            StatusForm update = new StatusForm("Done");
+            ImportOrderResponse orderResponse = importOrderService.updateStatus(orderId, update);
+
+            int processedItems = 0;
+            for (ImportResponseItem item : items) {
+                try {
+                    // Update item details
+                    updateRealityQuantity(item.getItemId(),
+                            new UpdateQuantityRequest(item.getRealityQuantity()));
+                    updateBinLocation(item.getItemId(),
+                            new UpdateBinRequest(item.getBin().getBinId()));
+
+                    // Create inventory records
+                    createInventoryRecords(item, orderResponse);
+
+                    processedItems++;
+                    log.info("Processed item {}/{}: {}", processedItems, items.size(),
+                            item.getProduct().getProductName());
+
+                } catch (Exception e) {
+                    log.error("Failed to process item: {}", item.getItemId(), e);
+                    throw new AppException(ErrorCode.IMPORT_EXECUTION_FAILED);
+                }
+            }
+
+            log.info("Successfully completed import for order: {} with {} items",
+                    orderId, processedItems);
+
+        } catch (Exception e) {
+            log.error("Import execution failed for order: {}", orderId, e);
+            throw e;
+        }
     }
 }

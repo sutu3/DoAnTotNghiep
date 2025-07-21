@@ -1,8 +1,11 @@
 package com.example.userservice.Service.Impl;
 
+import com.example.userservice.Client.Authen.AuthenController;
+import com.example.userservice.Client.Authen.Dto.Request.UserRequestAuthen;
 import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
-import com.example.userservice.Client.WarehouseService.WarehouseController;
+import com.example.userservice.Client.WarehouseService.Redis.WarehouseController;
 import com.example.userservice.Dto.Request.UserRequest;
+import com.example.userservice.Dto.Responses.User.IdWarehouseResponse;
 import com.example.userservice.Dto.Responses.User.UserResponse;
 import com.example.userservice.Enum.StatusEnum;
 import com.example.userservice.Exception.AppException;
@@ -20,9 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +35,7 @@ public class UsersServiceImpl implements UserService {
     UserRepo userRepo;
     WarehouseController warehouseService; // Sử dụng Feign Client đúng chức năng
     AsyncServiceImpl asyncServiceImpl;
+    private final AuthenController authenController;
 
     @Override
     public Page<UserResponse> getAllByWarehouseId(String warehouseId,Pageable pageable) {
@@ -48,6 +50,13 @@ public class UsersServiceImpl implements UserService {
     }
 
     @Override
+    public IdWarehouseResponse getWarehouseByIdUser() {
+        var idUser=GetCurrentUserId.getCurrentUserId();
+        String warehouse=findById(idUser).getWarehouses();
+        return new IdWarehouseResponse(warehouse);
+    }
+
+    @Override
     public UserResponse CreateUser(UserRequest request) {
         if (userRepo.existsByPhoneNumberAndEmail(request.phoneNumber(), request.email())) {
             throw new AppException(ErrorCode.USER_EXIST);
@@ -57,6 +66,7 @@ public class UsersServiceImpl implements UserService {
         user.setIsDeleted(false);
 
         Users savedUser = userRepo.save(user);
+        authenController.createUser(new UserRequestAuthen(savedUser.getUserName(), user.getEmail(), user.getEmail(), savedUser.getUserId()));
         return enrich(savedUser);
     }
     @Override
@@ -75,8 +85,20 @@ public class UsersServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse getByUserId(String id) {
-        return enrich(findById(id));
+    public UserResponse getByIdResponse(String id) {
+        return userMapper.toResponse(findById(id));
+    }
+
+    @Override
+    public UserResponse findByEmail(String email) {
+        Users users=userRepo.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return  userMapper.toResponse(users);
+    }
+
+    @Override
+    public UserResponse getByUserId() {
+        var idUser=GetCurrentUserId.getCurrentUserId();
+        return enrich(findById(idUser));
     }
 
     @Override

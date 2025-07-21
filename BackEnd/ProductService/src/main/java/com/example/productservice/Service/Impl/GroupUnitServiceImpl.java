@@ -55,8 +55,9 @@ public class GroupUnitServiceImpl implements GroupUnitService {
 
     @Override
     public GroupUnitResponse createGroupUnit(GroupUnitRequest request) {
+        var idUser=GetCurrentUserId.getCurrentUserId();
         UserResponse userResponse=userController
-                .getUser(request.createByUser()).getResult();
+                .getUser(idUser).getResult();
         Optional<GroupUnit> existing=groupUnitRepo.findByGroupNameAndIsDeleted(
                 request.groupName(), false);
         if(existing.isPresent()){
@@ -65,13 +66,14 @@ public class GroupUnitServiceImpl implements GroupUnitService {
                 throw new AppException(ErrorCode.GROUP_UNIT_EXISTS);
             }
             groupUnit.setIsDeleted(false);
-            groupUnit.setCreateByUser(request.createByUser());
+            groupUnit.setCreateByUser(idUser);
             groupUnitRepo.save(groupUnit);
             GroupUnitResponse response=groupUnitMapper.toResponse(groupUnit);
             return groupUnitMapper.updateCreateByUser(response,userResponse);
         }
         GroupUnit groupUnit=groupUnitMapper.toEntity(request);
         groupUnit.setIsDeleted(false);
+        groupUnit.setCreateByUser(idUser);
         GroupUnitResponse groupUnitResponse=groupUnitMapper
                 .toResponse(groupUnitRepo.save(groupUnit));
         return groupUnitMapper.updateCreateByUser(groupUnitResponse,userResponse);

@@ -33,14 +33,14 @@ public class SupplierServiceImpl implements SupplierService {
     private final SupplierRepo supplierRepo;
 
     @Override
-    public Page<SupplierResponse> getAll(Pageable pageable, String warehouse) {
-        return supplierRepo.findAllByWarehousesAndIsDeleted(warehouse, false, pageable)
+    public Page<SupplierResponse> getAll(Pageable pageable) {
+        return supplierRepo.findAllByIsDeleted( false, pageable)
                 .map(supplierMapper::toResponse);
     }
 
     @Override
-    public List<SupplierResponse> getALlList(String warehouse) {
-        return supplierRepo.findAllByWarehousesAndIsDeleted(warehouse, false).stream()
+    public List<SupplierResponse> getALlList() {
+        return supplierRepo.findAllByIsDeleted( false).stream()
                 .map(supplierMapper::toResponse).collect(Collectors.toList());
     }
 
@@ -57,10 +57,10 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public SupplierResponse createSupplier(SupplierRequest supplierRequest) {
-        Optional<Supplier> existing=supplierRepo.findAllByEmailAndWarehousesAndPhoneNumber(
+        Optional<Supplier> existing=supplierRepo.findAllByEmailAndPhoneNumber(
                 supplierRequest.email(),
-                supplierRequest.warehouses(),
                 supplierRequest.phoneNumber());
+        var idUser=GetCurrentUserId.getCurrentUserId();
         if(existing.isPresent()){
             Supplier supplier=existing.get();
             if(!supplier.getIsDeleted()){
@@ -80,9 +80,8 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public SupplierResponse updateSupplier(SupplierForm update, String supplierId) {
-        Optional<Supplier> existing=supplierRepo.findAllByEmailAndWarehousesAndPhoneNumber(
+        Optional<Supplier> existing=supplierRepo.findAllByEmailAndPhoneNumber(
                 update.email(),
-                update.warehouses(),
                 update.phoneNumber());
         if(existing.isPresent()){
             throw new AppException(ErrorCode.SUPPLIER_EXIST);

@@ -11,7 +11,5 @@ public record SupplierRequest(
         String address,
         String district,
         String street,
-        String country,
-        String warehouses
-) {
+        String country) {
 }

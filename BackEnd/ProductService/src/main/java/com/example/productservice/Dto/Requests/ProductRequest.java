@@ -12,9 +12,9 @@ public record ProductRequest(
         BigDecimal price,
         String urlImageProduct,
         String supplier,
-        String warehouses,
-        String createByUser,
         String category,
-        String unit
+        String unit,
+        Integer minStockLevel,
+        Integer maxStockLevel
 ) {
 }

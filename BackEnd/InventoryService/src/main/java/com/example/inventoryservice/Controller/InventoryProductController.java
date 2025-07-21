@@ -1,10 +1,13 @@
 package com.example.inventoryservice.Controller;
 
 
+import com.example.inventoryservice.Client.ProductService.Dto.Response.Product.ProductClientRequest;
+import com.example.inventoryservice.Client.ProductService.Dto.Response.Product.ProductFilterRequest;
 import com.example.inventoryservice.Dtos.ApiResponse;
 import com.example.inventoryservice.Dtos.Request.InventoryProductRequest;
 import com.example.inventoryservice.Dtos.Response.InventoryProductResponse;
 import com.example.inventoryservice.Form.InventoryProductForm;
+import com.example.inventoryservice.Service.Impl.ProductFilterService;
 import com.example.inventoryservice.Service.InventoryProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -27,7 +30,7 @@ import java.util.List;
 public class InventoryProductController {
 
     InventoryProductService inventoryProductService;
-
+    ProductFilterService productFilterService;
     /**
      * Lấy danh sách tất cả inventory products theo warehouse với phân trang
      * @param page Số trang (bắt đầu từ 0)
@@ -44,6 +47,17 @@ public class InventoryProductController {
         Pageable pageable = PageRequest.of(page, size);
         return ApiResponse.<Page<InventoryProductResponse>>builder()
                 .Result(inventoryProductService.getAllByWarehouse(pageable, warehouseId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @PostMapping("/filter")
+    ApiResponse<List<ProductClientRequest>> filterProductsByWarehouse(
+            @RequestBody ProductFilterRequest request
+            ){
+        return ApiResponse.<List<ProductClientRequest>>builder()
+                .Result(productFilterService.filterByWarehouse(request.getWarehouseId(), request.getProductIds()))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

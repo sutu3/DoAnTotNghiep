@@ -1,10 +1,9 @@
 package com.example.userservice.Service.Impl;
 
 import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
-import com.example.userservice.Client.WarehouseService.WarehouseController;
+import com.example.userservice.Client.WarehouseService.Redis.WarehouseController;
 import com.example.userservice.Dto.Request.TaskTypeRequest;
 import com.example.userservice.Dto.Responses.TaskType.TaskTypeResponse;
-import com.example.userservice.Dto.Responses.User.UserResponse;
 import com.example.userservice.Exception.AppException;
 import com.example.userservice.Exception.ErrorCode;
 import com.example.userservice.Form.TaskTypeForm;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

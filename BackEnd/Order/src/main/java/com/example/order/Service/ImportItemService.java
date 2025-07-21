@@ -26,5 +26,6 @@ public interface ImportItemService {
     List<String> getRecentSuppliersByProduct(String productId, String warehouseId);
     ImportResponseItem updateRealityQuantity(String itemId, UpdateQuantityRequest request);
     ImportResponseItem updateBinLocation(String itemId, UpdateBinRequest request);
+    void executeImport(String orderId,List<ImportResponseItem> items);
 
 }

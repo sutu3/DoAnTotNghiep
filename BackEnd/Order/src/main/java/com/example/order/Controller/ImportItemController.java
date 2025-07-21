@@ -136,7 +136,18 @@ public class ImportItemController {
                 .success(true)
                 .build();
     }
-
+    @PostMapping("/{orderId}/execute-import")
+    public ApiResponse<Void> executeImport(
+            @PathVariable String orderId,
+            @RequestBody List<ImportResponseItem> items
+    ) {
+        importItemService.executeImport(orderId, items);
+        return ApiResponse.<Void>builder()
+                .code(0)
+                .message("Import executed successfully")
+                .success(true)
+                .build();
+    }
     // PUT - Cập nhật bin location
     @PutMapping("/{itemId}/bin")
     public ApiResponse<ImportResponseItem> updateBinLocation(

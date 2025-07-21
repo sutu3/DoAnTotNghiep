@@ -12,8 +12,8 @@ import java.util.List;
 
 @Service
 public interface SupplierService {
-    Page<SupplierResponse> getAll(Pageable pageable,String warehouse);
-    List<SupplierResponse> getALlList(String warehouse);
+    Page<SupplierResponse> getAll(Pageable pageable);
+    List<SupplierResponse> getALlList();
     Supplier getById(String supplierId);
     SupplierResponse getByIdResponse(String supplierId);
     SupplierResponse createSupplier(SupplierRequest supplierRequest);

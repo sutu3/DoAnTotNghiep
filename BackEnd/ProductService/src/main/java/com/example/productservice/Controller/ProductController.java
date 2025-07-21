@@ -1,5 +1,7 @@
 package com.example.productservice.Controller;
 
+import com.example.productservice.Dto.Requests.ProductClientRequest;
+import com.example.productservice.Dto.Requests.ProductCreateWrapper;
 import com.example.productservice.Dto.Requests.ProductRequest;
 import com.example.productservice.Dto.Responses.ApiResponse;
 import com.example.productservice.Dto.Responses.Product.ProductResponse;
@@ -27,15 +29,14 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
-    @GetMapping("/search/warehouseId/{warehouseId}")
+    @GetMapping("/search/productPage")
     public ApiResponse<Page<ProductResponse>> getAll(
             @RequestParam("pageNumber") int page,
-            @RequestParam("pageSize") int size,
-            @PathVariable String warehouseId
+            @RequestParam("pageSize") int size
     ){
         Pageable pageable= PageRequest.of(page,size);
         return ApiResponse.<Page<ProductResponse>>builder()
-                .Result(productService.getAllByWarehouses(warehouseId,pageable))
+                .Result(productService.getAll(pageable))
                 .code(0)
                 .message("SuccessFully")
                 .success(true)
@@ -43,41 +44,33 @@ public class ProductController {
     }
     @GetMapping("/search")
     public ApiResponse<List<ProductResponse>> searchProducts(
-            @RequestParam(required = false) String productName,
-            @RequestParam(required = false) String warehouseId,
-            @RequestParam(required = false) String sku,
-            @RequestParam(required = false) String supplier,
-            @RequestParam(required = false) Boolean isActive
+            @RequestParam(required = false) String supplierId,
+            @RequestParam(required = false) String warehouseId
     ) {
         return ApiResponse.<List<ProductResponse>>builder()
-                .Result(productService.searchProducts(
-                        productName,
-                        warehouseId,
-                        sku,
-                        supplier,
-                        isActive))
+                .Result(productService.getProductsBySupplierFilteredByWarehouse(supplierId,warehouseId))
                 .code(0)
                 .message("SuccessFully")
                 .success(true)
                 .build();
     }
-    @GetMapping("/search/warehouseId/{warehouseId}/groupUnitName/{groupUnitName}/supplierId/{supplierId}")
+    @GetMapping("/search/groupUnitName/{groupUnitName}/supplierId/{supplierId}")
     public ApiResponse<Page<ProductResponse>> getAllBySupplier(
             @RequestParam("pageNumber") int page,
             @RequestParam("pageSize") int size,
-            @PathVariable String warehouseId,
             @PathVariable String supplierId
     ){
         Pageable pageable= PageRequest.of(page,size);
         return ApiResponse.<Page<ProductResponse>>builder()
-                .Result(productService.getAllBySupplierAndWarehouse(supplierId,warehouseId,pageable))
+                .Result(productService.getAllBySupplier(supplierId,pageable))
                 .code(0)
                 .message("SuccessFully")
                 .success(true)
                 .build();
     }
     @PostMapping
-    public ApiResponse<ProductResponse> save(@RequestBody ProductRequest productRequest){
+    public ApiResponse<ProductResponse> save(
+            @RequestBody ProductCreateWrapper productRequest){
         return ApiResponse.<ProductResponse>builder()
                 .Result(productService.createProduct(productRequest))
                 .code(0)

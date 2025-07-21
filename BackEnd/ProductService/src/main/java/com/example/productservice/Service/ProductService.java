@@ -1,13 +1,14 @@
 package com.example.productservice.Service;
 
-import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
-import com.example.productservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
+import com.example.productservice.Dto.Requests.ProductClientRequest;
+import com.example.productservice.Dto.Requests.ProductCreateWrapper;
 import com.example.productservice.Dto.Requests.ProductRequest;
 import com.example.productservice.Dto.Responses.Product.ProductResponse;
 import com.example.productservice.Form.ProductForm;
 import com.example.productservice.Model.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,22 +18,20 @@ public interface ProductService {
     /**
      * Lấy danh sách sản phẩm theo kho, có phân trang.
      *
-     * @param warehouse ID của kho cần lấy sản phẩm.
      * @param pageable  Thông tin phân trang.
      * @return Danh sách trang của {@link ProductResponse}.
      */
-    Page<ProductResponse> getAllByWarehouses(String warehouse, Pageable pageable);
+    Page<ProductResponse> getAll( Pageable pageable);
 
     /**
      * Lấy danh sách sản phẩm theo nhà cung cấp và kho, có phân trang.
      *
      * @param supplier  ID nhà cung cấp.
-     * @param warehouse ID của kho.
      * @param pageable  Thông tin phân trang.
      * @return Danh sách trang của {@link ProductResponse}.
      */
-    Page<ProductResponse> getAllBySupplierAndWarehouse(String supplier, String warehouse, Pageable pageable);
-    List<ProductResponse> searchProducts(String productName,String warehouses, String sku, String supplier, Boolean isActive);
+    Page<ProductResponse> getAllBySupplier(String supplier,  Pageable pageable);
+    List<ProductResponse> searchProducts(String productName, String sku, String supplier, Boolean isActive);
     /**
      * Lấy thực thể sản phẩm từ ID.
      *
@@ -56,7 +55,16 @@ public interface ProductService {
      * @param request Thông tin sản phẩm cần tạo.
      * @return {@link ProductResponse} của sản phẩm vừa tạo.
      */
-    ProductResponse createProduct(ProductRequest request);
+    @PreAuthorize("hasRole('MANAGER')")
+    ProductResponse createProduct(ProductCreateWrapper request);
+    /**
+     * Tìm kiếm danh sách sản phẩm dựa trên mã nhà sản xuất và mã kho.
+     *
+     * @param supplierId Mã  nhà sản xuất của sản phẩm.
+     * @param warehouseId Mã  nhà kho của sản phẩm.
+     * @return {@link ProductResponse} của sản phẩm nếu tìm thấy.
+     */
+    List<ProductResponse> getProductsBySupplierFilteredByWarehouse(String supplierId, String warehouseId);
 
     /**
      * Tìm kiếm sản phẩm dựa trên mã SKU.
@@ -64,6 +72,7 @@ public interface ProductService {
      * @param sku Mã SKU của sản phẩm.
      * @return {@link ProductResponse} của sản phẩm nếu tìm thấy.
      */
+
     ProductResponse getBySku(String sku);
 
     /**
@@ -73,6 +82,7 @@ public interface ProductService {
      * @param productId  ID sản phẩm cần cập nhật.
      * @return {@link ProductResponse} sau khi cập nhật.
      */
+    @PreAuthorize("hasRole('MANAGER')")
     ProductResponse updateProduct(ProductForm update, String productId);
 
     /**
@@ -80,6 +90,7 @@ public interface ProductService {
      *
      * @param productId ID của sản phẩm cần xóa.
      */
+    @PreAuthorize("hasRole('MANAGER')")
     void deleteByProductId(String productId);
     ProductResponse enrich(Product product);
 }

@@ -28,7 +28,6 @@ public class ProductResponse{
     String urlImageProduct;
     BigDecimal price;
     SupplierResponse supplier;
-    WarehousesResponse warehouses;
     UserResponse createByUser;
     Boolean isActive;
     CategoryResponseNoList category;

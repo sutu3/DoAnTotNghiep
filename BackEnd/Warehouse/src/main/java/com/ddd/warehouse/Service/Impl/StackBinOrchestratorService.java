@@ -12,6 +12,7 @@ import com.ddd.warehouse.Module.Bins;
 import com.ddd.warehouse.Module.Stacks;
 import com.ddd.warehouse.Service.BinService;
 import com.ddd.warehouse.Service.StackService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,16 +32,26 @@ public class StackBinOrchestratorService {
 
     StackService stackService;
     BinService binService;
-
+    @Transactional
     public StackResponse createStackAndBins(StackRequest stackRequest) {
         StackResponse stackCreated = stackService.createStack(stackRequest);
 
         List<BinResponseNoWarehouse> bins = new ArrayList<>();
         if (stackRequest.binQuantity() > 0) {
             for (int i = 1; i <= stackRequest.binQuantity(); i++) {
+                // Sanitize trước
+                String sanitizedStackName = stackRequest.stackName()
+                        .toUpperCase()
+                        .replaceAll("[^A-Z0-9]", "");
+
+                // Fix lỗi substring bằng cách cắt theo độ dài của chuỗi đã sanitize
+                String trimmedName = sanitizedStackName.substring(0, Math.min(10, sanitizedStackName.length()));
+
+                String binCode = String.format("%s-BIN-%03d", trimmedName, i);
+
                 BinRequest bin = BinRequest.builder()
-                        .binCode(stackRequest.stackName() + "-BIN-" + i)
-                        .capacity(100)
+                        .binCode(binCode)
+                        .capacity(1)
                         .stack(stackCreated.getStackId())
                         .warehouse(stackRequest.warehouse())
                         .build();
@@ -48,14 +59,15 @@ public class StackBinOrchestratorService {
             }
         }
 
-        // B3: Lấy lại Stack từ DB
+        // Lấy lại Stack từ DB
         Stacks fullStack = stackService.getById(stackCreated.getStackId());
 
-        // B4: Map sang response và set danh sách bin
+        // Map sang response và set danh sách bin
         StackResponse response = stackMapper.toResponse(fullStack);
         response.setBin(bins);
         return response;
     }
+
     public StackResponse getStackByBinId(String binId) {
         Bins bin = binService.getById(binId);
 

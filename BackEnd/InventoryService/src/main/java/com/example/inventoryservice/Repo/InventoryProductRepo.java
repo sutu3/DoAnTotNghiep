@@ -1,6 +1,7 @@
 package com.example.inventoryservice.Repo;
 
 import com.example.inventoryservice.Module.InventoryProduct;
+import feign.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,6 +27,8 @@ public interface InventoryProductRepo extends JpaRepository<InventoryProduct, St
     // Tìm các sản phẩm có tồn kho thấp hơn mức tối thiểu
     @Query("SELECT ip FROM InventoryProduct ip WHERE ip.totalQuantity < ip.minStockLevel AND ip.isDeleted = false")
     List<InventoryProduct> findLowStockProducts();
+    @Query("SELECT ip.product FROM InventoryProduct ip WHERE ip.warehouse = :warehouse AND ip.isDeleted = false")
+    List<String> findAllListIdProduct(@Param("warehouse") String warehouse);
 
     // Tìm theo trạng thái
     Page<InventoryProduct> findAllByStatusAndIsDeleted(String status, Boolean isDeleted, Pageable pageable);

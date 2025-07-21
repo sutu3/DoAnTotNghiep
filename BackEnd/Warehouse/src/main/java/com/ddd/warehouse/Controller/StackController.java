@@ -8,6 +8,7 @@ import com.ddd.warehouse.Form.StackForm;
 import com.ddd.warehouse.Service.Impl.StackBinOrchestratorService;
 import com.ddd.warehouse.Service.StackService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -92,7 +93,7 @@ public class StackController {
                 .build();
     }
     @PostMapping
-    public ApiResponse<StackResponse> create(@RequestBody StackRequest stackRequest){
+    public ApiResponse<StackResponse> create(@RequestBody @Valid StackRequest stackRequest){
         return ApiResponse.<StackResponse>builder()
                 .Result(stackBinOrchestratorService.createStackAndBins(stackRequest))
                 .code(0)

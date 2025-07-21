@@ -1,0 +1,55 @@
+app:
+  api-prefix: ""
+server:
+  port: 8888
+spring:
+  application:
+    name: GateWayService
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: ${USER_SERVICE_URI}
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=2
+
+        - id: authen-service
+          uri: ${AUTHEN_SERVICE_URI}
+          predicates:
+            - Path=/api/authen/**
+          filters:
+            - StripPrefix=2
+
+        - id: product-service
+          uri: ${PRODUCT_SERVICE_URI}
+          predicates:
+            - Path=/api/products/**
+          filters:
+            - StripPrefix=2
+
+        - id: order-service
+          uri: ${ORDER_SERVICE_URI}
+          predicates:
+            - Path=/api/orders/**
+          filters:
+            - StripPrefix=2
+        - id: file-service
+          uri: ${FILE_SERVICE_URI}
+          predicates:
+            - Path=/api/file/**
+          filters:
+            - StripPrefix=2
+        - id: warehouse-service
+          uri: ${WAREHOUSE_SERVICE_URI}
+          predicates:
+            - Path=/api/warehouses/**
+          filters:
+            - StripPrefix=2
+        - id: warehouse-service
+          uri: ${INVENTORY_SERVICE_URI}
+          predicates:
+            - Path=/api/inventories/**
+          filters:
+            - StripPrefix=2
