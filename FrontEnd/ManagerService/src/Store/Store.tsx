@@ -12,6 +12,9 @@ import CategorySlice from "@/Store/CategorySlice.tsx";
 import SupplierSlice from "@/Store/SupplierSlice.tsx";
 import ProductSlice from "@/Store/ProductSlice.tsx";
 import ImportOrder from "@/Store/ImportOrder.tsx";
+import InventorySlice from "@/Store/InventoryOverView.tsx";
+import InventoryWarehouseSlice from "@/Store/InventoryWarehouseSlice.tsx";
+import ExportOrderSlice from "@/Store/ExportOrderSlice.tsx";
 
 const ThemeReducer = (state = { value: true }, action: any) => {
   switch (action.type) {
@@ -37,7 +40,10 @@ const store = configureStore({
     category:CategorySlice.reducer,
     supplier:SupplierSlice.reducer,
     product:ProductSlice.reducer,
-    importOrder:ImportOrder.reducer
+    importOrder:ImportOrder.reducer,
+    inventory: InventorySlice.reducer,
+    inventoryWarehouse:InventoryWarehouseSlice.reducer,
+    exportOrder:ExportOrderSlice.reducer
   },
 });
 export const callApiThunk = async (

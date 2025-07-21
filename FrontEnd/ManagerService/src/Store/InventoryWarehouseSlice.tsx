@@ -1,10 +1,12 @@
 import {createSlice} from "@reduxjs/toolkit";
+import {Bin} from "@/Store/StackSlice.tsx";
+import {Product} from "@/Store/ProductSlice.tsx";
 
 export interface InventoryWarehouse {
     inventoryWarehouseId: string;
     inventoryProduct: string;
-    product: string;
-    bin: string;
+    product: Product;
+    binDetails: Bin;
     quantity: number;
     expiryDate?: string;
     unitCost?: number;
@@ -25,23 +27,12 @@ export interface InventoryWarehouseCreate {
 interface InventoryWarehouseState {
     inventoryWarehouses: InventoryWarehouse[];
     totalPage: number;
-    inventoryWarehouseEdit: InventoryWarehouse;
     inventoryWarehouseCreate: InventoryWarehouseCreate;
 }
 
 const initialState: InventoryWarehouseState = {
     inventoryWarehouses: [],
     totalPage: 0,
-    inventoryWarehouseEdit: {
-        inventoryWarehouseId: "",
-        inventoryProduct: "",
-        product: "",
-        bin: "",
-        quantity: 0,
-        status: "ACTIVE",
-        createdAt: null,
-        updatedAt: null,
-    },
     inventoryWarehouseCreate: {
         product: "",
         bin: "",
@@ -60,6 +51,7 @@ const InventoryWarehouseSlice = createSlice({
             state.totalPage = action.payload;
         },
         setInventoryWarehouseList: (state, action) => {
+            console.log(action.payload);
             state.inventoryWarehouses = action.payload;
         },
         setAddInventoryWarehouse: (state, action) => {
@@ -73,9 +65,6 @@ const InventoryWarehouseSlice = createSlice({
                 state.inventoryWarehouses[index] = action.payload;
             }
         },
-        setInventoryWarehouseEdit: (state, action) => {
-            state.inventoryWarehouseEdit = action.payload;
-        },
     },
 });
 
@@ -84,7 +73,6 @@ export const {
     setInventoryWarehouseList,
     setAddInventoryWarehouse,
     setUpdateInventoryWarehouse,
-    setInventoryWarehouseEdit,
 } = InventoryWarehouseSlice.actions;
 
 export default InventoryWarehouseSlice;

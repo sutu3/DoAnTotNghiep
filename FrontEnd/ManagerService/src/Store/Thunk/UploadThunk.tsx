@@ -1,6 +1,6 @@
 import { showToast } from "@/components/UI/Toast/ToastUI.tsx";
 import { useFileStore } from "@/zustand/File.tsx";
-import {API_ROUTES} from "@/Constants/UrlApi.tsx";
+import {API_ROUTES} from "@/Api/UrlApi.tsx";
 
 export interface UploadResponse {
     idImage: string;

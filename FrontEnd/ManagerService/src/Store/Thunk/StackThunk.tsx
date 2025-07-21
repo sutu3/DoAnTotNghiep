@@ -1,7 +1,7 @@
 import {setAddStack, setStackList, StackCreate,initToTalPage} from "@/Store/StackSlice.tsx";
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {callApiThunk} from "@/Store/Store.tsx";
-import {API_ROUTES, pageApi} from "@/Constants/UrlApi.tsx";
+import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 
 export const addStack = createAsyncThunk(
@@ -12,7 +12,17 @@ export const addStack = createAsyncThunk(
             .stacks(null)
             .addStacks, payload, rejectWithValue)
 );
-
+export const updateStack = createAsyncThunk(
+    "stack/updateStack",
+    async ({stackName,description,stackId}: {stackName:string,description:string,stackId:string}, { rejectWithValue }) =>
+        await callApiThunk("PUT", API_ROUTES
+            .warehouse
+            .stacks(null)
+            .updateStacks(stackId),
+            {stackName: stackName,
+            description: description
+            }, rejectWithValue)
+);
 export const GetAllStack = createAsyncThunk(
     "stack/getAllStack",
     async (
@@ -50,13 +60,11 @@ export const GetAllStackList = createAsyncThunk(
         )
 );
 
-export const MiddleGetAllStack = (page: pageApi) => {
-    return async function check(dispatch: any, getState: any) {
+export const MiddleGetAllStack = (page: pageApi,warehouse:string) => {
+    return async function check(dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
 
-            const action = await dispatch(GetAllStack({ warehouseId, page }));
+            const action = await dispatch(GetAllStack({ warehouseId:warehouse, page }));
             dispatch(setStackList(action.payload.result.content));
             dispatch(initToTalPage(action.payload.result.totalPages));
         } catch (error: any) {
@@ -68,13 +76,10 @@ export const MiddleGetAllStack = (page: pageApi) => {
         }
     };
 };
-export const MiddleGetAllStackList = () => {
-    return async function check(dispatch: any, getState: any) {
+export const MiddleGetAllStackList = (warehouse:string) => {
+    return async function check(dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-
-            const action = await dispatch(GetAllStackList({ warehouseId }));
+            const action = await dispatch(GetAllStackList({ warehouseId:warehouse }));
             dispatch(setStackList(action.payload.result));
         } catch (error: any) {
             showToast({
@@ -86,12 +91,11 @@ export const MiddleGetAllStackList = () => {
     };
 };
 export const MiddleAddStack = (payload: StackCreate) => {
-    return async function check(dispatch: any, getState: any) {
+    return async function check(dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
 
             // Kiểm tra kỹ slice "warehouse" trong root reducer của bạn có field này không
-            const action=await dispatch(addStack({ ...payload, warehouse: warehouse.warehouseId }));
+            const action=await dispatch(addStack( payload ));
             dispatch(setAddStack(action.payload.result));
             showToast({
                 title: "Add New",

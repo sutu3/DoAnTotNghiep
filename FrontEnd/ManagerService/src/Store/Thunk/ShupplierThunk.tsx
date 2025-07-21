@@ -1,6 +1,6 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {callApiThunk} from "@/Store/Store.tsx";
-import {API_ROUTES, pageApi} from "@/Constants/UrlApi.tsx";
+import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {setAddSupplier, setSupplierList, SupplierCreate} from "@/Store/SupplierSlice.tsx";
 import {initToTalPage} from "@/Store/Unit.tsx";
@@ -19,11 +19,9 @@ export const AddSupplier = createAsyncThunk(
         )
 );
 export const MiddleAddSupplier = (SupplierCreate:SupplierCreate) => {
-    return async function (dispatch: any,getState: any) {
+    return async function (dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-            const action = await dispatch(AddSupplier({ payload:{...SupplierCreate,warehouses:warehouseId} }));
+            const action = await dispatch(AddSupplier({ payload:{...SupplierCreate} }));
             dispatch(setAddSupplier(action.payload.result));
             showToast({
                 title: "Add New",
@@ -42,12 +40,12 @@ export const MiddleAddSupplier = (SupplierCreate:SupplierCreate) => {
 export const GetAllSupplierPageByIdWarehouse = createAsyncThunk(
     "Supplier/GetAllSupplierPageByIdWarehouse",
     async (
-        { page,warehouseId }: { page: pageApi,warehouseId: string },
+        { page}: { page: pageApi },
         { rejectWithValue }
     ) =>
         await callApiThunk(
             "GET",
-            API_ROUTES.user.supplier(page).search().byWarehouseId(warehouseId).getAll,
+            API_ROUTES.user.supplier(page).search().byWarehouseId().getAll,
             undefined,
             rejectWithValue
         )
@@ -56,12 +54,12 @@ export const GetAllSupplierPageByIdWarehouse = createAsyncThunk(
 export const GetAllSupplierListByIdWarehouse = createAsyncThunk(
     "Supplier/GetAllSupplierListByIdWarehouse",
     async (
-        { warehouseId }: { warehouseId: string },
+        _: { },
         { rejectWithValue }
     ) =>
         await callApiThunk(
             "GET",
-            API_ROUTES.user.supplier(null).search().byWarehouseId(warehouseId).getAllName,
+            API_ROUTES.user.supplier(null).search().byWarehouseId().getAllName,
             undefined,
             rejectWithValue
         )
@@ -84,11 +82,9 @@ export const MiddleGetAllSupplierList = () => {
     };
 };
 export const MiddleGetAllSupplierPage = (page: pageApi) => {
-    return async function (dispatch: any,getState:any) {
+    return async function (dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-            const action = await dispatch(GetAllSupplierPageByIdWarehouse({ page,warehouseId }));
+            const action = await dispatch(GetAllSupplierPageByIdWarehouse({ page }));
             dispatch(setSupplierList(action.payload.result.content));
             dispatch(initToTalPage(action.payload.result.totalPages));
 

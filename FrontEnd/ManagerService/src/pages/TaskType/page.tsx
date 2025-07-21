@@ -7,7 +7,7 @@ import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
 import InputTaskType from "@/components/Admin/TaskType/InputTaskType.tsx";
 import {TaskTypeSelector, TotalPageTask} from "@/Store/Selector.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {pageApi} from "@/Constants/UrlApi.tsx";
+import {pageApi} from "@/Api/UrlApi.tsx";
 import CustomPagination from "@/components/UI/Pagination/PaginationUI.tsx";
 import CardUI from "@/components/Admin/Dashboard/CardUI.tsx";
 import {useNavigate} from "react-router-dom";

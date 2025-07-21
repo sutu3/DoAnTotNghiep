@@ -3,14 +3,14 @@ import { NavLink } from "react-router-dom";
 
 import DashboardIcon from "../../assets/DashboardIcon.png";
 
-import { navbarLinks } from "@/Constants/NavbarLink.tsx";
 
 interface AppSidebarProps {
-  collapsed: boolean;
+    collapsed: boolean;
+    navbarLinks: any[]; // Thêm prop này
 }
 
 const AppSidebar = forwardRef<HTMLElement, AppSidebarProps>(
-  ({ collapsed }, ref) => {
+    ({ collapsed, navbarLinks }, ref) => {
     return (
       <aside
         ref={ref}

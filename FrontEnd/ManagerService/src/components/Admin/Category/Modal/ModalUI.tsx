@@ -1,7 +1,6 @@
 import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
 import {Layers} from "lucide-react";
 import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
-import UnitForm from "@/components/Form/UnitForm.tsx";
 import {useState} from "react";
 import {CategoryCreate} from "@/Store/CategorySlice.tsx";
 import {useDispatch} from "react-redux";
@@ -16,8 +15,6 @@ const ModalCategory=({open,setOpen}:Props)=>{
     const [formData,setFormData]=useState<CategoryCreate>({
         categoryName: "",
         description: "",
-        warehouses: "",
-        createByUser: "",
     })
     const handleChange = (key: string, value: string|number) => {
         setFormData((prev) => ({ ...prev, [key]: value }));
@@ -27,8 +24,6 @@ const ModalCategory=({open,setOpen}:Props)=>{
         setFormData({
             categoryName: "",
             description: "",
-            warehouses: "",
-            createByUser: "",
         })
         setOpen(false);
     }

@@ -4,7 +4,7 @@ import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEf
 import {useDispatch, useSelector} from "react-redux";
 import {ProductSelector, UnitSelector} from "@/Store/Selector.tsx";
 import {MiddleGetAllUnit} from "@/Store/Thunk/UnitThunk.tsx";
-import {pageApi} from "@/Constants/UrlApi.tsx";
+import {pageApi} from "@/Api/UrlApi.tsx";
 
 interface SelectProps {
     formData: ImportItemCreate;
@@ -18,7 +18,7 @@ export const UnitSelect = ({formData, setFormData}: SelectProps) => {
 
     // 👉 Lấy product an toàn
     const selectedProduct = useMemo(() => {
-        return products.find((el: { productId: string; }) => el.productId === formData?.product);
+        return products?.find((el: { productId: string; }) => el.productId === formData?.product);
     }, [products, formData?.product]);
 
     const groupUnitName = selectedProduct?.unit?.groupUnit?.groupName;

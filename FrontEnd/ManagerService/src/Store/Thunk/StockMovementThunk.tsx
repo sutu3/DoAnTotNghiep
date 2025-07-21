@@ -1,7 +1,7 @@
 import {callApiThunk} from "@/Store/Store.tsx";
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {initTotalPage, setStockMovementList, StockMovementCreate} from "@/Store/StockMovementSlice.tsx";
-import {API_ROUTES, pageApi} from "@/Constants/UrlApi.tsx";
+import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 
 export const GetAllStockMovement = createAsyncThunk(

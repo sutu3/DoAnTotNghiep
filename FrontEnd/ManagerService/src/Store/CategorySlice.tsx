@@ -3,7 +3,6 @@ import {createSlice} from "@reduxjs/toolkit";
 export const columns = [
     { name: "Category Name", uid: "categoryName", sortable: true },
     { name: "Description", uid: "description", sortable: true },
-    { name: "Warehouses", uid: "warehouseName", sortable: true },
     { name: "Create By User", uid: "createByUser", sortable: false },
     { name: "Create At", uid: "createdAt", sortable: false },
 ];
@@ -21,14 +20,11 @@ export interface UserResponse  {
 export interface CategoryCreate{
     categoryName:string,
     description:string,
-    warehouses:string,
-    createByUser:string
 }
 export interface Category{
     categoryId:string,
     categoryName:string,
     description:string,
-    warehouses:WarehouseResponse|undefined,
     createByUser:UserResponse|undefined,
     createdAt:Date|undefined
 }
@@ -43,9 +39,6 @@ const initialState:CategoryState = {
     category: {
         categoryName:"",
         description:"",
-        warehouses:"",
-        createByUser:""
-
     },
 };
 const CategorySlice = createSlice({

@@ -1,11 +1,8 @@
 import {useEffect, useState} from "react";
-import { IdCard } from "lucide-react";
 
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
-import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
-import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
 import {useDispatch} from "react-redux";
-import {pageApi} from "@/Constants/UrlApi.tsx";
+import {pageApi} from "@/Api/UrlApi.tsx";
 import {MiddleGetAllGroupUnit} from "@/Store/Thunk/GroupUnitThunk.tsx";
 import TableUI from "@/components/Admin/Unit/Table/TableUI.tsx";
 
@@ -13,21 +10,18 @@ import TableUI from "@/components/Admin/Unit/Table/TableUI.tsx";
 
 const GroupUnit = () => {
     // console.log(useSelector(warehouse));
-    const [isOpen, setIsOpen] = useState(false);
     const dispatch = useDispatch();
     // const [idShow, setIdShow] = useState<String>("");
-
+const [loading, setLoading] = useState(false);
     const isSidebarCollapsed = localStorage.getItem("theme") == "light";
 
-    const handleOpenModel = () => {
-        setIsOpen(!isOpen);
-    };
 
     useEffect(() => {
         const PageApi: pageApi = { pageNumber: 0, pageSize:  5 };
-
+        setLoading(true);
         const fetch=async ()=>{
             (dispatch as any)(MiddleGetAllGroupUnit(PageApi));
+            setLoading(false);
         }
         fetch();
     },[])
@@ -58,36 +52,10 @@ const GroupUnit = () => {
                     </div>
 
                     <div className="p-0 md:p-4">
-                        <TableUI />
+                        <TableUI loading={loading} />
                     </div>
                 </div>
             </div>
-            <ModalUI
-                footer={
-                    <ButtonUI
-                        className="relative z-0 font-medium text-black px-5 py-2 rounded-full overflow-hidden
-             border border-transparent
-             before:content-[''] before:absolute before:inset-0 before:rounded-full
-             before:border before:border-transparent before:bg-gradient-to-r
-             before:from-pink-500 before:to-purple-500
-             before:z-[-1]"
-                        label="Add new"
-                        loading={false}
-                        startContent={<IdCard />}
-                        variant = {undefined}
-                    />
-
-
-                }
-                size={"2xl"}
-                isOpen={isOpen}
-                title="User From"
-                onOpenChange={setIsOpen}
-            >
-{/*
-                <UserForm data={formData} onChange={handleChange} />
-*/}
-            </ModalUI>
         </div>
     );
 };

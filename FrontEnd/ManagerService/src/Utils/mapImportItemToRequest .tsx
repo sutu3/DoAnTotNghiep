@@ -9,7 +9,6 @@ export interface ImportOrderRequest {
     requestQuantity: number;
     note?: string;
     costUnitBase: number;
-    createByUser: string;
     expiredDate?:string,
 }
 
@@ -17,7 +16,6 @@ export const mapImportItemToRequest = (
     item: ImportItemCreate,
     warehouseId: string,
     importOrderId: string,
-    userId: string
 ): ImportOrderRequest => {
     return {
         product: item.product,
@@ -28,7 +26,6 @@ export const mapImportItemToRequest = (
         requestQuantity: item.requestQuantity,
         note: item.note,
         costUnitBase: item.costUnitBase,
-        createByUser: userId,
         expiredDate:item.expiryDate
     };
 };

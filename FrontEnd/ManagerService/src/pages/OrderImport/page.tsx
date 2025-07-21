@@ -18,7 +18,7 @@ import {SupplierSelect} from "@/components/Admin/OrderImport/select/SupplierSele
 import {UnitSelect} from "@/components/Admin/OrderImport/select/UnitSelect.tsx";
 import TableUI from "@/components/Admin/OrderImport/Table/TableUI.tsx";
 import {useImportOrderStore} from "@/zustand/importOrderStore.tsx";
-import {MiddleAddOrder} from "@/Store/Thunk/ImportOrderThunk.tsx";
+import {MiddleAddOrderImport} from "@/Store/Thunk/ImportOrderThunk.tsx";
 import {useDispatch} from "react-redux";
 
 
@@ -28,7 +28,6 @@ export default function OrderRequestImportForm() {
     const dispatch=useDispatch();
     const [formData, setFormData] = useState<OrderRequestImportCreate>({
         warehouse: "",
-        createByUser: "",
         note: ""
     });
     const [currentItem, setCurrentItem] = useState<ImportItemCreate>({
@@ -68,7 +67,7 @@ export default function OrderRequestImportForm() {
     const handleSubmit = async () => {
         setLoading(true);
         try {
-            await (dispatch as any)(MiddleAddOrder(formData,items));
+            await (dispatch as any)(MiddleAddOrderImport(formData,items));
             clearItems();
 
         } catch (error) {
@@ -117,9 +116,9 @@ export default function OrderRequestImportForm() {
                             </CardHeader>
                             <CardBody className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <ProductSelect formData={currentItem} setFormData={setCurrentItem}/>
+                                    <ProductSelect formData={formData} currentItem={currentItem} setCurrentItem={setCurrentItem}/>
 
-                                    <SupplierSelect formData={currentItem} setFormData={setCurrentItem}/>
+                                    <SupplierSelect  formData={currentItem} setFormData={setCurrentItem}/>
 
                                     <UnitSelect formData={currentItem} setFormData={setCurrentItem}/>
 

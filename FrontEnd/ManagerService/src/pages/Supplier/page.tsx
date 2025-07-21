@@ -5,7 +5,7 @@ import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
 import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
 import {useDispatch} from "react-redux";
-import {pageApi} from "@/Constants/UrlApi.tsx";
+import {pageApi} from "@/Api/UrlApi.tsx";
 import TableUI from "@/components/Admin/Supplier/Table/TableUI.tsx";
 import {MiddleGetAllSupplierPage} from "@/Store/Thunk/ShupplierThunk.tsx";
 
@@ -15,6 +15,7 @@ const SupplierPage = () => {
     // console.log(useSelector(warehouse));
     const [isOpen, setIsOpen] = useState(false);
     const dispatch = useDispatch();
+    const [loading,setloading] = useState(true);
     // const [idShow, setIdShow] = useState<String>("");
 
     const isSidebarCollapsed = localStorage.getItem("theme") == "light";
@@ -25,8 +26,10 @@ const SupplierPage = () => {
 
     useEffect(() => {
         const PageApi: pageApi = { pageNumber: 0, pageSize:  5 };
+        setloading(true)
         const fetch=async ()=>{
-            (dispatch as any)(MiddleGetAllSupplierPage(PageApi));
+            await (dispatch as any)(MiddleGetAllSupplierPage(PageApi));
+            setloading(false)
         }
         fetch();
     },[])
@@ -57,6 +60,7 @@ const SupplierPage = () => {
                     </div>
                     <div className="p-0 md:p-4">
                         <TableUI
+                            loading={loading}
                             setOpen={setIsOpen}
                             open={isOpen} />
                     </div>

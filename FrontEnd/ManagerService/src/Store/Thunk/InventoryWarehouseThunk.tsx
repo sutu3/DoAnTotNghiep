@@ -1,46 +1,57 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { callApiThunk } from "../Store";
-import {initTotalPage, InventoryWarehouseCreate, setInventoryWarehouseList} from "@/Store/InventoryWarehouseSlice.tsx";
-import {API_ROUTES, pageApi} from "@/Constants/UrlApi.tsx";
+import {API_ROUTES} from "@/Api/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
+import {setInventoryWarehouseList} from "@/Store/InventoryWarehouseSlice.tsx";
 
-export const GetAllInventoryWarehouse = createAsyncThunk(
-    "inventoryWarehouse/getAllInventoryWarehouse",
+
+export const GetInventoryWarehouseByBinId = createAsyncThunk(
+    "inventoryWarehouse/GetInventoryWarehouseByBinId",
     async (
-        { warehouseId, page }: { warehouseId: string; page: pageApi },
+        {  binId }: { binId:string  },
         { rejectWithValue }
     ) =>
         await callApiThunk(
             "GET",
-            API_ROUTES.inventory.InventoryWarehouse(page).addInventoryWarehouse,
+            API_ROUTES.inventory.InventoryWarehouse().search().byBinId(binId).getProduct,
             undefined,
             rejectWithValue
         )
 );
-
-export const AddInventoryWarehouse = createAsyncThunk(
-    "inventoryWarehouse/addInventoryWarehouse",
+export const GetAllInventoryWarehouseByProduct = createAsyncThunk(
+    "inventoryWarehouse/GetAllInventoryWarehouseByProduct",
     async (
-        { payload }: { payload: InventoryWarehouseCreate },
+        { productId }: { productId: string },
         { rejectWithValue }
     ) =>
         await callApiThunk(
-            "POST",
-            API_ROUTES.inventory.InventoryWarehouse(null).addInventoryWarehouse,
-            payload,
+            "GET",
+            API_ROUTES.inventory.InventoryWarehouse().search().byProductId(productId).getProduct,
+            null,
             rejectWithValue
         )
 );
 
-export const MiddleGetAllInventoryWarehouse = (page: pageApi) => {
-    return async function (dispatch: any, getState: any) {
-        try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-            const action = await dispatch(GetAllInventoryWarehouse({ warehouseId, page }));
+export const MiddleGetInventoryWarehouse = (binId:string) => {
+    return async function (dispatch: any) {
+         try {
 
-            dispatch(setInventoryWarehouseList(action.payload.result.content));
-            dispatch(initTotalPage(action.payload.result.totalPages));
+            const action = await dispatch(GetInventoryWarehouseByBinId({  binId }));
+            dispatch(setInventoryWarehouseList(action.payload.result));
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
+export const MiddleGetInventoryWarehouseByProductId = (productId:string) => {
+    return async function (dispatch: any) {
+        try {
+            const action = await dispatch(GetAllInventoryWarehouseByProduct({  productId }));
+            dispatch(setInventoryWarehouseList(action.payload.result));
         } catch (error: any) {
             showToast({
                 title: "Error",
@@ -51,27 +62,3 @@ export const MiddleGetAllInventoryWarehouse = (page: pageApi) => {
     };
 };
 
-export const MiddleAddInventoryWarehouse = (inventoryWarehouseCreate: InventoryWarehouseCreate) => {
-    return async function (dispatch: any, getState: any) {
-        try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-
-            await dispatch(AddInventoryWarehouse({
-                payload: { ...inventoryWarehouseCreate, warehouse: warehouseId }
-            }));
-
-            showToast({
-                title: "Success",
-                description: "Inventory warehouse created successfully",
-                color: "success",
-            });
-        } catch (error: any) {
-            showToast({
-                title: "Error",
-                description: `Message: ${error.message || error}`,
-                color: "danger",
-            });
-        }
-    };
-};

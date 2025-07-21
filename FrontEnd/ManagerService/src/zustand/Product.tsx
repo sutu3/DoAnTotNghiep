@@ -8,10 +8,10 @@ export interface ProductCreate {
     price: number;
     urlImageProduct: string;
     supplier: string;
-    warehouses: string;
-    createByUser: string;
     category: string;
     unit: string;
+    minStockLevel:number;
+    maxStockLevel:number;
 }
 
 interface ProductState {
@@ -28,10 +28,10 @@ const initialState: ProductCreate = {
     price: 0,
     urlImageProduct: "",
     supplier: "",
-    warehouses: "",
-    createByUser: "",
     category: "",
-    unit: ""
+    unit: "",
+    minStockLevel:0,
+    maxStockLevel:0,
 };
 
 export const useProductStore = create<ProductState>((set) => ({
