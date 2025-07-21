@@ -28,26 +28,23 @@ public class SupplierController {
 
     private final SupplierService supplierService;
 
-    @GetMapping("/search/byWarehouseId/{warehouseId}")
+    @GetMapping("/search")
     public ApiResponse<Page<SupplierResponse>> getALl(
             @RequestParam("pageNumber") int page,
-            @RequestParam("pageSize") int size,
-            @PathVariable String warehouseId
-    ){
+            @RequestParam("pageSize") int size){
         Pageable pageable= PageRequest.of(page,size);
         return ApiResponse.<Page<SupplierResponse>>builder()
-                .Result(supplierService.getAll(pageable,warehouseId))
+                .Result(supplierService.getAll(pageable))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)
                 .build();
     }
-    @GetMapping("/search/byWarehouseId/{warehouseId}/SuppliersName")
+    @GetMapping("/search/SuppliersName")
     public ApiResponse<List<SupplierResponse>> getALl(
-            @PathVariable String warehouseId
     ){
         return ApiResponse.<List<SupplierResponse>>builder()
-                .Result(supplierService.getALlList(warehouseId))
+                .Result(supplierService.getALlList())
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

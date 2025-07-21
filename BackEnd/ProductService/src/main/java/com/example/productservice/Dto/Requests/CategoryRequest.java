@@ -5,6 +5,5 @@ import lombok.Builder;
 @Builder
 public record CategoryRequest(
         String categoryName,
-        String description,
-        String warehouses) {
+        String description) {
 }

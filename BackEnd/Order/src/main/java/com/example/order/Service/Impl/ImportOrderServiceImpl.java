@@ -74,8 +74,10 @@ public class ImportOrderServiceImpl implements ImportOrderService {
         log.info("Create Order Request1:{}",importOrderRequest);
         ImportOrder importOrder = importOrderMapper.toEntity(importOrderRequest);
         log.info("Create Order Request2:{}",importOrder);
+        var idUser=GetCurrentUserId.getCurrentUserId();
         importOrder.setIsDeleted(false);
         importOrder.setType(OrderType.Request);
+        importOrder.setCreateByUser(idUser);
         importOrder.setStatus(OrderStatus.Created);
         importOrder.setRequestDate(LocalDateTime.now());
         importOrder.setCreatedAt(LocalDateTime.now());

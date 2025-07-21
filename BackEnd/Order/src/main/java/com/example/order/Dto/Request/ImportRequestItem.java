@@ -15,6 +15,5 @@ public record ImportRequestItem(
         int requestQuantity,
         String note,
         BigDecimal costUnitBase,
-        String createByUser,
         String expiredDate) {
 }

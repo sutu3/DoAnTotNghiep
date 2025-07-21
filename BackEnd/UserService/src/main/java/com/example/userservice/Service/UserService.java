@@ -2,6 +2,7 @@ package com.example.userservice.Service;
 
 import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.userservice.Dto.Request.UserRequest;
+import com.example.userservice.Dto.Responses.User.IdWarehouseResponse;
 import com.example.userservice.Dto.Responses.User.UserResponse;
 import com.example.userservice.Model.Users;
 import org.springframework.data.domain.Page;
@@ -15,11 +16,13 @@ import java.util.List;
 public interface UserService {
     Page<UserResponse> getAllByWarehouseId(String warehouseId,Pageable pageable);
     Page<UserResponse> getAllUserByUserName(String userName, Pageable pageable);
+    IdWarehouseResponse getWarehouseByIdUser();
     @PreAuthorize("hasRole('MANAGER')")
     UserResponse CreateUser(UserRequest request);
     String DeletedUser(String id);
     Users findById(String id);
+    UserResponse getByIdResponse(String id);
     UserResponse findByEmail(String email);
-    UserResponse getByUserId(String id);
+    UserResponse getByUserId();
     UserResponse enrich(Users users);
 }

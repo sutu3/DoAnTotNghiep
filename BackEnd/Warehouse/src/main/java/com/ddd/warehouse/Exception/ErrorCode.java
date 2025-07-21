@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatusCode;
 @NoArgsConstructor
 public enum ErrorCode {
     INVALID_KEY(1001,"Invalid key", HttpStatus.BAD_REQUEST),
+    USER_SERVICE_NOT_WORKING(1002,"User Service Not Working", HttpStatus.BAD_REQUEST),
     INVALID_OCCUPANCY(1002,"Invalid occupancy", HttpStatus.BAD_REQUEST),
     BIN_CAPACITY_EXCEEDED(1003,"Bin capacity exceeded", HttpStatus.BAD_REQUEST),
     CAPICITY_INVALID(1003,"Invalid capacity", HttpStatus.BAD_REQUEST),

@@ -5,8 +5,10 @@ import com.example.productservice.Client.Inventory.InventoryController;
 import com.example.productservice.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.productservice.Client.UserService.UserController;
-import com.example.productservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.productservice.Client.WarehouseService.WarehouseController;
+import com.example.productservice.Dto.Requests.ProductClientRequest;
+import com.example.productservice.Dto.Requests.ProductCreateWrapper;
+import com.example.productservice.Dto.Requests.ProductFilterRequest;
 import com.example.productservice.Dto.Requests.ProductRequest;
 import com.example.productservice.Dto.Responses.Product.ProductResponse;
 import com.example.productservice.Exception.AppException;
@@ -33,6 +35,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -51,25 +54,24 @@ public class ProductServiceImpl implements ProductService {
     private final InventoryController inventoryController;
 
     @Override
-    public Page<ProductResponse> getAllByWarehouses(String warehouse, Pageable pageable) {
-        return productRepo.findAllByWarehousesAndIsDeleted(warehouse, false, pageable)
+    public Page<ProductResponse> getAll( Pageable pageable) {
+        return productRepo.findAllByIsDeleted( false, pageable)
                 .map(this::enrich);
     }
 
 
     @Override
-    public Page<ProductResponse> getAllBySupplierAndWarehouse(String supplier, String warehouse, Pageable pageable) {
-        return productRepo.findAllBySupplierAndWarehousesAndIsDeleted(supplier, warehouse, false, pageable)
+    public Page<ProductResponse> getAllBySupplier(String supplier, Pageable pageable) {
+        return productRepo.findAllBySupplierAndIsDeleted(supplier, false, pageable)
                 .map(this::enrich);
     }
 
     @Override
-    public List<ProductResponse> searchProducts(String productName,String warehouses, String sku, String supplier, Boolean isActive) {
+    public List<ProductResponse> searchProducts(String productName, String sku, String supplier, Boolean isActive) {
         Specification<Product> spec = Specification.where(ProductSpecification.hasProductName(productName))
                 .and(ProductSpecification.hasSku(sku))
                 .and(ProductSpecification.hasSupplier(supplier))
-                .and(ProductSpecification.isActive(isActive))
-                .and(ProductSpecification.hasWarehouses(warehouses));
+                .and(ProductSpecification.isActive(isActive));
     List<Product> listProduct=productRepo.findAll(spec);
         return listProduct.stream()
                 .map(this::enrich)
@@ -91,10 +93,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse createProduct(ProductRequest request) {
+    public ProductResponse createProduct(ProductCreateWrapper productCreateWrapper) {
+        ProductRequest request=productCreateWrapper.getProductRequest();
+        List<String> warehouseIds=productCreateWrapper.getIdWarehouses();
         Category category=categoryService.getById(request.category());
         Unit unit=unitService.getById(request.unit());
-        Optional<Product> existing=productRepo.findBySkuAndWarehouses(request.sku(),request.warehouses());
+        if(warehouseIds == null || warehouseIds.isEmpty()) {
+            throw new AppException(ErrorCode.WAREHOUSE_LIST_EMPTY);
+        }
+
+        for(String warehouseId : warehouseIds) {
+            warehouseController.getWarehouse(warehouseId);
+        }
+        Optional<Product> existing=productRepo.findBySku(request.sku());
         var idUser=GetCurrentUserId.getCurrentUserId();
         if(existing.isPresent()){
             Product  product=existing.get();
@@ -107,13 +118,16 @@ public class ProductServiceImpl implements ProductService {
             product.setIsDeleted(false);
             product.setCreateByUser(idUser);
             Product productSave=productRepo.save(product);
-            InventoryProductRequest inventoryProductRequest=new InventoryProductRequest(productSave.getProductId(),
-                    request.warehouses(),
-                    0,
-                    request.minStockLevel(),
-                    request.maxStockLevel(),
-                    "Active");
-            inventoryController.createInventoryProduct(inventoryProductRequest);
+            for(String warehouseId:warehouseIds){
+                InventoryProductRequest inventoryProductRequest=new InventoryProductRequest(productSave.getProductId(),
+                        warehouseId,
+                        0,
+                        request.minStockLevel(),
+                        request.maxStockLevel(),
+                        "Active");
+                inventoryController.createInventoryProduct(inventoryProductRequest);
+            }
+
             return  enrich(productSave);
         }
         Product product=productMapper.toEntity(request);
@@ -123,16 +137,68 @@ public class ProductServiceImpl implements ProductService {
         product.setIsActive(true);
         product.setCreateByUser(idUser);
         Product productSave=productRepo.save(product);
-        InventoryProductRequest inventoryProductRequest=new InventoryProductRequest(
-                productSave.getProductId(),
-                request.warehouses(),
-                0,
-                request.minStockLevel(),
-                request.maxStockLevel(),
-                "ACTIVE");
-        inventoryController.createInventoryProduct(inventoryProductRequest);
+        for(String warehouseId:warehouseIds){
+            InventoryProductRequest inventoryProductRequest=new InventoryProductRequest(productSave.getProductId(),
+                    warehouseId,
+                    0,
+                    request.minStockLevel(),
+                    request.maxStockLevel(),
+                    "Active");
+            inventoryController.createInventoryProduct(inventoryProductRequest);
+        }
         return  enrich(productSave);
     }
+
+    @Override
+    public List<ProductResponse> getProductsBySupplierFilteredByWarehouse(String supplierId, String warehouseId) {
+        log.info("Start");
+        Specification<Product> spec = Specification.where(ProductSpecification.hasSupplier(supplierId))
+                .and(ProductSpecification.isActive(true));
+
+        log.info("📦 [Product Filter] - Specification created for supplierId={} and isActive=true", supplierId);
+
+        List<Product> listProduct = productRepo.findAll(spec);
+        log.info("🔍 [Product Filter] - Found {} products for supplierId={}", listProduct.size(), supplierId);
+
+        if (listProduct.isEmpty()) {
+            log.warn("⚠️ [Product Filter] - No products found for supplierId={}", supplierId);
+        }
+
+        log.info("🏬 [Warehouse Filter] - Filtering products for warehouseId={}", warehouseId);
+        ProductFilterRequest request = new ProductFilterRequest(
+                warehouseId,
+                listProduct.stream().map(productMapper::toClientRequest).toList()
+        );
+
+        List<ProductClientRequest> filteredProductDtos = inventoryController
+                .filterProductsByWarehouse(request)
+                .getResult();
+
+        log.info("🏬 [Warehouse Filter] - Done");
+
+        if (filteredProductDtos == null || filteredProductDtos.isEmpty()) {
+            log.warn("⚠️ [Warehouse Filter] - No products matched in warehouseId={}", warehouseId);
+            return List.of();
+        }
+
+        // 🔁 Lọc lại danh sách gốc theo ID trong danh sách đã lọc
+        Set<String> filteredProductIds = filteredProductDtos.stream()
+                .map(ProductClientRequest::getProductId)
+                .collect(Collectors.toSet());
+
+        List<Product> filteredFullProducts = listProduct.stream()
+                .filter(product -> filteredProductIds.contains(product.getProductId()))
+                .toList();
+
+        log.info("✅ [Result] - Returning {} enriched products", filteredFullProducts.size());
+
+        // ✨ enrich để trả về đầy đủ thông tin
+        return filteredFullProducts.stream()
+                .map(this::enrich)
+                .toList();
+    }
+
+
 
     @Override
     public ProductResponse getBySku(String sku) {
@@ -162,14 +228,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse enrich(Product product) {
         CompletableFuture<UserResponse> userFuture = asyncServiceImpl.getUserAsync(product.getCreateByUser());
-        CompletableFuture<WarehousesResponse> warehouseFuture = asyncServiceImpl.getWarehouseAsync(product.getWarehouses());
         CompletableFuture<SupplierResponse> supplierFuture = asyncServiceImpl.getSupplierAsync(product.getSupplier());
 
-        CompletableFuture.allOf(userFuture, warehouseFuture, supplierFuture).join();
+        CompletableFuture.allOf(userFuture, supplierFuture).join();
 
         ProductResponse response = productMapper.toResponse(product);
         response.setCreateByUser(userFuture.join());
-        response.setWarehouses(warehouseFuture.join());
         response.setSupplier(supplierFuture.join());
         return response;
     }

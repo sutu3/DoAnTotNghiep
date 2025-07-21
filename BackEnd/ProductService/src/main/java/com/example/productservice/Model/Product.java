@@ -32,8 +32,6 @@ public class Product extends BaseEntity{
     BigDecimal price;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'Mã nhà cung cấp'")
     String supplier;
-    @Column(columnDefinition = "VARCHAR(36) COMMENT 'mã id của warehouse của từng category'",nullable = false)
-    String warehouses;
     @Column(columnDefinition = "VARCHAR(36) COMMENT 'mã id của user đã tạo'",nullable = false)
     String createByUser;
     @Column(columnDefinition = "BOOLEAN COMMENT 'Trạng thái còn bán của sản phẩm'", nullable = false)

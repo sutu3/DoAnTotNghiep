@@ -14,10 +14,10 @@ import java.util.List;
 
 @Service
 public interface CategoryService {
-    Page<CategoryResponse> getAllByWarehouseId(Pageable pageable,String warehouses);
-    List<CategoryNameResponse> getAllCategoryName(String warehouses);
-    Category getByName(String name, String warehouses);
-    CategoryResponse getByNameResponse(String name,String warehouses);
+    Page<CategoryResponse> getAll(Pageable pageable);
+    List<CategoryNameResponse> getAllCategoryName();
+    Category getByName(String name);
+    CategoryResponse getByNameResponse(String name);
     @PreAuthorize("hasRole('MANAGER')")
     CategoryResponse createCategory(CategoryRequest request);
     void DeleteCategory(String id);

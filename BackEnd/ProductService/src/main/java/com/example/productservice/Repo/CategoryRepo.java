@@ -12,9 +12,9 @@ import java.util.Optional;
 
 @Repository
 public interface CategoryRepo extends JpaRepository<Category,String>, JpaSpecificationExecutor<Category> {
-    Page<Category> findAllByIsDeletedAndWarehouses(boolean isdeleted,String warehouse, Pageable pageable);
-    List<Category> findAllByIsDeletedAndWarehouses(boolean isdeleted, String warehouse);
-    Optional<Category> findByCategoryNameAndIsDeletedAndWarehouses(String name, boolean isdeleted,String warehouse);
-    Optional<Category> findByCategoryNameAndWarehouses(String name,String warehouse);
+    Page<Category> findAllByIsDeleted(boolean isdeleted, Pageable pageable);
+    List<Category> findAllByIsDeleted(boolean isdeleted);
+    Optional<Category> findByCategoryNameAndIsDeleted(String name, boolean isdeleted);
+    Optional<Category> findByCategoryName(String name);
     Optional<Category> findByCategoryIdAndIsDeleted(String id, boolean b);
 }

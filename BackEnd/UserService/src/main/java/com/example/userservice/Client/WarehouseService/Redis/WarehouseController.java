@@ -1,4 +1,4 @@
-package com.example.userservice.Client.WarehouseService;
+package com.example.userservice.Client.WarehouseService.Redis;
 
 import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.userservice.Client.WarehouseService.Fallbacks.WarehouseServiceFallback;
@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(
         name = "Warehouse",
-        url = "https://doantotnghiep-r5ta.onrender.com/api/cache",
-        //url = "http://localhost:8081/api/cache",
+        //url = "https://doantotnghiep-r5ta.onrender.com/api/cache",
+        url = "http://localhost:8087/api/cache",
         fallback = WarehouseServiceFallback.class,
         configuration = {AuthenticationRequestInterceptor.class}
 )

@@ -1,7 +1,6 @@
 package com.example.productservice.Dto.Responses.Category;
 
 import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
-import com.example.productservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -15,7 +14,6 @@ public class CategoryResponse {
     String categoryId;
     String categoryName;
     String description;
-    WarehousesResponse warehouses;
     UserResponse createByUser;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

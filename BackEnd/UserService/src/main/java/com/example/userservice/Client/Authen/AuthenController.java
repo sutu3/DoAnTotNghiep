@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
         name = "AuthenService",
-        url = "https://doantotnghiep-3a2x.onrender.com/api",
-        //url = "http://localhost:8081/api/cache",
+        //url = "https://doantotnghiep-3a2x.onrender.com/api",
+        url = "http://localhost:8088/api",
         fallback = WarehouseServiceFallback.class,
         configuration = {AuthenticationRequestInterceptor.class, FeignConfiguration.class}
 )

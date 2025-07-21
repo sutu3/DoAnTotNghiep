@@ -30,8 +30,6 @@ public class Supplier extends AddressEntity{
     StatusSupplier status;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'Điện thoại của người dùng'",nullable = false)
     String phoneNumber;
-    @Column(columnDefinition = "VARCHAR(36) COMMENT 'mã id của warehouse'",nullable = false)
-    String warehouses;
 
 
 }
