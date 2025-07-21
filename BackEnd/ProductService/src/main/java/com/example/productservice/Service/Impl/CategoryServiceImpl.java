@@ -1,9 +1,7 @@
 package com.example.productservice.Service.Impl;
 
-import com.example.productservice.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
 import com.example.productservice.Client.UserService.UserController;
-import com.example.productservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.productservice.Client.WarehouseService.WarehouseController;
 import com.example.productservice.Dto.Requests.CategoryRequest;
 import com.example.productservice.Dto.Responses.Category.CategoryNameResponse;
@@ -41,49 +39,49 @@ public class CategoryServiceImpl implements CategoryService {
     private final AsyncServiceImpl asyncServiceImpl;
 
     @Override
-    public Page<CategoryResponse> getAllByWarehouseId(Pageable pageable, String warehouses) {
-        return categoryRepo.findAllByIsDeletedAndWarehouses(false, warehouses,pageable)
+    public Page<CategoryResponse> getAll(Pageable pageable) {
+        return categoryRepo.findAllByIsDeleted(false,pageable)
                 .map(this::enrich);
     }
 
     @Override
-    public List<CategoryNameResponse> getAllCategoryName(String warehouses) {
-        return categoryRepo.findAllByIsDeletedAndWarehouses(false, warehouses)
+    public List<CategoryNameResponse> getAllCategoryName() {
+        return categoryRepo.findAllByIsDeleted(false)
                 .stream().map(categoryMapper::toNameResponse).collect(Collectors.toList());
     }
 
     @Override
-    public Category getByName(String name, String warehouses) {
-        return categoryRepo.findByCategoryNameAndIsDeletedAndWarehouses(name,false,warehouses)
+    public Category getByName(String name) {
+        return categoryRepo.findByCategoryNameAndIsDeleted(name,false)
                 .orElseThrow(()->new AppException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 
     @Override
-    public CategoryResponse getByNameResponse(String name, String warehouses) {
-        WarehousesResponse warehouse = warehouseController
-                .getWarehouse(warehouses)
-                .getResult();
-        Category category=getByName(name,warehouses);
+    public CategoryResponse getByNameResponse(String name) {
+        Category category=getByName(name);
         return enrich(category);
     }
 
     @Override
     public CategoryResponse createCategory(CategoryRequest request) {
+        var idUser=GetCurrentUserId.getCurrentUserId();
 
         Optional<Category> existing = categoryRepo
-                .findByCategoryNameAndWarehouses(request.categoryName(),request.warehouses());
+                .findByCategoryName(request.categoryName());
         if(existing.isPresent()){
             Category category=existing.get();
             if(!category.getIsDeleted()){
                 throw  new AppException(ErrorCode.CATEGORY_EXISTS);
             }
             category.setIsDeleted(false);
+            category.setCreateByUser(idUser);
             category.setDescription(request.description());
             Category savedCategory = categoryRepo.save(category);
             return enrich(savedCategory);
         }
         Category category=categoryMapper.toEntity(request);
         category.setIsDeleted(false);
+        category.setCreateByUser(idUser);
         Category savedCategory = categoryRepo.save(category);
         return enrich(savedCategory);
     }
@@ -111,7 +109,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse updateCategory(CategoryForm update,String id) {
         Category category=getById(id);
-        getByName(update.categoryName(),category.getWarehouses());
+        getByName(update.categoryName());
         categoryMapper.update(category,update);
         Category savedCategory = categoryRepo.save(category);
         return enrich(savedCategory);
@@ -120,11 +118,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse enrich(Category category) {
         CompletableFuture<UserResponse> userFuture = asyncServiceImpl.getUserAsync(category.getCreateByUser());
-        CompletableFuture<WarehousesResponse> warehouseFuture = asyncServiceImpl.getWarehouseAsync(category.getWarehouses());
-        CompletableFuture.allOf(userFuture, warehouseFuture).join();
+        CompletableFuture.allOf(userFuture).join();
         CategoryResponse categoryResponse=categoryMapper.toResponse(category);
         categoryResponse.setCreateByUser(userFuture.join());
-        categoryResponse.setWarehouses(warehouseFuture.join());
         return categoryResponse;
     }
 }

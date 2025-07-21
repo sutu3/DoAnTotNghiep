@@ -6,12 +6,12 @@ springdoc:
 spring:
   application:
     name: Order
-  datasource:
-    url: jdbc:mysql://mysql-32d8e507-minhdaimk111-0ea4.l.aivencloud.com:25644/orderDB?createDatabaseIfNotExist=true&serverTimezone=UTC&ssl-mode=REQUIRED
-    username: "avnadmin"
-    password: "AVNS_qlIFCPONWrpyRD8A4Rr"
-    driver-class-name: "com.mysql.cj.jdbc.Driver"
 
+  datasource:
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
   jpa:
     database: mysql
     hibernate:

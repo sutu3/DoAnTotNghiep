@@ -24,8 +24,6 @@ public class Category extends BaseEntity {
     String categoryName;
     @Column(columnDefinition = "TEXT COMMENT 'Mo ta the loai'", nullable = false)
     String description;
-    @Column(columnDefinition = "VARCHAR(36) COMMENT 'mã id của warehouse của từng category'",nullable = false)
-    String warehouses;
     @Column(columnDefinition = "VARCHAR(36) COMMENT 'mã id của user đã tạo'",nullable = false)
     String createByUser;
     @OneToMany(mappedBy="category")

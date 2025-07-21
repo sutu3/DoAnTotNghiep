@@ -17,10 +17,8 @@ public interface CategoryMapper {
     Category toEntity(CategoryRequest request);
 
     @Mapping(target = "createByUser", ignore = true)
-    @Mapping(target = "warehouses", ignore = true)
     CategoryResponse toResponse(Category category);
 
     CategoryNameResponse toNameResponse(Category category);
-    @Mapping(target = "warehouses", ignore = true)
     void update(@MappingTarget Category category, CategoryForm categoryUpdate);
 }

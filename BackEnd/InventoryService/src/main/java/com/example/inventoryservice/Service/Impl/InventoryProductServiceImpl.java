@@ -1,11 +1,13 @@
 package com.example.inventoryservice.Service.Impl;
 
+import com.example.inventoryservice.Client.ProductService.Dto.Response.Product.ProductClientRequest;
 import com.example.inventoryservice.Client.ProductService.Dto.Response.ProductResponse;
 import com.example.inventoryservice.Client.ProductService.Redis.ProductController;
 import com.example.inventoryservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.inventoryservice.Client.WarehouseService.Redis.WarehouseController;
 import com.example.inventoryservice.Dtos.Request.InventoryProductRequest;
 import com.example.inventoryservice.Dtos.Response.InventoryProductResponse;
+import com.example.inventoryservice.Enum.InventoryStatus;
 import com.example.inventoryservice.Exception.AppException;
 import com.example.inventoryservice.Exception.ErrorCode;
 import com.example.inventoryservice.Form.InventoryProductForm;
@@ -52,6 +54,18 @@ public class InventoryProductServiceImpl implements InventoryProductService {
     }
 
     @Override
+    public List<ProductClientRequest> getFilterProductByWarehouse(String warehouse, List<ProductClientRequest> products) {
+        List<String> idProductByWarehouse = inventoryProductRepo.findAllListIdProduct(warehouse);
+
+        if (idProductByWarehouse != null && !idProductByWarehouse.isEmpty()) {
+            return products.stream()
+                    .filter(productClient -> idProductByWarehouse.contains(productClient.getProductId()))
+                    .toList();
+        }
+        return null;
+    }
+
+    @Override
     public InventoryProductResponse getByIdResponse(String id) {
         return enrich(getById(id));
     }
@@ -85,6 +99,7 @@ public class InventoryProductServiceImpl implements InventoryProductService {
         }
 
         InventoryProduct inventoryProduct = inventoryProductMapper.toEntity(request);
+        inventoryProduct.setStatus(InventoryStatus.valueOf(request.status().toUpperCase()));
         inventoryProduct.setIsDeleted(false);
         InventoryProduct savedProduct = inventoryProductRepo.save(inventoryProduct);
 

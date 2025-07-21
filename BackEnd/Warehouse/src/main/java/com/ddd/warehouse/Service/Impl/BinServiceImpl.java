@@ -16,6 +16,7 @@ import com.ddd.warehouse.Repo.WarehouseRepo;
 import com.ddd.warehouse.Service.BinService;
 import com.ddd.warehouse.Service.StackService;
 import com.ddd.warehouse.Utils.CheckNumber;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -79,16 +80,12 @@ public class BinServiceImpl implements BinService {
     }
 
     @Override
+    @Transactional
     public void updateCurrentOccupancy(String binId, Integer occupancyChange) {
         Bins bin = getById(binId);
 
-        // Tính toán occupancy mới
+        // Tính toán occupancy mới dựa trên số lượng thực tế
         Integer newOccupancy = bin.getCurrentOccupancy() + occupancyChange;
-
-        // Validate không vượt quá capacity
-        if (newOccupancy > bin.getCapacity()) {
-            throw new AppException(ErrorCode.BIN_CAPACITY_EXCEEDED);
-        }
 
         // Validate không âm
         if (newOccupancy < 0) {
@@ -100,15 +97,10 @@ public class BinServiceImpl implements BinService {
         // Cập nhật status dựa trên occupancy
         if (newOccupancy == 0) {
             bin.setStatus(BinStatus.EMPTY);
-        } else if (newOccupancy >= bin.getCapacity()) {
-            bin.setStatus(BinStatus.FULL);
         } else {
             bin.setStatus(BinStatus.AVAILABLE);
         }
-
-        binRepo.save(bin);
     }
-
     @Override
     public void resetCurrentOccupancy(String binId) {
         Bins bin = getById(binId);

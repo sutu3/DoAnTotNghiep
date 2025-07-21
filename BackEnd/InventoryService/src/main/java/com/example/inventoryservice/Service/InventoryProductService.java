@@ -1,6 +1,7 @@
 package com.example.inventoryservice.Service;
 
 
+import com.example.inventoryservice.Client.ProductService.Dto.Response.Product.ProductClientRequest;
 import com.example.inventoryservice.Dtos.Request.InventoryProductRequest;
 import com.example.inventoryservice.Dtos.Response.InventoryProductResponse;
 import com.example.inventoryservice.Form.InventoryProductForm;
@@ -15,6 +16,7 @@ import java.util.List;
 public interface InventoryProductService {
     Page<InventoryProductResponse> getAllByWarehouse(Pageable pageable, String warehouse);
     InventoryProduct getById(String id);
+    List<ProductClientRequest> getFilterProductByWarehouse(String warehouse, List<ProductClientRequest> products);
     InventoryProductResponse getByIdResponse(String id);
     InventoryProduct getByProductAndWarehouse(String product, String warehouse);
     InventoryProductResponse getByProductAndWarehouseResponse(String product, String warehouse);

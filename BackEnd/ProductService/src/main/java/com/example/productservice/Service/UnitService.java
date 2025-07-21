@@ -7,6 +7,7 @@ import com.example.productservice.Form.UnitForm;
 import com.example.productservice.Model.Unit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,7 +19,9 @@ public interface UnitService {
     Unit getById(String id);
     List<UnitNameResponse> getAllUnitName();
     UnitResponse getByIdResponse(String id);
+    @PreAuthorize("hasRole('MANAGER')")
     UnitResponse createUnit(UnitRequest request);
+    @PreAuthorize("hasRole('MANAGER')")
     UnitResponse updateUnit(UnitForm update,String unitId);
     Unit getByShortNameAndUnitName(String shortName,String unitName);
 

@@ -65,6 +65,15 @@ public class InventoryWarehouseController {
                 .success(true)
                 .build();
     }
+    @GetMapping("/search/bin/{binId}/singer")
+    public ApiResponse<InventoryWarehouseResponse> getByBin(@PathVariable String binId) {
+        return ApiResponse.<InventoryWarehouseResponse>builder()
+                .Result(inventoryWarehouseService.getByBin(binId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
 
     /**
      * Lấy thông tin inventory warehouse theo ID
@@ -115,6 +124,22 @@ public class InventoryWarehouseController {
 
     /**
      * Tạo mới inventory warehouse (đặt hàng vào bin cụ thể)
+     * @param productId Thông tin id của product cần truy xuất
+     * @return <List<InventoryWarehouseResponse>> - Thông tin inventory warehouse vừa được tạo
+     */
+    @GetMapping("/search/product/{productId}")
+    public ApiResponse<List<InventoryWarehouseResponse>> getByProductId(
+            @PathVariable String productId
+    ) {
+        return ApiResponse.<List<InventoryWarehouseResponse>>builder()
+                .Result(inventoryWarehouseService.getAllByProduct(productId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    /**
+     * Tạo mới inventory warehouse (đặt hàng vào bin cụ thể)
      * @param request Thông tin inventory warehouse cần tạo
      * @return InventoryWarehouseResponse - Thông tin inventory warehouse vừa được tạo
      */
@@ -129,7 +154,6 @@ public class InventoryWarehouseController {
                 .success(true)
                 .build();
     }
-
     /**
      * Cập nhật thông tin inventory warehouse
      * @param id ID của inventory warehouse cần cập nhật

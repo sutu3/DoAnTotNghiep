@@ -27,14 +27,13 @@ import java.util.List;
 @Tag(name = "Category API", description = "Quản lý thể loại sản phẩm")
 public class CategoryController {
     CategoryService categoryService;
-    @GetMapping("/search/warehouseId/{warehouse}")
+    @GetMapping("/search")
     public ApiResponse<Page<CategoryResponse>> getAllByWarehouseId(
             @RequestParam("pageNumber") int page,
-            @RequestParam("pageSize") int size,
-            @PathVariable String warehouse) {
+            @RequestParam("pageSize") int size) {
         Pageable pageable= PageRequest.of(page,size);
         return ApiResponse.<Page<CategoryResponse>>builder()
-                .Result(categoryService.getAllByWarehouseId(pageable,warehouse))
+                .Result(categoryService.getAll(pageable))
                 .code(0)
                 .message("SuccessFully")
                 .success(true)
@@ -51,22 +50,21 @@ public class CategoryController {
                 .success(true)
                 .build();
     }
-    @GetMapping("/search/warehouseId/{warehouse}/categoryNames")
+    @GetMapping("/search/categoryNames")
     public ApiResponse<List<CategoryNameResponse>> getByWarehouseId(
-            @PathVariable String warehouse) {
+            ) {
         return ApiResponse.<List<CategoryNameResponse>>builder()
-                .Result(categoryService.getAllCategoryName(warehouse))
+                .Result(categoryService.getAllCategoryName())
                 .code(0)
                 .message("SuccessFully")
                 .success(true)
                 .build();
     }
-    @GetMapping("/search/warehouseId/{warehouse}/categoryName/{categoryName}")
+    @GetMapping("/search/categoryName/{categoryName}")
     public ApiResponse<CategoryResponse> getByWarehouseIdAndCategoryName(
-            @PathVariable String warehouse,
             @PathVariable String categoryName) {
         return ApiResponse.<CategoryResponse>builder()
-                .Result(categoryService.getByNameResponse(warehouse,categoryName))
+                .Result(categoryService.getByNameResponse(categoryName))
                 .code(0)
                 .message("SuccessFully")
                 .success(true)

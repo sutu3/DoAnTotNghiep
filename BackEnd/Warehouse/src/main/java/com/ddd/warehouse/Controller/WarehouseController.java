@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/warehouses")
 @RequiredArgsConstructor
@@ -43,10 +45,30 @@ public class WarehouseController {
                 .build();
 
     }
+    @GetMapping("/getList")
+    public ApiResponse<List<WarehousesResponse>> getAllList(
+    ){
+        return ApiResponse.<List<WarehousesResponse>>builder()
+                .Result(warehouseService.getAllList())
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+
+    }
     @GetMapping("search/byManager/{id}")
     public ApiResponse<WarehousesResponse> getByManagerId(@PathVariable String id){
         return ApiResponse.<WarehousesResponse>builder()
                 .Result(warehouseService.getByManagerId(id))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @GetMapping("search/byStaff")
+    public ApiResponse<WarehousesResponse> getByStaffId(){
+        return ApiResponse.<WarehousesResponse>builder()
+                .Result(warehouseService.getByStaffId())
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

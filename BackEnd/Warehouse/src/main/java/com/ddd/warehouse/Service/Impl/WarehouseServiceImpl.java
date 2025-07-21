@@ -1,5 +1,8 @@
 package com.ddd.warehouse.Service.Impl;
 
+import com.ddd.warehouse.Client.UserService.Dto.Response.UserResponse;
+import com.ddd.warehouse.Client.UserService.Redis.UserController;
+import com.ddd.warehouse.Client.UserService.UserClient;
 import com.ddd.warehouse.Dto.Request.WarehousesRequest;
 import com.ddd.warehouse.Dto.Response.Warehouse.WarehousesResponse;
 import com.ddd.warehouse.Exception.AppException;
@@ -19,6 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +32,8 @@ import java.time.LocalDateTime;
 public class WarehouseServiceImpl implements WarehouseService {
     WarehouseMapper warehouseMapper;
     WarehouseRepo warehouseRepo;
+    UserController userController;
+    private final UserClient userClient;
 
     @Override
     public Page<WarehousesResponse> getAll(Pageable pageable) {
@@ -35,9 +42,23 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    public List<WarehousesResponse> getAllList() {
+        return warehouseRepo.findAllByIsDeleted(false)
+                .stream().map(warehouseMapper::toResponse).collect(Collectors.toList());
+    }
+
+    @Override
     public WarehousesResponse getByManagerId(String managerId) {
         return warehouseMapper.toResponse(warehouseRepo.findByManagerId(managerId)
                 .orElseThrow(()->new AppException(ErrorCode.WAREHOUSE_NOT_FOUND)));
+    }
+
+    @Override
+    public WarehousesResponse getByStaffId() {
+        var idUser=GetCurrentUserId.getCurrentUserId();
+        String warehouseId=userClient.getIdWarehouseByIdUser().getResult().getWarehouseId();
+        Warehouses warehouse=getById(warehouseId);
+        return warehouseMapper.toResponse(warehouse);
     }
 
     @Override

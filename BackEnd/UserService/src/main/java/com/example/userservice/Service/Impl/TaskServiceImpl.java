@@ -1,12 +1,11 @@
 package com.example.userservice.Service.Impl;
 
 import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
-import com.example.userservice.Client.WarehouseService.WarehouseController;
+import com.example.userservice.Client.WarehouseService.Redis.WarehouseController;
 import com.example.userservice.Dto.Request.LevelRequest;
 import com.example.userservice.Dto.Request.StatusRequest;
 import com.example.userservice.Dto.Request.TaskRequest;
 import com.example.userservice.Dto.Responses.Task.TaskResponse;
-import com.example.userservice.Dto.Responses.TaskType.TaskTypeResponse;
 import com.example.userservice.Enum.LevelEnum;
 import com.example.userservice.Enum.StatusTaskEnum;
 import com.example.userservice.Exception.AppException;
@@ -24,11 +23,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Service

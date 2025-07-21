@@ -2,6 +2,7 @@ package com.example.userservice.Controller;
 
 import com.example.userservice.Dto.Request.UserRequest;
 import com.example.userservice.Dto.Responses.ApiResponse;
+import com.example.userservice.Dto.Responses.User.IdWarehouseResponse;
 import com.example.userservice.Dto.Responses.User.UserResponse;
 import com.example.userservice.Service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,6 +40,15 @@ public class UserController {
                 .code(0)
                 .build();
     }
+    @GetMapping("/search/GetIdWarehouseByIdUser")
+    public ApiResponse<IdWarehouseResponse> getIdWarehouseByIdUser(){
+        return ApiResponse.<IdWarehouseResponse>builder()
+                .Result(userService.getWarehouseByIdUser())
+                .message("SuccessFull")
+                .success(true)
+                .code(0)
+                .build();
+    }
     @GetMapping("/search/userName/{name}")
     public ApiResponse<Page<UserResponse>> getAllByUserName(
             @PathVariable String name,
@@ -70,10 +80,28 @@ public class UserController {
                 .code(0)
                 .build();
     }
-    @GetMapping("/{id}")
-    public ApiResponse<UserResponse> getById(@PathVariable String id){
+    @GetMapping("/search/idUser")
+    public ApiResponse<UserResponse> getById(){
         return ApiResponse.<UserResponse>builder()
-                .Result(userService.getByUserId(id))
+                .Result(userService.getByUserId())
+                .message("SuccessFull")
+                .success(true)
+                .code(0)
+                .build();
+    }
+    @GetMapping("/search/email/{email}")
+    public ApiResponse<UserResponse> getByEmal(@PathVariable String email){
+        return ApiResponse.<UserResponse>builder()
+                .Result(userService.findByEmail(email))
+                .message("SuccessFull")
+                .success(true)
+                .code(0)
+                .build();
+    }
+    @GetMapping("/{id}")
+    public ApiResponse<UserResponse> getByIdUser(@PathVariable String id){
+        return ApiResponse.<UserResponse>builder()
+                .Result(userService.getByIdResponse(id))
                 .message("SuccessFull")
                 .success(true)
                 .code(0)

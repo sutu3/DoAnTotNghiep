@@ -2,6 +2,7 @@ package com.ddd.warehouse.Module;
 
 import com.ddd.warehouse.Enum.BinStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,15 +20,25 @@ public class Bins extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String binId;
-    @Column(columnDefinition = "VARCHAR(100) COMMENT 'mã code của bin'", nullable = false)
+    @NotBlank(message = "Mã bin không được để trống")
+    @Pattern(regexp = "^[A-Z0-9-]+$", message = "Mã bin chỉ được chứa chữ hoa, số và dấu gạch ngang")
+    @Column(columnDefinition = "VARCHAR(255) COMMENT 'Mã bin'", nullable = false)
     String binCode;
+
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(20) COMMENT 'Trạng thái của bin'", nullable = false)
+    @NotNull(message = "Trạng thái bin không được null")
     BinStatus status;
+
     @Column(columnDefinition = "INTEGER COMMENT 'sức chưa của bin'", nullable = false)
+    @Min(value = 1, message = "BIN_CAPACITY_INVALID")
+    @Max(value = 10000, message = "BIN_CAPACITY_INVALID")
     Integer capacity;
+
+    @Min(value = 0, message = "Số lượng hiện tại không được âm")
     @Column(columnDefinition = "INTEGER COMMENT 'sức chưa còn lại'", nullable = false)
-    Integer currentOccupancy;
+    Integer currentOccupancy = 0;
+
     @ManyToOne
     @JoinColumn(name = "stackId",nullable = false)
     Stacks stack;

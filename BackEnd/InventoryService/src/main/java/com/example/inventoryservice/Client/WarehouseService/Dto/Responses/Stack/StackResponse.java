@@ -2,6 +2,7 @@ package com.example.inventoryservice.Client.WarehouseService.Dto.Responses.Stack
 
 import com.example.inventoryservice.Client.WarehouseService.Dto.Responses.Bin.BinResponse;
 import com.example.inventoryservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class StackResponse {
     String stackId;
     String stackName;

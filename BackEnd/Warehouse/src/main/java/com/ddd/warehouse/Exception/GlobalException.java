@@ -73,7 +73,13 @@ public class GlobalException {
         return ResponseEntity.badRequest().body(apiResponse);
     }
     private String mapAttribute(String message, Map<String,Object> attributes){
-        String minValue=String.valueOf(attributes.get(MIN_ATTRIBUTE));
-        return  message.replace("{"+MIN_ATTRIBUTE+"}",minValue);
+        String result = message;
+        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+            String placeholder = "{" + entry.getKey() + "}";
+            if (result.contains(placeholder)) {
+                result = result.replace(placeholder, String.valueOf(entry.getValue()));
+            }
+        }
+        return result;
     }
 }
