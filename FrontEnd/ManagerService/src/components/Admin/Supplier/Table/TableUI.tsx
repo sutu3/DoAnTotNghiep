@@ -15,11 +15,11 @@ import {
 } from "@heroui/react";
 import {ChevronDownIcon, PlusIcon, SearchIcon} from "lucide-react";
 import {useSelector} from "react-redux";
-import {SupplierSelector, TotalPageSelector, TotalPageUnit} from "@/Store/Selector.tsx";
+import {SupplierSelector, TotalPageSelector} from "@/Store/Selector.tsx";
 import {columns, Supplier} from "@/Store/SupplierSlice.tsx";
 import RenderTable, {Props} from "@/components/Admin/Supplier/Table/RenderTable.tsx";
 import {useNavigate} from "react-router-dom";
-import React, {useCallback, useMemo, useState} from "react";
+import  {useCallback, useMemo, useState} from "react";
 
 
 export const statusOptions = [
@@ -60,6 +60,7 @@ const TableUI=({loading,setOpen,open}:Pros)=> {
     });
     const [page, setPage] = useState(1);
     const handleDetail=(supplierId:string) => {
+        navigate(`/admin/supplier/edit?supplierId=${supplierId}`);
         console.log(supplierId);
         // Detail của supplier
     }

@@ -4,17 +4,25 @@ import {Product} from "@/Store/ProductSlice.tsx";
 
 export interface InventoryWarehouse {
     inventoryWarehouseId: string;
-    inventoryProduct: string;
-    product: Product;
+    productDetails: Product;
     binDetails: Bin;
     quantity: number;
     expiryDate?: string;
     unitCost?: number;
-    status: "ACTIVE" | "INACTIVE" | "EXPIRED";
+    inventoryProduct:InventoryProduct;
+    status: "AVAILABLE" | "QUARANTINE" | "RESERVED"|"EXPIRED";
     createdAt: Date | null;
     updatedAt: Date | null;
 }
-
+export interface InventoryProduct{
+    inventoryProductId:string;
+    totalQuantity:number;
+    minStockLevel:number;
+    maxStockLevel:number;
+    lastImportDate:string;
+    lastExportDate:string;
+    status:string;
+}
 export interface InventoryWarehouseCreate {
     product: string;
     bin?: string;

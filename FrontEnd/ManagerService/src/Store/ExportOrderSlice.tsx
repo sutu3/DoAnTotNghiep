@@ -70,7 +70,6 @@ export interface ExportOrder {
 
 export interface OrderRequestExportCreate {
     warehouse: string;
-    createByUser: string;
     customer: string;
     description: string;
     deliveryDate?: string;

@@ -19,6 +19,7 @@ const WarehousePage = () => {
     const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
     const [page, setPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         warehouseName: "",
         address: "",
@@ -29,12 +30,23 @@ const WarehousePage = () => {
     const isDarkMode = localStorage.getItem("theme") === "dark";
 
     useEffect(() => {
-       const fetch=async ()=>{
-           const PageApi: pageApi = { pageNumber: page - 1, pageSize: 10 };
-           const result=await (dispatch as any)(GetAllWarehouse({page:PageApi}))
-           dispatch(setAllWarehouse(result.payload.result.content));
-           dispatch(initToTalPage(result.payload.result.totalPages));
-       }
+        setLoading(true)
+        const fetch = async () => {
+            setLoading(true);
+            const PageApi: pageApi = { pageNumber: page - 1, pageSize: 10 };
+            const result = await (dispatch as any)(GetAllWarehouse({ page: PageApi }));
+
+            console.log("Warehouse API result:", result); // <- xem có payload không
+
+            if (result?.payload?.result?.content) {
+                dispatch(setAllWarehouse(result.payload.result.content));
+                dispatch(initToTalPage(result.payload.result.totalPages));
+            } else {
+                console.warn("Không có data trong payload");
+            }
+
+            setLoading(false);
+        };
         fetch()
     }, [page, dispatch]);
 
@@ -82,6 +94,7 @@ const WarehousePage = () => {
                     {/* Bên trái: Warehouse Table (2/3) */}
                     <div className="lg:col-span-2">
                         <WarehouseTableSection
+                            loading={loading}
                             selectedWarehouse={selectedWarehouse}
                             onWarehouseClick={handleWarehouseSelect}
                             onOpenModal={handleOpenModal}

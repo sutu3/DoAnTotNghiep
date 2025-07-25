@@ -203,7 +203,7 @@ export const MiddleChangeTypeOrderItem = (orderId:string,access:boolean,note:str
         }
     };
 };
-export const MiddleImportOrder = (orderId: string, ListOrderItem: ImportOrderItem[]) => {
+export const MiddleImportOrder = (orderId: string | null, ListOrderItem: ImportOrderItem[]) => {
     return async function (dispatch: any) {
         try {
             console.log(ListOrderItem)

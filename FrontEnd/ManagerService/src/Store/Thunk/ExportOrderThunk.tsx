@@ -152,12 +152,10 @@ export const MiddleExportOrder = (orderId: string, ListOrderItem: ExportOrderIte
         }
     };
 };
-export const MiddleGetAllExportOrderByStatus = ( status:string, page:pageApi) => {
-    return async function (dispatch: any,getState: any) {
+export const MiddleGetAllExportOrderByStatus = (warehouse:string, status:string, page:pageApi) => {
+    return async function (dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-            const action=await dispatch(GetExportOrdersByStatus({status,warehouseId,page}))
+            const action=await dispatch(GetExportOrdersByStatus({status,warehouseId:warehouse,page}))
             dispatch(OrderExportSlice.actions.setOrderExportList(action?.payload?.result?.content));
         } catch (error: any) {
             dispatch(setExpiringError(error.message));
@@ -170,14 +168,14 @@ export const MiddleGetAllExportOrderByStatus = ( status:string, page:pageApi) =>
     };
 };
 
-export const MiddleGetOrderExportPending_Approve = (page:pageApi) => {
-    return async function (dispatch: any,getState:any) {
+export const MiddleGetOrderExportPending_Approve = (warehouses:string,page:pageApi) => {
+    return async function (dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-            const action=await dispatch(GetPendingExportOrders({warehouse:warehouseId,page}))
-            console.log(action?.payload?.result?.content)
-            dispatch(OrderExportSlice.actions.setOrderExportList(action?.payload?.result?.content));
+            if(warehouses!=""){
+                const action=await dispatch(GetPendingExportOrders({warehouse:warehouses,page}))
+                console.log(action?.payload?.result?.content)
+                dispatch(OrderExportSlice.actions.setOrderExportList(action?.payload?.result?.content));
+            }
         } catch (error: any) {
             dispatch(setExpiringError(error.message));
             showToast({
@@ -189,16 +187,11 @@ export const MiddleGetOrderExportPending_Approve = (page:pageApi) => {
     };
 };
 export const MiddleAddOrderExport = (order: OrderRequestExportCreate,items:ExportItemCreateUI[]) => {
-    return async function (dispatch: any,getState:any) {
+    return async function (dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-            const {user}= getState().users;
-            const userId= user?.userId;
+
             const action=await dispatch(AddOrderExport(
-                {order:{...order,
-                        warehouse:warehouseId,
-                        createByUser:userId,}}));
+                {order:order}));
 
             const Order:ExportOrder=action?.payload?.result;
             console.log(Order);

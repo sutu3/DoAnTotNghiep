@@ -6,7 +6,7 @@ import { MiddleGetAllUser } from "@/Store/Thunk/UserThunk.tsx";
 import {UserTableSection} from "@/components/Admin/User/UserTableSection.tsx";
 import UserThumbnail from "@/components/Admin/User/UserThumbnail.tsx";
 import {pageApi} from "@/Api/UrlApi.tsx";
-import {User, UserCreate} from "@/Store/UserSlice.tsx";
+import {UserData, UserCreate} from "@/Store/UserSlice.tsx";
 import UserModal from "@/components/Admin/User/UserModal.tsx";
 
 const UserPage = () => {
@@ -24,16 +24,21 @@ const UserPage = () => {
     phoneNumber: "",
     warehouses: "",
   });
-
   const isSidebarCollapsed = localStorage.getItem("theme") === "light";
 
   useEffect(() => {
     const PageApi: pageApi = { pageNumber: page - 1, pageSize: 10 };
-    (dispatch as any)(MiddleGetAllUser(PageApi));
-  }, [page, dispatch]);
+    const fetch=async()=>{
+      if(formData?.warehouses!=""){
+        await (dispatch as any)(MiddleGetAllUser(formData?.warehouses,PageApi));
+      }
+    }
+    fetch()
+
+  }, [page, dispatch,formData?.warehouses]);
 
   const handleUserSelect = (userId: string) => {
-    const user = users.find((u:User) => u.userId === userId);
+    const user = users.find((u:UserData) => u.userId === userId);
     setSelectedUser(user);
   };
 
@@ -68,6 +73,8 @@ const UserPage = () => {
             {/* Bên trái: User Table (2/3) */}
             <div className="lg:col-span-2">
               <UserTableSection
+                  formData={formData}
+                  onFormChange={handleFormChange}
                   selectedUser={selectedUser}
                   onUserClick={handleUserSelect}
                   onOpenModal={handleOpenModal}

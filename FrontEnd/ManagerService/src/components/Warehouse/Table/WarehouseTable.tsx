@@ -7,10 +7,11 @@ import {
     TableRow,
     TableCell,
     Chip,
-    Pagination
+    Pagination, Spinner
 } from "@heroui/react";
 
 interface WarehouseTableProps {
+    loading: boolean;
     warehouses: any[];
     onWarehouseSelect: (warehouseId: string) => void;
     selectedWarehouseId?: string;
@@ -19,7 +20,7 @@ interface WarehouseTableProps {
     onPageChange: (page: number) => void;
 }
 
-const WarehouseTable: React.FC<WarehouseTableProps> = ({
+const WarehouseTable: React.FC<WarehouseTableProps> = ({loading,
                                                            warehouses,
                                                            onWarehouseSelect,
                                                            selectedWarehouseId,
@@ -143,7 +144,11 @@ const WarehouseTable: React.FC<WarehouseTableProps> = ({
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={warehouses} emptyContent="Không có dữ liệu kho">
+                <TableBody  className="bg-white dark:bg-gray-900 text-gray-800 dark:text-white"
+                            isLoading={loading}
+                            loadingContent={<Spinner label="Loading..." />}
+                            items={warehouses}
+                            emptyContent="Không có dữ liệu kho">
                     {(warehouse) => (
                         <TableRow
                             key={warehouse.warehouseId}

@@ -20,6 +20,7 @@ import {pageApi} from "@/Api/UrlApi.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {MiddleGetOrderExportPending_Approve} from "@/Store/Thunk/ExportOrderThunk.tsx";
 import {ExportOrderSelector} from "@/Store/Selector.tsx";
+import SelectWarehouseApprove from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
 
 interface ExportOrderTableProps {
     searchValue: string;
@@ -44,6 +45,7 @@ export default function ExportOrderTable({
     const orders=useSelector(ExportOrderSelector);
     const [totalPages, setTotalPages] = useState(5);
     const [loading,setLoading] = useState(false);
+    const [warehouses, setWarehouses] = useState<string>("");
     const dispatch = useDispatch();
 // Trong useEffect để fetch data
     useEffect(() => {
@@ -52,13 +54,13 @@ export default function ExportOrderTable({
             const PageApi: pageApi = { pageNumber: currentPage - 1, pageSize: totalPages };
             dispatch(OrderExportSlice.actions.setOrderExportList([]));
             try {
-                await (dispatch as any)(MiddleGetOrderExportPending_Approve(PageApi));
+                await (dispatch as any)(MiddleGetOrderExportPending_Approve(warehouses,PageApi));
             } finally {
                 setLoading(false);
             }
         };
         fetchData();
-    }, [currentPage, totalPages]);
+    }, [currentPage, totalPages,warehouses]);
     const getStatusColor = (status: string) => {
         switch (status) {
             case "CREATED": return "warning";
@@ -90,21 +92,8 @@ export default function ExportOrderTable({
                         Danh Sách Yêu Cầu Xuất Hàng
                     </h2>
 
-                    <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                        <Input
-                            isClearable
-                            classNames={{
-                                base: "w-full sm:max-w-[300px]",
-                                inputWrapper: "border-1",
-                            }}
-                            placeholder="Tìm kiếm theo mã đơn, khách hàng..."
-                            size="sm"
-                            startContent={<Icon icon="mdi:magnify" className="text-default-300"/>}
-                            value={searchValue}
-                            variant="bordered"
-                            onClear={() => setSearchValue("")}
-                            onValueChange={setSearchValue}
-                        />
+                    <div className="flex w-[500px] flex-col sm:flex-row gap-3 items-start sm:items-center">
+                        <SelectWarehouseApprove warehouse={warehouses} setWarehouse={setWarehouses}/>
 
                         <Select
                             label="Trạng thái"

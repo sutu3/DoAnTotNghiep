@@ -1,165 +1,150 @@
-import {useEffect, useState} from 'react';
-import {Plus} from "lucide-react";
-import TaskTypeCard from "@/components/Admin/TaskTypeItem.tsx";
-import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
-import ButtonUI from "@/components/UI/Button/ButtonUI.tsx";
-import ModalUI from "@/components/UI/Modal/ModalUI.tsx";
-import InputTaskType from "@/components/Admin/TaskType/InputTaskType.tsx";
-import {TaskTypeSelector, TotalPageTask} from "@/Store/Selector.tsx";
-import {useDispatch, useSelector} from "react-redux";
-import {pageApi} from "@/Api/UrlApi.tsx";
-import CustomPagination from "@/components/UI/Pagination/PaginationUI.tsx";
-import CardUI from "@/components/Admin/Dashboard/CardUI.tsx";
-import {useNavigate} from "react-router-dom";
-import {MiddleAddTaskType, MiddleGetAllTaskType, TaskType, TaskTypeCreated} from "@/Store/TaskTypeSlice.tsx";
-import TaskTypeForm from "@/components/Form/TaskTypeForm.tsx";
+import  { useEffect, useState } from 'react';
+import {  Button } from '@heroui/react';
+import { Package, Clock } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { TaskSelector } from '@/Store/Selector';
+import TaskList from "@/components/Admin/TaskType/TaskList.tsx";
+import TaskDetailModal from "@/components/Admin/TaskType/Modal/TaskDetail.tsx";
+import TaskSidebar from "@/components/Admin/TaskType/TaskSidebar.tsx";
+import SelectWarehouse from "@/components/Admin/Tasks/SelectWarehouse.tsx";
+import {MiddleGetWarehouseByUser} from "@/Store/Thunk/WarehouseThunk.tsx";
+import {MiddleGetAllTask} from "@/Store/TaskSlice.tsx";
 
-const taskTypeStats = [
-    {
-        title: "Total TaskType Types",
-        value: 24,
-        change: "12%",
-        changeType: "positive",
-        iconName: "solar:document-text-outline",
-        onActionClick: () => console.log("Navigate to all task types"),
-    },
-    {
-        title: "Active TaskType Types",
-        value: 18,
-        change: "0.0%",
-        changeType: "neutral",
-        iconName: "solar:check-circle-linear",
-        onActionClick: () => console.log("Show active task types"),
-    },
-    {
-        title: "Deprecated TaskType Types",
-        value: 6,
-        change: "5%",
-        changeType: "negative",
-        iconName: "solar:close-circle-linear",
-        onActionClick: () => console.log("View deprecated task types"),
-    },
-];
-
-const AdminTaskPage = () => {
+const StaffTaskDashboard = () => {
     const dispatch = useDispatch();
-    const naviagate=useNavigate();
-    const [name, setName] = useState("");
-    const [isOpen, setIsOpen] = useState(false);
-    const [formData, setFormData] = useState<TaskTypeCreated>({
-        taskName: "",
-        description: "",
-        warehouses: "",
-    });
-    const [page, setPage] = useState(1);
+    const tasks = useSelector(TaskSelector);
+    const [loading, setLoading] = useState(false);
+    const [warehouse, setWarehouse] = useState<string>("");
+    const [taskType,setTaskType] = useState<string>("");
+    // States cho TaskDetailModal
+    const [taskId,setTaskId]= useState<string>("");
+    const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<any>(null);
 
     useEffect(() => {
-        const PageApi: pageApi = { pageNumber: page - 1, pageSize: 8 };
-        const fetchData = async () => {
-            (dispatch as any)(MiddleGetAllTaskType(PageApi));
-        };
-
-        fetchData();
-    }, [page]);
-
-    const handleChange = (key: string, value: string) => {
-        setFormData((prev) => ({...prev, [key]: value}));
+        if(warehouse!=""){
+            loadTasks();
+        }
+    }, [warehouse,taskType]);
+    useEffect(() => {
+       const fetch=async()=>{
+           setLoading(true);
+           try {
+               await (dispatch as any)(MiddleGetWarehouseByUser({ pageNumber: 0, pageSize: 20 }));
+           } finally {
+               setLoading(false);
+           }
+       }
+       fetch()
+    }, []);
+    const loadTasks = async () => {
+        setLoading(true);
+        try {
+            await (dispatch as any)(MiddleGetAllTask({ pageNumber: 0, pageSize: 20 },warehouse,taskType));
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const TaskTypeList: TaskType[] = useSelector(TaskTypeSelector);
-    const totalPage = useSelector(TotalPageTask);
-
-    const handleAddTaskType = async () => {
-        await (dispatch as any)(MiddleAddTaskType(formData));
-        setIsOpen(false);
-        setFormData({ taskName: "", description: "", warehouses: "" });
-
+    // Handler để mở modal chi tiết task
+    const handleViewTaskDetail = (task: any) => {
+        console.log(task)
+        setSelectedTask(task);
+        setTaskId(task?.taskId)
+        setIsTaskDetailOpen(true);
     };
 
-    const handleOpen = () => {
-        setIsOpen(!isOpen);
-
+    // Handler để cập nhật status task
+    const handleUpdateTaskStatus = async (taskId: string, status: string) => {
+        try {
+            // await (dispatch as any)(MiddleUpdateTaskStatus(taskId, status));
+            await loadTasks(); // Reload tasks sau khi update
+        } catch (error) {
+            console.error('Error updating task status:', error);
+        }
     };
-    const isSidebarCollapsed = localStorage.getItem("theme") !== "light";
 
-    const handleCardClick = (task: TaskType) => {
-        naviagate(`/admin/tasks?idTaskType=${task.taskTypeId}`);
-        console.log("Card clicked for task:", task.taskTypeId);
+    // Existing logic...
+    const getTasksByStatus = (status: string) => {
+        return tasks?.filter((task: any) => task.statusTask === status) || [];
     };
+
+    // const pendingTasks = getTasksByStatus('pending');
+    // const inProgressTasks = getTasksByStatus('in_progress');
+    // const completedTasks = getTasksByStatus('completed');
+    // const overdueTasks = getTasksByStatus('overdue');
 
     return (
-        <div className="min-h-screen bg-white dark:bg-gray-900 px-4 py-6">
-            {/* Breadcrumb + Stats + Title */}
-            <div className="mb-8 space-y-4">
-                <BreadcrumbsUI isDarkMode={isSidebarCollapsed} />
-                <CardUI data={taskTypeStats} />
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Tasks Page</h1>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Manage and monitor Task Types.</p>
-                </div>
-            </div>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
+            <div className="max-w-7xl mx-auto">
+                {/* Header và Statistics - giữ nguyên */}
+                <div className="mb-8">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                        {/* Header content */}
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-3">
+                                    <Package className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                                </div>
+                                <div>
+                                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+                                        Bảng điều khiển nhiệm vụ
+                                    </h1>
+                                    <p className="text-gray-500 dark:text-gray-400">
+                                        Quản lý và theo dõi nhiệm vụ kho hàng
+                                    </p>
+                                </div>
+                            </div>
+                            <SelectWarehouse warehouse={warehouse} setWarehouse={setWarehouse}/>
+                            <Button
+                                color="primary"
+                                startContent={<Clock className="w-4 h-4" />}
+                                onClick={loadTasks}
+                                isLoading={loading}
+                            >
+                                Làm mới
+                            </Button>
+                        </div>
 
-            {/* Top Control Bar */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <InputTaskType
-                    onChange={setName}
-                    defaultValue={name}
-                    label={""}
-                    placeholder="Search task type..."
-                    type="text"
-                />
-                <button
-                    onClick={handleOpen}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition"
-                >
-                    <Plus size={20} />
-                    Add New Task
-                </button>
-            </div>
-
-            {/* Grid of TaskType Type Cards */}
-            {TaskTypeList.length === 0 ? (
-                <div className="text-center text-gray-800 dark:text-gray-100 text-xl mt-10">
-                    No task types available. Add one above!
-                </div>
-            ) : (
-                <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                        {TaskTypeList.slice(0, 8).map((task) => (
-                            <TaskTypeCard
-                                key={task.taskTypeId}
-                                taskType={task}
-                                onClick={handleCardClick}
-                            />
-                        ))}
+                        {/* Task Statistics - giữ nguyên */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            {/* Statistics cards */}
+                        </div>
                     </div>
-                    <div className="flex justify-center mt-4">
-                        <CustomPagination
-                            page={page}
-                            setPage={setPage}
-                            totalPages={totalPage}
+                </div>
+
+                {/* Task Board Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Task List - Pass handler để mở modal */}
+                    <div className="lg:col-span-2">
+                        <TaskList
+                            taskType={taskType}
+                            warehouse={warehouse}
+                            tasks={tasks}
+                            loading={loading}
+                            onTaskUpdate={loadTasks}
+                            onViewDetail={handleViewTaskDetail} // Truyền handler
+                            setTaskType={setTaskType}
                         />
                     </div>
-                </>
-            )}
 
-            <ModalUI
-                footer={
-                    <ButtonUI
-                        className="bg-gradient-to-tr from-green-500 to-emerald-400 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-200 hover:from-green-600 hover:to-emerald-500 active:scale-95 px-6 py-3 rounded-xl text-sm flex items-center gap-2"
-                        label="Add Tasks"
-                        loading={false}
-                        startContent={<Plus size={18}/>}
-                        onClick={handleAddTaskType} variant={undefined}                    />
-                }
-                isOpen={isOpen}
-                title="Thêm Loại Nhiệm vụ"
-                onOpenChange={setIsOpen}
-            >
-                <TaskTypeForm data={formData} onChange={handleChange} />
-            </ModalUI>
+                    {/* Task Details Sidebar */}
+                    <div className="lg:col-span-1">
+                        <TaskSidebar />
+                    </div>
+                </div>
+
+                {/* TaskDetailModal */}
+                <TaskDetailModal
+                    taskId={taskId}
+                    isOpen={isTaskDetailOpen}
+                    onClose={() => setIsTaskDetailOpen(false)}
+                    task={selectedTask}
+                    onUpdateStatus={handleUpdateTaskStatus}
+                />
+            </div>
         </div>
     );
 };
 
-export default AdminTaskPage;
+export default StaffTaskDashboard;

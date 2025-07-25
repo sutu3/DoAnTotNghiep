@@ -2,7 +2,7 @@ import React from "react";
 
 export const AdminIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
-    aria-hidden="true"
+    aria-hidden="false"
     fill="none"
     height="1em"
     viewBox="0 0 24 24"

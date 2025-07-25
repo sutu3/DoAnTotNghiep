@@ -2,8 +2,10 @@ import React from "react";
 import { Building2, Plus } from "lucide-react";
 import { Button } from "@heroui/button";
 import WarehouseTable from "@/components/Warehouse/Table/WarehouseTable.tsx";
+import {useNavigate} from "react-router-dom";
 
 interface WarehouseTableSectionProps {
+    loading: boolean;
     selectedWarehouse: any | null;
     onWarehouseClick: (warehouseId: string) => void;
     onOpenModal: (open: boolean) => void;
@@ -15,6 +17,7 @@ interface WarehouseTableSectionProps {
 }
 
 export const WarehouseTableSection: React.FC<WarehouseTableSectionProps> = ({
+    loading,
                                                                                 selectedWarehouse,
                                                                                 onWarehouseClick,
                                                                                 onOpenModal,
@@ -23,6 +26,8 @@ export const WarehouseTableSection: React.FC<WarehouseTableSectionProps> = ({
                                                                                 currentPage,
                                                                                 onPageChange
                                                                             }) => {
+    const navigate=useNavigate();
+
     return (
         <div className="bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
             <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-gray-800 dark:to-gray-700">
@@ -42,7 +47,7 @@ export const WarehouseTableSection: React.FC<WarehouseTableSectionProps> = ({
                     </div>
 
                     <Button
-                        onClick={() => onOpenModal(true)}
+                        onClick={() => navigate("/admin/warehouses/addnew")}
                         className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
                         startContent={<Plus className="w-4 h-4" />}
                     >
@@ -53,6 +58,7 @@ export const WarehouseTableSection: React.FC<WarehouseTableSectionProps> = ({
 
             <div className="p-6">
                 <WarehouseTable
+                    loading={loading}
                     warehouses={warehouses}
                     onWarehouseSelect={onWarehouseClick}
                     selectedWarehouseId={selectedWarehouse?.warehouseId}

@@ -1,8 +1,6 @@
-import  { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import { Icon } from '@iconify/react';
-import { useSelector, useDispatch } from 'react-redux';
-import { StacksSelector } from '@/Store/Selector';
-import { MiddleGetAllStackList } from '@/Store/Thunk/StackThunk';
+import {useStorageStats} from '@/Hooks/useStorageStats';
 import StorageFilters from "@/components/Admin/StorageLimits/StorageFilters.tsx";
 import StorageOverviewCards from "@/components/Admin/StorageLimits/Card/StorageOverviewCards.tsx";
 import WarehouseCapacityChart from "@/components/Admin/StorageLimits/Chart/WarehouseCapacityChart.tsx";
@@ -10,14 +8,13 @@ import StorageAlertsPanel from "@/components/Admin/StorageLimits/StorageAlertsPa
 import StackCapacityTable from "@/components/Admin/StorageLimits/Table/StackCapacityTable.tsx";
 
 const StorageLimitsPage = () => {
-    const dispatch = useDispatch();
-    const stacks = useSelector(StacksSelector);
     const [timeFilter, setTimeFilter] = useState("today");
-    const [warehouseFilter, setWarehouseFilter] = useState("all");
+    const [warehouseFilter, setWarehouseFilter] = useState("");
 
-    useEffect(() => {
-        (dispatch as any)(MiddleGetAllStackList());
-    }, [dispatch]);
+    // Sử dụng API data thay vì stacks từ Redux
+    const { data: storageData, loading,error } = useStorageStats(warehouseFilter, timeFilter);
+
+
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
@@ -46,24 +43,36 @@ const StorageLimitsPage = () => {
                     />
                 </div>
 
-                {/* Overview Cards */}
-                <StorageOverviewCards stacks={stacks} />
+                {/* Overview Cards - Truyền API data */}
+                <StorageOverviewCards
+                    capacityData={storageData?.capacity}
+                    loading={loading}
+                />
 
                 {/* Main Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Warehouse Capacity Chart */}
                     <div className="lg:col-span-2">
-                        <WarehouseCapacityChart stacks={stacks} />
+                        <WarehouseCapacityChart
+                            stackData={storageData?.stacks}
+                            loading={loading}
+                        />
                     </div>
 
                     {/* Storage Alerts */}
                     <div className="lg:col-span-1">
-                        <StorageAlertsPanel stacks={stacks} />
+                        <StorageAlertsPanel
+                            alerts={storageData?.alerts}
+                            loading={loading}
+                        />
                     </div>
                 </div>
 
                 {/* Stack Capacity Table */}
-                <StackCapacityTable stacks={stacks} />
+                <StackCapacityTable
+                    stackData={storageData?.stacks}
+                    loading={loading}
+                />
             </div>
         </div>
     );
