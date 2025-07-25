@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {Product} from "@/Store/ProductSlice.tsx";
 import {Category} from "@/Store/CategorySlice.tsx";
-import {User} from "@/Store/UserSlice.tsx";
+import {UserData} from "@/Store/UserSlice.tsx";
 import {Warehouse} from "@/Store/WarehouseSlice.tsx";
 
 export interface InventoryStats {
@@ -38,7 +38,7 @@ export interface RecentMovement {
     quantity: number,
     quantityBefore: number,
     quantityAfter: number,
-    performedByUser: User;
+    performedByUser: UserData;
     createdAt: string;
 }
 

@@ -17,11 +17,11 @@ import {SupplierSelect} from "@/components/Admin/OrderExport/select/SupplierSele
 import {useDispatch, useSelector} from "react-redux";
 import {ExportItemCreateSelector} from "@/Store/Selector.tsx";
 import TableUI from "@/components/Admin/OrderExport/Table/TableUI.tsx";
-import SelectBinLocation from "@/components/Admin/OrderExport/select/SelectWarehouse.tsx";
+import SelectBinLocation from "@/components/Admin/OrderExport/select/SelectBinLocation.tsx";
 import {BatchNumber} from "@/components/Admin/OrderExport/select/BatchNumber.tsx";
-import {MiddleAddOrderImport} from "@/Store/Thunk/ImportOrderThunk.tsx";
 import {MiddleAddOrderExport} from "@/Store/Thunk/ExportOrderThunk.tsx";
 import OrderExportSlice from "@/Store/ExportOrderSlice.tsx";
+import SelectWarehouse from "@/components/Admin/OrderExport/select/SelectWarehouse.tsx";
 
 
 
@@ -31,7 +31,6 @@ export default function CreateExportOrderPage() {
     const [availableQuantity,setAvailableQuantity] = useState<number>(0)
     const [formData, setFormData] = useState<OrderRequestExportCreate>({
         warehouse: "",
-        createByUser: "",
         customer: "",
         description: "",
         deliveryDate: "",
@@ -102,7 +101,7 @@ export default function CreateExportOrderPage() {
             await (dispatch as any)(MiddleAddOrderExport(formData,items));
             await new Promise(resolve => setTimeout(resolve, 1000));
             dispatch(OrderExportSlice.actions.setCleanItemOrderCreate());
-            setFormData({createByUser: "", customer: "", deliveryDate: "", description: "", warehouse: ""})
+            setFormData({ customer: "", deliveryDate: "", description: "", warehouse: ""})
             // Simulate API call
         } catch (error) {
             console.error("Error creating export order:", error);
@@ -146,30 +145,32 @@ export default function CreateExportOrderPage() {
                                     Thông Tin Đơn Xuất Hàng
                                 </h2>
                             </CardHeader>
-                            <CardBody className="space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                   <SupplierSelect formData={currentItem} setFormData={setCurrentItem}/>
 
-                                    <Input
+
+                                <CardBody className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <SelectWarehouse
+                                            formData={formData}
+                                            setFormData={setFormData}
+                                        />
+                                        <SupplierSelect formData={currentItem} setFormData={setCurrentItem}/>
+                                        <Input
+                                            aria-labelledby="Input"
+                                            type="date"
+                                            label="Ngày giao hàng"
+                                            value={formData.deliveryDate || ""}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, deliveryDate: e.target.value }))}
+                                        />
+                                    </div>
+                                    {/* Textarea description */}
+                                    <Textarea
                                         aria-labelledby="Input"
-                                        type="date"
-                                        label="Ngày giao hàng"
-                                        value={formData.deliveryDate || ""}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, deliveryDate: e.target.value }))}
-                                    />
-
-                                </div>
-
-                                <Textarea
-                                    aria-labelledby="Input"
-                                    label="Mô tả đơn hàng"
-                                    placeholder="Nhập mô tả cho đơn xuất hàng..."
-                                    value={formData.description}
-                                    onValueChange={(value) =>
-                                        setFormData(prev => ({ ...prev, description: value }))
-                                    }
-                                />
-                            </CardBody>
+                                        label="Mô tả đơn hàng"
+                                        placeholder="Nhập mô tả cho đơn xuất hàng..."
+                                        value={formData.description}
+                                        onValueChange={(value) =>
+                                            setFormData(prev => ({ ...prev, description: value })) } />
+                                </CardBody>
                         </Card>
 
                         {/* Add Item Form */}
@@ -181,7 +182,7 @@ export default function CreateExportOrderPage() {
                             </CardHeader>
                             <CardBody className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <ProductSelect formData={currentItem} setFormData={setCurrentItem}/>
+                                    <ProductSelect formData={formData} currentItem={currentItem} setCurrentItem={setCurrentItem}/>
                                     <SelectBinLocation
                                         formData={currentItem}
                                         setFormData={setCurrentItem}

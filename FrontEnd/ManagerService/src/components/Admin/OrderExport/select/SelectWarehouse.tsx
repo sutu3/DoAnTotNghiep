@@ -1,60 +1,67 @@
-import {Select, SelectItem} from "@heroui/react";
-import {useDispatch, useSelector} from "react-redux";
-import {InventoryWarehouseSelector} from "@/Store/Selector.tsx";
-import { useEffect} from "react";
-import {
-    MiddleGetInventoryWarehouseByProductId
-} from "@/Store/Thunk/InventoryWarehouseThunk.tsx";
-import {ExportItemCreateUI} from "@/Store/ExportOrderSlice.tsx";
-import {InventoryWarehouse} from "@/Store/InventoryWarehouseSlice.tsx";
+import { Select, SelectItem } from "@heroui/react";
+import { useDispatch, useSelector } from "react-redux";
+import { warehouseListSelector } from "@/Store/Selector.tsx";
+import  { useEffect } from "react";
+import { Warehouse } from "@/Store/WarehouseSlice.tsx";
+import { MiddleGetWarehouseByUser } from "@/Store/Thunk/WarehouseThunk.tsx";
+import { pageApi } from "@/Api/UrlApi.tsx";
+import { Building2 } from "lucide-react";
+import {  OrderRequestExportCreate} from "@/Store/ExportOrderSlice.tsx";
 
 interface SelectProps {
-    formData: ExportItemCreateUI;
+    formData:  OrderRequestExportCreate;
     setFormData: (formData: (prev: any) => any) => void;
-    onBinSelect?: (availableQty: number) => void; // Thêm callback này
 }
 
-const SelectBinLocation = ({formData, setFormData,onBinSelect}: SelectProps) => {
-    const inventoryWarehouse: InventoryWarehouse[] = useSelector(InventoryWarehouseSelector);
+const SelectWarehouse = ({ formData, setFormData }: SelectProps) => {
+    const defaultWarehouse: Warehouse[] = useSelector(warehouseListSelector);
     const dispatch = useDispatch();
-
-    // Lấy danh sách inventory warehouse khi product thay đổi
+    // Gọi API lấy danh sách kho
     useEffect(() => {
-        if (formData.product) {
-            (dispatch as any)(MiddleGetInventoryWarehouseByProductId(formData.product));
+        const fetch = async () => {
+            const page: pageApi = { pageNumber: 0, pageSize: 10 };
+            await (dispatch as any)(MiddleGetWarehouseByUser(page));
+        };
+        fetch();
+    }, [dispatch]);
+
+    // Gán kho mặc định sau khi fetch xong
+    useEffect(() => {
+        if (defaultWarehouse.length > 0 && !formData.warehouse) {
+            setFormData((prev: any) => ({
+                ...prev,
+                warehouse: defaultWarehouse[0].warehouseId,
+            }));
         }
-    }, [formData.product, dispatch]);
+    }, [defaultWarehouse, formData.warehouse, setFormData]);
+
+    // Xử lý khi user chọn kho khác
+    const handleSelectionChange = (keys: any) => {
+        const selectedId = Array.from(keys)[0]?.toString();
+        if (selectedId) {
+            setFormData((prev: any) => ({
+                ...prev,
+                warehouse: selectedId,
+            }));
+        }
+    };
 
     return (
         <Select
-            label="Vị trí Bin"
-            placeholder="Chọn vị trí bin"
-            selectedKeys={formData.bin ? [formData.bin] : []}
-            onSelectionChange={(keys) => {
-                const binId = Array.from(keys)[0]?.toString();
-                const selectedInventory = inventoryWarehouse.find(
-                    (inv) => inv.binDetails.binId === binId
-                );
-                if (selectedInventory) {
-                    setFormData((prev: any) => ({
-                        ...prev,
-                        bin: binId,
-                        // Có thể thêm thông tin khác nếu cần
-                    }));
-                    onBinSelect?.(selectedInventory.quantity);
-                }
-            }}
-            isDisabled={!formData.product || inventoryWarehouse.length === 0}
+            label="Kho hàng"
+            placeholder="Chọn kho"
+            selectedKeys={formData.warehouse ? [formData.warehouse] : []}
+            onSelectionChange={handleSelectionChange}
         >
-            {inventoryWarehouse.map((inv: InventoryWarehouse) => (
+            {defaultWarehouse?.map((warehouse) => (
                 <SelectItem
-                    aria-labelledby="Input"
-                    key={inv.binDetails.binId}
-                    textValue={`${inv.binDetails.binCode} (Còn: ${inv.quantity})`}
+                    key={warehouse.warehouseId}
+                    value={warehouse.warehouseId}
+                    textValue={warehouse.warehouseName}
                 >
-                    <div className="flex justify-between">
-                        <span>{inv.binDetails.binCode}</span>
-                        <span className="text-gray-500">Còn: {inv.quantity}</span>
+                    <div className="flex items-center gap-2">
+                        <Building2 className="w-4 h-4 text-blue-600" />
+                        <span>{warehouse.warehouseName}</span>
                     </div>
                 </SelectItem>
             ))}
@@ -62,4 +69,4 @@ const SelectBinLocation = ({formData, setFormData,onBinSelect}: SelectProps) => 
     );
 };
 
-export default SelectBinLocation;
+export default SelectWarehouse;

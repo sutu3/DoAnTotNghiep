@@ -15,6 +15,8 @@ import ImportOrder from "@/Store/ImportOrder.tsx";
 import InventorySlice from "@/Store/InventoryOverView.tsx";
 import InventoryWarehouseSlice from "@/Store/InventoryWarehouseSlice.tsx";
 import ExportOrderSlice from "@/Store/ExportOrderSlice.tsx";
+import TaskUserSlice from "@/Store/TaskUserSlice.tsx";
+import StockMovementSlice from "@/Store/StockMovementSlice.tsx";
 
 const ThemeReducer = (state = { value: true }, action: any) => {
   switch (action.type) {
@@ -35,6 +37,7 @@ const store = configureStore({
     taskType: TaskTypeSlice.reducer,
     users: UserSlice.reducer,
     tasks: TaskSlice.reducer,
+    taskUser:TaskUserSlice.reducer,
     groupUnit:GroupUnit.reducer,
     unit:UnitSlice.reducer,
     category:CategorySlice.reducer,
@@ -43,6 +46,7 @@ const store = configureStore({
     importOrder:ImportOrder.reducer,
     inventory: InventorySlice.reducer,
     inventoryWarehouse:InventoryWarehouseSlice.reducer,
+    stockMovement:StockMovementSlice.reducer,
     exportOrder:ExportOrderSlice.reducer
   },
 });

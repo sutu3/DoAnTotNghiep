@@ -18,6 +18,7 @@ export default function ExecuteExportPage() {
     const [isExecuting, setIsExecuting] = useState(false);
     const [loading, setLoading] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [warehouse, setWarehouse] = useState<string>("");
     const dispatch = useDispatch();
     const item=useSelector(ExportOrderItemSelector)
 
@@ -25,14 +26,16 @@ export default function ExecuteExportPage() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const page: pageApi = { pageNumber: 0, pageSize: 5 };
-                await (dispatch as any)(MiddleGetAllExportOrderByStatus("Approved", page));
+                if(warehouse!=""){
+                    const page: pageApi = { pageNumber: 0, pageSize: 5 };
+                    await (dispatch as any)(MiddleGetAllExportOrderByStatus(warehouse,"Approved", page));
+                }
             } finally {
                 setLoading(false);
             }
         };
         fetchData();
-    }, [dispatch]);
+    }, [warehouse]);
 
     const handleExecuteExport = (order: ExportOrder) => {
         setSelectedOrder(order);
@@ -69,17 +72,18 @@ export default function ExecuteExportPage() {
 
     const handleRefresh = async () => {
         const page: pageApi = { pageNumber: 0, pageSize: 5 };
-        await (dispatch as any)(MiddleGetAllExportOrderByStatus("Approved", page));
+        await (dispatch as any)(MiddleGetAllExportOrderByStatus(warehouse,"Approved", page));
     };
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
             <div className="max-w-7xl mx-auto">
                 <PageHeader />
-
                 <ExportStatsCards exportOrders={exportOrders} />
 
                 <ExportOrdersTable
+                    warehouse={warehouse}
+                    setWarehouse={setWarehouse}
                     loading={loading}
                     exportOrders={exportOrders}
                     onExecuteExport={handleExecuteExport}

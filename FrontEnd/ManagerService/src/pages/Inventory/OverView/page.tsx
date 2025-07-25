@@ -1,14 +1,15 @@
 // FrontEnd/ManagerService/src/pages/Inventory/Overview/page.tsx
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { warehouseSelector } from "@/Store/Selector.tsx";
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 import LowStockAlert from "@/components/Admin/Inventory/Overview/LowStockAlert.tsx";
 import ExpiringProducts from "@/components/Admin/Inventory/Overview/ExpiringProducts.tsx";
 import RecentMovements from "@/components/Admin/Inventory/Overview/RecentMovements.tsx";
-import InventoryStatsCards from "@/components/Admin/Inventory/Overview/Card/InventoryStatsCards.tsx";
 import {MiddleLoadAllInventoryData} from "@/Store/Thunk/InventoryOverviewThunk.tsx";
 import WarehouseCapacity from "@/components/Admin/Inventory/Overview/WarehouseCapacity.tsx";
+import InventoryStatsCards from "@/components/Staff/InventoryCheck/InventoryStatsOverview.tsx";
+import WarehouseCapacityWidget from "@/components/Staff/InventoryCheck/WarehouseCapacityWidget.tsx";
 
 const InventoryOverviewPage = () => {
     const dispatch = useDispatch();
@@ -51,7 +52,7 @@ const InventoryOverviewPage = () => {
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <RecentMovements />
-                    <WarehouseCapacity />
+                    <WarehouseCapacityWidget />
                 </div>
                 {/* Recent Movements */}
 

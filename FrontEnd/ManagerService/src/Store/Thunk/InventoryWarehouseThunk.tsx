@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { callApiThunk } from "../Store";
-import {API_ROUTES} from "@/Api/UrlApi.tsx";
+import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {setInventoryWarehouseList} from "@/Store/InventoryWarehouseSlice.tsx";
 
@@ -13,7 +13,7 @@ export const GetInventoryWarehouseByBinId = createAsyncThunk(
     ) =>
         await callApiThunk(
             "GET",
-            API_ROUTES.inventory.InventoryWarehouse().search().byBinId(binId).getProduct,
+            API_ROUTES.inventory.InventoryWarehouse(null).search().byBinId(binId).getBin,
             undefined,
             rejectWithValue
         )
@@ -26,7 +26,20 @@ export const GetAllInventoryWarehouseByProduct = createAsyncThunk(
     ) =>
         await callApiThunk(
             "GET",
-            API_ROUTES.inventory.InventoryWarehouse().search().byProductId(productId).getProduct,
+            API_ROUTES.inventory.InventoryWarehouse(null).search().byProductId(productId).getProduct,
+            null,
+            rejectWithValue
+        )
+);
+export const GetAllInventoryWarehouseByWarehouse = createAsyncThunk(
+    "inventoryWarehouse/GetAllInventoryWarehouseByWarehouse",
+    async (
+        { warehouse,page }: { warehouse: string,page:pageApi },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES.inventory.InventoryWarehouse(page).search().byWarehouseId(warehouse).getWarehouse,
             null,
             rejectWithValue
         )
@@ -52,6 +65,20 @@ export const MiddleGetInventoryWarehouseByProductId = (productId:string) => {
         try {
             const action = await dispatch(GetAllInventoryWarehouseByProduct({  productId }));
             dispatch(setInventoryWarehouseList(action.payload.result));
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
+export const MiddleGetInventoryWarehouseByWarehouseId = (warehouse:string,page:pageApi) => {
+    return async function (dispatch: any) {
+        try {
+            const action = await dispatch(GetAllInventoryWarehouseByWarehouse({  warehouse,page }));
+            dispatch(setInventoryWarehouseList(action.payload.result?.content));
         } catch (error: any) {
             showToast({
                 title: "Error",

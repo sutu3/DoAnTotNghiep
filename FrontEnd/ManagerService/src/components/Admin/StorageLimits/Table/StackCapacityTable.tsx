@@ -1,65 +1,82 @@
-import React, { useMemo, useState } from 'react';
+import React, {useMemo, useState } from 'react';
 import {
-    Table,
-    TableHeader,
-    TableColumn,
-    TableBody,
-    TableRow,
-    TableCell,
     Card,
     CardHeader,
     CardBody,
-    Input,
-    Button,
-    Pagination,
     Progress,
     Chip,
+    Spinner,
     Dropdown,
+    Button,
     DropdownTrigger,
     DropdownMenu,
-    DropdownItem
+    DropdownItem,
+    Input,
+    Pagination,
+    Table,
+    TableColumn,
+    TableHeader,
+    TableBody, TableRow, TableCell
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import { StackCapacityDetailResponse } from '@/Hooks/useStorageStats';
 
 interface StackCapacityTableProps {
-    stacks: any[];
+    stackData?: StackCapacityDetailResponse[];
+    loading?: boolean;
 }
 
-const StackCapacityTable: React.FC<StackCapacityTableProps> = ({ stacks }) => {
+const StackCapacityTable: React.FC<StackCapacityTableProps> = ({
+                                                                   stackData = [],
+                                                                   loading
+                                                               }) => {
     const [filterValue, setFilterValue] = useState("");
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
-    const processedStacks = useMemo(() => {
-        return stacks?.map(stack => {
-            const totalBins = stack.bin?.length || 0;
-            const emptyBins = stack.bin?.filter((bin: any) => bin.status === "EMPTY").length || 0;
-            const fullBins = stack.bin?.filter((bin: any) => bin.status === "FULL").length || 0;
-            const maintenanceBins = stack.bin?.filter((bin: any) => bin.status === "MAINTENANCE").length || 0;
-            const occupiedBins = totalBins - emptyBins;
-            const percentage = totalBins > 0 ? Math.round((occupiedBins / totalBins) * 100) : 0;
+    // if (loading) {
+    //     return (
+    //         <Card>
+    //             <CardHeader className="pb-3">
+    //                 <div className="flex items-center gap-3">
+    //                     <Icon icon="mdi:table" className="text-2xl text-purple-600" />
+    //                     <div>
+    //                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+    //                             Chi Tiết Sức Chứa Stack
+    //                         </h3>
+    //                         <p className="text-sm text-gray-600 dark:text-gray-400">
+    //                             Đang tải dữ liệu...
+    //                         </p>
+    //                     </div>
+    //                 </div>
+    //             </CardHeader>
+    //             <CardBody>
+    //                 <div className="flex justify-center py-8">
+    //                     <Spinner size="lg" />
+    //                 </div>
+    //             </CardBody>
+    //         </Card>
+    //     );
+    // }
 
-            return {
-                ...stack,
-                totalBins,
-                emptyBins,
-                fullBins,
-                maintenanceBins,
-                occupiedBins,
-                percentage,
-                status: percentage > 90 ? 'critical' : percentage > 70 ? 'warning' : 'normal',
-                warehouseName: stack.warehouse?.warehouseName || "N/A"
-            };
-        })||[];
-    }, [stacks]);
+    // Sử dụng trực tiếp stackData từ API thay vì tính toán
+    const processedStacks = useMemo(() => {
+        return stackData?.map(stack => ({
+            ...stack,
+            // Tính toán fullBins từ totalBins - emptyBins - maintenanceBins
+            fullBins: stack.totalBins - stack.emptyBins - stack.maintenanceBins,
+            percentage: Math.round(stack.utilizationPercentage),
+            warehouseName: "N/A" // API chưa trả về warehouse name, có thể cần thêm
+        }));
+    }, [stackData]);
 
     const filteredItems = useMemo(() => {
         let filtered = [...processedStacks];
 
         if (filterValue) {
-            filtered = filtered.filter((stack) =>
+            filtered = filtered?.filter((stack) =>
                 (stack.stackName || '').toLowerCase().includes(filterValue.toLowerCase()) ||
-                stack.warehouseName.toLowerCase().includes(filterValue.toLowerCase())
+                (stack.description || '').toLowerCase().includes(filterValue.toLowerCase())
             );
         }
 
@@ -74,7 +91,7 @@ const StackCapacityTable: React.FC<StackCapacityTableProps> = ({ stacks }) => {
         return filteredItems.slice(start, end);
     }, [page, filteredItems, rowsPerPage]);
 
-    const renderCell = (stack: any, columnKey: string) => {
+    const renderCell = (stack: StackCapacityDetailResponse & { fullBins: number; percentage: number; warehouseName: string }, columnKey: string) => {
         switch (columnKey) {
             case "stackInfo":
                 return (
@@ -82,7 +99,7 @@ const StackCapacityTable: React.FC<StackCapacityTableProps> = ({ stacks }) => {
                         <p className="font-semibold text-gray-900 dark:text-white">
                             {stack.stackName || `Stack ${stack.stackId}`}
                         </p>
-                        <p className="text-sm text-gray-500">{stack.warehouseName}</p>
+                        <p className="text-sm text-gray-500">{stack.description || "Không có mô tả"}</p>
                     </div>
                 );
             case "capacity":
@@ -161,7 +178,7 @@ const StackCapacityTable: React.FC<StackCapacityTableProps> = ({ stacks }) => {
                     </Dropdown>
                 );
             default:
-                return stack[columnKey];
+                return stack[columnKey as keyof typeof stack]?.toString() || '';
         }
     };
 
@@ -171,7 +188,7 @@ const StackCapacityTable: React.FC<StackCapacityTableProps> = ({ stacks }) => {
                 <Input
                     isClearable
                     className="w-full sm:max-w-[44%]"
-                    placeholder="Tìm kiếm theo tên stack hoặc kho..."
+                    placeholder="Tìm kiếm theo tên stack hoặc mô tả..."
                     startContent={<Icon icon="mdi:magnify" />}
                     value={filterValue}
                     onClear={() => setFilterValue("")}
@@ -189,6 +206,7 @@ const StackCapacityTable: React.FC<StackCapacityTableProps> = ({ stacks }) => {
                         color="secondary"
                         startContent={<Icon icon="mdi:refresh" />}
                         size="sm"
+                        onClick={() => window.location.reload()}
                     >
                         Làm mới
                     </Button>
@@ -203,6 +221,7 @@ const StackCapacityTable: React.FC<StackCapacityTableProps> = ({ stacks }) => {
                     <select
                         className="bg-transparent outline-none text-default-400 text-small ml-2"
                         onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                        value={rowsPerPage}
                     >
                         <option value="5">5</option>
                         <option value="10">10</option>
@@ -258,7 +277,7 @@ const StackCapacityTable: React.FC<StackCapacityTableProps> = ({ stacks }) => {
                         <TableColumn key="status">TÌNH TRẠNG</TableColumn>
                         <TableColumn key="actions">THAO TÁC</TableColumn>
                     </TableHeader>
-                    <TableBody items={items}>
+                    <TableBody items={items} emptyContent="Không có dữ liệu">
                         {(item) => (
                             <TableRow key={item.stackId}>
                                 {(columnKey) => (
@@ -272,4 +291,5 @@ const StackCapacityTable: React.FC<StackCapacityTableProps> = ({ stacks }) => {
         </Card>
     );
 };
+
 export default StackCapacityTable;
