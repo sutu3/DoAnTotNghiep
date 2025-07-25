@@ -40,6 +40,17 @@ public class UserController {
                 .code(0)
                 .build();
     }
+    @GetMapping("/search/warehouses/{warehouseId}/active")
+    public ApiResponse<List<UserResponse>> getActiveUsersByWarehouse(
+            @PathVariable String warehouseId
+    ) {
+        return ApiResponse.<List<UserResponse>>builder()
+                .Result(userService.getActiveUsersByWarehouse(warehouseId))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
     @GetMapping("/search/GetIdWarehouseByIdUser")
     public ApiResponse<IdWarehouseResponse> getIdWarehouseByIdUser(){
         return ApiResponse.<IdWarehouseResponse>builder()

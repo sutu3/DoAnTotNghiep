@@ -31,15 +31,27 @@ public interface StockMovementRepo extends JpaRepository<StockMovement, String>,
     // Tìm theo người thực hiện
     Page<StockMovement> findAllByPerformedByAndIsDeleted(String performedBy, Boolean isDeleted, Pageable pageable);
 
+    @Query("SELECT sm FROM StockMovement sm " +
+            "WHERE sm.inventoryWarehouseId IN (" +
+            "    SELECT iw.inventoryWarehouseId FROM InventoryWarehouse iw " +
+            "    WHERE iw.warehouse = :warehouseId" +
+            ") " +
+            "AND sm.createdAt BETWEEN :fromDate AND :toDate " +
+            "ORDER BY sm.createdAt DESC")
+    List<StockMovement> findByWarehouseAndDateRange(
+            @Param("warehouseId") String warehouseId,
+            @Param("fromDate") LocalDateTime fromDate,
+            @Param("toDate") LocalDateTime toDate
+    );
     // Tìm theo khoảng thời gian
-    @Query("SELECT sm FROM StockMovement sm WHERE sm.createdAt BETWEEN :startDate AND :endDate AND sm.isDeleted = false")
+    @Query("SELECT sm FROM StockMovement sm WHERE sm.createdAt BETWEEN :startDate AND :endDate")
     List<StockMovement> findByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     // Lấy movement gần nhất của một inventory warehouse
-    @Query("SELECT sm FROM StockMovement sm WHERE sm.inventoryWarehouseId = :inventoryWarehouseId AND sm.isDeleted = false ORDER BY sm.createdAt DESC")
+    @Query("SELECT sm FROM StockMovement sm WHERE sm.inventoryWarehouseId = :inventoryWarehouseId ORDER BY sm.createdAt DESC")
     List<StockMovement> findLatestMovementsByInventoryWarehouse(@Param("inventoryWarehouseId") String inventoryWarehouseId, Pageable pageable);
 
     // Thống kê movement theo type trong khoảng thời gian
-    @Query("SELECT sm.movementType, COUNT(sm), SUM(sm.quantity) FROM StockMovement sm WHERE sm.createdAt BETWEEN :startDate AND :endDate AND sm.isDeleted = false GROUP BY sm.movementType")
+    @Query("SELECT sm.movementType, COUNT(sm), SUM(sm.quantity) FROM StockMovement sm WHERE sm.createdAt BETWEEN :startDate AND :endDate GROUP BY sm.movementType")
     List<Object[]> getMovementStatsByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

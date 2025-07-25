@@ -126,6 +126,7 @@ public class InventoryWarehouseServiceImpl implements InventoryWarehouseService 
     public void deleteInventoryWarehouse(String id) {
         InventoryWarehouse inventoryWarehouse = getById(id);
         inventoryWarehouse.setIsDeleted(true);
+        inventoryWarehouse.setQuantity(0);
         inventoryWarehouse.setDeletedAt(LocalDateTime.now());
         inventoryWarehouseRepo.save(inventoryWarehouse);
 

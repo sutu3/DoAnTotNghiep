@@ -26,15 +26,16 @@ import org.springframework.web.bind.annotation.*;
 public class TaskController {
     private final TaskService taskService;
 
-    @GetMapping("/search/warehouse/{warehouseId}")
+    @GetMapping("/search")
     public ApiResponse<Page<TaskResponse>> getAll(
             @RequestParam("pageNumber") int page,
             @RequestParam("pageSize") int size,
-            @PathVariable String warehouseId
+            @RequestParam(required = false) String warehouseId,
+            @RequestParam(required = false) String taskName
     ){
         Pageable pageable= PageRequest.of(page,size);
         return ApiResponse.<Page<TaskResponse>>builder()
-                .Result(taskService.getAll(pageable,warehouseId))
+                .Result(taskService.getAll(pageable,warehouseId,taskName))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)
@@ -59,15 +60,6 @@ public class TaskController {
     public ApiResponse<TaskResponse> getById(@PathVariable String id){
         return ApiResponse.<TaskResponse>builder()
                 .Result(taskService.getByIdToResponse(id))
-                .code(0)
-                .message("SuccessFull")
-                .success(true)
-                .build();
-    }
-    @PostMapping
-    public ApiResponse<TaskResponse> createTask(@RequestBody TaskRequest request){
-        return ApiResponse.<TaskResponse>builder()
-                .Result(taskService.createTask(request))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

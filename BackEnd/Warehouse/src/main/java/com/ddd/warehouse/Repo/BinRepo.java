@@ -1,6 +1,7 @@
 package com.ddd.warehouse.Repo;
 
 import com.ddd.warehouse.Module.Bins;
+import com.ddd.warehouse.Module.Warehouses;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,4 +19,8 @@ public interface BinRepo extends JpaRepository<Bins,String>, JpaSpecificationExe
     Page<Bins> findAllByStack_StackName(Pageable pageable, String stackName);
     Optional<Bins> findByBinCodeAndStack_StackNameAndWarehouse_WarehouseId(String binCode, String stackStackName,String  warehouseId);
     boolean existsByBinCodeAndStack_StackNameAndWarehouse_WarehouseId(String binCode, String stackStackName,String  warehouseId);
+    List<Bins> findAllByWarehouse_WarehouseIdAndIsDeleted(String warehouse, Boolean isDeleted);
+    List<Bins> findByStack_StackIdAndIsDeleted(String stackId, Boolean isDeleted);
+
+
 }

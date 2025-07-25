@@ -23,7 +23,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -108,5 +110,13 @@ public class UsersServiceImpl implements UserService {
         UserResponse response = userMapper.toResponse(users);
         response.setWarehouses(warehouseFuture.join());
         return response;
+    }
+
+    @Override
+    public List<UserResponse> getActiveUsersByWarehouse(String warehouseId) {
+        List<Users> activeUsers = userRepo.findActiveUsersByWarehouse(warehouseId);
+        return activeUsers.stream()
+                .map(this::enrich)
+                .collect(Collectors.toList());
     }
 }

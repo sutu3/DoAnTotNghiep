@@ -18,4 +18,6 @@ public interface StackRepo extends JpaRepository<Stacks,String>, JpaSpecificatio
     List<Stacks> findAllByWarehouse_WarehouseId(String warehouseId);
     Optional<Stacks> findByStackNameAndWarehouse_WarehouseId(String stackName,String warehouseId);
     boolean existsByStackNameAndWarehouse_WarehouseId(String stackName,String warehouseId);
+    List<Stacks> findByWarehouse_WarehouseIdAndIsDeleted(String warehouseId, Boolean isDeleted);
+
 }

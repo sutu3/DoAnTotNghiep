@@ -4,6 +4,7 @@ import com.example.order.Dto.Request.ImportOrderRequest;
 import com.example.order.Dto.Request.ImportRequestItem;
 import com.example.order.Dto.Response.ApiResponse;
 import com.example.order.Dto.Response.ImportOrder.ImportOrderResponse;
+import com.example.order.Dto.Response.ImportOrder.ImportOrderResponseClient;
 import com.example.order.Form.ImportOrderForm;
 import com.example.order.Form.StatusForm;
 import com.example.order.Service.ImportOrderService;
@@ -15,8 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -160,6 +163,45 @@ public class ImportOrderController {
                 .Result(importOrderService.deleteOrder(orderId))
                 .code(0)
                 .message("Deleted SuccessFull")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/search/warehouse/{warehouseId}/date-range")
+    public ApiResponse<List<ImportOrderResponseClient>> getOrdersByWarehouseAndDateRange(
+            @PathVariable String warehouseId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate
+    ) {
+        return ApiResponse.<List<ImportOrderResponseClient>>builder()
+                .Result(importOrderService.getOrdersByWarehouseAndDateRange(warehouseId, fromDate, toDate))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+
+    @GetMapping("/search/warehouse/{warehouseId}/status/pending")
+    public ApiResponse<List<ImportOrderResponseClient>> getPendingImportOrdersByWarehouse(
+            @PathVariable String warehouseId
+    ) {
+        return ApiResponse.<List<ImportOrderResponseClient>>builder()
+                .Result(importOrderService.getPendingImportOrdersByWarehouse(warehouseId))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+
+    @GetMapping("/search/warehouse/{warehouseId}/status/completed/date-range")
+    public ApiResponse<List<ImportOrderResponseClient>> getCompletedImportOrdersByWarehouse(
+            @PathVariable String warehouseId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate
+    ) {
+        return ApiResponse.<List<ImportOrderResponseClient>>builder()
+                .Result(importOrderService.getCompletedImportOrdersByWarehouse(warehouseId, fromDate, toDate))
+                .code(0)
+                .message("Success")
                 .success(true)
                 .build();
     }

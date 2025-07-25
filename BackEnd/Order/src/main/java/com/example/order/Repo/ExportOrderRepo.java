@@ -32,4 +32,12 @@ public interface ExportOrderRepo extends JpaRepository<ExportOrder, String> {
                                                 @Param("endDate") LocalDateTime endDate);
 
     Optional<ExportOrder> findByExportOrderIdAndIsDeletedFalse(String exportOrderId);
+    List<ExportOrder> findAllByWarehouseAndCreatedAtBetweenAndIsDeletedFalse(
+            String warehouse, LocalDateTime fromDate, LocalDateTime toDate);
+
+    List<ExportOrder> findAllByWarehouseAndStatusInAndIsDeletedFalse(
+            String warehouse, List<ExportOrderStatus> statuses);
+
+    List<ExportOrder> findAllByWarehouseAndStatusAndCreatedAtBetweenAndIsDeletedFalse(
+            String warehouse, ExportOrderStatus status, LocalDateTime fromDate, LocalDateTime toDate);
 }
