@@ -31,15 +31,11 @@ export const AddUser = createAsyncThunk(
         )
 );
 export const MiddleAddUser = (user: UserCreate) => {
-    return async function (dispatch: any, getState: any) {
+    return async function (dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-
             await dispatch(AddUser({user:
                     { ...user,
-                        urlImage:`https://dummyimage.com/300.png/09f/fff&text=${user.userName}}`,
-                        warehouses:warehouseId}}));
+                        urlImage:`https://dummyimage.com/300.png/09f/fff&text=${user.userName}}`}}));
         } catch (error: any) {
             showToast({
                 title: "Error",
@@ -49,13 +45,10 @@ export const MiddleAddUser = (user: UserCreate) => {
         }
     };
 };
-export const MiddleGetAllUser = (page: pageApi) => {
-    return async function (dispatch: any, getState: any) {
+export const MiddleGetAllUser = (warehouse:string,page: pageApi) => {
+    return async function (dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-
-            const action = await dispatch(GetAllUser({ warehouseId, page }));
+            const action = await dispatch(GetAllUser({ warehouseId:warehouse, page }));
 
             dispatch(setUserList(action.payload.result.content));
             dispatch(initToTalPage(action.payload.result.totalPages));

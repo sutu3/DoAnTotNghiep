@@ -3,28 +3,29 @@ import {Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal, useEff
 import {useDispatch, useSelector} from "react-redux";
 import {MiddleGetAllProductBySearch} from "@/Store/Thunk/ProductThunk.tsx";
 import {ProductSelector} from "@/Store/Selector.tsx";
-import {ExportItemCreateUI} from "@/Store/ExportOrderSlice.tsx";
+import {ExportItemCreateUI, OrderRequestExportCreate} from "@/Store/ExportOrderSlice.tsx";
 
 interface SelectProps {
-    formData:  ExportItemCreateUI;
-    setFormData: (formData: (prev: any) => any) => void;
+    formData: OrderRequestExportCreate
+    currentItem:  ExportItemCreateUI;
+    setCurrentItem: (formData: (prev: any) => any) => void;
 }
 
-export const ProductSelect = ({ formData, setFormData}:SelectProps) => {
+export const ProductSelect = ({formData, currentItem, setCurrentItem}:SelectProps) => {
     const dispatch = useDispatch();
     const products=useSelector(ProductSelector);
     useEffect(() => {
-        (dispatch as any)(MiddleGetAllProductBySearch(null));
-    }, [])
+        (dispatch as any)(MiddleGetAllProductBySearch(null,formData.warehouse));
+    }, [formData.warehouse])
     return (<Select
         aria-labelledby="Input"
         label="Sản phẩm"
         placeholder="Chọn sản phẩm"
-        selectedKeys={formData?.product ? [formData.product] : []}
+        selectedKeys={currentItem?.product ? [currentItem.product] : []}
         onSelectionChange={(keys) => {
             const productId = Array.from(keys)[0]?.toString();
             const product = products.find((p: { productId: string; }) => p.productId === productId);
-            if (product) setFormData((prev: any) => ({
+            if (product) setCurrentItem((prev: any) => ({
                 ...prev,
                 product: productId,
                 productName: product.productName,

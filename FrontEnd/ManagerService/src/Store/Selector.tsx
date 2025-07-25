@@ -5,8 +5,8 @@ export const warehouseListSelector = (state: { warehouse: { warehouseList: any }
 export const TotalPageWarehouse = (state: { warehouse: { totalPage: number } }) =>
     state.warehouse.totalPage;
 
-export const userSelector = (state: { user: { user: any } }) =>
-    state.user.user;
+// export const userSelector = (state: (state: { taskUser: { taskUsers: any } }) => any) =>
+//     state.user.user;
 
 export const CategorySelector = (state: { category: { categoryList: any } }) =>
 state.category.categoryList;
@@ -61,9 +61,15 @@ export const GroupUnitSelector = (state: { groupUnit: {groupUnitList: any} }) =>
     state.groupUnit.groupUnitList;
 export const TotalPageGroupUnit = (state: { groupUnit: { totalPage: number } }) =>
     state.groupUnit.totalPage;
-
+export const StockMovementSelector = (state: { stockMovement: {stockMovements: any} }) =>
+    state.stockMovement.stockMovements;
+export const TotalPageStockMovement = (state: { stockMovement: { totalPage: number } }) =>
+    state.stockMovement.totalPage;
 export const TaskSelector = (state: { tasks: any }) =>
     state.tasks.tasks;
+
+export const TaskUserSelector = (state: { taskUser: {taskUsers:any} }) =>
+    state.taskUser.taskUsers;
 
 export const InventoryStatsSelector = (state: { inventory: { stats: any } }) =>
     state.inventory.stats;

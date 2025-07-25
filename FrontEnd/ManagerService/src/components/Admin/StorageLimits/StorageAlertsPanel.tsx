@@ -1,58 +1,17 @@
 import React from 'react';
-import { Card, CardHeader, CardBody, Chip, Button } from '@heroui/react';
+import {Card, CardHeader, CardBody, Chip, Button, Spinner} from '@heroui/react';
 import { Icon } from '@iconify/react';
+import {StorageAlertResponse} from "@/Hooks/useStorageStats.ts";
 
 interface StorageAlertsPanelProps {
-    stacks: any[];
+    alerts?: StorageAlertResponse[];
+    loading?: boolean;
 }
 
-const StorageAlertsPanel: React.FC<StorageAlertsPanelProps> = ({ stacks }) => {
-    const generateAlerts = () => {
-        const alerts = [];
-
-        stacks?.forEach(stack => {
-            const totalBins = stack.bin?.length || 0;
-            const emptyBins = stack.bin?.filter((bin: any) => bin.status === "EMPTY").length || 0;
-            const percentage = totalBins > 0 ? Math.round(((totalBins - emptyBins) / totalBins) * 100) : 0;
-
-            if (percentage > 90) {
-                alerts.push({
-                    type: 'critical',
-                    title: 'Stack Gần Đầy',
-                    message: `${stack.stackName || `Stack ${stack.stackId}`} đã sử dụng ${percentage}%`,
-                    warehouse: stack.warehouse?.warehouseName || "N/A",
-                    icon: 'mdi:alert-circle',
-                    time: 'Vừa xong'
-                });
-            } else if (percentage > 70) {
-                alerts.push({
-                    type: 'warning',
-                    title: 'Cảnh Báo Sức Chứa',
-                    message: `${stack.stackName || `Stack ${stack.stackId}`} đã sử dụng ${percentage}%`,
-                    warehouse: stack.warehouse?.warehouseName || "N/A",
-                    icon: 'mdi:alert',
-                    time: '5 phút trước'
-                });
-            }
-        });
-
-        // Thêm một số cảnh báo mẫu khác
-        if (alerts.length < 3) {
-            alerts.push({
-                type: 'info',
-                title: 'Kiểm Tra Định Kỳ',
-                message: 'Đã đến thời gian kiểm tra sức chứa kho',
-                warehouse: 'Tất cả kho',
-                icon: 'mdi:information',
-                time: '1 giờ trước'
-            });
-        }
-
-        return alerts.slice(0, 5); // Giới hạn 5 cảnh báo
-    };
-
-    const alerts = generateAlerts();
-
+const StorageAlertsPanel: React.FC<StorageAlertsPanelProps> = ({
+                                                                   alerts = [],
+                                                                   loading
+                                                               }) => {
     const getAlertColor = (type: string) => {
         switch (type) {
             case 'critical': return 'danger';
@@ -70,6 +29,51 @@ const StorageAlertsPanel: React.FC<StorageAlertsPanelProps> = ({ stacks }) => {
             default: return 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700';
         }
     };
+
+    const getAlertIcon = (type: string) => {
+        switch (type) {
+            case 'critical': return 'mdi:alert-circle';
+            case 'warning': return 'mdi:alert';
+            case 'info': return 'mdi:information';
+            default: return 'mdi:alert';
+        }
+    };
+
+    const formatTimeAgo = (dateString: string) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+
+        if (diffInMinutes < 1) return 'Vừa xong';
+        if (diffInMinutes < 60) return `${diffInMinutes} phút trước`;
+        if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} giờ trước`;
+        return `${Math.floor(diffInMinutes / 1440)} ngày trước`;
+    };
+
+    if (loading) {
+        return (
+            <Card>
+                <CardHeader className="pb-3">
+                    <div className="flex items-center gap-3">
+                        <Icon icon="mdi:bell-alert" className="text-2xl text-red-600" />
+                        <div>
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                                Cảnh Báo Lưu Trữ
+                            </h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                Đang tải...
+                            </p>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardBody>
+                    <div className="flex justify-center py-8">
+                        <Spinner size="lg" />
+                    </div>
+                </CardBody>
+            </Card>
+        );
+    }
 
     return (
         <Card>
@@ -96,12 +100,12 @@ const StorageAlertsPanel: React.FC<StorageAlertsPanelProps> = ({ stacks }) => {
                     {alerts.length > 0 ? (
                         alerts.map((alert, index) => (
                             <div
-                                key={index}
+                                key={`${alert.stackId}-${index}`}
                                 className={`p-4 rounded-lg border ${getAlertBgColor(alert.type)}`}
                             >
                                 <div className="flex items-start gap-3">
                                     <Icon
-                                        icon={alert.icon}
+                                        icon={getAlertIcon(alert.type)}
                                         className={`text-xl mt-0.5 ${
                                             alert.type === 'critical' ? 'text-red-600' :
                                                 alert.type === 'warning' ? 'text-yellow-600' :
@@ -118,16 +122,19 @@ const StorageAlertsPanel: React.FC<StorageAlertsPanelProps> = ({ stacks }) => {
                                                 color={getAlertColor(alert.type) as any}
                                                 variant="flat"
                                             >
-                                                {alert.type === 'critical' ? 'Khẩn cấp' :
-                                                    alert.type === 'warning' ? 'Cảnh báo' : 'Thông tin'}
+                                                {alert.severity === 'HIGH' ? 'Khẩn cấp' :
+                                                    alert.severity === 'MEDIUM' ? 'Cảnh báo' : 'Thông tin'}
                                             </Chip>
                                         </div>
                                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                                             {alert.message}
                                         </p>
                                         <div className="flex justify-between items-center text-xs text-gray-500">
-                                            <span>Kho: {alert.warehouse}</span>
-                                            <span>{alert.time}</span>
+                                            <span>Stack: {alert.stackName}</span>
+                                            <span>{formatTimeAgo(alert.createdAt)}</span>
+                                        </div>
+                                        <div className="mt-1 text-xs text-gray-500">
+                                            Sử dụng: {alert.utilizationPercentage.toFixed(1)}%
                                         </div>
                                     </div>
                                 </div>

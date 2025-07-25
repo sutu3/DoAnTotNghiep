@@ -95,7 +95,7 @@ export const MoonFilledIcon = ({
   ...props
 }: IconSvgProps) => (
   <svg
-    aria-hidden="true"
+    aria-hidden="false"
     focusable="false"
     height={size || height}
     role="presentation"

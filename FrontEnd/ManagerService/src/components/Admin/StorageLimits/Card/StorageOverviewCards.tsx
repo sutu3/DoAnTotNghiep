@@ -1,35 +1,43 @@
 import React from 'react';
 import { Card, CardBody, Progress } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import {StackType} from "@/Store/StackSlice.tsx";
+import { WarehouseCapacityStatsResponse} from "@/Hooks/useStorageStats.ts";
 
 interface StorageOverviewCardsProps {
-    stacks: StackType[];
+    capacityData?: WarehouseCapacityStatsResponse;
+    loading?: boolean;
 }
 
-const StorageOverviewCards: React.FC<StorageOverviewCardsProps> = ({ stacks }) => {
-    // Tính toán thống kê từ stacks data
-    const safeStacks = stacks || [];
+const StorageOverviewCards: React.FC<StorageOverviewCardsProps> = ({
+                                                                       capacityData,
+                                                                       loading
+                                                                   }) => {
+    if (loading) {
+        return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[1, 2, 3, 4].map((i) => (
+                    <Card key={i} className="animate-pulse">
+                        <CardBody className="p-6">
+                            <div className="h-20 bg-gray-200 rounded"></div>
+                        </CardBody>
+                    </Card>
+                ))}
+            </div>
+        );
+    }
 
-    const totalBins = safeStacks.reduce((acc, stack) => acc + (stack?.bin?.length || 0), 0);
-    const emptyBins = safeStacks.reduce((acc, stack) =>
-        acc + (stack?.bin?.filter((bin: any) => bin.status === "EMPTY")?.length || 0), 0
-    );
-    const occupiedBins = totalBins - emptyBins;
-    const criticalStacks = safeStacks.filter(stack => {
-        const binLength = stack?.bin?.length || 0;
-        if (binLength === 0) return false;
-
-        const nonEmptyBins = stack.bin.filter((bin: any) => bin.status !== "EMPTY").length;
-        const stackCapacity = (nonEmptyBins / binLength) * 100;
-        return stackCapacity > 90;
-    }).length||0;
+    // Sử dụng dữ liệu từ API thay vì tính toán từ stacks
+    const totalBins = capacityData?.totalBins || 0;
+    const emptyBins = capacityData?.emptyBins || 0;
+    const occupiedBins = capacityData?.occupiedBins || 0;
+    const utilizationPercentage = capacityData?.utilizationPercentage || 0;
+    const criticalStacks = capacityData?.criticalStacks || 0;
 
     const overviewData = [
         {
             title: "Tổng Sức Chứa",
             value: `${occupiedBins}/${totalBins}`,
-            percentage: safeStacks.length > 0 ? Math.round((criticalStacks / safeStacks.length) * 100) : 0,
+            percentage: utilizationPercentage,
             icon: "mdi:warehouse",
             color: "blue",
             bgColor: "bg-blue-100 dark:bg-blue-900",
@@ -37,8 +45,8 @@ const StorageOverviewCards: React.FC<StorageOverviewCardsProps> = ({ stacks }) =
         },
         {
             title: "Bin Trống",
-            value: emptyBins.toString()||"",
-            percentage: safeStacks.length > 0 ? Math.round((criticalStacks / safeStacks.length) * 100) : 0,
+            value: emptyBins.toString(),
+            percentage: totalBins > 0 ? Math.round((emptyBins / totalBins) * 100) : 0,
             icon: "mdi:package-variant-closed",
             color: "green",
             bgColor: "bg-green-100 dark:bg-green-900",
@@ -46,8 +54,8 @@ const StorageOverviewCards: React.FC<StorageOverviewCardsProps> = ({ stacks }) =
         },
         {
             title: "Bin Đã Sử Dụng",
-            value: occupiedBins.toString()||"",
-            percentage: safeStacks.length > 0 ? Math.round((criticalStacks / safeStacks.length) * 100) : 0,
+            value: occupiedBins.toString(),
+            percentage: totalBins > 0 ? Math.round((occupiedBins / totalBins) * 100) : 0,
             icon: "mdi:package-variant",
             color: "orange",
             bgColor: "bg-orange-100 dark:bg-orange-900",
@@ -55,8 +63,8 @@ const StorageOverviewCards: React.FC<StorageOverviewCardsProps> = ({ stacks }) =
         },
         {
             title: "Stack Gần Đầy",
-            value: criticalStacks.toString()||"",
-            percentage: stacks.length > 0 ? Math.round((criticalStacks / stacks.length) * 100) : 0,
+            value: criticalStacks.toString(),
+            percentage: criticalStacks > 0 ? 100 : 0, // Hiển thị 100% nếu có stack critical
             icon: "mdi:alert-circle",
             color: "red",
             bgColor: "bg-red-100 dark:bg-red-900",
@@ -67,7 +75,15 @@ const StorageOverviewCards: React.FC<StorageOverviewCardsProps> = ({ stacks }) =
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {overviewData.map((item, index) => (
-                <Card key={index} className="border-l-4 border-l-current" style={{ borderLeftColor: item.color === 'blue' ? '#3b82f6' : item.color === 'green' ? '#10b981' : item.color === 'orange' ? '#f59e0b' : '#ef4444' }}>
+                <Card
+                    key={index}
+                    className="border-l-4 border-l-current"
+                    style={{
+                        borderLeftColor: item.color === 'blue' ? '#3b82f6' :
+                            item.color === 'green' ? '#10b981' :
+                                item.color === 'orange' ? '#f59e0b' : '#ef4444'
+                    }}
+                >
                     <CardBody className="p-6">
                         <div className="flex items-center justify-between">
                             <div className="flex-1">

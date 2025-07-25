@@ -12,7 +12,7 @@ export const columns = [
   { name: "Status", uid: "status", sortable: true },
   { name: "Actions", uid: "actions" },
 ];
-export interface User {
+export interface UserData {
   userId: string;
   userName: string;
   fullName: string;
@@ -32,9 +32,9 @@ export interface UserCreate {
   warehouses: string;
 }
 export interface UserState {
-  userList: User[];
+  userList: UserData[];
   totalPage: 0,
-  user: User;
+  user: UserData;
 }
 
 const initialState:UserState = {

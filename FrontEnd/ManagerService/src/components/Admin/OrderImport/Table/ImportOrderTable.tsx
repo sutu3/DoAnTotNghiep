@@ -47,8 +47,10 @@ export default function ImportOrderTable({
         const PageApi: pageApi = { pageNumber: currentPage - 1, pageSize: 5 };
         dispatch(OrderImportSlice.actions.setOrderImportList([]))
         const fetchData = async () => {
-            await (dispatch as any)(MiddleGetAllImportOrderByStatus(warehouse,"Created",PageApi));
-            setLoading(false)
+            if(warehouse!=""){
+                await (dispatch as any)(MiddleGetAllImportOrderByStatus(warehouse,"Created",PageApi));
+                setLoading(false)
+            }
         };
         fetchData();
     }, [warehouse]);
@@ -59,7 +61,7 @@ export default function ImportOrderTable({
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
-                        Danh Sách Yêu     </h2>
+                        Danh Sách Yêu Cầu   </h2>
 
                     <div className="flex flex-col sm:flex-row gap-3 w-[300px] items-start sm:items-center">
                         {/*<Input*/}

@@ -16,7 +16,7 @@ export const PlusIcon: React.FC<IconProps> = ({
 }) => {
   return (
     <svg
-      aria-hidden="true"
+      aria-hidden="false"
       fill="none"
       focusable="false"
       height={size || height}

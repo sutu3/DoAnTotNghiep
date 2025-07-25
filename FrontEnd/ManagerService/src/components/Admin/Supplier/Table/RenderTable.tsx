@@ -5,6 +5,7 @@ import {DeleteIcon, EditIcon} from "lucide-react";
 import React from "react";
 import {VerticalDotsIcon} from "@/components/UI/Table/IconTable.tsx";
 import {Supplier} from "@/Store/SupplierSlice.tsx";
+import {useNavigate} from "react-router-dom";
 
 
 export interface Props {
@@ -26,7 +27,6 @@ const RenderCell: React.FC<Props> = ({
                                      }) => {
 
     const cellValue = item[columnKey as keyof Supplier];
-
     switch (columnKey) {
 
         case "createdAt":
@@ -71,7 +71,6 @@ const RenderCell: React.FC<Props> = ({
 
                     <Tooltip content="Edit">
                         <span onClick={()=>{
-                            setOpen(!open);
                             handleDetail(item.supplierId)
                         }}  className="text-lg text-default-400 cursor-pointer active:opacity-50">
                             <EditIcon/>

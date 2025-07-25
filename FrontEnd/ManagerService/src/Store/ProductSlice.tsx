@@ -3,7 +3,7 @@ import {Category} from "@/Store/CategorySlice.tsx";
 import {Unit} from "@/Store/Unit.tsx";
 import {Supplier} from "@/Store/SupplierSlice.tsx";
 import {Warehouse} from "@/Store/WarehouseSlice.tsx";
-import {User} from "@/Store/UserSlice.tsx";
+import {UserData} from "@/Store/UserSlice.tsx";
 
 
 export const columns = [
@@ -29,7 +29,7 @@ export interface Product {
     price: number;
     supplier: Supplier;
     warehouses: Warehouse;
-    createByUser: User;
+    createByUser: UserData;
     isActive: boolean;
     category: Category;
     unit: Unit;
