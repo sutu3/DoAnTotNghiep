@@ -2,6 +2,7 @@ package com.example.inventoryservice.Client.WarehouseService;
 
 import com.example.inventoryservice.Client.WarehouseService.Dto.Form.UpdateOccupancyRequest;
 import com.example.inventoryservice.Client.WarehouseService.Dto.Responses.Stack.StackResponse;
+import com.example.inventoryservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehouseCapacityResponse;
 import com.example.inventoryservice.Client.WarehouseService.Fallbacks.WarehouseServiceFallbackClient;
 import com.example.inventoryservice.Config.FeignConfiguration;
 import com.example.inventoryservice.Dtos.ApiResponse;
@@ -23,4 +24,6 @@ public interface WarehouseClient {
     ApiResponse<StackResponse> getStackByBin(@PathVariable String binId);
     @PutMapping(value = "/api/bins/{binId}/occupancy", consumes = "application/json")
     ApiResponse<StackResponse> updateBinOccupancy(@PathVariable String binId, @RequestBody UpdateOccupancyRequest request);
+    @GetMapping(value = "/api/warehouses/{warehouseId}/capacity", consumes = "application/json")
+    ApiResponse<WarehouseCapacityResponse> getWarehouseCapacity(@PathVariable String warehouseId);
 }

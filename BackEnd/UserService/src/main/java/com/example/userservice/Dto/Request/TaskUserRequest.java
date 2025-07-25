@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 
 @Builder
 public record TaskUserRequest(
-                String task,
                 String user,
                 String note,
                 LocalDateTime completeAt

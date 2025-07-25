@@ -3,6 +3,7 @@ package com.example.userservice.Controller;
 import com.example.userservice.Dto.Request.TaskTypeRequest;
 import com.example.userservice.Dto.Responses.ApiResponse;
 import com.example.userservice.Dto.Responses.TaskType.TaskTypeResponse;
+import com.example.userservice.Form.DescriptionForm;
 import com.example.userservice.Form.TaskTypeForm;
 import com.example.userservice.Repo.TaskTypeRepo;
 import com.example.userservice.Service.TaskTypeService;
@@ -68,6 +69,17 @@ public class TaskTypeController {
             @PathVariable String id){
         return ApiResponse.<TaskTypeResponse>builder()
                 .Result(taskTypeService.updateTaskType(update,id))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @PutMapping("/description/{id}")
+    public ApiResponse<TaskTypeResponse> updateDesciptionTaskType(
+            @RequestBody DescriptionForm update,
+            @PathVariable String id){
+        return ApiResponse.<TaskTypeResponse>builder()
+                .Result(taskTypeService.updateDescriptionTaskType(update,id))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

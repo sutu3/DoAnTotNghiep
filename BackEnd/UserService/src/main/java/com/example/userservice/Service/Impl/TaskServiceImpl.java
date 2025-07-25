@@ -14,6 +14,7 @@ import com.example.userservice.Form.TaskForm;
 import com.example.userservice.Mapper.TaskMapper;
 import com.example.userservice.Model.TaskType;
 import com.example.userservice.Model.Tasks;
+import com.example.userservice.Repo.Specification.TaskSpecification;
 import com.example.userservice.Repo.TaskRepo;
 import com.example.userservice.Service.TaskService;
 import com.example.userservice.Service.TaskTypeService;
@@ -23,10 +24,13 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,9 +44,11 @@ public class TaskServiceImpl implements TaskService {
     AsyncServiceImpl asyncServiceImpl;
 
     @Override
-    public Page<TaskResponse> getAll(Pageable pageable,String warehouseId) {
-        return taskRepo.findAllByIsDeletedAndWarehouses(false,warehouseId, pageable)
-                .map(this::entry);
+    public Page<TaskResponse> getAll(Pageable pageable,String warehouseId,String TaskName) {
+        Specification<Tasks> spec = Specification.where(TaskSpecification.hasTaskTypeNameLike(TaskName))
+                .and(TaskSpecification.hasWarehouses(warehouseId));
+        Page<Tasks> pageTasks = taskRepo.findAll(spec, pageable);
+        return pageTasks.map(this::entry);
     }
 
     @Override
@@ -64,7 +70,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponse createTask(TaskRequest request) {
+    public Tasks createTask(TaskRequest request) {
         TaskType taskType=taskTypeService.getByTaskName(request.taskType(), request.warehouses());
         Tasks task=taskMapper.toEntity(request);
         task.setIsDeleted(false);
@@ -72,7 +78,7 @@ public class TaskServiceImpl implements TaskService {
         task.setStatus(StatusTaskEnum.Pending);
         task.setWarehouses(request.warehouses());
         Tasks taskSave=taskRepo.save(task);
-        return entry(taskSave);
+        return taskSave;
     }
 
     @Override

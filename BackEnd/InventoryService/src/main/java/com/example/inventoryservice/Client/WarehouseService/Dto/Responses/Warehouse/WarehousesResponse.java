@@ -11,6 +11,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WarehousesResponse{
+    String warehouseId;
     String warehouseName;
     String managerId;
 }

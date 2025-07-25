@@ -2,8 +2,11 @@ package com.example.order.Mapper;
 
 import com.example.order.Client.ProductService.Dto.Response.ProductResponse;
 import com.example.order.Dto.Request.ImportOrderRequest;
+import com.example.order.Dto.Response.ExportOrder.ExportOrderResponseClient;
 import com.example.order.Dto.Response.ImportOrder.ImportOrderResponse;
+import com.example.order.Dto.Response.ImportOrder.ImportOrderResponseClient;
 import com.example.order.Form.ImportOrderForm;
+import com.example.order.Module.ExportOrder;
 import com.example.order.Module.ImportOrder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,5 +23,6 @@ public interface ImportOrderMapper {
     ImportOrderResponse toResponse(ImportOrder importOrder);
 
     void toUpdate(@MappingTarget ImportOrder importOrder, ImportOrderForm update);
+    ImportOrderResponseClient toClient(ImportOrder importOrder);
 }
 

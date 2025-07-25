@@ -21,4 +21,6 @@ public interface StockMovementService {
     void updateBinOccupancy(String binId, Integer quantityChange, MovementType movementType);
     List<StockMovementResponse> getMovementsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
     StockMovementResponse enrich(StockMovement stockMovement);
+    List<StockMovementResponse> getStockMovementsByWarehouseAndDateRange(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate);
+
 }

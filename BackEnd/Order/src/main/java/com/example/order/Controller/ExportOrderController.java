@@ -3,6 +3,7 @@ package com.example.order.Controller;
 import com.example.order.Dto.Request.ExportOrderRequest;
 import com.example.order.Dto.Response.ApiResponse;
 import com.example.order.Dto.Response.ExportOrder.ExportOrderResponse;
+import com.example.order.Dto.Response.ExportOrder.ExportOrderResponseClient;
 import com.example.order.Enum.ExportOrderStatus;
 import com.example.order.Form.StatusForm;
 import com.example.order.Service.ExportOrderService;
@@ -14,8 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -37,6 +40,45 @@ public class ExportOrderController {
         Pageable pageable = PageRequest.of(page, size);
         return ApiResponse.<Page<ExportOrderResponse>>builder()
                 .Result(exportOrderService.getExportOrdersByWarehouse(warehouseId, pageable))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/search/warehouse/{warehouseId}/date-range")
+    public ApiResponse<List<ExportOrderResponseClient>> getExportOrdersByWarehouseAndDateRange(
+            @PathVariable String warehouseId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate
+    ) {
+        return ApiResponse.<List<ExportOrderResponseClient>>builder()
+                .Result(exportOrderService.getExportOrdersByWarehouseAndDateRange(warehouseId, fromDate, toDate))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+
+    @GetMapping("/search/warehouse/{warehouseId}/status/pending")
+    public ApiResponse<List<ExportOrderResponseClient>> getPendingExportOrdersByWarehouse(
+            @PathVariable String warehouseId
+    ) {
+        return ApiResponse.<List<ExportOrderResponseClient>>builder()
+                .Result(exportOrderService.getPendingExportOrdersByWarehouse(warehouseId))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+
+    @GetMapping("/search/warehouse/{warehouseId}/status/completed/date-range")
+    public ApiResponse<List<ExportOrderResponseClient>> getCompletedExportOrdersByWarehouse(
+            @PathVariable String warehouseId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate
+    ) {
+        return ApiResponse.<List<ExportOrderResponseClient>>builder()
+                .Result(exportOrderService.getCompletedExportOrdersByWarehouse(warehouseId, fromDate, toDate))
                 .code(0)
                 .message("Success")
                 .success(true)
