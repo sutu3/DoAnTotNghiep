@@ -2,7 +2,8 @@ package com.ddd.warehouse.Controller;
 
 import com.ddd.warehouse.Dto.Request.WarehousesRequest;
 import com.ddd.warehouse.Dto.Response.ApiResponse;
-import com.ddd.warehouse.Dto.Response.Warehouse.WarehousesResponse;
+import com.ddd.warehouse.Dto.Response.Stack.NearFullStacksResponse;
+import com.ddd.warehouse.Dto.Response.Warehouse.*;
 import com.ddd.warehouse.Form.AddressForm;
 import com.ddd.warehouse.Form.WarehousesForm;
 import com.ddd.warehouse.Service.WarehouseService;
@@ -45,6 +46,17 @@ public class WarehouseController {
                 .build();
 
     }
+    @GetMapping("/{warehouseId}/capacity")
+    public ApiResponse<WarehouseCapacityResponse> getWarehouseCapacity(
+            @PathVariable String warehouseId
+    ) {
+        return ApiResponse.<WarehouseCapacityResponse>builder()
+                .Result(warehouseService.getWarehouseCapacity(warehouseId))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
     @GetMapping("/getList")
     public ApiResponse<List<WarehousesResponse>> getAllList(
     ){
@@ -55,6 +67,52 @@ public class WarehouseController {
                 .success(true)
                 .build();
 
+    }
+    @GetMapping("/{warehouseId}/near-full-stacks")
+    public ApiResponse<NearFullStacksResponse> getNearFullStacks(
+            @PathVariable String warehouseId,
+            @RequestParam(defaultValue = "90") Integer threshold
+    ) {
+        return ApiResponse.<NearFullStacksResponse>builder()
+                .Result(warehouseService.getNearFullStacks(warehouseId, threshold))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/{warehouseId}/capacity-stats")
+    public ApiResponse<WarehouseCapacityStatsResponse> getWarehouseCapacityStats(
+            @PathVariable String warehouseId,
+            @RequestParam(defaultValue = "today") String timeFilter
+    ) {
+        return ApiResponse.<WarehouseCapacityStatsResponse>builder()
+                .Result(warehouseService.getCapacityStats(warehouseId, timeFilter))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/{warehouseId}/storage-alerts")
+    public ApiResponse<List<StorageAlertResponse>> getStorageAlerts(
+            @PathVariable String warehouseId
+    ) {
+        return ApiResponse.<List<StorageAlertResponse>>builder()
+                .Result(warehouseService.getStorageAlerts(warehouseId))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/{warehouseId}/stack-capacity-details")
+    public ApiResponse<List<StackCapacityDetailResponse>> getStackCapacityDetails(
+            @PathVariable String warehouseId
+    ) {
+        return ApiResponse.<List<StackCapacityDetailResponse>>builder()
+                .Result(warehouseService.getStackCapacityDetails(warehouseId))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
     }
     @GetMapping("search/byManager/{id}")
     public ApiResponse<WarehousesResponse> getByManagerId(@PathVariable String id){

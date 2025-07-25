@@ -35,4 +35,10 @@ public interface InventoryProductRepo extends JpaRepository<InventoryProduct, St
 
     // Đếm số lượng sản phẩm theo warehouse
     Integer countByWarehouseAndIsDeleted(String warehouse, Boolean isDeleted);
+
+    @Query("SELECT COUNT(ip) FROM InventoryProduct ip " +
+            "WHERE ip.warehouse = :warehouseId " +
+            "AND ip.totalQuantity <= ip.minStockLevel " +
+            "AND ip.isDeleted = false")
+    Integer countLowStockByWarehouse(@Param("warehouseId") String warehouseId);
 }

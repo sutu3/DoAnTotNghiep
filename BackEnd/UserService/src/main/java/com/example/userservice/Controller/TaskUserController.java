@@ -1,6 +1,7 @@
 package com.example.userservice.Controller;
 
 import com.example.userservice.Dto.Request.StatusRequest;
+import com.example.userservice.Dto.Request.TaskUserAndTaskRequest;
 import com.example.userservice.Dto.Request.TaskUserRequest;
 import com.example.userservice.Dto.Responses.ApiResponse;
 import com.example.userservice.Dto.Responses.TaskUser.TaskUserResponse;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/taskUsers")
@@ -39,15 +42,12 @@ public class TaskUserController {
                 .success(true)
                 .build();
     }
-    @GetMapping("/tasks/{id}/search")
-    public ApiResponse<Page<TaskUserResponse>> getAllByIdTask(
-            @RequestParam("pageNumber") int pageNumber,
-            @RequestParam("pageSize") int pageSize,
+    @GetMapping("/search/tasks/{id}")
+    public ApiResponse<List<TaskUserResponse>> getAllByIdTask(
             @PathVariable String id
     ){
-        Pageable pageable= PageRequest.of(pageNumber,pageSize);
-        return ApiResponse.<Page<TaskUserResponse>>builder()
-                .Result(taskUserService.getAllByTaskId(id,pageable))
+        return ApiResponse.<List<TaskUserResponse>>builder()
+                .Result(taskUserService.getAllByTaskId(id))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)
@@ -69,11 +69,11 @@ public class TaskUserController {
                 .build();
     }
     @PostMapping
-    public ApiResponse<TaskUserResponse> createTaskUser(
-            @RequestBody TaskUserRequest request
+    public ApiResponse<List<TaskUserResponse>> createTaskUser(
+            @RequestBody TaskUserAndTaskRequest request
             ){
-        return ApiResponse.<TaskUserResponse>builder()
-                .Result(taskUserService.createTaskUser(request))
+        return ApiResponse.<List<TaskUserResponse>>builder()
+                .Result(taskUserService.createTaskUsers(request.request(),request.tasks()))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

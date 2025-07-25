@@ -25,4 +25,6 @@ public interface UserService {
     UserResponse findByEmail(String email);
     UserResponse getByUserId();
     UserResponse enrich(Users users);
+    List<UserResponse> getActiveUsersByWarehouse(String warehouseId);
+
 }

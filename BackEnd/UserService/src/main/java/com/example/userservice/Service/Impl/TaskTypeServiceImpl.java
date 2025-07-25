@@ -6,6 +6,7 @@ import com.example.userservice.Dto.Request.TaskTypeRequest;
 import com.example.userservice.Dto.Responses.TaskType.TaskTypeResponse;
 import com.example.userservice.Exception.AppException;
 import com.example.userservice.Exception.ErrorCode;
+import com.example.userservice.Form.DescriptionForm;
 import com.example.userservice.Form.TaskTypeForm;
 import com.example.userservice.Mapper.TaskTypeMapper;
 import com.example.userservice.Model.TaskType;
@@ -86,6 +87,14 @@ public class TaskTypeServiceImpl implements TaskTypeService {
         }
         TaskType taskType=getByid(id);
         taskTypeMapper.update(taskType,update);
+        TaskType taskTypeSave = taskTypeRepo.save(taskType);
+        return entry(taskTypeSave);
+    }
+
+    @Override
+    public TaskTypeResponse updateDescriptionTaskType(DescriptionForm update, String id) {
+        TaskType taskType=getByid(id);
+        taskType.setDescription(update.description());
         TaskType taskTypeSave = taskTypeRepo.save(taskType);
         return entry(taskTypeSave);
     }

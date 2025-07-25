@@ -3,6 +3,7 @@ package com.example.order.Service;
 import com.example.order.Dto.Request.ImportOrderRequest;
 import com.example.order.Dto.Request.ImportRequestItem;
 import com.example.order.Dto.Response.ImportOrder.ImportOrderResponse;
+import com.example.order.Dto.Response.ImportOrder.ImportOrderResponseClient;
 import com.example.order.Form.ImportOrderForm;
 import com.example.order.Form.StatusForm;
 import com.example.order.Module.ImportOrder;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -32,4 +34,7 @@ public interface ImportOrderService {
     ImportOrderResponse updateReject(String id,ImportOrderForm form);
     ImportOrderResponse entry(ImportOrder importOrder);
     Integer getPendingOrdersByProduct(String productId, String warehouseId);
+    List<ImportOrderResponseClient> getOrdersByWarehouseAndDateRange(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate);
+    List<ImportOrderResponseClient> getPendingImportOrdersByWarehouse(String warehouseId);
+    List<ImportOrderResponseClient> getCompletedImportOrdersByWarehouse(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate);
 }

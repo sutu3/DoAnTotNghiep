@@ -5,6 +5,7 @@ import com.example.order.Client.UserService.Dto.Response.UserResponse;
 import com.example.order.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.order.Dto.Request.ExportOrderRequest;
 import com.example.order.Dto.Response.ExportOrder.ExportOrderResponse;
+import com.example.order.Dto.Response.ExportOrder.ExportOrderResponseClient;
 import com.example.order.Enum.ExportOrderStatus;
 import com.example.order.Exception.AppException;
 import com.example.order.Exception.ErrorCode;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,9 +39,10 @@ public class ExportOrderServiceImpl implements ExportOrderService {
 
     @Override
     public ExportOrderResponse createExportOrder(ExportOrderRequest request) {
+        var IdUser=GetCurrentUserId.getCurrentUserId();
         ExportOrder exportOrder = ExportOrder.builder()
                 .warehouse(request.warehouse())
-                .createByUser(request.createByUser())
+                .createByUser(IdUser)
                 .isDeleted(false)
                 .customer(request.customer())
                 .description(request.description())
@@ -170,5 +173,37 @@ public class ExportOrderServiceImpl implements ExportOrderService {
             exportOrderResponse.setCustomer(customerFuture.join());
         }
         return exportOrderResponse;
+    }
+
+    @Override
+    public List<ExportOrderResponseClient> getExportOrdersByWarehouseAndDateRange(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate) {
+        List<ExportOrder> orders = exportOrderRepo.findAllByWarehouseAndCreatedAtBetweenAndIsDeletedFalse(
+                warehouseId, fromDate, toDate);
+        return orders.stream()
+                .map(exportOrderMapper::toClient)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ExportOrderResponseClient> getPendingExportOrdersByWarehouse(String warehouseId) {
+        List<ExportOrderStatus> pendingStatuses = Arrays.asList(
+                ExportOrderStatus.CREATED,
+                ExportOrderStatus.PENDING_APPROVAL,
+                ExportOrderStatus.APPROVED
+        );
+        List<ExportOrder> orders = exportOrderRepo.findAllByWarehouseAndStatusInAndIsDeletedFalse(
+                warehouseId, pendingStatuses);
+        return orders.stream()
+                .map(exportOrderMapper::toClient)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ExportOrderResponseClient> getCompletedExportOrdersByWarehouse(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate) {
+        List<ExportOrder> orders = exportOrderRepo.findAllByWarehouseAndStatusAndCreatedAtBetweenAndIsDeletedFalse(
+                warehouseId, ExportOrderStatus.COMPLETED, fromDate, toDate);
+        return orders.stream()
+                .map(exportOrderMapper::toClient)
+                .collect(Collectors.toList());
     }
 }

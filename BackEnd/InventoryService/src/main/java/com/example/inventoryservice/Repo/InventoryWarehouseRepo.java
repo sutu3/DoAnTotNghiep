@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -49,4 +50,10 @@ public interface InventoryWarehouseRepo extends JpaRepository<InventoryWarehouse
     // Kiểm tra bin có trống không
     @Query("SELECT CASE WHEN COUNT(iw) > 0 THEN false ELSE true END FROM InventoryWarehouse iw WHERE iw.bin = :bin AND iw.quantity > 0 AND iw.isDeleted = false")
     Boolean isBinEmpty(@Param("bin") String bin);
+
+    @Query("SELECT COALESCE(SUM(iw.quantity * sm.unitCost), 0) " +
+            "FROM InventoryWarehouse iw " +
+            "JOIN StockMovement sm ON sm.inventoryWarehouseId = iw.inventoryWarehouseId " +
+            "WHERE iw.warehouse = :warehouseId AND iw.isDeleted = false")
+    BigDecimal calculateTotalInventoryValue(@Param("warehouseId") String warehouseId);
 }

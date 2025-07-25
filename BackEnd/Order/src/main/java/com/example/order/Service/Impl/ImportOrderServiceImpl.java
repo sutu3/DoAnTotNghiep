@@ -5,6 +5,7 @@ import com.example.order.Client.UserService.UserController;
 import com.example.order.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.order.Dto.Request.ImportOrderRequest;
 import com.example.order.Dto.Response.ImportOrder.ImportOrderResponse;
+import com.example.order.Dto.Response.ImportOrder.ImportOrderResponseClient;
 import com.example.order.Enum.OrderStatus;
 import com.example.order.Enum.OrderType;
 import com.example.order.Exception.AppException;
@@ -167,5 +168,33 @@ public class ImportOrderServiceImpl implements ImportOrderService {
         return importItemRepo.countPendingItemsByProductAndWarehouse(
                 productId, warehouseId, pendingStatuses, false
         );
+    }
+
+    @Override
+    public List<ImportOrderResponseClient> getOrdersByWarehouseAndDateRange(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate) {
+        List<ImportOrder> orders = importOrderRepo.findAllByWarehouseAndCreatedAtBetweenAndIsDeleted(
+                warehouseId, fromDate, toDate, false);
+        return orders.stream()
+                .map(importOrderMapper::toClient)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ImportOrderResponseClient> getPendingImportOrdersByWarehouse(String warehouseId) {
+        List<OrderStatus> pendingStatuses = Arrays.asList(OrderStatus.Created, OrderStatus.InProgress);
+        List<ImportOrder> orders = importOrderRepo.findAllByWarehouseAndStatusInAndIsDeleted(
+                warehouseId, pendingStatuses, false);
+        return orders.stream()
+                .map(importOrderMapper::toClient)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ImportOrderResponseClient> getCompletedImportOrdersByWarehouse(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate) {
+        List<ImportOrder> orders = importOrderRepo.findAllByWarehouseAndStatusAndCreatedAtBetweenAndIsDeleted(
+                warehouseId, OrderStatus.Done, fromDate, toDate, false);
+        return orders.stream()
+                .map(importOrderMapper::toClient)
+                .collect(Collectors.toList());
     }
 }

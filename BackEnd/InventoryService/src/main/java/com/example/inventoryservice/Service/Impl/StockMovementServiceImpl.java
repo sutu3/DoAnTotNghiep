@@ -75,6 +75,8 @@ public class StockMovementServiceImpl implements StockMovementService {
     @Override
     @Transactional
     public StockMovementResponse createStockMovement(StockMovementRequest request) {
+        var userId=GetCurrentUserId.getCurrentUserId();
+        request.setPerformedBy(userId);
         log.info("=== STARTING STOCK MOVEMENT CREATION ===");
         log.info("Request details - Product: {}, InventoryWarehouseId: {}, Quantity: {}, MovementType: {}",
                 request.getProduct(), request.getInventoryWarehouseId(), request.getQuantity(), request.getMovementType());
@@ -131,6 +133,13 @@ public class StockMovementServiceImpl implements StockMovementService {
                     log.info("Processing ADJUSTMENT movement");
                     stockMovement.setQuantityAfter(request.getQuantity());
                     log.info("ADJUSTMENT: Set quantity to {}", request.getQuantity());
+
+                    // Bổ sung logic cho trường hợp quantity = 0
+                    if (request.getQuantity() == 0) {
+                        log.info("Quantity adjusted to 0, marking inventory warehouse for deletion");
+                        inventoryWarehouseService.deleteInventoryWarehouse(request.getInventoryWarehouseId());
+                        // Sẽ xóa InventoryWarehouse record sau khi save movement
+                    }
                     break;
                 case TRANSFER:
                     log.info("Processing TRANSFER movement");
@@ -225,17 +234,33 @@ public class StockMovementServiceImpl implements StockMovementService {
         return response;
     }
 
+    @Override
+    public List<StockMovementResponse> getStockMovementsByWarehouseAndDateRange(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate) {
+        log.info("Getting stock movements for warehouse: {} from {} to {}", warehouseId, fromDate, toDate);
+
+        List<StockMovement> movements = stockMovementRepo.findByWarehouseAndDateRange(warehouseId, fromDate, toDate);
+
+        return movements.stream()
+                .map(this::enrich)
+                .collect(Collectors.toList());
+    }
+
     private void updateInventoryWarehouseQuantity(InventoryWarehouse inventoryWarehouse, Integer newQuantity) {
-        inventoryWarehouse.setQuantity(newQuantity);
-        inventoryWarehouse.setUpdatedAt(LocalDateTime.now());
-        inventoryWarehouseService.updateInventoryWarehouse(
-                InventoryWarehouseForm.builder()
-                        .quantity(newQuantity)
-                        .bin(inventoryWarehouse.getBin())
-                        .expiryDate(inventoryWarehouse.getExpiryDate())
-                        .status(inventoryWarehouse.getStatus().toString())
-                        .build(),
-                inventoryWarehouse.getInventoryWarehouseId()
-        );
+        if (newQuantity == 0) {
+            inventoryWarehouseService.deleteInventoryWarehouse(inventoryWarehouse.getInventoryWarehouseId());
+            log.info("InventoryWarehouse deleted due to zero quantity");
+        } else {
+            // Cập nhật quantity bình thường
+            inventoryWarehouse.setQuantity(newQuantity);
+            inventoryWarehouse.setUpdatedAt(LocalDateTime.now());
+            inventoryWarehouseService.updateInventoryWarehouse(
+                    InventoryWarehouseForm.builder()
+                            .quantity(newQuantity)
+                            .bin(inventoryWarehouse.getBin())
+                            .expiryDate(inventoryWarehouse.getExpiryDate())
+                            .status(inventoryWarehouse.getStatus().toString())
+                            .build(),
+                    inventoryWarehouse.getInventoryWarehouseId());
+        }
     }
 }

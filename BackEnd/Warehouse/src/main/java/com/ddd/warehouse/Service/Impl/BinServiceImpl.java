@@ -84,7 +84,6 @@ public class BinServiceImpl implements BinService {
     public void updateCurrentOccupancy(String binId, Integer occupancyChange) {
         Bins bin = getById(binId);
 
-        // Tính toán occupancy mới dựa trên số lượng thực tế
         Integer newOccupancy = bin.getCurrentOccupancy() + occupancyChange;
 
         // Validate không âm
@@ -92,15 +91,25 @@ public class BinServiceImpl implements BinService {
             throw new AppException(ErrorCode.INVALID_OCCUPANCY);
         }
 
+        // Thêm validation không vượt quá capacity
+        if (newOccupancy > bin.getCapacity()) {
+            throw new AppException(ErrorCode.BIN_CAPACITY_EXCEEDED);
+        }
+
         bin.setCurrentOccupancy(newOccupancy);
 
         // Cập nhật status dựa trên occupancy
         if (newOccupancy == 0) {
             bin.setStatus(BinStatus.EMPTY);
+        } else if (newOccupancy >= bin.getCapacity()) {
+            bin.setStatus(BinStatus.FULL);
         } else {
             bin.setStatus(BinStatus.AVAILABLE);
         }
+
+        binRepo.save(bin);
     }
+
     @Override
     public void resetCurrentOccupancy(String binId) {
         Bins bin = getById(binId);

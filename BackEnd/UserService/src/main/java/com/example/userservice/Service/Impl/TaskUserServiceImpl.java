@@ -1,6 +1,7 @@
 package com.example.userservice.Service.Impl;
 
 import com.example.userservice.Dto.Request.StatusRequest;
+import com.example.userservice.Dto.Request.TaskRequest;
 import com.example.userservice.Dto.Request.TaskUserRequest;
 import com.example.userservice.Dto.Responses.TaskUser.TaskUserResponse;
 import com.example.userservice.Enum.StatusTaskUserEnum;
@@ -24,6 +25,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
@@ -42,9 +46,9 @@ public class TaskUserServiceImpl implements TaskUserService {
     }
 
     @Override
-    public Page<TaskUserResponse> getAllByTaskId(String id, Pageable pageable) {
+    public List<TaskUserResponse> getAllByTaskId(String id) {
         taskService.getById(id);
-        return taskUserRepo.findAllByTask_TaskId(id,pageable).map(taskUserMapper::toResponse);
+        return taskUserRepo.findAllByTask_TaskId(id).stream().map(taskUserMapper::toResponse).collect(Collectors.toList());
     }
 
     @Override
@@ -55,15 +59,23 @@ public class TaskUserServiceImpl implements TaskUserService {
     }
 
     @Override
-    public TaskUserResponse createTaskUser(TaskUserRequest request) {
+    public TaskUserResponse createTaskUser(TaskUserRequest request,Tasks task) {
         Users user=userService.findById(request.user());
-        Tasks task=taskService.getById(request.task());
         TaskUser taskUser=taskUserMapper.toEntity(request);
-        taskUser.setStatus(StatusTaskUserEnum.ASSIGNED);
+        taskUser.setStatus(StatusTaskUserEnum.Pending);
         taskUser.setIsDeleted(false);
         taskUser.setTask(task);
         taskUser.setUser(user);
         return taskUserMapper.toResponse(taskUserRepo.save(taskUser));
+    }
+
+    @Override
+    public List<TaskUserResponse> createTaskUsers(TaskRequest request, List<TaskUserRequest> tasks) {
+        Tasks taskCreate = taskService.createTask(request);
+        List<TaskUserResponse> results = tasks.stream()
+                .map(taskUserReq -> createTaskUser(taskUserReq, taskCreate))
+                .toList();
+        return results;
     }
 
     @Override
