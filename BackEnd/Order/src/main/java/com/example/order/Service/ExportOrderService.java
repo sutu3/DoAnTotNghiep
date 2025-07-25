@@ -2,6 +2,7 @@ package com.example.order.Service;
 
 import com.example.order.Dto.Request.ExportOrderRequest;
 import com.example.order.Dto.Response.ExportOrder.ExportOrderResponse;
+import com.example.order.Dto.Response.ExportOrder.ExportOrderResponseClient;
 import com.example.order.Enum.ExportOrderStatus;
 import com.example.order.Module.ExportOrder;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -39,4 +41,7 @@ public interface ExportOrderService {
     Page<ExportOrderResponse> getExportOrdersForApprovalByWarehouse(String warehouse, Pageable pageable);
 
     ExportOrderResponse entry(ExportOrder exportOrder);
+    List<ExportOrderResponseClient> getExportOrdersByWarehouseAndDateRange(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate);
+    List<ExportOrderResponseClient> getPendingExportOrdersByWarehouse(String warehouseId);
+    List<ExportOrderResponseClient> getCompletedExportOrdersByWarehouse(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate);
 }

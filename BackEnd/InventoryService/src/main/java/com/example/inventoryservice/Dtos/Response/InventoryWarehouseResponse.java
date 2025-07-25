@@ -3,6 +3,7 @@ package com.example.inventoryservice.Dtos.Response;
 import com.example.inventoryservice.Client.ProductService.Dto.Response.ProductResponse;
 import com.example.inventoryservice.Client.WarehouseService.Dto.Responses.Bin.BinResponse;
 import com.example.inventoryservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
+import com.example.inventoryservice.Module.InventoryProduct;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,6 +30,7 @@ public class InventoryWarehouseResponse {
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     Boolean isDeleted;
+    InventoryProductResponseNoList inventoryProduct;
 
     // Enriched fields từ external services
     ProductResponse productDetails;

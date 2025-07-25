@@ -2,6 +2,7 @@ package com.example.userservice.Service;
 
 import com.example.userservice.Dto.Request.TaskTypeRequest;
 import com.example.userservice.Dto.Responses.TaskType.TaskTypeResponse;
+import com.example.userservice.Form.DescriptionForm;
 import com.example.userservice.Form.TaskTypeForm;
 import com.example.userservice.Model.TaskType;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ public interface TaskTypeService {
     TaskTypeResponse getByTaskNametoResponse(String taskName,String warehouses);
     TaskTypeResponse createTaskType(TaskTypeRequest request);
     TaskTypeResponse updateTaskType(TaskTypeForm update,String id);
+    TaskTypeResponse updateDescriptionTaskType(DescriptionForm update, String id);
     String deleteByTaskName(String taskName,String warehouses);
     TaskTypeResponse entry(TaskType taskType);
 }
