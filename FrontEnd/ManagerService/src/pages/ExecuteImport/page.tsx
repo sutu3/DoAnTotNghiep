@@ -35,7 +35,7 @@ export default function ExecuteImportPage() {
         const fetchData = async () => {
             if(warehouse!=""){
                 await (dispatch as any)(MiddleGetAllImportOrderByStatus(warehouse,"InProgress",PageApi));
-                await (dispatch as any)(MiddleGetAllStackList());
+                await (dispatch as any)(MiddleGetAllStackList(warehouse));
             }
 
         };
@@ -84,7 +84,7 @@ export default function ExecuteImportPage() {
     const handleCompleteImport = async () => {
         setLoading(true);
         try {
-                await (dispatch as any)(MiddleImportOrder(OrderImport.importOrderId,items));
+                await (dispatch as any)(MiddleImportOrder(OrderImport.importOrderId, items));
 
         } catch (error) {
             console.error("Error completing import:", error);

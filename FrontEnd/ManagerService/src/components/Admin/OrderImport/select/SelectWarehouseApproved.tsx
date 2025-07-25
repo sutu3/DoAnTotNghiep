@@ -41,6 +41,7 @@ const SelectWarehouseApprove = ({ warehouse, setWarehouse }: SelectProps) => {
 
     return (
         <Select
+            aria-labelledby="Input"
             label="Kho hàng"
             placeholder="Chọn kho"
             selectedKeys={warehouse ? [warehouse] : []}
@@ -48,12 +49,14 @@ const SelectWarehouseApprove = ({ warehouse, setWarehouse }: SelectProps) => {
         >
             {defaultWarehouse?.map((warehouse) => (
                 <SelectItem
+                    aria-labelledby="Input"
                     key={warehouse.warehouseId}
                     value={warehouse.warehouseId}
                     textValue={warehouse.warehouseName}
                 >
                     <div className="flex items-center gap-2">
-                        <Building2 className="w-4 h-4 text-blue-600" />
+                        <Building2                        aria-labelledby="Input"
+                                                          className="w-4 h-4 text-blue-600" />
                         <span>{warehouse.warehouseName}</span>
                     </div>
                 </SelectItem>

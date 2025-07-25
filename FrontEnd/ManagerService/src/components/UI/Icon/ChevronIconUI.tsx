@@ -4,7 +4,7 @@ import { JSX } from "react/jsx-runtime";
 export const ChevronIcon = (props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) => {
     return (
         <svg
-            aria-hidden="true"
+            aria-hidden="false"
             fill="none"
             focusable="false"
             height="1em"

@@ -2,11 +2,9 @@ import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {callApiThunk} from "@/Store/Store.tsx";
+import {Warehouse} from "@/Store/WarehouseSlice.tsx";
 
-interface Warehouse {
-    warehouseName: string;
-    managerId: string;
-}
+
 
 export interface TaskType {
     taskTypeId: string;
@@ -37,6 +35,10 @@ const TaskTypeSlice = createSlice({
         initToTalPage: (state, action) => {
             state.totalPage = action.payload || 0;
         },
+        updateTaskType: (state, action) => {
+            const result:TaskType = action.payload
+            state.taskTypes=state.taskTypes.filter((el:TaskType)=>el.taskTypeId==result.taskTypeId?result:el)
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -64,6 +66,30 @@ export const GetAllTaskType = createAsyncThunk(
             .byWarehouseId(warehouseId)
             .getAll,undefined,rejectWithValue)
 );
+export const EditTaskType = createAsyncThunk(
+    "taskType/EditTaskType", // sửa tên action đúng với mục đích
+    async (
+        { taskTypeId, taskUpdate }: { taskTypeId: string; taskUpdate: TaskTypeCreated },
+        { rejectWithValue },
+    ) => await
+        callApiThunk("PUT",API_ROUTES
+            .user
+            .taskType(null)
+            .updateTaskType(taskTypeId)
+            ,taskUpdate,rejectWithValue)
+);
+export const EditDescriptionTaskType = createAsyncThunk(
+    "taskType/EditDescriptionTaskType", // sửa tên action đúng với mục đích
+    async (
+        { taskTypeId, description }: { taskTypeId: string; description: string },
+        { rejectWithValue },
+    ) => await
+        callApiThunk("PUT",API_ROUTES
+                .user
+                .taskType(null)
+                .updateDescriptionTaskType(taskTypeId)
+            , {description},rejectWithValue)
+);
 export const AddTaskType=createAsyncThunk(
     "taskType/AddTaskType",
     async (
@@ -76,11 +102,9 @@ export const AddTaskType=createAsyncThunk(
             .addTask,payload,rejectWithValue)
 );
 export const MiddleAddTaskType = (TaskTypeCreate:TaskTypeCreated) => {
-    return async function check(dispatch: any, getState: any) {
+    return async function check(dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-            await dispatch(AddTaskType({payload: {...TaskTypeCreate,warehouses:warehouseId} }));
+            await dispatch(AddTaskType({payload: {...TaskTypeCreate} }));
         } catch (error: any) {
             showToast({
                 title: "Error",
@@ -90,16 +114,45 @@ export const MiddleAddTaskType = (TaskTypeCreate:TaskTypeCreated) => {
         }
     };
 };
-export const MiddleGetAllTaskType = (page: pageApi) => {
-    return async function check(dispatch: any, getState: any) {
+export const MiddleGetAllTaskType = (warehouse:string,page: pageApi) => {
+    return async function check(dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-
-            const action = await dispatch(GetAllTaskType({ warehouseId, page }));
+            const action = await dispatch(GetAllTaskType({ warehouseId:warehouse, page }));
 
             dispatch(
                 TaskTypeSlice.actions.initToTalPage(action.payload.result.totalPages),
+            );
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
+export const MiddleUpdateTaskType = (taskTypeId:string,taskUpdate: TaskTypeCreated) => {
+    return async function check(dispatch: any) {
+        try {
+            const action = await dispatch(EditTaskType({ taskTypeId, taskUpdate }));
+            dispatch(
+                TaskTypeSlice.actions.updateTaskType(action.payload.result),
+            );
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
+export const MiddleUpdateDescriptionTaskType = (taskTypeId:string,description: string) => {
+    return async function check(dispatch: any) {
+        try {
+            const action = await dispatch(EditDescriptionTaskType({ taskTypeId, description }));
+            dispatch(
+                TaskTypeSlice.actions.updateTaskType(action.payload.result),
             );
         } catch (error: any) {
             showToast({

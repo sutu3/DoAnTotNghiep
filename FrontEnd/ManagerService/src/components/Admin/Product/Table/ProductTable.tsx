@@ -22,6 +22,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {ProductSelector, TotalPageProduct} from "@/Store/Selector.tsx";
 import {pageApi} from "@/Api/UrlApi.tsx";
 import {MiddleGetAllProduct} from "@/Store/Thunk/ProductThunk.tsx";
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -31,6 +32,7 @@ const ProductTable = () => {
     const [filterValue, setFilterValue] = useState("");
     const products=useSelector(ProductSelector)
     const dispatch = useDispatch();
+    const navigate=useNavigate()
     const pageProduct=useSelector(TotalPageProduct);
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -122,8 +124,7 @@ const ProductTable = () => {
                             </Button>
                         </DropdownTrigger>
                         <DropdownMenu>
-                            <DropdownItem key="view">Xem chi tiết</DropdownItem>
-                            <DropdownItem key="edit">Chỉnh sửa</DropdownItem>
+                            <DropdownItem onClick={()=>navigate(`/admin/products/edit?productId=${product?.productId}`)} key="view">Xem chi tiết</DropdownItem>
                             <DropdownItem key="delete" className="text-danger">
                                 Xóa
                             </DropdownItem>

@@ -2,8 +2,12 @@ import React from "react";
 import { Users, Plus } from "lucide-react";
 import { Button } from "@heroui/button";
 import UserTable from "@/components/Admin/User/TableUI.tsx";
+import SelectWarehouse from "@/components/Admin/User/SelectWarehouse.tsx";
+import {UserCreate} from "@/Store/UserSlice.tsx";
 
 interface UserTableSectionProps {
+    formData:UserCreate,
+    onFormChange: (key: string, value: string) => void;
     selectedUser: any | null;
     onUserClick: (userId: string) => void;
     onOpenModal: (open: boolean) => void;
@@ -14,7 +18,7 @@ interface UserTableSectionProps {
     onPageChange: (page: number) => void;
 }
 
-export const UserTableSection: React.FC<UserTableSectionProps> = ({
+export const UserTableSection: React.FC<UserTableSectionProps> = ({formData,onFormChange,
                                                                       selectedUser,
                                                                       onUserClick,
                                                                       onOpenModal,
@@ -40,7 +44,7 @@ export const UserTableSection: React.FC<UserTableSectionProps> = ({
                             </p>
                         </div>
                     </div>
-
+                    <SelectWarehouse formData={formData} onFormChange={onFormChange}/>
                     <Button
                         onClick={() => onOpenModal(true)}
                         className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"

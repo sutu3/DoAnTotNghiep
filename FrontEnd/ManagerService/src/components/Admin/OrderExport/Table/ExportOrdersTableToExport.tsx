@@ -10,21 +10,22 @@ import {
     TableBody,
     TableRow,
     TableCell,
-    Chip,
-    Select,
-    SelectItem, Spinner
+    Chip, Spinner
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { ExportOrder } from "@/Store/ExportOrderSlice.tsx";
+import SelectWarehouseApproved from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
 
 interface ExportOrdersTableProps {
+    warehouse:string;
+    setWarehouse:(warehouse:string) => void;
     exportOrders: ExportOrder[];
     onExecuteExport: (order: ExportOrder) => void;
     onRefresh: () => void;
     loading: boolean;
 }
 
-export default function ExportOrdersTable({
+export default function ExportOrdersTable({warehouse,setWarehouse,
                                               exportOrders,
                                               onExecuteExport,
                                               onRefresh,loading
@@ -45,12 +46,8 @@ export default function ExportOrdersTable({
                     <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
                         Đơn Xuất Hàng Cần Xử Lý
                     </h2>
-                    <div className="flex gap-3">
-                        <Select size="sm" placeholder="Lọc theo trạng thái" className="w-48">
-                            <SelectItem key="all">Tất cả</SelectItem>
-                            <SelectItem key="confirmed">Đã phê duyệt</SelectItem>
-                            <SelectItem key="inprogress">Đang thực hiện</SelectItem>
-                        </Select>
+                    <div className="flex gap-3 w-[400px]">
+                        <SelectWarehouseApproved warehouse={warehouse} setWarehouse={setWarehouse} />
                         <Button
                             color="primary"
                             variant="flat"
