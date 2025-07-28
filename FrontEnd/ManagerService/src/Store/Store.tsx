@@ -11,12 +11,13 @@ import UnitSlice from "@/Store/Unit.tsx";
 import CategorySlice from "@/Store/CategorySlice.tsx";
 import SupplierSlice from "@/Store/SupplierSlice.tsx";
 import ProductSlice from "@/Store/ProductSlice.tsx";
-import ImportOrder from "@/Store/ImportOrder.tsx";
+import ImportOrder from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import InventorySlice from "@/Store/InventoryOverView.tsx";
 import InventoryWarehouseSlice from "@/Store/InventoryWarehouseSlice.tsx";
 import ExportOrderSlice from "@/Store/ExportOrderSlice.tsx";
 import TaskUserSlice from "@/Store/TaskUserSlice.tsx";
 import StockMovementSlice from "@/Store/StockMovementSlice.tsx";
+import WarehousReceipteSlice from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
 
 const ThemeReducer = (state = { value: true }, action: any) => {
   switch (action.type) {
@@ -47,7 +48,8 @@ const store = configureStore({
     inventory: InventorySlice.reducer,
     inventoryWarehouse:InventoryWarehouseSlice.reducer,
     stockMovement:StockMovementSlice.reducer,
-    exportOrder:ExportOrderSlice.reducer
+    exportOrder:ExportOrderSlice.reducer,
+    warehousReceipt:WarehousReceipteSlice.reducer
   },
 });
 export const callApiThunk = async (

@@ -14,7 +14,7 @@ import {
     Divider
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import {ImportOrderItem} from "@/Store/ImportOrder.tsx";
+import {ImportOrderItem} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import {getStatusFromBinAndQuantity} from "@/Utils/GetStatusOrder.tsx";
 
 interface ImportItemsTableProps {

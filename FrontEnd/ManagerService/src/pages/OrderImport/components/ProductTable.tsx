@@ -1,0 +1,203 @@
+import React, { useState, useEffect } from "react";
+import {
+    Card,
+    CardBody,
+    CardHeader,
+    Table,
+    TableHeader,
+    TableColumn,
+    TableBody,
+    TableRow,
+    TableCell,
+    Button,
+    Input,
+    Chip,
+    Spinner,
+    Avatar
+} from "@heroui/react";
+import { Package, Plus, Search } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { ProductSelector } from "@/Store/Selector.tsx";
+import { MiddleGetAllProductBySearch } from "@/Store/Thunk/ProductThunk.tsx";
+import AddProductModal from "./AddProductModal";
+
+interface ProductTableProps {
+    warehouseId: string;
+}
+
+const ProductTable: React.FC<ProductTableProps> = ({ warehouseId }) => {
+    const [loading, setLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedProduct, setSelectedProduct] = useState<any>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const products = useSelector(ProductSelector) || [];
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (warehouseId) {
+            fetchProducts();
+        }
+    }, [warehouseId]);
+
+    const fetchProducts = async () => {
+        setLoading(true);
+        try {
+            await (dispatch as any)(MiddleGetAllProductBySearch(null, warehouseId));
+        } catch (error) {
+            console.error("Error fetching products:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const filteredProducts = products.filter((product: any) =>
+        product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.sku.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleAddProduct = (product: any) => {
+        setSelectedProduct(product);
+        setIsModalOpen(true);
+    };
+
+    const formatPrice = (price: number) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
+    };
+
+    return (
+        <>
+            <Card className="shadow-sm">
+                <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-3">
+                            <Package className="w-6 h-6 text-blue-600" />
+                            <div>
+                                <h2 className="text-xl font-semibold text-gray-800">
+                                    Danh Sách Sản Phẩm
+                                </h2>
+                                <p className="text-sm text-gray-500">
+                                    {filteredProducts.length} sản phẩm có sẵn
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardBody>
+                    {/* Search */}
+                    <div className="mb-6">
+                        <Input
+                            placeholder="Tìm kiếm sản phẩm theo tên hoặc SKU..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            startContent={<Search className="w-4 h-4 text-gray-400" />}
+                            size="lg"
+                            classNames={{
+                                input: "text-sm",
+                                inputWrapper: "shadow-sm border-gray-200"
+                            }}
+                        />
+                    </div>
+
+                    {/* Products Table */}
+                    <Table
+                        aria-label="Products table"
+                        classNames={{
+                            wrapper: "shadow-none border border-gray-200 rounded-lg",
+                            th: "bg-gray-50 text-gray-700 font-semibold",
+                            td: "py-4 border-b border-gray-100",
+                        }}
+                    >
+                        <TableHeader>
+                            <TableColumn>SẢN PHẨM</TableColumn>
+                            <TableColumn>NHÀ CUNG CẤP</TableColumn>
+                            <TableColumn>DANH MỤC</TableColumn>
+                            <TableColumn>GIÁ TIỀN</TableColumn>
+                            <TableColumn>TỒN KHO</TableColumn>
+                            <TableColumn>THAO TÁC</TableColumn>
+                        </TableHeader>
+                        <TableBody
+                            isLoading={loading}
+                            loadingContent={<Spinner label="Đang tải sản phẩm..." />}
+                            emptyContent="Không có sản phẩm nào"
+                        >
+                            {filteredProducts.map((product: any) => (
+                                <TableRow key={product.productId}>
+                                    <TableCell>
+                                        <div className="flex items-center gap-3">
+                                            <Avatar
+                                                src={product.urlImageProduct}
+                                                size="md"
+                                                className="flex-shrink-0"
+                                                fallback={<Package className="w-5 h-5" />}
+                                            />
+                                            <div>
+                                                <p className="font-semibold text-gray-900">
+                                                    {product.productName}
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                    SKU: {product.sku}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span className="text-gray-700">
+                                            {product.supplier?.supplierName || "N/A"}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Chip
+                                            variant="flat"
+                                            color="primary"
+                                            size="sm"
+                                        >
+                                            {product.category?.categoryName || "N/A"}
+                                        </Chip>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span className="font-semibold text-green-600">
+                                            {formatPrice(product.price)}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="text-center">
+                                            <div className="text-lg font-bold text-blue-600">
+                                                {product.quantity || 0}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                                {product.unit?.unitName || "đơn vị"}
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button
+                                            color="primary"
+                                            variant="flat"
+                                            size="sm"
+                                            startContent={<Plus className="w-4 h-4" />}
+                                            onClick={() => handleAddProduct(product)}
+                                        >
+                                            Thêm
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardBody>
+            </Card>
+
+            <AddProductModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                product={selectedProduct}
+            />
+        </>
+    );
+};
+
+export default ProductTable;

@@ -30,6 +30,14 @@ export interface Task {
     warehouses: Warehouse
     completeAt: string; // ISO date string
 }
+export interface TaskNoList {
+    taskId: string;
+    taskType: TaskTypeCreated
+    status: "Pending" | "In_Progress" | "Complete"| "Cancel" | string; // Enum if possible
+    level: "Low" | "Medium" | "Hight" | string; // Enum nếu backend cố định giá trị
+    description: string;
+    completeAt: string; // ISO date string
+}
 export interface TaskCreated {
     taskType: string;
     level: string; // Enum nếu backend cố định giá trị

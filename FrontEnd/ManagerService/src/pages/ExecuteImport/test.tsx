@@ -17,7 +17,7 @@ import {
 import { Icon } from '@iconify/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { MiddleGetAllImportOrderByStatus } from '@/Store/Thunk/ImportOrderThunk';
+import { MiddleGetAllImportOrderByStatus } from '@/pages/ExecuteImport/Store/ImportOrderThunk.tsx';
 import { OrderSelector } from '@/Store/Selector';
 import { Package, Eye, Clock, CheckCircle } from 'lucide-react';
 import SelectWarehouseApproved from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";

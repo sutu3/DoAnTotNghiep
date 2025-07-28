@@ -3,8 +3,7 @@ import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {callApiThunk} from "@/Store/Store.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {getUserRoleFromToken} from "@/Utils/auth.ts";
-import WarehouseSlice, {setAllWarehouse, setWarehouse} from "@/Store/WarehouseSlice.tsx";
-import {initToTalPage} from "@/Store/ProductSlice.tsx";
+import {setAllWarehouse, setUpdateWarehouse, setWarehouse, WarehouseCreate} from "@/Store/WarehouseSlice.tsx";
 
 export const GetAllWarehouse = createAsyncThunk(
     "warehouse/GetAllWarehouse",
@@ -16,6 +15,19 @@ export const GetAllWarehouse = createAsyncThunk(
             "GET",
             API_ROUTES.warehouse.warehouses(page).search.getAll,
             undefined,
+            rejectWithValue
+        )
+);
+export const AddWarehouse = createAsyncThunk(
+    "warehouse/AddWarehouse",
+    async (
+        { payload }:  {payload: WarehouseCreate },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "POST",
+            API_ROUTES.warehouse.warehouses(null).addWarehouse,
+            payload,
             rejectWithValue
         )
 );
@@ -56,6 +68,21 @@ export const MiddleGetWarehouseByUser = (page: pageApi) => {
             }
 
 
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
+export const MiddleAddWarehouse = (payload: WarehouseCreate) => {
+    return async function (dispatch: any) {
+        try {
+
+                const action=await dispatch(AddWarehouse({payload}))
+                dispatch(setUpdateWarehouse(action.payload.result));
         } catch (error: any) {
             showToast({
                 title: "Error",

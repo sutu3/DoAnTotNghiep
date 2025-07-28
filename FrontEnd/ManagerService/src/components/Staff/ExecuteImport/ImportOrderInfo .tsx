@@ -1,5 +1,5 @@
 import { Card, CardBody, CardHeader, Chip } from "@heroui/react";
-import {ImportOrder} from "@/Store/ImportOrder.tsx";
+import {ImportOrder} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 
 interface ImportOrderInfoProps {
     importOrder: ImportOrder;

@@ -5,27 +5,23 @@ import { useNavigate } from 'react-router-dom';
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 import WarehouseBasicForm from '@/components/Warehouse/Form/WarehouseForm';
 import WarehouseAddressForm from "@/components/Warehouse/Form/WarehouseAddressForm.tsx";
+import {WarehouseCreate} from "@/Store/WarehouseSlice.tsx";
+import {useDispatch} from "react-redux";
+import {MiddleAddWarehouse} from "@/Store/Thunk/WarehouseThunk.tsx";
+import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 
-interface WarehouseCreateData {
-    warehouseName: string;
-    address: string;
-    street: string;
-    district: string;
-    country: string;
-    managerId: string;
-    description?: string;
-}
+
 
 const AddWarehousePage = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState<WarehouseCreateData>({
+    const dispatch = useDispatch();
+    const [formData, setFormData] = useState<WarehouseCreate>({
         warehouseName: "",
         address: "",
         street: "",
         district: "",
         country: "",
-        managerId: "",
         description: ""
     });
 
@@ -38,12 +34,27 @@ const AddWarehousePage = () => {
         setLoading(true);
 
         try {
-            // API call để tạo warehouse mới
-            // Sử dụng pattern tương tự như MiddleAddSupplier
-            console.log('Creating warehouse:', formData);
-            navigate("/admin/warehouses");
+            await (dispatch as any)(MiddleAddWarehouse(formData));
+
+            // Hiển thị toast thành công
+            showToast({
+                title: "Thành công",
+                description: "Warehouse đã được tạo thành công!",
+                color: "success",
+            });
+
+            // Đợi 1 giây rồi navigate
+            setTimeout(() => {
+                navigate("/admin/warehouses");
+            }, 1000);
+
         } catch (error) {
             console.error('Create failed:', error);
+            showToast({
+                title: "Lỗi",
+                description: "Không thể tạo warehouse. Vui lòng thử lại.",
+                color: "danger",
+            });
         } finally {
             setLoading(false);
         }

@@ -46,6 +46,15 @@ export const OrderItemSelector = (state: { importOrder: {orderItem: any} }) =>
 export const TotalPageOrder = (state: { importOrder: { totalPage: number } }) =>
     state.importOrder.totalPage;
 
+export const ReceiptWarehouseSelector = (state: { warehousReceipt: {warehouseReceiptResponse: any} }) =>
+    state.warehousReceipt.warehouseReceiptResponse;
+export const ReceiptWarehousesSelector = (state: { warehousReceipt: {warehouseReceiptsResponse: any} }) =>
+    state.warehousReceipt.warehouseReceiptsResponse;
+export const ReceiptItemSelector = (state: { warehousReceipt: {receiptItem: any} }) =>
+    state.warehousReceipt.receiptItem;
+export const TotalPageReceipt = (state: { warehousReceipt: { totalPage: number } }) =>
+    state.warehousReceipt.totalPage;
+
 export const ExportItemCreateSelector = (state: { exportOrder: {exportItemCreate:any} }) =>
     state.exportOrder.exportItemCreate;
 export const ExportOrderSelector = (state: { exportOrder: {orderExport:any} }) =>

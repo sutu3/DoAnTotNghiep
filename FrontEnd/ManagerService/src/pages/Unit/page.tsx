@@ -9,9 +9,7 @@ import TableUI from "@/components/Admin/Unit/Table/TableUI.tsx";
 
 
 const GroupUnit = () => {
-    // console.log(useSelector(warehouse));
     const dispatch = useDispatch();
-    // const [idShow, setIdShow] = useState<String>("");
 const [loading, setLoading] = useState(false);
     const isSidebarCollapsed = localStorage.getItem("theme") == "light";
 

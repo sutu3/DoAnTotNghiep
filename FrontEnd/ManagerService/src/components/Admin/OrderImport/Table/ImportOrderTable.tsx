@@ -7,16 +7,19 @@ import {
     TableCell,
     Chip,
     Button,
-    Input,
-    Pagination, Avatar, Spinner
+    Pagination,
+    Avatar,
+    Spinner,
+    Select,
+    SelectItem
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import {getStatusColor, getStatusText} from "@/Utils/statusHelpers.tsx";
 import {useEffect, useState} from "react";
 import {pageApi} from "@/Api/UrlApi.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import { MiddleGetAllImportOrderByStatus} from "@/Store/Thunk/ImportOrderThunk.tsx";
-import OrderImportSlice, {ImportOrder} from "@/Store/ImportOrder.tsx";
+import { MiddleGetAllImportOrderByStatus} from "@/pages/ExecuteImport/Store/ImportOrderThunk.tsx";
+import OrderImportSlice, {ImportOrder} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import {OrderSelector, TotalPageOrder} from "@/Store/Selector.tsx";
 import SelectWarehouseApprove from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
 
@@ -28,58 +31,104 @@ interface ImportOrderTableProps {
     onViewOrder: (order: ImportOrder) => void;
     onApproveOrder: (orderId: string) => void;
     onRejectOrder: (order: ImportOrder) => void;
+    onMarkGoodsArrived: (orderId: string) => void;
 }
 
 export default function ImportOrderTable({
+                                             onMarkGoodsArrived,
                                              onViewOrder,
                                              onApproveOrder,
-                                             onRejectOrder
+                                             onRejectOrder,
+                                             statusFilter,
+                                             setStatusFilter
                                          }: ImportOrderTableProps) {
     const dispatch = useDispatch();
     const [currentPage, setCurrentPage] = useState(1);
-    const totalPages=useSelector(TotalPageOrder);
-    const orders=useSelector(OrderSelector);
-    const [loading,setLoading] = useState(false);
-    const [warehouse,setWarehouse] = useState<string>("");
+    const totalPages = useSelector(TotalPageOrder);
+    const orders = useSelector(OrderSelector);
+    const [loading, setLoading] = useState(false);
+    const [warehouse, setWarehouse] = useState<string>("");
 
     useEffect(() => {
         setLoading(true);
         const PageApi: pageApi = { pageNumber: currentPage - 1, pageSize: 5 };
-        dispatch(OrderImportSlice.actions.setOrderImportList([]))
+        dispatch(OrderImportSlice.actions.setOrderImportList([]));
+
         const fetchData = async () => {
-            if(warehouse!=""){
-                await (dispatch as any)(MiddleGetAllImportOrderByStatus(warehouse,"Created",PageApi));
-                setLoading(false)
+            if (warehouse !== "") {
+                // Fetch theo status filter hoặc tất cả nếu là "all"
+                if (statusFilter === "all") {
+                    await (dispatch as any)(MiddleGetAllImportOrderByStatus(warehouse, null, PageApi));
+                } else {
+                    await (dispatch as any)(MiddleGetAllImportOrderByStatus(warehouse, statusFilter, PageApi));
+                }
+                setLoading(false);
             }
         };
         fetchData();
-    }, [warehouse]);
+    }, [warehouse, statusFilter, currentPage]);
 
+    // Filter orders based on status
+    const filteredOrders = statusFilter === "all"
+        ? orders
+        : orders.filter((order: ImportOrder) => order.status === statusFilter);
 
     return (
         <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
-                        Danh Sách Yêu Cầu   </h2>
+                        Danh Sách Yêu Cầu Nhập Hàng
+                    </h2>
 
-                    <div className="flex flex-col sm:flex-row gap-3 w-[300px] items-start sm:items-center">
-                        {/*<Input*/}
-                        {/*    isClearable*/}
-                        {/*    classNames={{*/}
-                        {/*        base: "w-full sm:max-w-[300px]",*/}
-                        {/*        inputWrapper: "border-1",*/}
-                        {/*    }}*/}
-                        {/*    placeholder="Tìm kiếm theo mã đơn, người tạo..."*/}
-                        {/*    size="sm"*/}
-                        {/*    startContent={<Icon icon="mdi:magnify" className="text-default-300"/>}*/}
-                        {/*    value={searchValue}*/}
-                        {/*    variant="bordered"*/}
-                        {/*    onClear={() => setSearchValue("")}*/}
-                        {/*    onValueChange={setSearchValue}*/}
-                        {/*/>*/}
-
+                    <div className="flex flex-col sm:flex-row gap-3 w-[500px] items-start sm:items-center">
                         <SelectWarehouseApprove warehouse={warehouse} setWarehouse={setWarehouse}/>
+
+                        {/* Status Filter Select */}
+                        <Select
+                            label="Trạng thái"
+                            selectedKeys={[statusFilter]}
+                            onSelectionChange={(keys) => {
+                                const status = Array.from(keys)[0]?.toString() || "all";
+                                setStatusFilter(status);
+                                setCurrentPage(1);
+                            }}
+                            className="w-full sm:max-w-[200px]"
+                            size="sm"
+                            variant="bordered"
+                        >
+                            <SelectItem key="all">Tất cả</SelectItem>
+                            <SelectItem key="Created">
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="mdi:clock-outline" className="text-warning" />
+                                    <span>Đã tạo yêu cầu</span>
+                                </div>
+                            </SelectItem>
+                            <SelectItem key="InProgress">
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="mdi:loading" className="text-primary animate-spin" />
+                                    <span>Đang chờ hàng</span>
+                                </div>
+                            </SelectItem>
+                            <SelectItem key="Goods_Arrived">
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="mdi:truck-delivery" className="text-success" />
+                                    <span>Hàng đã đến kho</span>
+                                </div>
+                            </SelectItem>
+                            <SelectItem key="Done">
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="mdi:check-circle" className="text-success" />
+                                    <span>Hoàn thành nhập kho</span>
+                                </div>
+                            </SelectItem>
+                            <SelectItem key="Cancel">
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="mdi:close-circle" className="text-danger" />
+                                    <span>Đã hủy</span>
+                                </div>
+                            </SelectItem>
+                        </Select>
                     </div>
                 </div>
             </div>
@@ -110,7 +159,7 @@ export default function ImportOrderTable({
                         className="bg-white dark:bg-gray-900 text-gray-800 dark:text-white"
                         emptyContent="Không có yêu cầu nào"
                     >
-                        {orders.map((order:ImportOrder) => (
+                        {filteredOrders.map((order: ImportOrder) => (
                             <TableRow
                                 key={order.importOrderId}
                                 className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -131,10 +180,9 @@ export default function ImportOrderTable({
                                         })}
                                     </div>
                                 </TableCell>
-
                                 <TableCell>
                                     <div className="flex items-center gap-2">
-                                        {order?.createByUser?
+                                        {order?.createByUser ?
                                             <Avatar size="sm" isBordered color="primary" src={`https://dummyimage.com/300.png/09f/fff&text=${order?.createByUser?.userName}`} />
                                             :
                                             <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
@@ -167,8 +215,9 @@ export default function ImportOrderTable({
                                         startContent={
                                             order.status === "Created" ? <Icon icon="mdi:clock-outline" className="text-xs" /> :
                                                 order.status === "InProgress" ? <Icon icon="mdi:loading" className="text-xs animate-spin" /> :
-                                                    order.status === "Completed" ? <Icon icon="mdi:check-circle" className="text-xs" /> :
-                                                        <Icon icon="mdi:close-circle" className="text-xs" />
+                                                    order.status === "Goods_Arrived" ? <Icon icon="mdi:truck-delivery" className="text-xs" /> :
+                                                        order.status === "Done" ? <Icon icon="mdi:check-circle" className="text-xs" /> :
+                                                            <Icon icon="mdi:close-circle" className="text-xs" />
                                         }
                                     >
                                         {getStatusText(order.status)}
@@ -185,6 +234,18 @@ export default function ImportOrderTable({
                                         >
                                             <Icon icon="mdi:eye" />
                                         </Button>
+
+                                        {order.status === "InProgress" && (
+                                            <Button
+                                                size="sm"
+                                                color="success"
+                                                variant="flat"
+                                                onClick={() => onMarkGoodsArrived(order.importOrderId)}
+                                                startContent={<Icon icon="mdi:truck-delivery" className="text-xs" />}
+                                            >
+                                                Hàng đã đến
+                                            </Button>
+                                        )}
 
                                         {order.status === "Created" && (
                                             <>
@@ -208,6 +269,17 @@ export default function ImportOrderTable({
                                                 </Button>
                                             </>
                                         )}
+
+                                        {order.status === "Goods_Arrived" && (
+                                            <Button
+                                                size="sm"
+                                                color="primary"
+                                                variant="flat"
+                                                startContent={<Icon icon="mdi:warehouse" className="text-xs" />}
+                                            >
+                                                Tạo phiếu nhập
+                                            </Button>
+                                        )}
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -217,7 +289,12 @@ export default function ImportOrderTable({
 
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-4 px-2 gap-4">
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                        Hiển thị {orders.length} trong tổng số {orders.length} yêu cầu
+                        Hiển thị {filteredOrders.length} trong tổng số {orders.length} yêu cầu
+                        {statusFilter !== "all" && (
+                            <span className="ml-2 text-blue-600">
+                                (Lọc theo: {getStatusText(statusFilter)})
+                            </span>
+                        )}
                     </div>
                     <Pagination
                         total={totalPages}

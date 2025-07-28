@@ -1,5 +1,6 @@
 import { createSlice} from "@reduxjs/toolkit";
 import {UserData} from "@/Store/UserSlice.tsx";
+import {Task, TaskNoList} from "@/Store/TaskSlice.tsx";
 
 
 
@@ -9,6 +10,7 @@ enum('ASSIGNED','CANCELED','COMPLETED','IN_PROGRESS')
 export interface TaskUser {
     id: string;
     user: UserData;
+    tasks:TaskNoList;
     status: string; // tùy enum bạn dùng
     note: string;
     completeAt: string; // ISO date string, thường từ backend sẽ là kiểu này

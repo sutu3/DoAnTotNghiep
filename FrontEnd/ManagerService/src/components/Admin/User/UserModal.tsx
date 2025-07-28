@@ -31,6 +31,10 @@ const UserModal: React.FC<UserModalProps> = ({
                 description: "Người dùng đã được thêm thành công!",
                 color: "success",
             });
+            onFormChange("email", "");
+            onFormChange("userName", "");
+            onFormChange("fullName", "");
+            onFormChange("phoneNumber", "");
             setLoading(false);
         }
         fetch();

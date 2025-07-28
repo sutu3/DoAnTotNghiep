@@ -1,4 +1,4 @@
-import  {useEffect, useMemo, useState} from 'react';
+import  {useEffect, useMemo} from 'react';
 import {
     Table,
     TableHeader,
@@ -14,29 +14,39 @@ import {
     Dropdown,
     DropdownTrigger,
     DropdownMenu,
-    DropdownItem, Spinner
+    DropdownItem, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import ProductSlice, { Product } from '@/Store/ProductSlice';
 import {useDispatch, useSelector} from "react-redux";
 import {ProductSelector, TotalPageProduct} from "@/Store/Selector.tsx";
 import {pageApi} from "@/Api/UrlApi.tsx";
-import {MiddleGetAllProduct} from "@/Store/Thunk/ProductThunk.tsx";
+import {MiddleDeleteProduct, MiddleGetAllProduct} from "@/Store/Thunk/ProductThunk.tsx";
 import { useNavigate } from 'react-router-dom';
-
-
-
-
+import {Trash2} from "lucide-react";
+import { useState } from 'react';
 
 const ProductTable = () => {
     const [filterValue, setFilterValue] = useState("");
     const products=useSelector(ProductSelector)
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const dispatch = useDispatch();
     const navigate=useNavigate()
     const pageProduct=useSelector(TotalPageProduct);
+    const [selectProduct,setSelectProduct] = useState<Product|null>(null);
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [loading, setLoading] = useState(false);
+    const handleDeleteProduct=(product:Product)=>{
+        setSelectProduct(product)
+        onOpen()
+    }
+    const handleDeleteApprove=async ()=>{
+        const fetch=async ()=>{
+            await (dispatch as any)(MiddleDeleteProduct(selectProduct?.productId||""))
+        }
+        fetch();
+    }
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -125,7 +135,7 @@ const ProductTable = () => {
                         </DropdownTrigger>
                         <DropdownMenu>
                             <DropdownItem onClick={()=>navigate(`/admin/products/edit?productId=${product?.productId}`)} key="view">Xem chi tiết</DropdownItem>
-                            <DropdownItem key="delete" className="text-danger">
+                            <DropdownItem onClick={()=>{handleDeleteProduct(product)}} key="delete" className="text-danger">
                                 Xóa
                             </DropdownItem>
                         </DropdownMenu>
@@ -186,6 +196,7 @@ const ProductTable = () => {
     );
 
     return (
+        <div>
         <Table
             aria-label="Bảng danh sách sản phẩm"
             isHeaderSticky
@@ -219,6 +230,46 @@ const ProductTable = () => {
                 )}
             </TableBody>
         </Table>
+            <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalContent>
+                    <ModalHeader className="flex flex-col gap-1">
+                        <h3 className="text-lg font-semibold">Xác nhận xóa</h3>
+                    </ModalHeader>
+                    <ModalBody>
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-3 bg-red-100 rounded-full">
+                                <Trash2 className="w-6 h-6 text-red-600" />
+                            </div>
+                            <div>
+                                <p className="font-medium text-gray-900">
+                                    Bạn có chắc chắn muốn xóa sản phẩm này?
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                    {selectProduct?.productName}
+                                </p>
+                            </div>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                            Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan sẽ bị xóa vĩnh viễn.
+                        </p>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button variant="light" onPress={onClose}>
+                            Hủy
+                        </Button>
+                        <Button
+                            color="danger"
+                            onPress={() => {
+                                handleDeleteApprove();
+                                onClose();
+                            }}
+                        >
+                            Xóa
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+        </div>
     );
 };
 
