@@ -38,11 +38,13 @@ public class TaskUserServiceImpl implements TaskUserService {
     TaskUserRepo taskUserRepo;
     TaskService taskService;
     TaskTypeService taskTypeService;
+    private final GetCurrentUserId getCurrentUserId;
 
     @Override
-    public Page<TaskUserResponse> getAllByUserId(String id, Pageable pageable) {
-        userService.findById(id);
-        return taskUserRepo.findAllByUser_UserId(id,pageable).map(taskUserMapper::toResponse);
+    public Page<TaskUserResponse> getAllByUserId( Pageable pageable) {
+        var userId=GetCurrentUserId.getCurrentUserId();
+        userService.findById(userId);
+        return taskUserRepo.findAllByUser_UserId(userId,pageable).map(taskUserMapper::toResponse);
     }
 
     @Override

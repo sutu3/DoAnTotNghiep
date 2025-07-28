@@ -21,7 +21,8 @@ public interface ImportOrderRepo extends JpaRepository<ImportOrder,String>, JpaS
 
     List<ImportOrder> findAllByWarehouseAndStatusInAndIsDeleted(
             String warehouse, List<OrderStatus> statuses, Boolean isDeleted);
-
+    List<ImportOrder> findAllByWarehouseAndStatusAndIsDeleted(
+            String warehouse, OrderStatus statuses, Boolean isDeleted);
     List<ImportOrder> findAllByWarehouseAndStatusAndCreatedAtBetweenAndIsDeleted(
             String warehouse, OrderStatus status, LocalDateTime fromDate, LocalDateTime toDate, Boolean isDeleted);
 }

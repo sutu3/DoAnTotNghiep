@@ -6,7 +6,10 @@ import com.example.inventoryservice.Client.ProductService.Redis.ProductControlle
 import com.example.inventoryservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.inventoryservice.Client.WarehouseService.Redis.WarehouseController;
 import com.example.inventoryservice.Dtos.Request.InventoryProductRequest;
+import com.example.inventoryservice.Dtos.Request.UpdateStockLevelsRequest;
 import com.example.inventoryservice.Dtos.Response.InventoryProductResponse;
+import com.example.inventoryservice.Dtos.Response.InventoryProductTotalStock;
+import com.example.inventoryservice.Dtos.Response.InventoryWarehouseResponse;
 import com.example.inventoryservice.Enum.InventoryStatus;
 import com.example.inventoryservice.Exception.AppException;
 import com.example.inventoryservice.Exception.ErrorCode;
@@ -15,6 +18,8 @@ import com.example.inventoryservice.Mapper.InventoryProductMapper;
 import com.example.inventoryservice.Module.InventoryProduct;
 import com.example.inventoryservice.Repo.InventoryProductRepo;
 import com.example.inventoryservice.Service.InventoryProductService;
+import com.example.inventoryservice.Service.InventoryWarehouseService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,8 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -90,7 +94,7 @@ public class InventoryProductServiceImpl implements InventoryProductService {
         productController.getProductById(request.product());
         warehouseController.getWarehouse(request.warehouse());
 
-        // Check if already exists
+        // Check if already exists (active)
         Optional<InventoryProduct> existing = inventoryProductRepo
                 .findByProductAndWarehouseAndIsDeleted(request.product(), request.warehouse(), false);
 
@@ -98,6 +102,33 @@ public class InventoryProductServiceImpl implements InventoryProductService {
             throw new AppException(ErrorCode.INVENTORY_PRODUCT_EXISTS);
         }
 
+        // Check if exists but deleted (for restoration)
+        Optional<InventoryProduct> deletedExisting = inventoryProductRepo
+                .findByProductAndWarehouseAndIsDeleted(request.product(), request.warehouse(), true);
+
+        if (deletedExisting.isPresent()) {
+            // Restore the deleted record instead of creating new one
+            InventoryProduct inventoryProduct = deletedExisting.get();
+
+            // Update with new request data
+            inventoryProductMapper.update(inventoryProduct,
+                    new InventoryProductForm(
+                            request.totalQuantity(),
+                            request.minStockLevel(),
+                            request.maxStockLevel(),
+                            request.status()
+                    ));
+
+            inventoryProduct.setStatus(InventoryStatus.valueOf(request.status().toUpperCase()));
+            inventoryProduct.setIsDeleted(false);
+            inventoryProduct.setDeletedAt(null);
+            inventoryProduct.setUpdatedAt(LocalDateTime.now());
+
+            InventoryProduct savedProduct = inventoryProductRepo.save(inventoryProduct);
+            return enrich(savedProduct);
+        }
+
+        // Create new if no existing record found
         InventoryProduct inventoryProduct = inventoryProductMapper.toEntity(request);
         inventoryProduct.setStatus(InventoryStatus.valueOf(request.status().toUpperCase()));
         inventoryProduct.setIsDeleted(false);
@@ -133,6 +164,14 @@ public class InventoryProductServiceImpl implements InventoryProductService {
     }
 
     @Override
+    public List<InventoryProductResponse> getAllByProduct(String idProduct) {
+        return inventoryProductRepo.findAllByProductAndIsDeleted(idProduct,false)
+                .stream()
+                .map(this::enrich)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public InventoryProductResponse enrich(InventoryProduct inventoryProduct) {
         CompletableFuture<ProductResponse> productFuture = asyncServiceImpl
                 .getProductAsync(inventoryProduct.getProduct());
@@ -147,4 +186,92 @@ public class InventoryProductServiceImpl implements InventoryProductService {
 
         return response;
     }
+
+    @Override
+    public InventoryProductTotalStock getInventoryProductTotalStock(String idProduct) {
+        InventoryProduct inventoryProduct=inventoryProductRepo
+                .findFirstByProductAndIsDeleted(idProduct,false)
+                .orElseThrow(() -> new AppException(ErrorCode.INVENTORY_PRODUCT_NOT_FOUND));
+        InventoryProductTotalStock inventoryProductTotalStock=InventoryProductTotalStock.builder()
+                .minStockLevel(inventoryProduct.getMinStockLevel())
+                .maxStockLevel(inventoryProduct.getMaxStockLevel())
+                .build();
+        return inventoryProductTotalStock;
+    }
+
+    @Override
+    @Transactional
+    public List<InventoryProductResponse> batchUpdateInventoryProduct(String productId, List<InventoryProductRequest> requests) {
+        // 1. Lấy tất cả InventoryProduct hiện có của product
+        List<InventoryProduct> existingInventoryProducts = inventoryProductRepo
+                .findAllByProductAndIsDeleted(productId, false);
+
+        // 2. Tạo map để so sánh nhanh
+        Map<String, InventoryProduct> existingMap = existingInventoryProducts.stream()
+                .collect(Collectors.toMap(
+                        ip -> ip.getProduct() + "_" + ip.getWarehouse(),
+                        ip -> ip
+                ));
+
+        // 3. Tạo set các warehouse từ request để tracking
+        Set<String> requestWarehouseKeys = requests.stream()
+                .map(req -> req.product() + "_" + req.warehouse())
+                .collect(Collectors.toSet());
+
+        List<InventoryProductResponse> results = new ArrayList<>();
+
+        // 4. Xử lý từng request
+        for (InventoryProductRequest request : requests) {
+            String key = request.product() + "_" + request.warehouse();
+
+            if (existingMap.containsKey(key)) {
+                // Đã tồn tại - bỏ qua và loại khỏi danh sách existing
+                log.info("InventoryProduct already exists for product: {} warehouse: {}",
+                        request.product(), request.warehouse());
+                existingMap.remove(key);
+            } else {
+                // Chưa tồn tại - tạo mới
+                try {
+                    InventoryProductResponse created = createInventoryProduct(request);
+                    results.add(created);
+                    log.info("Created new InventoryProduct for product: {} warehouse: {}",
+                            request.product(), request.warehouse());
+                } catch (Exception e) {
+                    log.error("Failed to create InventoryProduct for product: {} warehouse: {}",
+                            request.product(), request.warehouse(), e);
+                }
+            }
+        }
+
+        // 5. Xóa mềm các InventoryProduct còn lại (không có trong request)
+        for (InventoryProduct remaining : existingMap.values()) {
+            deleteInventoryProduct(remaining.getInventoryProductId());
+            log.info("Soft deleted InventoryProduct: {} for product: {} warehouse: {}",
+                    remaining.getInventoryProductId(), remaining.getProduct(), remaining.getWarehouse());
+        }
+
+        return results;
+    }
+
+    @Override
+    @Transactional
+    public boolean updateStockLevelsByProduct(String productId, UpdateStockLevelsRequest request) {
+        // Lấy tất cả InventoryProduct của product
+        List<InventoryProduct> inventoryProducts = inventoryProductRepo
+                .findAllByProduct(productId);
+
+        List<InventoryProductResponse> results = new ArrayList<>();
+
+        for (InventoryProduct inventoryProduct : inventoryProducts) {
+            // Update stock levels
+            inventoryProduct.setMinStockLevel(request.getMinStockLevel());
+            inventoryProduct.setMaxStockLevel(request.getMaxStockLevel());
+            inventoryProduct.setUpdatedAt(LocalDateTime.now());
+
+            inventoryProductRepo.save(inventoryProduct);
+        }
+
+        return true;
+    }
+
 }

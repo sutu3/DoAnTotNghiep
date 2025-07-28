@@ -19,7 +19,7 @@ import java.util.List;
 public class InventoryStatsResponse {
     String productId;
     String productName;
-    Integer currentStock;
+    BigDecimal currentStock;
     Integer pendingOrders;
     Integer minimumStock;
     BigDecimal averagePrice;

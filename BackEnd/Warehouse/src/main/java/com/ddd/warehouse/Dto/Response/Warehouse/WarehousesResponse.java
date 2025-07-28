@@ -12,7 +12,7 @@ public record WarehousesResponse(
         String street,
         String district,
         String country,
-        String managerId,
+        String description,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         Boolean isDeleted,

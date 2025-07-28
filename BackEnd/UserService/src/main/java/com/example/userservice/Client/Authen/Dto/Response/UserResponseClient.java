@@ -16,10 +16,11 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserResponse {
+public class UserResponseClient {
     String idUser;
     String username;
     String password;
     String email;
+    Set<RoleResponse> roles;
 
 }

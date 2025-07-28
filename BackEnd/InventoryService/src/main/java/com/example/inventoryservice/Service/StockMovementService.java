@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface StockMovementService {
     StockMovement getById(String id);
     StockMovementResponse getByIdResponse(String id);
     StockMovementResponse createStockMovement(StockMovementRequest request);
-    void updateBinOccupancy(String binId, Integer quantityChange, MovementType movementType);
+    void updateBinOccupancy(String binId, BigDecimal quantityChange, MovementType movementType);
     List<StockMovementResponse> getMovementsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
     StockMovementResponse enrich(StockMovement stockMovement);
     List<StockMovementResponse> getStockMovementsByWarehouseAndDateRange(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate);

@@ -1,5 +1,6 @@
 package com.example.authenservice.Repo;
 
+import com.example.authenservice.Modal.Role;
 import com.example.authenservice.Modal.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,4 +20,5 @@ public interface UserRepo extends JpaRepository<User,String> {
     @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email = :email")
     Optional<User> findByEmailWithRoles(@Param("email") String email);
     Optional<User> findByUsername(String username);
+    List<User> findAllByRolesAndIsDeleted(Role role, Boolean isDeleted);
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,8 +32,8 @@ public class InventoryProduct extends BaseEntity {
     @Column(columnDefinition = "VARCHAR(36) COMMENT 'ID warehouse'", nullable = false)
     String warehouse;
 
-    @Column(columnDefinition = "INT COMMENT 'Tổng số lượng tồn kho'", nullable = false)
-    Integer totalQuantity = 0;
+    @Column(columnDefinition = "DECIMAL(15,6) COMMENT 'Tổng số lượng tồn kho'", nullable = false)
+    BigDecimal totalQuantity= BigDecimal.valueOf(0);
 
     @Column(columnDefinition = "INT COMMENT 'Mức tồn kho tối thiểu'")
     Integer minStockLevel = 0;

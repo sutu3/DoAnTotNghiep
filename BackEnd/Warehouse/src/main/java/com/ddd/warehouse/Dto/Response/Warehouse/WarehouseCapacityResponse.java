@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -18,6 +19,6 @@ public class WarehouseCapacityResponse {
     private Integer occupiedBins;
     private Integer availableBins;
     private Integer utilizationPercentage;
-    private Integer totalCapacity;
-    private Integer usedCapacity;
+    private BigDecimal totalCapacity;
+    private BigDecimal usedCapacity;
 }

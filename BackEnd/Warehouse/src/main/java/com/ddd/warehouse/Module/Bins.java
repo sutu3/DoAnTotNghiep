@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
+
 @Entity
 @SuperBuilder
 @Data
@@ -30,14 +32,14 @@ public class Bins extends BaseEntity{
     @NotNull(message = "Trạng thái bin không được null")
     BinStatus status;
 
-    @Column(columnDefinition = "INTEGER COMMENT 'sức chưa của bin'", nullable = false)
-    @Min(value = 1, message = "BIN_CAPACITY_INVALID")
-    @Max(value = 10000, message = "BIN_CAPACITY_INVALID")
-    Integer capacity;
+    @Column(columnDefinition = "DECIMAL(15,6) COMMENT 'sức chứa của bin'", nullable = false)
+    @DecimalMin(value = "0.000001", message = "BIN_CAPACITY_INVALID")
+    @DecimalMax(value = "10000.000000", message = "BIN_CAPACITY_INVALID")
+    BigDecimal capacity;
 
-    @Min(value = 0, message = "Số lượng hiện tại không được âm")
-    @Column(columnDefinition = "INTEGER COMMENT 'sức chưa còn lại'", nullable = false)
-    Integer currentOccupancy = 0;
+    @DecimalMin(value = "0.000000", message = "Số lượng hiện tại không được âm")
+    @Column(columnDefinition = "DECIMAL(15,6) COMMENT 'số lượng hiện tại'", nullable = false)
+    BigDecimal currentOccupancy = BigDecimal.ZERO;
 
     @ManyToOne
     @JoinColumn(name = "stackId",nullable = false)

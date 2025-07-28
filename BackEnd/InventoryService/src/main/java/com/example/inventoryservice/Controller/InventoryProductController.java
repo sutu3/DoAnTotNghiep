@@ -5,7 +5,9 @@ import com.example.inventoryservice.Client.ProductService.Dto.Response.Product.P
 import com.example.inventoryservice.Client.ProductService.Dto.Response.Product.ProductFilterRequest;
 import com.example.inventoryservice.Dtos.ApiResponse;
 import com.example.inventoryservice.Dtos.Request.InventoryProductRequest;
+import com.example.inventoryservice.Dtos.Request.UpdateStockLevelsRequest;
 import com.example.inventoryservice.Dtos.Response.InventoryProductResponse;
+import com.example.inventoryservice.Dtos.Response.InventoryProductTotalStock;
 import com.example.inventoryservice.Form.InventoryProductForm;
 import com.example.inventoryservice.Service.Impl.ProductFilterService;
 import com.example.inventoryservice.Service.InventoryProductService;
@@ -97,7 +99,52 @@ public class InventoryProductController {
                 .success(true)
                 .build();
     }
-
+    @GetMapping("/search/product/{productId}/getFirst")
+    public ApiResponse<InventoryProductTotalStock> getFirstByProduc(
+            @PathVariable String productId
+    ) {
+        return ApiResponse.<InventoryProductTotalStock>builder()
+                .Result(inventoryProductService.getInventoryProductTotalStock(productId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/search/product/{productId}")
+    public ApiResponse<List<InventoryProductResponse>> getAllByProduc(
+            @PathVariable String productId
+    ) {
+        return ApiResponse.<List<InventoryProductResponse>>builder()
+                .Result(inventoryProductService.getAllByProduct(productId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @PostMapping("/batch/{productId}")
+    public ApiResponse<List<InventoryProductResponse>> batchUpdateInventoryProduct(
+            @PathVariable String productId,
+            @RequestBody List<InventoryProductRequest> requests
+    ) {
+        return ApiResponse.<List<InventoryProductResponse>>builder()
+                .Result(inventoryProductService.batchUpdateInventoryProduct(productId, requests))
+                .code(0)
+                .message("Batch update successful")
+                .success(true)
+                .build();
+    }
+    @PutMapping("/batch/product/{productId}/stock-levels")
+    public ApiResponse<Boolean> updateStockLevelsByProduct(
+            @PathVariable String productId,
+            @RequestBody UpdateStockLevelsRequest request
+    ) {
+        return ApiResponse.<Boolean>builder()
+                .Result(inventoryProductService.updateStockLevelsByProduct(productId, request))
+                .code(0)
+                .message("Stock levels updated successfully")
+                .success(true)
+                .build();
+    }
     /**
      * Lấy danh sách các sản phẩm có tồn kho thấp hơn mức tối thiểu
      * @return List<InventoryProductResponse> - Danh sách sản phẩm cần bổ sung tồn kho

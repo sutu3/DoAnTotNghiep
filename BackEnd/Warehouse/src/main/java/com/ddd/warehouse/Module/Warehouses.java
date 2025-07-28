@@ -24,13 +24,15 @@ public class Warehouses extends BaseEntity{
     String warehouseName;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'địa chỉ của kho'", nullable = false)
     String address;
+    @Column(columnDefinition = "TEXT COMMENT 'mô tả của kho'")
+    String description;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'tên đường của kho'", nullable = false)
     String street;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'quận/huyện của kho'", nullable = false)
     String district;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'thành phố/ tỉnh của kho'", nullable = false)
     String country;
-    @Column(columnDefinition = "VARCHAR(255) COMMENT 'Mã người quản lý'", nullable = false)
+    @Column(columnDefinition = "VARCHAR(255) COMMENT 'Mã người quản lý'")
     String managerId;
     @OneToMany(mappedBy="warehouse")
     List<Bins> bins;

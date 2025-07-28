@@ -1,8 +1,11 @@
 package com.example.authenservice.Controller;
 
 import com.example.authenservice.Dtos.ApiResponse;
+import com.example.authenservice.Dtos.Request.UpdateRole;
 import com.example.authenservice.Dtos.Request.UserRequest;
+import com.example.authenservice.Dtos.Response.RoleResponse;
 import com.example.authenservice.Dtos.Response.UserResponse;
+import com.example.authenservice.Modal.Role;
 import com.example.authenservice.Service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -11,6 +14,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
+
 @RestController
 @RequestMapping("/api/authen/users")
 @RequiredArgsConstructor
@@ -37,6 +42,15 @@ public class UserController {
                 .code(0)
                 .build();
     }
+    @GetMapping("search/user/{userid}")
+    public ApiResponse<Set<RoleResponse>> getRoleByUserId(@PathVariable String userid) {
+        return ApiResponse.<Set<RoleResponse>>builder()
+                .Result(userService.getRolesByUserId(userid))
+                .message("User retrieved successfully")
+                .success(true)
+                .code(0)
+                .build();
+    }
 
     @PutMapping("/{id}")
     public ApiResponse<UserResponse> updateUser(@PathVariable String id, @RequestBody UserRequest request) {
@@ -48,9 +62,9 @@ public class UserController {
                 .build();
     }
     @PutMapping("/search/email/{email}/roles")
-    public ApiResponse<UserResponse> updateRoleUser(@PathVariable String email) {
+    public ApiResponse<UserResponse> updateRoleUser(@PathVariable String email, @RequestBody UpdateRole updateRole) {
         return ApiResponse.<UserResponse>builder()
-                .Result(userService.updateUserRoleManager(email))
+                .Result(userService.updateUserRoleManager(email,updateRole))
                 .message("User updated successfully")
                 .success(true)
                 .code(0)

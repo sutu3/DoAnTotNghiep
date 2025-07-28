@@ -80,16 +80,11 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public SupplierResponse updateSupplier(SupplierForm update, String supplierId) {
-        Optional<Supplier> existing=supplierRepo.findAllByEmailAndPhoneNumber(
-                update.email(),
-                update.phoneNumber());
-        if(existing.isPresent()){
-            throw new AppException(ErrorCode.SUPPLIER_EXIST);
-        }
         Supplier supplier=getById(supplierId);
         supplierMapper.updateSupplier(supplier,update);
-
-        return supplierMapper.toResponse(supplier);
+        supplier.setCountry(update.country());
+        Supplier supplierUpdate=supplierRepo.save(supplier);
+        return supplierMapper.toResponse(supplierUpdate);
     }
 
     @Override

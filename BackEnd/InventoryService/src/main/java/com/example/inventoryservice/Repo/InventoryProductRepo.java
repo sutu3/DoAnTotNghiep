@@ -17,7 +17,7 @@ public interface InventoryProductRepo extends JpaRepository<InventoryProduct, St
 
     // Tìm theo warehouse và trạng thái xóa
     Page<InventoryProduct> findAllByWarehouseAndIsDeleted(String warehouse, Boolean isDeleted, Pageable pageable);
-
+    Optional<InventoryProduct> findFirstByProductAndIsDeleted(String product, boolean isDeleted);
     // Tìm theo product và warehouse
     Optional<InventoryProduct> findByProductAndWarehouseAndIsDeleted(String product, String warehouse, Boolean isDeleted);
 
@@ -29,7 +29,11 @@ public interface InventoryProductRepo extends JpaRepository<InventoryProduct, St
     List<InventoryProduct> findLowStockProducts();
     @Query("SELECT ip.product FROM InventoryProduct ip WHERE ip.warehouse = :warehouse AND ip.isDeleted = false")
     List<String> findAllListIdProduct(@Param("warehouse") String warehouse);
+    List<InventoryProduct> findAllByWarehouse(@Param("warehouse") String warehouse);
 
+    List<InventoryProduct> findAllByProduct(String product);
+
+    List<InventoryProduct> findAllByProductAndIsDeleted(String product, Boolean isDeleted);
     // Tìm theo trạng thái
     Page<InventoryProduct> findAllByStatusAndIsDeleted(String status, Boolean isDeleted, Pageable pageable);
 

@@ -18,7 +18,7 @@ public class WebClientConfiguration {
     @Bean
     WebClient webClient(){
         return WebClient.builder()
-                .baseUrl("https://doantotnghiep-3a2x.onrender.com/api/")
+                .baseUrl("http://localhost:8088/api/")
                 .build();
     }
     @Bean

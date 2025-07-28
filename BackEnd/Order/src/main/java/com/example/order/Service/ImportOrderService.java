@@ -37,4 +37,6 @@ public interface ImportOrderService {
     List<ImportOrderResponseClient> getOrdersByWarehouseAndDateRange(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate);
     List<ImportOrderResponseClient> getPendingImportOrdersByWarehouse(String warehouseId);
     List<ImportOrderResponseClient> getCompletedImportOrdersByWarehouse(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate);
+    ImportOrderResponse markGoodsArrived(String orderId);
+    List<ImportOrderResponse> getOrdersReadyForReceipt(String warehouseId);
 }

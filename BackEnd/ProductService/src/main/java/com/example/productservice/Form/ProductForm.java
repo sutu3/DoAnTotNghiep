@@ -9,8 +9,12 @@ public record ProductForm(
         String productName,
         String description,
         BigDecimal price,
-        String createByUser,
         String category,
-        String unit
+        String unit,
+        String supplier,
+        Integer minStockLevel,
+        Integer maxStockLevel,
+        String sku,
+        String urlImageProduct
 ) {
 }

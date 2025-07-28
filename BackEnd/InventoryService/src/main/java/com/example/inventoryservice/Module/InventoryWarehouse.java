@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -33,8 +34,8 @@ public class InventoryWarehouse extends BaseEntity {
     @Column(columnDefinition = "VARCHAR(36) COMMENT 'ID bin chứa hàng'", nullable = false)
     String bin;
 
-    @Column(columnDefinition = "INT COMMENT 'Số lượng tại vị trí này'", nullable = false)
-    Integer quantity = 0;
+    @Column(columnDefinition = "DECIMAL(15,6) COMMENT 'Số lượng tại vị trí này'", nullable = false)
+    BigDecimal quantity= BigDecimal.valueOf(0);
 
     @Column(columnDefinition = "DATE COMMENT 'Ngày hết hạn'")
     LocalDate expiryDate;

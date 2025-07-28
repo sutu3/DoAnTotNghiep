@@ -2,10 +2,12 @@ package com.ddd.warehouse.Dto.Request;
 
 import lombok.Builder;
 
+import java.math.BigDecimal;
+
 @Builder
 public record BinRequest(
         String binCode,
-        Integer capacity,
+        BigDecimal capacity,
         String stack,
         String warehouse
 ) {

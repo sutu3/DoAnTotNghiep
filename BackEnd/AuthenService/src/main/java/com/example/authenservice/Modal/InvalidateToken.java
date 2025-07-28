@@ -16,6 +16,6 @@ import java.util.Date;
 public class InvalidateToken {
     @Id
     String id;
-    @Column(columnDefinition = "DATE  COMMENT 'thời gian hết hạn'",nullable = false,unique = true)
+    @Column(columnDefinition = "DATE  COMMENT 'thời gian hết hạn'",nullable = false)
     Date expiryTime;
 }

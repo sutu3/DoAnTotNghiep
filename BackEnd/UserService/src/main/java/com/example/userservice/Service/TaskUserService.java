@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 public interface TaskUserService {
-    Page<TaskUserResponse> getAllByUserId(String id, Pageable pageable);
+    Page<TaskUserResponse> getAllByUserId( Pageable pageable);
     List<TaskUserResponse> getAllByTaskId(String id);
     Page<TaskUserResponse> getAllByTaskTypeName(String taskName,String warehouseId, Pageable pageable);
     TaskUserResponse createTaskUser(TaskUserRequest request, Tasks task);

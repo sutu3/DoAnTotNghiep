@@ -1,5 +1,6 @@
 package com.example.userservice.Controller;
 
+import com.example.userservice.Dto.Request.UpdateRole;
 import com.example.userservice.Dto.Request.UserRequest;
 import com.example.userservice.Dto.Responses.ApiResponse;
 import com.example.userservice.Dto.Responses.User.IdWarehouseResponse;
@@ -46,6 +47,18 @@ public class UserController {
     ) {
         return ApiResponse.<List<UserResponse>>builder()
                 .Result(userService.getActiveUsersByWarehouse(warehouseId))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+    @PutMapping("/search/user/{userId}/roles")
+    public ApiResponse<UserResponse> updateRoleUser(
+            @PathVariable String userId,
+            @RequestBody UpdateRole updateRole
+    ) {
+        return ApiResponse.<UserResponse>builder()
+                .Result(userService.UpdateRoleUser(userId,updateRole))
                 .code(0)
                 .message("Success")
                 .success(true)

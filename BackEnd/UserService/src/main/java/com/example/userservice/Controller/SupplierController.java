@@ -71,7 +71,7 @@ public class SupplierController {
                 .build();
 
     }
-    @PutMapping("/{supplierId}")
+    @PutMapping("/update/{supplierId}")
     public ApiResponse<SupplierResponse> updateSupplier(
             @PathVariable String supplierId,
             @RequestBody SupplierForm update
@@ -83,7 +83,7 @@ public class SupplierController {
                 .success(true)
                 .build();
     }
-    @DeleteMapping("/{supplierId}")
+    @DeleteMapping("/delete/{supplierId}")
     public ApiResponse<SupplierResponse> deleteSupplier(
             @PathVariable String supplierId
     ){

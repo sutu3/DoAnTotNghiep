@@ -25,4 +25,8 @@ public class ProductSpecification {
         return (root, query, criteriaBuilder) ->
                 isActive == null ? null : criteriaBuilder.equal(root.get("IsActive"), isActive);
     }
+    public static Specification<Product> isDelete(Boolean isDelete) {
+        return (root, query, criteriaBuilder) ->
+                isDelete == null ? null : criteriaBuilder.equal(root.get("isDeleted"), isDelete);
+    }
 }

@@ -34,8 +34,6 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
     CategoryRepo categoryRepo;
     CategoryMapper categoryMapper;
-    WarehouseController warehouseController;
-    UserController userController;
     private final AsyncServiceImpl asyncServiceImpl;
 
     @Override

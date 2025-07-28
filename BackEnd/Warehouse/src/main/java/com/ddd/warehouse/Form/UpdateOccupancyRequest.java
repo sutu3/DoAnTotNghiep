@@ -1,6 +1,8 @@
 package com.ddd.warehouse.Form;
 
+import java.math.BigDecimal;
+
 public record UpdateOccupancyRequest(
-        Integer occupancyChange
+        BigDecimal occupancyChange
 ) {
 }

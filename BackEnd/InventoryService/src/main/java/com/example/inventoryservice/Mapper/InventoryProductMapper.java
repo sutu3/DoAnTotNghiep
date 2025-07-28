@@ -22,7 +22,6 @@ public interface InventoryProductMapper {
     // Convert entity to response (ignore related objects - will be populated separately)
     @Mapping(target = "productDetails", ignore = true)
     @Mapping(target = "warehouseDetails", ignore = true)
-    @Mapping(target = "inventoryWarehouses", ignore = true)
     InventoryProductResponse toResponse(InventoryProduct inventoryProduct);
 
     // Update entity from form
