@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class InventoryProductResponse {
     String inventoryProductId;
     String product;
     String warehouse;
-    Integer totalQuantity;
+    BigDecimal totalQuantity;
     Integer minStockLevel;
     Integer maxStockLevel;
     LocalDateTime lastImportDate;
@@ -31,7 +32,6 @@ public class InventoryProductResponse {
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     Boolean isDeleted;
-    List<InventoryWarehouseResponse> inventoryWarehouses;
 
     // Enriched fields từ external services
     ProductResponse productDetails;

@@ -17,6 +17,7 @@ import com.example.order.Mapper.ImportOrderMapper;
 import com.example.order.Module.ImportOrder;
 import com.example.order.Repo.ImportItemRepo;
 import com.example.order.Repo.ImportOrderRepo;
+import com.example.order.Repo.Specification.ImportOrderSpecification;
 import com.example.order.Service.ImportItemService;
 import com.example.order.Service.ImportOrderService;
 import lombok.AccessLevel;
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -65,9 +67,12 @@ public class ImportOrderServiceImpl implements ImportOrderService {
 
     @Override
     public Page<ImportOrderResponse> getAllByStatus(String warehouse, String status, Pageable pageable) {
-        OrderStatus orderStatus = OrderStatus.valueOf(status);
-        return importOrderRepo.findAllByWarehouseAndStatusAndIsDeleted(warehouse, orderStatus, false, pageable)
-                .map(this::entry);
+        log.info("heheheheheheheh");
+        Specification<ImportOrder> specification = Specification.where(ImportOrderSpecification.hasWarehouse(warehouse))
+                .and(ImportOrderSpecification.hasStatus(status));
+        log.info("heheheheheheheh");
+        Page<ImportOrder> importOrders = importOrderRepo.findAll(specification, pageable);
+        return importOrders.map(this::entry);
     }
 
     @Override
@@ -195,6 +200,31 @@ public class ImportOrderServiceImpl implements ImportOrderService {
                 warehouseId, OrderStatus.Done, fromDate, toDate, false);
         return orders.stream()
                 .map(importOrderMapper::toClient)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ImportOrderResponse markGoodsArrived(String orderId) {
+        ImportOrder importOrder = getById(orderId);
+
+        // Thay đổi validation - chấp nhận từ InProgress thay vì Sent_To_Supplier
+        if (importOrder.getStatus() != OrderStatus.InProgress) {
+            throw new AppException(ErrorCode.INVALID_ORDER_STATUS);
+        }
+
+        importOrder.setStatus(OrderStatus.Goods_Arrived);
+        importOrder.setUpdatedAt(LocalDateTime.now());
+
+        ImportOrder savedOrder = importOrderRepo.save(importOrder);
+        return entry(savedOrder);
+    }
+
+    @Override
+    public List<ImportOrderResponse> getOrdersReadyForReceipt(String warehouseId) {
+        List<ImportOrder> orders = importOrderRepo.findAllByWarehouseAndStatusAndIsDeleted(
+                warehouseId, OrderStatus.Goods_Arrived, false);
+        return orders.stream()
+                .map(this::entry)
                 .collect(Collectors.toList());
     }
 }

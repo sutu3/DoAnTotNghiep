@@ -1,10 +1,13 @@
 package com.example.authenservice.Service.Impl;
 
 import com.example.authenservice.Client.UserService.Redis.UserController;
+import com.example.authenservice.Dtos.Request.UpdateRole;
 import com.example.authenservice.Dtos.Request.UserRequest;
+import com.example.authenservice.Dtos.Response.RoleResponse;
 import com.example.authenservice.Dtos.Response.UserResponse;
 import com.example.authenservice.Exception.AppException;
 import com.example.authenservice.Exception.ErrorCode;
+import com.example.authenservice.Mapper.RoleMapper;
 import com.example.authenservice.Mapper.UserMapper;
 import com.example.authenservice.Modal.Role;
 import com.example.authenservice.Modal.User;
@@ -25,12 +28,14 @@ import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class UserServiceImpl implements UserService {
+    private final RoleMapper roleMapper;
     UserRepo userRepo;
     RoleRepo roleRepo;
     UserMapper userMapper;
@@ -102,13 +107,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateUserRoleManager(String email) {
+    public UserResponse updateUserRoleManager(String email, UpdateRole updateRole) {
         User user=userRepo.findByEmailWithRoles(email)
                 .orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
         Set<Role> roles=user.getRoles();
         Role role=roleRepo.findByRoleName("MANAGER")
                 .orElseThrow(()->new AppException(ErrorCode.ROLE_NOT_FOUND));
-        roles.add(role);
+        if(updateRole.isManager()){
+            roles.add(role);
+        }else{
+            roles.remove(role);
+        }
         user.setRoles(roles);
         userRepo.save(user);
         return userMapper.toResponse(user);
@@ -128,6 +137,20 @@ public class UserServiceImpl implements UserService {
     public Page<UserResponse> getAllUsers(Pageable pageable) {
         return userRepo.findByIsDeleted(pageable,false)
                 .map(userMapper::toResponse);
+    }
+
+    @Override
+    public Set<RoleResponse> getRolesByUserId(String userId) {
+        User user=userRepo.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return user.getRoles().stream().map(roleMapper::toResponse).collect(Collectors.toSet());
+    }
+
+    @Override
+    public List<UserResponse> getAllUserManager() {
+        Role role=roleRepo.findByRoleName("MANAGER")
+                .orElseThrow(()->new AppException(ErrorCode.ROLE_NOT_FOUND));
+        List<User> users=userRepo.findAllByRolesAndIsDeleted(role,false);
+        return List.of();
     }
 
     private void syncUpdateWithUserService(User authUser, UserRequest request) {

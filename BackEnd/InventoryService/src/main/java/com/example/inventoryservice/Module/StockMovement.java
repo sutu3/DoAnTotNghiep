@@ -34,14 +34,14 @@ public class StockMovement extends BaseEntity {
     @Column(columnDefinition = "VARCHAR(20) COMMENT 'Loại di chuyển (IMPORT, EXPORT, TRANSFER, ADJUSTMENT)'", nullable = false)
     MovementType movementType;
 
-    @Column(columnDefinition = "INT COMMENT 'Số lượng di chuyển'", nullable = false)
-    Integer quantity;
+    @Column(columnDefinition = "DECIMAL(15,6) COMMENT 'Số lượng di chuyển'", nullable = false)
+    BigDecimal quantity;
 
-    @Column(columnDefinition = "INT COMMENT 'Số lượng trước khi di chuyển'")
-    Integer quantityBefore;
+    @Column(columnDefinition = "DECIMAL(15,6) COMMENT 'Số lượng trước khi di chuyển'")
+    BigDecimal quantityBefore;
 
-    @Column(columnDefinition = "INT COMMENT 'Số lượng sau khi di chuyển'")
-    Integer quantityAfter;
+    @Column(columnDefinition = "DECIMAL(15,6) COMMENT 'Số lượng sau khi di chuyển'")
+    BigDecimal quantityAfter;
 
     @Column(columnDefinition = "VARCHAR(36) COMMENT 'ID đơn hàng tham chiếu'")
     String referenceOrderId;

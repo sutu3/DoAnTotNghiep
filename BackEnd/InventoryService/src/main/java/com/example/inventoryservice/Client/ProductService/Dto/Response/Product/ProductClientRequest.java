@@ -21,6 +21,7 @@ public class ProductClientRequest {
     String description;
     String urlImageProduct;
     Boolean isActive;
+    BigDecimal quantity;
     BigDecimal price;
     String supplier;
     String createByUser;

@@ -28,15 +28,14 @@ import java.util.List;
 public class TaskUserController {
     private final TaskUserService taskUserService;
 
-    @GetMapping("/users/{id}/search")
+    @GetMapping("/search/users")
     public ApiResponse<Page<TaskUserResponse>> getAllByIdUser(
             @RequestParam("pageNumber") int pageNumber,
-            @RequestParam("pageSize") int pageSize,
-            @PathVariable  String id
+            @RequestParam("pageSize") int pageSize
     ){
         Pageable pageable= PageRequest.of(pageNumber,pageSize);
         return ApiResponse.<Page<TaskUserResponse>>builder()
-                .Result(taskUserService.getAllByUserId(id,pageable))
+                .Result(taskUserService.getAllByUserId(pageable))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

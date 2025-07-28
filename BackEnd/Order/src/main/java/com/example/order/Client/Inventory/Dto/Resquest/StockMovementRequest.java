@@ -17,7 +17,7 @@ public class StockMovementRequest {
     private String inventoryWarehouseId;
     private String product;
     private String movementType;
-    private Integer quantity;
+    private BigDecimal quantity;
     private String referenceOrderId;
     private String performedBy;
     private String note;

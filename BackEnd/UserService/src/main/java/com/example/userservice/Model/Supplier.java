@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@SuperBuilder  // Thay @Builder bằng @SuperBuilder
+@SuperBuilder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

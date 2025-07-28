@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -13,8 +15,8 @@ public class WarehouseInventoryCheck {
     Integer totalBin;
     Integer availableBin;
     Integer utilizationPercentage;
-    Integer totalCapacity;
-    Integer usedCapacity;
+    BigDecimal totalCapacity;
+    BigDecimal usedCapacity;
     Integer emptyBin;
 
 }

@@ -30,6 +30,7 @@ public class ProductClientRequest {
     String sku;
     String description;
     String urlImageProduct;
+    BigDecimal quantity;
     Boolean isActive;
     BigDecimal price;
     String supplier;

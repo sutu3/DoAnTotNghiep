@@ -24,9 +24,9 @@ public class StockMovementResponse {
     String inventoryWarehouseId;
     String product;
     String movementType;
-    Integer quantity;
-    Integer quantityBefore;
-    Integer quantityAfter;
+    BigDecimal quantity;
+    BigDecimal quantityBefore;
+    BigDecimal quantityAfter;
     String referenceOrderId;
     String performedBy;
     String note;

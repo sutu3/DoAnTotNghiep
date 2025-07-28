@@ -5,14 +5,15 @@ import com.ddd.warehouse.Enum.BinStatus;
 import com.ddd.warehouse.Module.Warehouses;
 import lombok.Builder;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
 public record BinResponse(
         String binId,
         String binCode,
-        Integer capacity,
-        Integer currentOccupancy,
+        BigDecimal capacity,
+        BigDecimal currentOccupancy,
         BinStatus status,
         WarehousesResponse warehouse,
         LocalDateTime createdAt,

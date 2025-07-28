@@ -19,6 +19,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +52,7 @@ public class StackBinOrchestratorService {
 
                 BinRequest bin = BinRequest.builder()
                         .binCode(binCode)
-                        .capacity(1)
+                        .capacity(BigDecimal.valueOf(1))
                         .stack(stackCreated.getStackId())
                         .warehouse(stackRequest.warehouse())
                         .build();

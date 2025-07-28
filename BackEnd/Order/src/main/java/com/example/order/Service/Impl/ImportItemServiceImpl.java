@@ -225,44 +225,6 @@ public class ImportItemServiceImpl implements ImportItemService {
         return entry(savedItem);
     }
 
-    private void createInventoryRecords(ImportResponseItem item, ImportOrderResponse orderResponse) {
-        try {
-            log.info("Creating inventory records for item: {}", item.getProduct().getProductName());
-
-            // Tạo inventory warehouse record
-            InventoryWarehouseRequest inventoryWarehouseRequest = new InventoryWarehouseRequest(
-                    item.getProduct().getProductId(),
-                    orderResponse.getWarehouse().getWarehouseId(),
-                    item.getBin().getBinId(),
-                    0,
-                    item.getExpiredDate().toLocalDate(),
-                    "AVAILABLE"
-            );
-            var inventoryResponse = inventoryController.createInventoryWarehouse(inventoryWarehouseRequest);
-            log.info("Created inventory warehouse record with ID: {}",
-                    inventoryResponse.getResult().getInventoryWarehouseId());
-
-            // Tạo stock movement record
-            StockMovementRequest stockMovementRequest = new StockMovementRequest(
-                    inventoryResponse.getResult().getInventoryWarehouseId(), // Sử dụng ID từ response
-                    item.getProduct().getProductId(),
-                    "Import",
-                    item.getRealityQuantity(),
-                    orderResponse.getImportOrderId(),
-                    item.getCreateByUser().getUserId(), // Thêm user thực hiện
-                    "Import from order: " + orderResponse.getImportOrderId(), // Thêm note
-                    item.getCostUnitBase()
-            );
-
-            var movementResponse = inventoryController.createStockMovement(stockMovementRequest);
-            log.info("Created stock movement record with ID: {}",
-                    movementResponse.getResult().getMovementId());
-
-        } catch (Exception e) {
-            log.error("Failed to create inventory records for item: {}", item.getItemId(), e);
-            throw new AppException(ErrorCode.INVENTORY_CREATION_FAILED);
-        }
-    }
     @Override
     @Transactional
     public void executeImport(String orderId, List<ImportResponseItem> items) {
@@ -283,7 +245,7 @@ public class ImportItemServiceImpl implements ImportItemService {
                             new UpdateBinRequest(item.getBin().getBinId()));
 
                     // Create inventory records
-                    createInventoryRecords(item, orderResponse);
+                    //createInventoryRecords(item, orderResponse);
 
                     processedItems++;
                     log.info("Processed item {}/{}: {}", processedItems, items.size(),

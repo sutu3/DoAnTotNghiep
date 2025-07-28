@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -66,8 +67,10 @@ public class InventoryWarehouseServiceImpl implements InventoryWarehouseService 
 
     @Override
     public List<InventoryWarehouseResponse> getAllByProduct(String product) {
-        return inventoryWarehouseRepo.findAllByProductAndIsDeleted(product, false)
-                .stream().map(this::enrich).collect(Collectors.toList());
+        List<InventoryWarehouse> entities = inventoryWarehouseRepo.findAllByProductAndIsDeleted(product, false);
+        log.info("Found {} InventoryWarehouse records for product: {}", entities.size(), product);
+
+        return entities.stream().map(this::enrich).collect(Collectors.toList());
     }
 
     @Override
@@ -126,7 +129,7 @@ public class InventoryWarehouseServiceImpl implements InventoryWarehouseService 
     public void deleteInventoryWarehouse(String id) {
         InventoryWarehouse inventoryWarehouse = getById(id);
         inventoryWarehouse.setIsDeleted(true);
-        inventoryWarehouse.setQuantity(0);
+        inventoryWarehouse.setQuantity(BigDecimal.ZERO);
         inventoryWarehouse.setDeletedAt(LocalDateTime.now());
         inventoryWarehouseRepo.save(inventoryWarehouse);
 
@@ -164,12 +167,12 @@ public class InventoryWarehouseServiceImpl implements InventoryWarehouseService 
     }
 
     private void updateInventoryProductTotalQuantity(InventoryProduct inventoryProduct) {
-        Integer totalQuantity = inventoryWarehouseRepo
+        BigDecimal totalQuantity = inventoryWarehouseRepo
                 .sumQuantityByProductAndWarehouse(
                         inventoryProduct.getProduct(),
                         inventoryProduct.getWarehouse()
                 );
-        inventoryProduct.setTotalQuantity(totalQuantity != null ? totalQuantity : 0);
+        inventoryProduct.setTotalQuantity(totalQuantity != null ? totalQuantity : BigDecimal.ZERO);
         inventoryProduct.setUpdatedAt(LocalDateTime.now());
         inventoryProductRepo.save(inventoryProduct);
     }

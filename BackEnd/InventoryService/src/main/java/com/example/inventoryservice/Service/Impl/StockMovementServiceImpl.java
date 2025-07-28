@@ -9,7 +9,6 @@ import com.example.inventoryservice.Client.WarehouseService.Redis.WarehouseContr
 import com.example.inventoryservice.Client.WarehouseService.WarehouseClient;
 import com.example.inventoryservice.Dtos.Request.StockMovementRequest;
 import com.example.inventoryservice.Dtos.Response.StockMovementResponse;
-import com.example.inventoryservice.Enum.InventoryStatus;
 import com.example.inventoryservice.Enum.MovementType;
 import com.example.inventoryservice.Exception.AppException;
 import com.example.inventoryservice.Exception.ErrorCode;
@@ -29,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -75,6 +75,8 @@ public class StockMovementServiceImpl implements StockMovementService {
     @Override
     @Transactional
     public StockMovementResponse createStockMovement(StockMovementRequest request) {
+
+        log.info("Updating inventory record with ID: {}",request.getQuantity());
         var userId=GetCurrentUserId.getCurrentUserId();
         request.setPerformedBy(userId);
         log.info("=== STARTING STOCK MOVEMENT CREATION ===");
@@ -114,18 +116,18 @@ public class StockMovementServiceImpl implements StockMovementService {
             switch ( MovementType.valueOf(String.valueOf(stockMovement.getMovementType()).toUpperCase()) ) {
                 case IMPORT:
                     log.info("Processing IMPORT movement");
-                    int newQuantityImport = inventoryWarehouse.getQuantity() + request.getQuantity();
+                    BigDecimal newQuantityImport = inventoryWarehouse.getQuantity().add(request.getQuantity());
                     stockMovement.setQuantityAfter(newQuantityImport);
                     log.info("IMPORT: {} + {} = {}", inventoryWarehouse.getQuantity(), request.getQuantity(), newQuantityImport);
                     break;
                 case EXPORT:
                     log.info("Processing EXPORT movement");
-                    if (inventoryWarehouse.getQuantity() < request.getQuantity()) {
+                    if (inventoryWarehouse.getQuantity().compareTo(request.getQuantity()) < 0) {
                         log.error("INSUFFICIENT_STOCK: Available {} < Required {}",
                                 inventoryWarehouse.getQuantity(), request.getQuantity());
                         throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
                     }
-                    int newQuantityExport = inventoryWarehouse.getQuantity() - request.getQuantity();
+                    BigDecimal newQuantityExport = inventoryWarehouse.getQuantity().subtract(request.getQuantity());
                     stockMovement.setQuantityAfter(newQuantityExport);
                     log.info("EXPORT: {} - {} = {}", inventoryWarehouse.getQuantity(), request.getQuantity(), newQuantityExport);
                     break;
@@ -135,7 +137,7 @@ public class StockMovementServiceImpl implements StockMovementService {
                     log.info("ADJUSTMENT: Set quantity to {}", request.getQuantity());
 
                     // Bổ sung logic cho trường hợp quantity = 0
-                    if (request.getQuantity() == 0) {
+                    if (request.getQuantity().compareTo(BigDecimal.ZERO) == 0) {
                         log.info("Quantity adjusted to 0, marking inventory warehouse for deletion");
                         inventoryWarehouseService.deleteInventoryWarehouse(request.getInventoryWarehouseId());
                         // Sẽ xóa InventoryWarehouse record sau khi save movement
@@ -143,15 +145,15 @@ public class StockMovementServiceImpl implements StockMovementService {
                     break;
                 case TRANSFER:
                     log.info("Processing TRANSFER movement");
-                    int newQuantityTransfer = inventoryWarehouse.getQuantity() - request.getQuantity();
+                    BigDecimal newQuantityTransfer = inventoryWarehouse.getQuantity().subtract(request.getQuantity());
                     stockMovement.setQuantityAfter(newQuantityTransfer);
                     log.info("TRANSFER: {} - {} = {}", inventoryWarehouse.getQuantity(), request.getQuantity(), newQuantityTransfer);
                     break;
             }
 
             log.info("Step 7: Updating bin occupancy for bin: {}", inventoryWarehouse.getBin());
-            updateBinOccupancy(inventoryWarehouse.getBin(), request.getQuantity(), MovementType.valueOf(String.valueOf(stockMovement.getMovementType()).toUpperCase()) );
-            log.info("Bin occupancy updated successfully");
+            updateBinOccupancy(inventoryWarehouse.getBin(), request.getQuantity(),
+                    MovementType.valueOf(String.valueOf(stockMovement.getMovementType()).toUpperCase()));              log.info("Bin occupancy updated successfully");
 
             log.info("Step 8: Setting entity properties and saving");
             stockMovement.setIsDeleted(false);
@@ -183,12 +185,12 @@ public class StockMovementServiceImpl implements StockMovementService {
     }
     @Override
     @Transactional
-    public void updateBinOccupancy(String binId, Integer quantityChange, MovementType movementType) {
+    public void updateBinOccupancy(String binId, BigDecimal quantityChange, MovementType movementType) {
         try {
-            Integer occupancyChange = switch (movementType) {
+            BigDecimal  occupancyChange = switch (movementType) {
                 case IMPORT -> quantityChange;
-                case EXPORT -> -quantityChange;
-                case TRANSFER -> 0; // Sẽ xử lý riêng cho from/to bins
+                case EXPORT -> quantityChange.negate();
+                case TRANSFER -> BigDecimal.ZERO;
                 case ADJUSTMENT -> quantityChange; // Có thể âm hoặc dương
             };
             UpdateOccupancyRequest request= UpdateOccupancyRequest.builder()
@@ -245,8 +247,8 @@ public class StockMovementServiceImpl implements StockMovementService {
                 .collect(Collectors.toList());
     }
 
-    private void updateInventoryWarehouseQuantity(InventoryWarehouse inventoryWarehouse, Integer newQuantity) {
-        if (newQuantity == 0) {
+    private void updateInventoryWarehouseQuantity(InventoryWarehouse inventoryWarehouse, BigDecimal newQuantity) {
+        if (newQuantity.compareTo(BigDecimal.ZERO) == 0) {
             inventoryWarehouseService.deleteInventoryWarehouse(inventoryWarehouse.getInventoryWarehouseId());
             log.info("InventoryWarehouse deleted due to zero quantity");
         } else {

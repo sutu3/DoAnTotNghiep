@@ -2,8 +2,11 @@ package com.example.userservice.Service.Impl;
 
 import com.example.userservice.Client.Authen.AuthenController;
 import com.example.userservice.Client.Authen.Dto.Request.UserRequestAuthen;
+import com.example.userservice.Client.Authen.Dto.Response.RoleResponse;
+import com.example.userservice.Client.Authen.Dto.Response.UserResponseClient;
 import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.userservice.Client.WarehouseService.Redis.WarehouseController;
+import com.example.userservice.Dto.Request.UpdateRole;
 import com.example.userservice.Dto.Request.UserRequest;
 import com.example.userservice.Dto.Responses.User.IdWarehouseResponse;
 import com.example.userservice.Dto.Responses.User.UserResponse;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -71,6 +75,16 @@ public class UsersServiceImpl implements UserService {
         authenController.createUser(new UserRequestAuthen(savedUser.getUserName(), user.getEmail(), user.getEmail(), savedUser.getUserId()));
         return enrich(savedUser);
     }
+
+    @Override
+    public UserResponse UpdateRoleUser(String userId ,UpdateRole updateRole) {
+        Users user = findById(userId);
+        UserResponseClient userUpdateRole=authenController.updateRoleUser(user.getEmail(),updateRole).getResult();
+        UserResponse userResponse=userMapper.toResponse(user);
+        userResponse.setRoles(userUpdateRole.getRoles());
+        return userResponse;
+    }
+
     @Override
     public String DeletedUser(String id) {
         Users user = findById(id);
@@ -106,9 +120,12 @@ public class UsersServiceImpl implements UserService {
     @Override
     public UserResponse enrich(Users users) {
         CompletableFuture<WarehousesResponse> warehouseFuture = asyncServiceImpl.getWarehouseAsync(users.getWarehouses());
-        CompletableFuture.allOf( warehouseFuture).join();
+        CompletableFuture<Set<RoleResponse>> rolesFuture = asyncServiceImpl.getRoleAsync(users.getUserId());
+
+        CompletableFuture.allOf( warehouseFuture,rolesFuture).join();
         UserResponse response = userMapper.toResponse(users);
         response.setWarehouses(warehouseFuture.join());
+        response.setRoles(rolesFuture.join());
         return response;
     }
 
