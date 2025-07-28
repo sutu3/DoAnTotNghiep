@@ -201,7 +201,7 @@ public class ExportItemServiceImpl implements ExportItemService {
                     StockMovementRequest stockMovementRequest = StockMovementRequest.builder()
                             .product(item.getProduct().getProductId())
                             .inventoryWarehouseId(inventoryWarehouseResponse.getInventoryWarehouseId())
-                            .quantity(item.getQuantity())
+                            .quantity(BigDecimal.valueOf(item.getQuantity()))
                             .movementType("Export")
                             .referenceOrderId(orderId)
                             .performedBy(idUser)

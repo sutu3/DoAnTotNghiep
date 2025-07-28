@@ -1,6 +1,7 @@
 package com.example.userservice.Service;
 
 import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
+import com.example.userservice.Dto.Request.UpdateRole;
 import com.example.userservice.Dto.Request.UserRequest;
 import com.example.userservice.Dto.Responses.User.IdWarehouseResponse;
 import com.example.userservice.Dto.Responses.User.UserResponse;
@@ -19,6 +20,8 @@ public interface UserService {
     IdWarehouseResponse getWarehouseByIdUser();
     @PreAuthorize("hasRole('MANAGER')")
     UserResponse CreateUser(UserRequest request);
+    @PreAuthorize("hasRole('MANAGER')")
+    UserResponse UpdateRoleUser(String userId, UpdateRole updateRole);
     String DeletedUser(String id);
     Users findById(String id);
     UserResponse getByIdResponse(String id);

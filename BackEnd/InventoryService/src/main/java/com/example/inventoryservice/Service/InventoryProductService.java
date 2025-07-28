@@ -3,7 +3,9 @@ package com.example.inventoryservice.Service;
 
 import com.example.inventoryservice.Client.ProductService.Dto.Response.Product.ProductClientRequest;
 import com.example.inventoryservice.Dtos.Request.InventoryProductRequest;
+import com.example.inventoryservice.Dtos.Request.UpdateStockLevelsRequest;
 import com.example.inventoryservice.Dtos.Response.InventoryProductResponse;
+import com.example.inventoryservice.Dtos.Response.InventoryProductTotalStock;
 import com.example.inventoryservice.Form.InventoryProductForm;
 import com.example.inventoryservice.Module.InventoryProduct;
 import org.springframework.data.domain.Page;
@@ -24,5 +26,11 @@ public interface InventoryProductService {
     InventoryProductResponse updateInventoryProduct(InventoryProductForm form, String id);
     void deleteInventoryProduct(String id);
     List<InventoryProductResponse> getLowStockProducts();
+    List<InventoryProductResponse> getAllByProduct(String idProduct);
     InventoryProductResponse enrich(InventoryProduct inventoryProduct);
+    InventoryProductTotalStock getInventoryProductTotalStock(String idProduct);
+    List<InventoryProductResponse> batchUpdateInventoryProduct(String productId, List<InventoryProductRequest> requests);
+    boolean updateStockLevelsByProduct(String productId, UpdateStockLevelsRequest request);
+
+
 }

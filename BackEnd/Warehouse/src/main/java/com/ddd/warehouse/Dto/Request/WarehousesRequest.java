@@ -7,8 +7,7 @@ public record WarehousesRequest(
         String warehouseName,
         String address,
         String street,
+        String description,
         String district,
-        String country,
-        String managerId
-) {
+        String country) {
 }

@@ -1,5 +1,6 @@
 package com.example.productservice.Service.Impl;
 
+import com.example.productservice.Client.Inventory.Dto.Response.UpdateStockLevelsRequest;
 import com.example.productservice.Client.Inventory.Dto.Resquest.InventoryProductRequest;
 import com.example.productservice.Client.Inventory.InventoryController;
 import com.example.productservice.Client.UserService.Dto.Response.SupplierResponse;
@@ -23,6 +24,7 @@ import com.example.productservice.Repo.Specification.ProductSpecification;
 import com.example.productservice.Service.CategoryService;
 import com.example.productservice.Service.ProductService;
 import com.example.productservice.Service.UnitService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,8 +34,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -47,11 +51,11 @@ public class ProductServiceImpl implements ProductService {
      ProductRepo productRepo;
      WarehouseController warehouseController;
      ProductMapper productMapper;
-     UserController userController;
      CategoryService categoryService;
      UnitService unitService;
     private final AsyncServiceImpl asyncServiceImpl;
     private final InventoryController inventoryController;
+    private final GetCurrentUserId getCurrentUserId;
 
     @Override
     public Page<ProductResponse> getAll( Pageable pageable) {
@@ -121,7 +125,7 @@ public class ProductServiceImpl implements ProductService {
             for(String warehouseId:warehouseIds){
                 InventoryProductRequest inventoryProductRequest=new InventoryProductRequest(productSave.getProductId(),
                         warehouseId,
-                        0,
+                        BigDecimal.ZERO,
                         request.minStockLevel(),
                         request.maxStockLevel(),
                         "Active");
@@ -140,7 +144,7 @@ public class ProductServiceImpl implements ProductService {
         for(String warehouseId:warehouseIds){
             InventoryProductRequest inventoryProductRequest=new InventoryProductRequest(productSave.getProductId(),
                     warehouseId,
-                    0,
+                    BigDecimal.ZERO,
                     request.minStockLevel(),
                     request.maxStockLevel(),
                     "Active");
@@ -151,20 +155,20 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponse> getProductsBySupplierFilteredByWarehouse(String supplierId, String warehouseId) {
-        log.info("Start");
-        Specification<Product> spec = Specification.where(ProductSpecification.hasSupplier(supplierId))
-                .and(ProductSpecification.isActive(true));
+        log.info("📦 Start filtering products by supplier={} and warehouse={}", supplierId, warehouseId);
 
-        log.info("📦 [Product Filter] - Specification created for supplierId={} and isActive=true", supplierId);
+        // 1. Lọc theo supplierId và active
+        Specification<Product> spec = Specification.where(ProductSpecification.hasSupplier(supplierId))
+                .and(ProductSpecification.isActive(true))
+                .and(ProductSpecification.isDelete(false));
 
         List<Product> listProduct = productRepo.findAll(spec);
-        log.info("🔍 [Product Filter] - Found {} products for supplierId={}", listProduct.size(), supplierId);
-
         if (listProduct.isEmpty()) {
-            log.warn("⚠️ [Product Filter] - No products found for supplierId={}", supplierId);
+            log.warn("⚠️ No products found for supplierId={}", supplierId);
+            return List.of();
         }
 
-        log.info("🏬 [Warehouse Filter] - Filtering products for warehouseId={}", warehouseId);
+        // 2. Tạo request để gọi sang inventory service
         ProductFilterRequest request = new ProductFilterRequest(
                 warehouseId,
                 listProduct.stream().map(productMapper::toClientRequest).toList()
@@ -174,29 +178,29 @@ public class ProductServiceImpl implements ProductService {
                 .filterProductsByWarehouse(request)
                 .getResult();
 
-        log.info("🏬 [Warehouse Filter] - Done");
-
         if (filteredProductDtos == null || filteredProductDtos.isEmpty()) {
-            log.warn("⚠️ [Warehouse Filter] - No products matched in warehouseId={}", warehouseId);
+            log.warn("⚠️ No products matched in warehouseId={}", warehouseId);
             return List.of();
         }
 
-        // 🔁 Lọc lại danh sách gốc theo ID trong danh sách đã lọc
-        Set<String> filteredProductIds = filteredProductDtos.stream()
-                .map(ProductClientRequest::getProductId)
-                .collect(Collectors.toSet());
+        // 3. Tạo Map<productId, quantity> từ kết quả inventory
+        Map<String, BigDecimal> productQuantityMap = filteredProductDtos.stream()
+                .collect(Collectors.toMap(ProductClientRequest::getProductId, ProductClientRequest::getQuantity));
 
-        List<Product> filteredFullProducts = listProduct.stream()
-                .filter(product -> filteredProductIds.contains(product.getProductId()))
+        // 4. Trả về danh sách enriched ProductResponse
+        List<ProductResponse> result = listProduct.stream()
+                .filter(p -> productQuantityMap.containsKey(p.getProductId()))
+                .map(p -> {
+                    ProductResponse response = enrich(p);
+                    response.setQuantity(productQuantityMap.get(p.getProductId())); // Gán quantity thực tế từ kho
+                    return response;
+                })
                 .toList();
 
-        log.info("✅ [Result] - Returning {} enriched products", filteredFullProducts.size());
-
-        // ✨ enrich để trả về đầy đủ thông tin
-        return filteredFullProducts.stream()
-                .map(this::enrich)
-                .toList();
+        log.info("✅ Returning {} enriched products with warehouse quantity", result.size());
+        return result;
     }
+
 
 
 
@@ -209,12 +213,23 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse updateProduct(ProductForm update, String productId) {
+    public ProductResponse updateProduct(ProductForm form, String productId) {
         Product product = getById(productId);
-        productMapper.update(product,update);
-        Product productUpdate=productRepo.save(product);
-        Product productSave=productRepo.save(productUpdate);
-        return  enrich(productSave);
+        productMapper.update(product, form);
+        product.setUpdatedAt(LocalDateTime.now());
+
+        Product updatedProduct = productRepo.save(product);
+
+        // Update stock levels in InventoryService if changed
+        if (form.minStockLevel() != null || form.maxStockLevel() != null) {
+            UpdateStockLevelsRequest stockRequest = new UpdateStockLevelsRequest(
+                    form.minStockLevel(),
+                    form.maxStockLevel()
+            );
+            inventoryController.updateStockLevelsByProduct(productId, stockRequest);
+        }
+
+        return enrich(updatedProduct);
     }
 
     @Override

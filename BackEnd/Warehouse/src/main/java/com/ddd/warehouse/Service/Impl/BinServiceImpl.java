@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -81,39 +82,37 @@ public class BinServiceImpl implements BinService {
 
     @Override
     @Transactional
-    public void updateCurrentOccupancy(String binId, Integer occupancyChange) {
+    public void updateCurrentOccupancy(String binId, BigDecimal occupancyChange) {
         Bins bin = getById(binId);
 
-        Integer newOccupancy = bin.getCurrentOccupancy() + occupancyChange;
+        BigDecimal newOccupancy = bin.getCurrentOccupancy().add(occupancyChange);
+
 
         // Validate không âm
-        if (newOccupancy < 0) {
+        if (newOccupancy.compareTo(BigDecimal.ZERO) < 0) {
             throw new AppException(ErrorCode.INVALID_OCCUPANCY);
         }
 
-        // Thêm validation không vượt quá capacity
-        if (newOccupancy > bin.getCapacity()) {
-            throw new AppException(ErrorCode.BIN_CAPACITY_EXCEEDED);
-        }
 
         bin.setCurrentOccupancy(newOccupancy);
 
-        // Cập nhật status dựa trên occupancy
-        if (newOccupancy == 0) {
+// Cập nhật status dựa trên occupancy với BigDecimal
+        if (newOccupancy.compareTo(BigDecimal.ZERO) == 0) {
             bin.setStatus(BinStatus.EMPTY);
-        } else if (newOccupancy >= bin.getCapacity()) {
+        } else if (newOccupancy.compareTo(bin.getCapacity()) >= 0) {
             bin.setStatus(BinStatus.FULL);
         } else {
             bin.setStatus(BinStatus.AVAILABLE);
         }
 
         binRepo.save(bin);
+
     }
 
     @Override
     public void resetCurrentOccupancy(String binId) {
         Bins bin = getById(binId);
-        bin.setCurrentOccupancy(0);
+        bin.setCurrentOccupancy(BigDecimal.ZERO);
         bin.setStatus(BinStatus.EMPTY);
         binRepo.save(bin);
     }
@@ -137,21 +136,11 @@ public class BinServiceImpl implements BinService {
         Stacks stack = stackService.getById(BinRequest.stack());
         String binCode = BinRequest.binCode();
         Warehouses warehouses=warehouseRepo.getById(BinRequest.warehouse());
-//        if (exsistByBinCode(BinRequest.binCode(), BinRequest.stack(), BinRequest.warehouse())) {
-//            Optional<Bins> exsisting= Optional.ofNullable(
-//                    getByBinCode(binCode,stack.getStackName(),warehouses.getWarehouseId()));
-//            Bins bin=exsisting.get();
-//            if(bin.getIsDeleted()){
-//                bin.setCapacity(bin.getCapacity());
-//                bin.setIsDeleted(false);
-//                return binMapper.toResponse(binRepo.save(bin));
-//            }
-//        }
         Bins bin= binMapper.toEntity(BinRequest);
         bin.setStatus(BinStatus.EMPTY);
         bin.setBinCode(binCode);
         bin.setStack(stack);
-        bin.setCurrentOccupancy(0);
+        bin.setCurrentOccupancy(BigDecimal.ZERO);
         bin.setWarehouse(warehouses);
         bin.setIsDeleted(false);
         return binMapper.toDto(binRepo.save(bin));

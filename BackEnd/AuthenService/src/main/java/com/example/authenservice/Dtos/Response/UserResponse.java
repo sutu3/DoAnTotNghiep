@@ -21,8 +21,6 @@ import java.util.Set;
 public class UserResponse {
     String idUser;
     String username;
-    String password;
     String email;
     Set<RoleResponse> roles;
-
 }

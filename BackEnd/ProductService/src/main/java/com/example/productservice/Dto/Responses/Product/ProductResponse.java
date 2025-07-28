@@ -26,6 +26,7 @@ public class ProductResponse{
     String sku;
     String description;
     String urlImageProduct;
+    BigDecimal quantity;
     BigDecimal price;
     SupplierResponse supplier;
     UserResponse createByUser;

@@ -1,5 +1,6 @@
 package com.example.userservice.Dto.Responses.User;
 
+import com.example.userservice.Client.Authen.Dto.Response.RoleResponse;
 import com.example.userservice.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.userservice.Dto.Responses.TaskUser.TaskUserResponseNoList;
 import com.example.userservice.Enum.StatusEnum;
@@ -8,6 +9,8 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+
 @Builder
 @Data
 @NoArgsConstructor
@@ -22,6 +25,7 @@ public class UserResponse{
     String phoneNumber;
     StatusEnum status;
     List<TaskUserResponseNoList> taskUsers;
+    Set<RoleResponse> roles;
     WarehousesResponse warehouses;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

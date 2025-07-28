@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -24,7 +25,7 @@ public class InventoryWarehouseResponse {
     String product;
     String warehouse;
     String bin;
-    Integer quantity;
+    BigDecimal quantity;
     LocalDate expiryDate;
     String status;
     LocalDateTime createdAt;

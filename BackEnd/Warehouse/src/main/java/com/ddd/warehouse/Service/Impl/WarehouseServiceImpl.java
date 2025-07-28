@@ -26,8 +26,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,10 +95,8 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    @PreAuthorize("hasRole('MANAGER')")
     public WarehousesResponse createWarehouse(WarehousesRequest request) {
-        if(exsistByManagerId(request.managerId())){
-            throw new AppException(ErrorCode.WAREHOUSE_EXIST);
-        }
         Warehouses warehouses=warehouseMapper.toEntity(request);
         warehouses.setIsDeleted(false);
         return warehouseMapper.toResponse(warehouseRepo.save(warehouses));
@@ -144,15 +144,15 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .filter(bin -> bin.getStatus() == BinStatus.EMPTY)
                 .count();
 
-        Integer totalCapacity = allBins.stream()
-                .mapToInt(Bins::getCapacity)
-                .sum();
+        // Nếu sử dụng BigDecimal trong entity
+        BigDecimal totalCapacity = allBins.stream()
+                .map(bin -> bin.getCapacity())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Thêm validation để đảm bảo usedCapacity không vượt quá totalCapacity
-        Integer usedCapacity = allBins.stream()
-                .mapToInt(bin -> Math.min(bin.getCurrentOccupancy(), bin.getCapacity()))
-                .sum();
-
+        BigDecimal usedCapacity = allBins.stream()
+                .map(bin -> bin.getCurrentOccupancy().min(bin.getCapacity()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         Integer utilizationPercentage = totalBins > 0 ?
                 Math.round((float) occupiedBins / totalBins * 100) : 0;
 

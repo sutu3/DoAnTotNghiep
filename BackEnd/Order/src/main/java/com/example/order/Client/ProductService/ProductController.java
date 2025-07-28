@@ -24,7 +24,5 @@ public interface ProductController {
     @GetMapping(value = "/units/{unitId}", consumes = "application/json")
     ApiResponse<UnitNameResponse> getUnitById( @PathVariable String unitId);
 
-
-
 }
 

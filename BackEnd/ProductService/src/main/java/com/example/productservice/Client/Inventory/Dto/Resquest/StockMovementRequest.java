@@ -9,7 +9,7 @@ public record StockMovementRequest(
         String inventoryWarehouseId,
         String product,
         String movementType,
-        Integer quantity,
+        BigDecimal quantity,
         String referenceOrderId,
         String performedBy,
         String note,

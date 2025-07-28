@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
@@ -15,8 +16,8 @@ import java.time.LocalDateTime;
 public class BinResponse{
     String binId;
     String binCode;
-    Integer capacity;
-    Integer currentOccupancy;
+    BigDecimal capacity;
+    BigDecimal currentOccupancy;
     String status;
 
 }

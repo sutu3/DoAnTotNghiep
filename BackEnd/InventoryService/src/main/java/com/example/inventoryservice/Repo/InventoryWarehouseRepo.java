@@ -45,7 +45,7 @@ public interface InventoryWarehouseRepo extends JpaRepository<InventoryWarehouse
 
     // Tính tổng số lượng theo product và warehouse
     @Query("SELECT COALESCE(SUM(iw.quantity), 0) FROM InventoryWarehouse iw WHERE iw.product = :product AND iw.warehouse = :warehouse AND iw.isDeleted = false")
-    Integer sumQuantityByProductAndWarehouse(@Param("product") String product, @Param("warehouse") String warehouse);
+    BigDecimal sumQuantityByProductAndWarehouse(@Param("product") String product, @Param("warehouse") String warehouse);
 
     // Kiểm tra bin có trống không
     @Query("SELECT CASE WHEN COUNT(iw) > 0 THEN false ELSE true END FROM InventoryWarehouse iw WHERE iw.bin = :bin AND iw.quantity > 0 AND iw.isDeleted = false")

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -21,7 +22,7 @@ public interface BinService {
     BinResponse getByBinCodeResponse(String BinName,String stackName,String warehouseId);
     Bins getByBinCode(String BinName,String stackName,String warehouseId);
     Boolean exsistByBinCode(String BinName,String stackName,String warehouseId);
-    void updateCurrentOccupancy(String binId, Integer occupancyChange);
+    void updateCurrentOccupancy(String binId, BigDecimal occupancyChange);
     void resetCurrentOccupancy(String binId);
     Bins getById(String BinId);
     BinResponse getByIdResponse(String BinId);

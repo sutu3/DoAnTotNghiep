@@ -46,14 +46,33 @@ public class ImportOrderController {
                 .success(true)
                 .build();
     }
+    @PutMapping("/{orderId}/mark-goods-arrived")
+    public ApiResponse<ImportOrderResponse> markGoodsArrived(@PathVariable String orderId) {
+        return ApiResponse.<ImportOrderResponse>builder()
+                .Result(importOrderService.markGoodsArrived(orderId))
+                .code(0)
+                .message("Goods marked as arrived")
+                .success(true)
+                .build();
+    }
+
+    @GetMapping("/ready-for-receipt/warehouse/{warehouseId}")
+    public ApiResponse<List<ImportOrderResponse>> getOrdersReadyForReceipt(@PathVariable String warehouseId) {
+        return ApiResponse.<List<ImportOrderResponse>>builder()
+                .Result(importOrderService.getOrdersReadyForReceipt(warehouseId))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
 
     // GET - Lấy orders theo status
-    @GetMapping("/search/warehouse/{warehouseId}/status/{status}")
+    @GetMapping("/search/getAllPage")
     public ApiResponse<Page<ImportOrderResponse>> getAllByStatus(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String warehouseId,
             @RequestParam("pageNumber") int page,
-            @RequestParam("pageSize") int size,
-            @PathVariable String warehouseId,
-            @PathVariable String status
+            @RequestParam("pageSize") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         return ApiResponse.<Page<ImportOrderResponse>>builder()
