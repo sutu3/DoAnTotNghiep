@@ -1,6 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {Bin} from "@/Store/StackSlice.tsx";
 import {Product} from "@/Store/ProductSlice.tsx";
+import {Warehouse} from "@/Store/WarehouseSlice.tsx";
 
 export interface InventoryWarehouse {
     inventoryWarehouseId: string;
@@ -10,6 +11,7 @@ export interface InventoryWarehouse {
     expiryDate?: string;
     unitCost?: number;
     inventoryProduct:InventoryProduct;
+    warehouseDetails:Warehouse;
     status: "AVAILABLE" | "QUARANTINE" | "RESERVED"|"EXPIRED";
     createdAt: Date | null;
     updatedAt: Date | null;
@@ -22,6 +24,16 @@ export interface InventoryProduct{
     lastImportDate:string;
     lastExportDate:string;
     status:string;
+    productDetails:Product;
+    warehouseDetails:Warehouse;
+}
+export interface InventoryProductCreate{
+    product:string,
+    warehouse:string,
+    totalQuantity:number,
+    minStockLevel:number,
+    maxStockLevel:number,
+    status:string
 }
 export interface InventoryWarehouseCreate {
     product: string;

@@ -9,21 +9,19 @@ import {useDispatch, useSelector} from "react-redux";
 import {StacksSelector} from "@/Store/Selector.tsx";
 
 interface LocationSelectionModalProps {
-    warehouse: string;
+    warehouseId: string;
     isOpen: boolean;
     onClose: () => void;
     selectedItem: any;
     onConfirmLocation: (stackId: string, binId: string) => void;
-    warehouseId: string;
 }
 
 export default function LocationSelectionModal({
-    warehouse,
+    warehouseId,
                                                    isOpen,
                                                    onClose,
                                                    selectedItem,
                                                    onConfirmLocation,
-                                                   warehouseId
                                                }: LocationSelectionModalProps) {
     const stackBinData=useSelector(StacksSelector);
     const dispatch = useDispatch();
@@ -33,7 +31,7 @@ export default function LocationSelectionModal({
     useEffect(() => {
         if (isOpen && warehouseId) {
             const fetchData = async () => {
-                await (dispatch as any)(MiddleGetAllStackList(warehouse));
+                await (dispatch as any)(MiddleGetAllStackList(warehouseId));
             };
             fetchData();
         }
@@ -57,7 +55,7 @@ export default function LocationSelectionModal({
             <ModalContent>
                 <ModalHeader>
                     <div className="flex items-center gap-3">
-                        <Icon icon="mdi:warehouse" className="text-2xl text-blue-600" />
+                        <Icon icon="mdi:warehouseId" className="text-2xl text-blue-600" />
                         <div>
                             <h3 className="text-xl font-bold">Chọn Vị Trí Lưu Trữ</h3>
                             <p className="text-sm text-gray-600">{selectedItem?.productName}</p>

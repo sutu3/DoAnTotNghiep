@@ -33,7 +33,6 @@ const WarehouseTable: React.FC<WarehouseTableProps> = ({loading,
         { key: "address", label: "Địa chỉ" },
         { key: "capacity", label: "Sức chứa" },
         { key: "currentStock", label: "Tồn kho hiện tại" },
-        { key: "manager", label: "Quản lý" },
         { key: "status", label: "Trạng thái" },
         { key: "createdAt", label: "Ngày tạo" }
     ];

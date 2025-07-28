@@ -53,6 +53,22 @@ export const API_ROUTES = {
         })
       }
     },
+    InventoryProduct:(page:pageApi|null)=>{
+      const base=`${TestGateWay}/inventories/api/inventory/products`
+      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      return{
+        search:(()=>{
+          const search=base+"/search";
+          return{
+            byProductId:(productId:string)=>({
+              getProduct:`${search}/product/${productId}/getFirst`,
+              getAll:`${search}/product/${productId}`,
+            }),
+
+          }
+        })
+      }
+    },
     movements:(page:pageApi|null)=>{
       const base=`${TestGateWay}/inventories/api/inventory/movements`
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
@@ -80,6 +96,7 @@ export const API_ROUTES = {
       return {
         getAll: `${base}${pageUrl}`,
         lowStock: `${base}/low-stock`,
+        batch:(productId:string)=>`${base}/batch/${productId}`,
         search: {
           byWarehouse: (warehouseId: string) => ({
             getAll: `${base}/search/warehouse/${warehouseId}${pageUrl}`,
@@ -133,25 +150,48 @@ export const API_ROUTES = {
         },
       }
     },
+    receiptWarehouse:(page: pageApi | null)=>{
+      const base = `${TestGateWay}/orders/api/warehouse-receipts`;
+      return{
+        addReceipt:base,
+        getByReceiptId:(receiptId:string)=>base+"/"+receiptId,
+        updateComplete:(receiptId:string)=>base+`/${receiptId}/complete`,
+        updateItem:(receiptId:string,receiptItemId:string)=>base+`/${receiptId}/items/${receiptItemId}`,
+        search:()=>{
+          const search=base+"/search";
+          return {
+            byWarehouseId:(warehouseId:string)=>search+"/warehouse/"+warehouseId,
+          }
+        }
+      }
+    },
     importOrder:(page: pageApi | null)=>{
       const base = `${TestGateWay}/orders/api/importOrders`;
-      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      const pageUrl = page ? `pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
       return {
+        readyForReceipt:(warehouseId:string)=>`${base}/ready-for-receipt/warehouse/${warehouseId}`,
         addOrderImport:base,
         changeStatus:(orderId: string) => {
           return{
             approve:`${base}/${orderId}/approve`,
             reject:`${base}/${orderId}/reject`,
             ChangeStatus:`${base}/${orderId}/status`,
+            markGoodsArrived:`${base}/${orderId}/mark-goods-arrived`,
           }
         },
         search:(()=>{
           const search=base+"/search";
           return{
-            byWarehouseId:(warehouseId: string,status:string|null)=>({
-              getAll: `${search}/warehouse/${warehouseId}${pageUrl}`,
-              byStatus:`${search}/warehouse/${warehouseId}/status/${status}${pageUrl}`,
-            })
+            byWarehouseId:(warehouseId: string|null,status:string|null)=>{
+              const params: string[] = [];
+              if (warehouseId) params.push(`warehouseId=${warehouseId}`);
+              if (status) params.push(`status=${status}`);
+              const url = search+"/getAllPage" + "?" + params.join("&");
+              return {
+                byStatus: url.slice(0,url.length)+"&"+pageUrl,
+                getAll: `${search}/warehouse/${warehouseId}?${pageUrl}`,
+              };
+            }
           }
         })
       }
@@ -233,9 +273,11 @@ export const API_ROUTES = {
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
     return{
       addProduct: base,
+      deleteProduct:(productId:string)=>base+"/"+productId,
       search:(()=>{
         const search=base+"/search";
         return{
+          byProduct:(productId:string)=>`${search}/productId/${productId}`,
           byWarehouseId: () => ({
             getAll: `${search}/productPage${pageUrl}`,
           }),
@@ -306,6 +348,8 @@ export const API_ROUTES = {
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
       return{
         addSupplier: base,
+        updateSupplier:(supplierId:string)=>base+"/update/"+supplierId,
+        deleteSupplier:(supplierId:string)=>base+"/delete/"+supplierId,
         search:(()=>{
           const searchUrl = `${base}/search`;
           return {
@@ -332,6 +376,9 @@ export const API_ROUTES = {
           byUserName: (username: string) => ({
             getAll: `${searchUrl}/userName/${username}${pageUrl}`,
           }),
+          byUserId: (userId: string) => ({
+            role:`${searchUrl}/user/${userId}/roles`
+          })
         };
       })(),
     };
@@ -363,6 +410,7 @@ export const API_ROUTES = {
           const searchUrl = `${base}/search`;
           return {
             byTask:(taskId: string) => searchUrl+"/tasks/"+taskId,
+            byUser:()=>searchUrl+`/users`+pageUrl
           }
         }
       };

@@ -48,7 +48,7 @@ export interface ImportOrder {
     description: string;
     itemCount: number,
     totalPrice: number,
-    status: "Created" | "InProgress" | "Completed" | "Cancel";
+    status: "Created" | "InProgress" | "Completed" | "Cancel"|"Goods_Arrived"|"Done";
     type: "Request" | "Accept";
     requestDate: string;
     accessDate?: string;
@@ -79,7 +79,8 @@ const OrderImportSlice = createSlice({
             state.totalPage = action.payload || 0;
         },
         setOrderImportList: (state, action) => {
-            state.orderImport = action.payload;
+
+            state.orderImport =  action.payload || 0;
         },
         setOrderImportItemList: (state, action) => {
             state.orderItem = action.payload;

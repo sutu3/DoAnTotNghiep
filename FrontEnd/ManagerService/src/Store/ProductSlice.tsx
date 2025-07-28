@@ -56,8 +56,12 @@ const ProductSlice = createSlice({
         },
         setAddProduct: (state, action) => {
             state.products = [...state.products, action.payload];
+        },
+        setRemoveProduct: (state, action) => {
+            state.products=state.products.filter((
+                product:Product) => product.productId != action.payload);
         }
     },
 });
-export const {initToTalPage,setProductList, setAddProduct} = ProductSlice.actions;
+export const {initToTalPage,setProductList, setAddProduct,setRemoveProduct} = ProductSlice.actions;
 export default ProductSlice;

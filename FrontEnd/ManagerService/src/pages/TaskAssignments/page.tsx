@@ -58,7 +58,6 @@ const TaskAssignmentsPage = () => {
     };
 
     const handleEditStart = (taskType: TaskType) => {
-        console.log(taskType.taskTypeId)
         setEditingId(taskType.taskTypeId);
         setEditingName(taskType.taskName);
     };

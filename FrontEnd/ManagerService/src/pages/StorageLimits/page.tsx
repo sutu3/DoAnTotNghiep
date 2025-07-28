@@ -12,7 +12,7 @@ const StorageLimitsPage = () => {
     const [warehouseFilter, setWarehouseFilter] = useState("");
 
     // Sử dụng API data thay vì stacks từ Redux
-    const { data: storageData, loading,error } = useStorageStats(warehouseFilter, timeFilter);
+    const { data: storageData, loading } = useStorageStats(warehouseFilter, timeFilter);
 
 
 

@@ -12,6 +12,8 @@ import CategorySelect from "@/components/Admin/Product/Select/CategorySelect.tsx
 import SupplierSelect from "@/components/Admin/Product/Select/SupplierSelect.tsx";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux';
+import {MiddleUploadImage, UploadResponse} from "@/Store/Thunk/UploadThunk.tsx";
+import {MiddleUpdateProduct} from "@/Store/Thunk/ProductThunk.tsx";
 
 interface Props {
     formData: ProductCreate;
@@ -35,9 +37,14 @@ export default function ProductEditForm({ formData, setFormData, productId }: Pr
         setLoading(true);
 
         try {
-            // API call để update sản phẩm
-            // Sử dụng pattern tương tự như MiddleAddProduct nhưng cho update
-            const updateData = {
+            let imageUrl = product?.urlImageProduct;
+
+            if (formData?.urlImageProduct != product?.urlImageProduct) {
+                const imageResponse: UploadResponse = await (dispatch as any)(MiddleUploadImage());
+                imageUrl = imageResponse?.urlImage || imageUrl;
+            }
+
+            const updateData: ProductCreate = {
                 ...formData,
                 productName: product.productName,
                 description: product.description,
@@ -45,12 +52,13 @@ export default function ProductEditForm({ formData, setFormData, productId }: Pr
                 sku: product.sku,
                 maxStockLevel: product.maxStockLevel,
                 minStockLevel: product.minStockLevel,
+                urlImageProduct: imageUrl,
             };
 
-            // await (dispatch as any)(MiddleUpdateProduct(productId, updateData));
+            await (dispatch as any)(MiddleUpdateProduct(productId || "", updateData));
             navigate("/admin/products");
         } catch (error) {
-            console.error('Update failed:', error);
+            console.error("Update failed:", error);
         } finally {
             setLoading(false);
         }

@@ -1,27 +1,69 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Card,
     CardBody,
     Avatar,
     Chip,
     Button,
-    Divider
+    Divider,
+    Select,
+    SelectItem
 } from "@heroui/react";
 import {
     Mail,
     Phone,
-    Calendar,
     Trash2,
     User as UserIcon,
     Building2,
-    Clock
+    Edit3,
+    Check,
+    X
 } from "lucide-react";
 
 interface UserThumbnailProps {
     user: any;
+    onRoleUpdate?: (userId: string, newRoles: string[]) => void; // Thay đổi để nhận array
 }
 
-const UserThumbnail: React.FC<UserThumbnailProps> = ({ user }) => {
+const UserThumbnail: React.FC<UserThumbnailProps> = ({ user, onRoleUpdate }) => {
+    const [isEditingRole, setIsEditingRole] = useState(false);
+    const [tempRoles, setTempRoles] = useState<string[]>([]); // Thay đổi thành array
+
+    const roles = [
+        { key: "MANAGER", label: "Quản lý", color: "primary" },
+        { key: "STAFF", label: "Nhân viên", color: "success" },
+    ];
+
+    const handleRoleEdit = () => {
+        // Lấy tất cả roles hiện tại
+        const currentRoles = user.roles?.map((role: any) => role.roleName) || [];
+        setTempRoles(currentRoles);
+        setIsEditingRole(true);
+    };
+
+    const handleRoleSave = () => {
+        if (onRoleUpdate && tempRoles.length > 0) {
+            onRoleUpdate(user.userId, tempRoles);
+        }
+        setIsEditingRole(false);
+        setTempRoles([]);
+    };
+
+    const handleRoleCancel = () => {
+        setIsEditingRole(false);
+        setTempRoles([]);
+    };
+
+    const getRoleColor = (roleName: string) => {
+        const role = roles.find(r => r.key === roleName);
+        return role?.color || "default";
+    };
+
+    const getRoleLabel = (roleName: string) => {
+        const role = roles.find(r => r.key === roleName);
+        return role?.label || roleName;
+    };
+
     if (!user) {
         return (
             <Card className="h-full min-h-[600px]">
@@ -39,6 +81,8 @@ const UserThumbnail: React.FC<UserThumbnailProps> = ({ user }) => {
             </Card>
         );
     }
+
+    const currentRoles = user.roles || [];
 
     return (
         <Card className="h-full">
@@ -73,6 +117,7 @@ const UserThumbnail: React.FC<UserThumbnailProps> = ({ user }) => {
 
                 {/* Thông tin chi tiết */}
                 <div className="space-y-5">
+                    {/* Các field khác giữ nguyên */}
                     <div className="flex items-start gap-3">
                         <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
                             <Mail className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -83,7 +128,7 @@ const UserThumbnail: React.FC<UserThumbnailProps> = ({ user }) => {
                             </p>
                             <p className="text-sm font-medium text-gray-800 dark:text-white break-all">
                                 {user.email}
-                            </p >
+                            </p>
                         </div>
                     </div>
 
@@ -101,6 +146,123 @@ const UserThumbnail: React.FC<UserThumbnailProps> = ({ user }) => {
                         </div>
                     </div>
 
+                    {/* Multi-Role Section */}
+                    <div className="flex items-start gap-3">
+                        <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
+                            <UserIcon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                        </div>
+                        <div className="flex-1">
+                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                                Vai trò
+                            </p>
+                            {isEditingRole ? (
+                                <div className="space-y-3">
+                                    <Select
+                                        label="Chọn vai trò"
+                                        placeholder="Chọn các vai trò"
+                                        selectionMode="multiple"
+                                        selectedKeys={new Set(tempRoles)}
+                                        onSelectionChange={(keys) => {
+                                            const selectedRoles = Array.from(keys) as string[];
+                                            setTempRoles(selectedRoles);
+                                        }}
+                                        classNames={{
+                                            trigger: "min-h-12",
+                                            label: "text-gray-700 dark:text-gray-300",
+                                            value: "text-gray-800 dark:text-white"
+                                        }}
+                                        renderValue={(items) => (
+                                            <div className="flex flex-wrap gap-2">
+                                                {items.map((item) => (
+                                                    <Chip
+                                                        key={item.key}
+                                                        color="primary"
+                                                        variant="flat"
+                                                        size="sm"
+                                                        className="text-xs"
+                                                    >
+                                                        {item.textValue}
+                                                    </Chip>
+                                                ))}
+                                            </div>
+                                        )}
+                                    >
+                                        {roles.map((role) => (
+                                            <SelectItem
+                                                key={role.key}
+                                                value={role.key}
+                                                textValue={role.label}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <UserIcon className="w-4 h-4 text-indigo-600" />
+                                                    <span>{role.label}</span>
+                                                </div>
+                                            </SelectItem>
+                                        ))}
+                                    </Select>
+
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            size="sm"
+                                            color="success"
+                                            variant="flat"
+                                            onClick={handleRoleSave}
+                                            startContent={<Check className="w-3 h-3" />}
+                                        >
+                                            Lưu
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            color="danger"
+                                            variant="flat"
+                                            onClick={handleRoleCancel}
+                                            startContent={<X className="w-3 h-3" />}
+                                        >
+                                            Hủy
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-x-2 flex flex-row ">
+                                    <div className="flex-wrap gap-2">
+                                        {currentRoles.length > 0 ? (
+                                            currentRoles.map((role: any, index: number) => (
+                                                <Chip
+                                                    key={index}
+                                                    size="sm"
+                                                    color={getRoleColor(role.roleName)}
+                                                    variant="flat"
+                                                    className="capitalize w-[15px]"
+                                                >
+                                                    {getRoleLabel(role.roleName)}
+                                                </Chip>
+                                            ))
+                                        ) : (
+                                            <Chip
+                                                size="sm"
+                                                color="default"
+                                                variant="flat"
+                                            >
+                                                Chưa có vai trò
+                                            </Chip>
+                                        )}
+                                    </div>
+                                    {user.email !== "admin@gmail.com" && (
+                                        <Button
+                                            size="sm"
+                                            variant="light"
+                                            onClick={handleRoleEdit}
+                                            startContent={<Edit3 className="w-3 h-3" />}
+                                        >
+                                            Chỉnh sửa vai trò
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Các field khác giữ nguyên */}
                     <div className="flex items-start gap-3">
                         <div className="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
                             <Building2 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
@@ -114,51 +276,14 @@ const UserThumbnail: React.FC<UserThumbnailProps> = ({ user }) => {
                             </p>
                         </div>
                     </div>
-
-                    <div className="flex items-start gap-3">
-                        <div className="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-lg">
-                            <Calendar className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                        </div>
-                        <div className="flex-1">
-                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                                Ngày tạo
-                            </p>
-                            <p className="text-sm font-medium text-gray-800 dark:text-white">
-                                {user.createdAt ? new Date(user.createdAt).toLocaleDateString("vi-VN") : "N/A"}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                        <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <Clock className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                        </div>
-                        <div className="flex-1">
-                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                                Cập nhật lần cuối
-                            </p>
-                            <p className="text-sm font-medium text-gray-800 dark:text-white">
-                                {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString("vi-VN") : "N/A"}
-                            </p>
-                        </div>
-                    </div>
                 </div>
 
                 <Divider className="my-6" />
 
                 {/* Action buttons */}
                 <div className="flex gap-2">
-                    {/*<Button*/}
-                    {/*    color="primary"*/}
-                    {/*    variant="flat"*/}
-                    {/*    size="sm"*/}
-                    {/*    startContent={<Edit className="w-4 h-4" />}*/}
-                    {/*    className="flex-1"*/}
-                    {/*>*/}
-                    {/*    Chỉnh sửa*/}
-                    {/*</Button>*/}
-                    {
-                        user.email!="admin@gmail.com"&&<Button
+                    {user.email !== "admin@gmail.com" && (
+                        <Button
                             color="danger"
                             variant="flat"
                             size="sm"
@@ -167,8 +292,7 @@ const UserThumbnail: React.FC<UserThumbnailProps> = ({ user }) => {
                         >
                             Xóa
                         </Button>
-                    }
-
+                    )}
                 </div>
             </CardBody>
         </Card>

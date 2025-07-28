@@ -14,12 +14,14 @@ import {API_ROUTES} from "@/Api/UrlApi.tsx";
 import {Warehouse} from "@/Store/WarehouseSlice.tsx";
 import {fetchApi} from "@/Api/FetchApi.tsx";
 import {ApiResponse} from "@/types";
+import {useStockLevel} from "@/Hooks/useNearFullStacks.tsx";
+import {InventoryProduct} from "@/Store/InventoryWarehouseSlice.tsx";
 
 const EditProductPage = () => {
     const [searchParams] = useSearchParams();
-    const { product,setProduct } = useProductStore();
-
+    const { setProduct } = useProductStore();
     const productId = searchParams.get("productId");
+    const {data } = useStockLevel(productId);
     const productSelect:Product[]=useSelector(ProductSelector);
     const [linkedWarehouses,setLinkedWarehouses]=useState<Warehouse[]>([]);
     const [formData, setFormData] = useState<ProductCreate>({
@@ -42,18 +44,18 @@ const EditProductPage = () => {
             loadProductData(productId);
             loadLinkedWarehouses(productId);
         }
-    }, [productId]);
+    }, [productId,data]);
 
     const loadProductData = async (id: string) => {
         if(productSelect.length!=0){
             const productFilter=productSelect.find((el:Product)=>el.productId==id)
-            if(productFilter){
-                console.log(productFilter)
+            if(productFilter&&data){
+                console.log(data.maxStockLevel)
                 setFormData({
                     category: productFilter?.category?.categoryId,
                     description: productFilter?.description,
-                    maxStockLevel: 0,
-                    minStockLevel: 0,
+                    maxStockLevel: data.maxStockLevel,
+                    minStockLevel: data.minStockLevel,
                     price: productFilter?.price,
                     productName: productFilter?.productName,
                     sku: productFilter?.sku,
@@ -64,8 +66,8 @@ const EditProductPage = () => {
                 setProduct({
                     category: productFilter?.category?.categoryName,
                     description: productFilter?.description,
-                    maxStockLevel: 0,
-                    minStockLevel: 0,
+                    maxStockLevel: data.maxStockLevel,
+                    minStockLevel: data.minStockLevel,
                     price: productFilter?.price,
                     productName: productFilter?.productName,
                     sku: productFilter?.sku,
@@ -82,11 +84,11 @@ const EditProductPage = () => {
     const loadLinkedWarehouses = async (id: string) => {
         const getLinkedWarehouses = async (productId: string) => {
             try {
-                const response:ApiResponse<Warehouse[]> = await fetchApi({method:"GET",url:API_ROUTES.inventory.InventoryWarehouse(null).search().byProductId(productId).getProduct,body:undefined,headers:undefined});
+                const response:ApiResponse<InventoryProduct[]> = await fetchApi({method:"GET",url:API_ROUTES.inventory.InventoryProduct(null).search().byProductId(productId).getAll,body:undefined,headers:undefined});
                 const data = response.result;
 
                 // Extract unique warehouse IDs from the response
-                const warehouseIds:Warehouse[] = data.map((item: any) => item.warehouseDetails);
+                const warehouseIds:Warehouse[] = data.map((item: InventoryProduct) => item.warehouseDetails);
                 return [...new Set(warehouseIds)]; // Remove duplicates
             } catch (error) {
                 console.error('Failed to load linked warehouses:', error);

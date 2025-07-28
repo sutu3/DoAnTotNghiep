@@ -3,10 +3,10 @@ import { useNavigate, useSearchParams} from 'react-router-dom';
 import {Card, CardBody, CardHeader, Button, Input, Progress, Divider, Badge,} from '@heroui/react';
 import { ArrowLeft, Package, MapPin, Hash } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { MiddleGetAllOrderItem, MiddleImportOrder } from '@/Store/Thunk/ImportOrderThunk';
+import { MiddleGetAllOrderItem, MiddleImportOrder } from '@/pages/ExecuteImport/Store/ImportOrderThunk.tsx';
 import {OrderItemSelector, StacksSelector} from '@/Store/Selector';
 import LocationSelectionModal from "@/components/Staff/ExecuteImport/Modal/LocationSelectionModal.tsx";
-import {ImportOrderItem} from "@/Store/ImportOrder.tsx";
+import {ImportOrderItem} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import {Bin, StackType} from "@/Store/StackSlice.tsx";
 
 const ImportOrderDetailsPage = () => {

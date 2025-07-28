@@ -19,7 +19,8 @@ export default function AddNewSupplierPage() {
         setLoading(true);
         const imageResponse:UploadResponse=await (dispatch as any)(MiddleUploadImage());
         setSupplier({urlSupplier:imageResponse.urlImage})
-        await (dispatch as any)(MiddleAddSupplier(supplier));
+        const newSupplier={...supplier,urlSupplier:imageResponse?.urlImage};
+        await (dispatch as any)(MiddleAddSupplier(newSupplier));
 
         await new Promise(resolve => setTimeout(resolve, 2000));
         navigate("/admin/suppliers");

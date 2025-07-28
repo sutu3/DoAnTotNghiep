@@ -6,6 +6,7 @@ import SelectWarehouse from "@/components/Admin/User/SelectWarehouse.tsx";
 import {UserCreate} from "@/Store/UserSlice.tsx";
 
 interface UserTableSectionProps {
+    loading:boolean
     formData:UserCreate,
     onFormChange: (key: string, value: string) => void;
     selectedUser: any | null;
@@ -18,7 +19,7 @@ interface UserTableSectionProps {
     onPageChange: (page: number) => void;
 }
 
-export const UserTableSection: React.FC<UserTableSectionProps> = ({formData,onFormChange,
+export const UserTableSection: React.FC<UserTableSectionProps> = ({loading,formData,onFormChange,
                                                                       selectedUser,
                                                                       onUserClick,
                                                                       onOpenModal,
@@ -57,13 +58,13 @@ export const UserTableSection: React.FC<UserTableSectionProps> = ({formData,onFo
 
             <div className="p-6">
                 <UserTable
+                    loading={loading}
                     users={users}
                     onUserSelect={onUserClick}
                     selectedUserId={selectedUser?.userId}
                     totalPage={totalPage}
                     currentPage={currentPage}
-                    onPageChange={onPageChange}
-                />
+                    onPageChange={onPageChange}  />
             </div>
         </div>
     );

@@ -13,6 +13,9 @@ import { Icon } from '@iconify/react';
 import {useDispatch, useSelector} from 'react-redux';
 import { MiddleGetWarehouseByUser} from "@/Store/Thunk/WarehouseThunk.tsx";
 import {warehouseListSelector} from "@/Store/Selector.tsx";
+import {MiddleAddLinkWarehouse} from "@/Store/Thunk/InventoryOverviewThunk.tsx";
+import {InventoryProductCreate} from "@/Store/InventoryWarehouseSlice.tsx";
+import {useProductStore} from "@/zustand/Product.tsx";
 
 interface Warehouse {
     warehouseId: string;
@@ -32,7 +35,7 @@ const ProductWarehouseManager: React.FC<Props> = ({
                                                       linkedWarehouses,
                                                       setLinkedWarehouses
                                                   }) => {
-    console.log(linkedWarehouses)
+    const { product } = useProductStore();
     const warehouseList:Warehouse[]=useSelector(warehouseListSelector)
     const [allWarehouses, setAllWarehouses] = useState<Warehouse[]>([]);
     const [searchValue, setSearchValue] = useState("");
@@ -79,6 +82,20 @@ const ProductWarehouseManager: React.FC<Props> = ({
         } finally {
             setLoading(false);
         }
+    };
+    const handleSubmit = async () => {
+        const inventoryProductCreate: InventoryProductCreate[] = linkedWarehouses.map(
+            (el: Warehouse) => ({
+                product: productId||"",
+                warehouse: el.warehouseId,
+                totalQuantity: 0,
+                minStockLevel: product.minStockLevel,
+                maxStockLevel: product.maxStockLevel,
+                status: "ACTIVE"
+            })
+        );
+
+        await (dispatch as any)(MiddleAddLinkWarehouse(inventoryProductCreate,productId||""));
     };
 
     const handleUnlinkWarehouse = async (warehouse: Warehouse) => {
@@ -231,10 +248,7 @@ const ProductWarehouseManager: React.FC<Props> = ({
                     color="success"
                     variant="flat"
                     startContent={<Icon icon="mdi:content-save" />}
-                    onClick={() => {
-                        // Save warehouse links
-                        console.log('Saving warehouse links:', linkedWarehouses);
-                    }}
+                    onClick={() => {handleSubmit()}}
                 >
                     Lưu thay đổi
                 </Button>

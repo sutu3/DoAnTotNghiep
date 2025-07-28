@@ -6,9 +6,9 @@ import ImportOrderTable from "@/components/Admin/OrderImport/Table/ImportOrderTa
 import {Icon} from "@iconify/react";
 import ImportOrderDetailModal from "@/components/Admin/OrderImport/Modal/ImportOrderDetailModal";
 import RejectReasonModal from "@/components/Admin/OrderImport/Modal/RejectReasonModal.tsx";
-import {ImportOrder, ImportOrderItem} from "@/Store/ImportOrder.tsx";
+import {ImportOrder, ImportOrderItem} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import ProductInventoryStatsModal from "@/components/Admin/OrderImport/Modal/ProductInventoryStatsModal.tsx";
-import {MiddleChangeTypeOrderItem} from "@/Store/Thunk/ImportOrderThunk.tsx";
+import {MiddleChangeTypeOrderItem, MiddleMarkGoodsArrived} from "@/pages/ExecuteImport/Store/ImportOrderThunk.tsx";
 import {useDispatch} from "react-redux";
 
 export interface BinLocation {
@@ -41,6 +41,14 @@ export default function AdminImportOrderManagement() {
     const isSidebarCollapsed = localStorage.getItem("theme") !== "light";
 
 
+    // Thêm handler mới
+    const handleMarkGoodsArrived = async (orderId: string) => {
+        try {
+            await (dispatch as any)(MiddleMarkGoodsArrived(orderId));
+        } catch (error) {
+            console.error("Error marking goods arrived:", error);
+        }
+    };
     const handleApprove = async (orderId: string) => {
         try {
             await (dispatch as any)(MiddleChangeTypeOrderItem(orderId,true,null));
@@ -99,6 +107,7 @@ export default function AdminImportOrderManagement() {
                         onDetailOpen();
                     }}
                     onApproveOrder={handleApprove}
+                    onMarkGoodsArrived={handleMarkGoodsArrived} // Thêm prop này
                     onRejectOrder={(order) => {
                         setSelectedOrder(order);
                         onRejectOpen();
@@ -110,6 +119,7 @@ export default function AdminImportOrderManagement() {
                     onClose={onDetailClose}
                     selectedOrder={selectedOrder}
                     onApprove={handleApprove}
+                    onMarkGoodsArrived={handleMarkGoodsArrived} // Thêm prop này
                     onReject={(order) => {
                         setSelectedOrder(order);
                         onRejectOpen();

@@ -13,6 +13,8 @@ import {
 } from "@/Store/InventoryOverView.tsx";
 import { showToast } from "@/components/UI/Toast/ToastUI";
 import { API_ROUTES } from "@/Api/UrlApi.tsx";
+import {InventoryProductCreate} from "@/Store/InventoryWarehouseSlice.tsx";
+import {OrderRequestImportCreate} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 
 export const GetLowStockProducts = createAsyncThunk(
     "inventory/getLowStock",
@@ -48,12 +50,24 @@ export const GetExpiringProducts = createAsyncThunk(
     async ({ date }: { date: string }, { rejectWithValue }) =>
         await callApiThunk(
             "GET",
-            `${API_ROUTES.inventory.InventoryWarehouse().expiring}?date=${date}`,
+            `${API_ROUTES.inventory.InventoryWarehouse(null).expiring}?date=${date}`,
             undefined,
             rejectWithValue
         )
 );
-
+export const AddInventoryProduct = createAsyncThunk(
+    "inventory/AddInventoryProduct",
+    async (
+        { payload,productId }: { payload: InventoryProductCreate[],productId:string },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "POST",
+            API_ROUTES.inventory.products(null).batch(productId),
+            payload,
+            rejectWithValue
+        )
+);
 export const MiddleGetExpiringProducts = (date: string) => {
     return async function (dispatch: any) {
         try {
@@ -70,7 +84,20 @@ export const MiddleGetExpiringProducts = (date: string) => {
         }
     };
 };
-
+export const MiddleAddLinkWarehouse = ( data: InventoryProductCreate[],productId:string ) => {
+    return async function (dispatch: any) {
+        try {
+            await dispatch(AddInventoryProduct({ payload:data,productId }));
+        } catch (error: any) {
+            dispatch(setExpiringError(error.message));
+            showToast({
+                title: "Error",
+                description: `Failed to load expiring products: ${error.message}`,
+                color: "danger",
+            });
+        }
+    };
+};
 // Get Recent Movements
 export const GetRecentMovements = createAsyncThunk(
     "inventory/getRecentMovements",

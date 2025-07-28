@@ -1,37 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Spinner } from "@heroui/react";
-import { Package, Calendar, AlertCircle } from "lucide-react";
+import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Spinner, Avatar } from "@heroui/react";
+import {Package, Calendar, AlertCircle, TrendingUp, MapPin, Warehouse} from "lucide-react";
 import {useDispatch, useSelector} from "react-redux";
 import { MiddleGetInventoryWarehouse} from "@/Store/Thunk/InventoryWarehouseThunk.tsx";
 import {InventoryWarehouseSelector} from "@/Store/Selector.tsx";
+import { InventoryWarehouse } from "@/Store/InventoryWarehouseSlice";
 
 interface ProductListProps {
     selectedBinId?: string;
     binCode?: string;
 }
 
-interface InventoryWarehouseItem {
-    inventoryWarehouseId: string;
-    product: string;
-    quantity: number;
-    expiryDate: string;
-    status: string;
-    productDetails?: {
-        productName: string;
-        productCode: string;
-        category: string;
-    };
-}
+
 
 export const ProductList: React.FC<ProductListProps> = ({
                                                             selectedBinId,
                                                             binCode
                                                         }) => {
     const [loading, setLoading] = useState(false);
-    const productsSelete: InventoryWarehouseItem[] = useSelector(InventoryWarehouseSelector) || [];
-    const products = productsSelete.length !== 0 ? productsSelete : [];
-    console.log(products)
+    const productsSelect: InventoryWarehouse[] = useSelector(InventoryWarehouseSelector) || [];
+    const products:InventoryWarehouse[] = productsSelect.length !== 0 ? productsSelect : [];
     const dispatch = useDispatch();
+
     useEffect(() => {
         if (selectedBinId) {
             fetchProductsByBin(selectedBinId);
@@ -41,8 +31,7 @@ export const ProductList: React.FC<ProductListProps> = ({
     const fetchProductsByBin = async (binId: string) => {
         setLoading(true);
         try {
-            // Gọi API InventoryWarehouse để lấy sản phẩm theo bin ID
-            await (dispatch as any)(MiddleGetInventoryWarehouse(binId))
+            await (dispatch as any)(MiddleGetInventoryWarehouse(binId));
         } catch (error) {
             console.error("Error fetching products:", error);
         } finally {
@@ -59,6 +48,12 @@ export const ProductList: React.FC<ProductListProps> = ({
         }
     };
 
+    const getStockLevelColor = (current: number, min: number, maxStockLevel: number) => {
+        if (current <= min) return "danger";
+        if (current <= min * 1.5) return "warning";
+        return "success";
+    };
+
     const isExpiringSoon = (expiryDate: string) => {
         const expiry = new Date(expiryDate);
         const today = new Date();
@@ -70,28 +65,69 @@ export const ProductList: React.FC<ProductListProps> = ({
     const columns = [
         { name: "Product", uid: "product" },
         { name: "Quantity", uid: "quantity" },
+        { name: "Stock Level", uid: "stockLevel" },
         { name: "Expiry Date", uid: "expiryDate" },
+        { name: "Bin Info", uid: "binInfo" },
         { name: "Status", uid: "status" }
     ];
 
-    const renderCell = (item: InventoryWarehouseItem, columnKey: string) => {
+    const renderCell = (item: InventoryWarehouse, columnKey: string) => {
         switch (columnKey) {
             case "product":
                 return (
-                    <div className="flex flex-col">
-                        <p className="text-bold text-sm">
-                            {item.productDetails?.productName || item.product}
-                        </p>
-                        <p className="text-bold text-sm text-default-400">
-                            {item.productDetails?.productCode}
-                        </p>
+                    <div className="flex items-center gap-3">
+                        <Avatar
+                            src={item.productDetails?.urlImageProduct}
+                            size="sm"
+                            fallback={<Package className="w-4 h-4" />}
+                            className="flex-shrink-0"
+                        />
+                        <div className="flex flex-col">
+                            <p className="text-bold text-sm">
+                                {item.productDetails?.productName}
+                            </p>
+                            <p className="text-xs text-default-400">
+                                SKU: {item.productDetails?.sku}
+                            </p>
+                            <p className="text-xs text-default-500">
+                                {item.productDetails?.price?.toLocaleString('vi-VN')} ₫/{item.productDetails?.unit?.shortName}
+                            </p>
+                        </div>
                     </div>
                 );
             case "quantity":
                 return (
-                    <div className="flex items-center gap-2">
-                        <Package className="w-4 h-4 text-gray-500" />
-                        <span className="text-bold text-sm">{item.quantity}</span>
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                            <Package className="w-4 h-4 text-gray-500" />
+                            <span className="text-bold text-sm">
+                                {item.quantity} {item.productDetails?.unit?.shortName}
+                            </span>
+                        </div>
+                        <div className="text-xs text-default-400">
+                            Total: {item.inventoryProduct?.totalQuantity} {item.productDetails?.unit?.shortName}
+                        </div>
+                    </div>
+                );
+            case "stockLevel":
+                const stockColor = getStockLevelColor(
+                    item.inventoryProduct?.totalQuantity,
+                    item.inventoryProduct?.minStockLevel,
+                    item.inventoryProduct?.maxStockLevel
+                );
+                return (
+                    <div className="flex flex-col gap-1">
+                        <Chip
+                            color={stockColor}
+                            size="sm"
+                            variant="flat"
+                            startContent={<TrendingUp className="w-3 h-3" />}
+                        >
+                            {item.inventoryProduct?.totalQuantity <= item.inventoryProduct?.minStockLevel ? "Low Stock" : "Normal"}
+                        </Chip>
+                        <div className="text-xs text-default-400">
+                            Min: {item.inventoryProduct?.minStockLevel} | Max: {item.inventoryProduct?.maxStockLevel}
+                        </div>
                     </div>
                 );
             case "expiryDate":
@@ -99,15 +135,26 @@ export const ProductList: React.FC<ProductListProps> = ({
                     <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-gray-500" />
                         <div className="flex flex-col">
-              <span className="text-sm">
-                {new Date(item.expiryDate).toLocaleDateString("vi-VN")}
-              </span>
-                            {isExpiringSoon(item.expiryDate) && (
+                            <span className="text-sm">
+                                {new Date(item?.expiryDate||"").toLocaleDateString("vi-VN")}
+                            </span>
+                            {isExpiringSoon(item?.expiryDate||"") && (
                                 <div className="flex items-center gap-1 text-amber-600">
                                     <AlertCircle className="w-3 h-3" />
                                     <span className="text-xs">Expiring soon</span>
                                 </div>
                             )}
+                        </div>
+                    </div>
+                );
+            case "binInfo":
+                return (
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-gray-500" />
+                            <span className="text-sm font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                {item.binDetails?.binCode}
+                            </span>
                         </div>
                     </div>
                 );
@@ -124,7 +171,7 @@ export const ProductList: React.FC<ProductListProps> = ({
                 );
             default:
                 // @ts-ignore
-                return <span>{item[columnKey as keyof InventoryWarehouseItem]}</span>;
+                return <span>{item[columnKey as keyof InventoryWarehouse]}</span>;
         }
     };
 
@@ -137,12 +184,23 @@ export const ProductList: React.FC<ProductListProps> = ({
                             Products in Bin
                         </h2>
                         {binCode && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Bin: {binCode}
-                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                                <MapPin className="w-4 h-4 text-gray-500" />
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    Bin: {binCode}
+                                </p>
+                            </div>
+                        )}
+                        {products.length > 0 && products[0].warehouseDetails && (
+                            <div className="flex items-center gap-2 mt-1">
+                                <Warehouse className="w-4 h-4 text-gray-500" />
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    {products[0].warehouseDetails.warehouseName}
+                                </p>
+                            </div>
                         )}
                     </div>
-                    <Chip size="sm" variant="flat">
+                    <Chip size="sm" variant="flat" color="primary">
                         {products?.length} items
                     </Chip>
                 </div>

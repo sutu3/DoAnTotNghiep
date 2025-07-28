@@ -11,7 +11,7 @@ import {
     Progress
 } from "@heroui/react";
 import {Button} from "@heroui/button";
-import {ImportOrderItem} from "@/Store/ImportOrder.tsx";
+import {ImportOrderItem} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import {Icon} from "@iconify/react";
 
 export interface ProductInventoryStats {

@@ -3,9 +3,9 @@ import  { useState, useEffect } from 'react';
 import {useParams, useNavigate, useSearchParams} from 'react-router-dom';
 import { Card, CardBody, CardHeader } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { useDispatch, useSelector } from 'react-redux';
+import {  useSelector } from 'react-redux';
 
-import {StacksSelector, SupplierSelector} from '@/Store/Selector';
+import { SupplierSelector} from '@/Store/Selector';
 import PageHeader from "@/components/Admin/Supplier/PageHeader.tsx";
 import {Supplier} from "@/Store/SupplierSlice.tsx";
 import SupplierEditForm from "@/components/Admin/Supplier/Form/SupplierEditForm .tsx";
@@ -15,13 +15,10 @@ const EditSupplierPage = () => {
     const { supplierId } = useParams();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const dispatch = useDispatch();
     const stackId = searchParams.get("supplierId");
     const stackDisplay = useSelector(SupplierSelector).find((el: { supplierId: string | null; }) => el.supplierId == stackId);
     const suppliers = useSelector(SupplierSelector);
-
     const [supplier, setSupplier] = useState<Supplier>();
-    console.log(supplierId);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {

@@ -44,16 +44,23 @@ const SupplierSlice = createSlice({
     initialState,
     reducers: {
         initToTalPage: (state, action) => {
-            state.totalPage = action.payload || 0;
+            console.log(action.payload);
+            state.totalPage = action.payload;
         },
         setSupplierList: (state, action) => {
             state.suppliers = action.payload;
         },
         setAddSupplier: (state, action) => {
             state.suppliers = [...state.suppliers, action.payload];
+        },
+        setUpdateSupplier: (state, action) => {
+            state.suppliers=state.suppliers.map((el:Supplier)=>el.supplierId==action.payload.supplierId?action.payload:el);
+        },
+        setDeleteSupplier: (state, action) => {
+            state.suppliers=state.suppliers.filter((el:Supplier)=>el.supplierId!=action.payload);
         }
     },
 });
-export const {setSupplierList, setAddSupplier} = SupplierSlice.actions;
+export const {setSupplierList, setAddSupplier,initToTalPage,setUpdateSupplier,setDeleteSupplier} = SupplierSlice.actions;
 export default SupplierSlice;
 
