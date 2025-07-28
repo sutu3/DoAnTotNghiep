@@ -47,7 +47,6 @@ export default function SupplierForm() {
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            console.log("sssss");
             setFile(file);
             const url = URL.createObjectURL(file);
             setPreviewUrl(url);
@@ -121,7 +120,8 @@ export default function SupplierForm() {
                     const selected = provinces.find((prov: any) => prov.code.toString() === key.target.value);
                     // @ts-ignore
                     setProvinceCode(selected?.code.toString() || "");
-                    setSupplier({ country: key.target.value });
+                    // @ts-ignore
+                    setSupplier({ country:  selected?.name||"" });
                 }}
             >
                 {provinces.map((prov: any) => (

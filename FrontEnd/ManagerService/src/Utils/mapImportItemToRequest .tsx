@@ -1,4 +1,4 @@
-import {ImportItemCreate} from "@/Store/ImportOrder.tsx";
+import {ImportItemCreate} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 
 export interface ImportOrderRequest {
     product: string;

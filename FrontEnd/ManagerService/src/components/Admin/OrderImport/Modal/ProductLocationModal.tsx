@@ -14,7 +14,7 @@ import {
 import { Icon } from "@iconify/react";
 import {BinLocation, StackLocation} from "@/pages/ApproveOrderImport/page.tsx";
 import {getBinStatusColor, getBinStatusText} from "@/Utils/statusHelpers.tsx";
-import {ImportOrderItem} from "@/Store/ImportOrder.tsx";
+import {ImportOrderItem} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 
 interface ProductLocationModalProps {
     isOpen: boolean;

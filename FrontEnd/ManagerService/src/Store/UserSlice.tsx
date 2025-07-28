@@ -19,6 +19,7 @@ export interface UserData {
   email: string;
   urlImage: string;
   phoneNumber: string;
+  roles:[]
   status: "Active" | "InActive";
   taskUsers: [];
   warehouses: Warehouse;
@@ -70,7 +71,11 @@ const UserSlice = createSlice({
     setUserList: (state, action) => {
       state.userList = action.payload;
     },
+    setUpdateUser:(state, action) => {
+      state.userList=state.userList.map((user) =>
+          user.userId == action.payload?.userId?action.payload:user);
+    }
   },
 });
-export const { initToTalPage,setUserList } = UserSlice.actions;
+export const { initToTalPage,setUserList,setUpdateUser } = UserSlice.actions;
 export default UserSlice;

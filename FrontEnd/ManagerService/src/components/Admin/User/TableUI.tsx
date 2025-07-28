@@ -8,11 +8,13 @@ import {
     TableCell,
     Chip,
     User,
-    Pagination
+    Pagination, Spinner,
 } from "@heroui/react";
+import {UserData} from "@/Store/UserSlice.tsx";
 
 interface UserTableProps {
-    users: any[];
+    loading:boolean
+    users: UserData[];
     onUserSelect: (userId: string) => void;
     selectedUserId?: string;
     totalPage: number;
@@ -20,7 +22,7 @@ interface UserTableProps {
     onPageChange: (page: number) => void;
 }
 
-const UserTable: React.FC<UserTableProps> = ({
+const UserTable: React.FC<UserTableProps> = ({loading,
                                                  users,
                                                  onUserSelect,
                                                  selectedUserId,
@@ -28,19 +30,41 @@ const UserTable: React.FC<UserTableProps> = ({
                                                  currentPage,
                                                  onPageChange
                                              }) => {
+
+    const roles = [
+        { key: "MANAGER", label: "Quản lý", color: "primary" },
+        { key: "STAFF", label: "Nhân viên", color: "success" },
+    ];
+
     const columns = [
         { key: "userName", label: "Nhân viên" },
         { key: "email", label: "Email" },
         { key: "phoneNumber", label: "Số điện thoại" },
+        { key: "role", label: "Vai trò" },
         { key: "warehouseName", label: "Kho làm việc" },
-        { key: "status", label: "Trạng thái" }
+        { key: "status", label: "Trạng thái" },
     ];
+    const handleClick = (userId: string) => {
+        onUserSelect(userId);
+        // Bỏ setEditingRole khỏi đây
+    }
+
+    const getRoleColor = (roleName: string) => {
+        const role = roles.find(r => r.key === roleName);
+        return role?.color || "default";
+    };
+
+    const getRoleLabel = (roleName: string) => {
+        const role = roles.find(r => r.key === roleName);
+        return role?.label || roleName;
+    };
 
     const renderCell = (user: any, columnKey: string) => {
         switch (columnKey) {
             case "userName":
                 return (
                     <User
+                        aria-labelledby="Input"
                         avatarProps={{
                             radius: "full",
                             size: "sm",
@@ -51,34 +75,50 @@ const UserTable: React.FC<UserTableProps> = ({
                         name={user.userName}
                     />
                 );
+            case "role":
+                const primaryRole = user.roles?.[0];
+                const currentRoleName = primaryRole?.roleName || "N/A";
+                    return (
+                        <Chip
+                            size="sm"
+                            color={getRoleColor(currentRoleName)}
+                            variant="flat"
+                            className="capitalize cursor-pointer"
+                        >
+                            {getRoleLabel(currentRoleName)}
+                        </Chip>                      );
+
+
+                // Hiển thị role bình thường
+
             case "status":
                 return (
-                    <Chip
-                        className="capitalize"
+                    <Chip                        aria-labelledby="Input"
+                                                 className="capitalize"
                         color={user.status === "Active" ? "success" : "warning"}
                         size="sm"
                         variant="flat"
                     >
-                        {user.status}
+                        {user.status === "Active" ? "Hoạt động" : "Không hoạt động"}
                     </Chip>
                 );
             case "warehouseName":
                 return (
                     <span className="text-blue-600 dark:text-blue-400">
-            {user.warehouses?.warehouseName || "N/A"}
-          </span>
+                        {user.warehouses?.warehouseName || "N/A"}
+                    </span>
                 );
             case "email":
                 return (
                     <span className="text-gray-600 dark:text-gray-300">
-            {user.email || "N/A"}
-          </span>
+                        {user.email || "N/A"}
+                    </span>
                 );
             case "phoneNumber":
                 return (
                     <span className="text-gray-600 dark:text-gray-300 font-mono">
-            {user.phoneNumber || "N/A"}
-          </span>
+                        {user.phoneNumber || "N/A"}
+                    </span>
                 );
             default:
                 return user[columnKey] || "N/A";
@@ -88,6 +128,7 @@ const UserTable: React.FC<UserTableProps> = ({
     return (
         <div className="space-y-4">
             <Table
+                aria-labelledby="Input"
                 aria-label="User table"
                 selectionMode="single"
                 classNames={{
@@ -96,24 +137,31 @@ const UserTable: React.FC<UserTableProps> = ({
                     td: "border-b border-gray-100 dark:border-gray-700 py-3"
                 }}
             >
-                <TableHeader columns={columns}>
+                <TableHeader                        aria-labelledby="Input"
+                                                    columns={columns}>
                     {(column) => (
                         <TableColumn key={column.key}>
                             {column.label}
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={users} emptyContent="Không có dữ liệu">
+                <TableBody
+                    isLoading={loading}
+                    loadingContent={<Spinner label="Loading..." />}
+                    aria-labelledby="Input"
+                    items={users} emptyContent="Không có dữ liệu">
                     {(user) => (
-                        <TableRow
-                            key={user.userId}
+                        <TableRow                        aria-labelledby="Input"
+
+                                                         key={user.userId}
                             className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
                                 selectedUserId === user.userId ? "bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500" : ""
                             }`}
-                            onClick={() => onUserSelect(user.userId)}
+                            onClick={() => handleClick(user.userId)}
                         >
                             {(columnKey) => (
-                                <TableCell>
+                                <TableCell                        aria-labelledby="Input"
+                                >
                                     {renderCell(user, columnKey.toString())}
                                 </TableCell>
                             )}
@@ -125,8 +173,9 @@ const UserTable: React.FC<UserTableProps> = ({
             {/* Pagination */}
             {totalPage > 1 && (
                 <div className="flex justify-center py-4">
-                    <Pagination
-                        total={totalPage}
+                    <Pagination                        aria-labelledby="Input"
+
+                                                       total={totalPage}
                         page={currentPage}
                         onChange={onPageChange}
                         showControls

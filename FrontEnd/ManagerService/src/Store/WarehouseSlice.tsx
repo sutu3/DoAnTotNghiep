@@ -7,14 +7,20 @@ export interface Warehouse {
   street: string;
   district: string;
   country: string;
-  managerId: string;
 }
 export interface WarehouseState {
   warehouseList: Warehouse[];
   warehouse: Warehouse;
   totalPage: number;
 }
-
+export interface WarehouseCreate {
+  warehouseName: string;
+  address: string;
+  street: string;
+  district: string;
+  country: string;
+  description?: string;
+}
 const initialState: WarehouseState = {
   warehouseList: [],
   totalPage: 0,
@@ -25,7 +31,6 @@ const initialState: WarehouseState = {
     street: "Cao Lỗ",
     district: "quận 8",
     country: "Thành Phố Hồ Chí Minh",
-    managerId: "",
   },
 };
 const WarehouseSlice = createSlice({
@@ -40,6 +45,9 @@ const WarehouseSlice = createSlice({
     },
     setWarehouse(state, action) {
       state.warehouse = action.payload;
+    },
+    setUpdateWarehouse(state, action) {
+      state.warehouseList=[...state.warehouseList,action.payload];
     }
   },
   extraReducers: (builder) => {
@@ -47,6 +55,6 @@ const WarehouseSlice = createSlice({
 
   },
 });
-export const {initToTalPage,setWarehouse,setAllWarehouse} = WarehouseSlice.actions;
+export const {initToTalPage,setWarehouse,setAllWarehouse,setUpdateWarehouse} = WarehouseSlice.actions;
 
 export default WarehouseSlice;

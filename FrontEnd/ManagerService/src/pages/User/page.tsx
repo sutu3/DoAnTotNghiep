@@ -2,11 +2,11 @@ import  { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 import { UserSelector, TotalPageUser } from "@/Store/Selector.tsx";
-import { MiddleGetAllUser } from "@/Store/Thunk/UserThunk.tsx";
+import {MiddleGetAllUser, MiddleUpdateUser} from "@/Store/Thunk/UserThunk.tsx";
 import {UserTableSection} from "@/components/Admin/User/UserTableSection.tsx";
 import UserThumbnail from "@/components/Admin/User/UserThumbnail.tsx";
 import {pageApi} from "@/Api/UrlApi.tsx";
-import {UserData, UserCreate} from "@/Store/UserSlice.tsx";
+import {UserData, UserCreate, setUserList} from "@/Store/UserSlice.tsx";
 import UserModal from "@/components/Admin/User/UserModal.tsx";
 
 const UserPage = () => {
@@ -16,7 +16,8 @@ const UserPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState<UserCreate>({
+  const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState<UserCreate>({
     userName: "",
     fullName: "",
     email: "",
@@ -29,9 +30,12 @@ const UserPage = () => {
   useEffect(() => {
     const PageApi: pageApi = { pageNumber: page - 1, pageSize: 10 };
     const fetch=async()=>{
+        dispatch(setUserList([]));
+        setLoading(true)
       if(formData?.warehouses!=""){
         await (dispatch as any)(MiddleGetAllUser(formData?.warehouses,PageApi));
       }
+      setLoading(false)
     }
     fetch()
 
@@ -41,7 +45,18 @@ const UserPage = () => {
     const user = users.find((u:UserData) => u.userId === userId);
     setSelectedUser(user);
   };
-
+  const handleRoleUpdate = async (userId: string, newRole: string[]) => {
+    try {
+      if(newRole?.find((role: any) => role.includes("MANAGER"))){
+        await (dispatch as any)(MiddleUpdateUser(userId,true))
+      }else{
+        await (dispatch as any)(MiddleUpdateUser(userId,false))
+      }
+      setSelectedUser(null)
+    } catch (error) {
+      console.error('Failed to update role:', error);
+    }
+  };
   const handleOpenModal = (open: boolean) => {
     setIsModalOpen(open);
   };
@@ -73,6 +88,7 @@ const UserPage = () => {
             {/* Bên trái: User Table (2/3) */}
             <div className="lg:col-span-2">
               <UserTableSection
+                  loading={loading}
                   formData={formData}
                   onFormChange={handleFormChange}
                   selectedUser={selectedUser}
@@ -88,7 +104,7 @@ const UserPage = () => {
 
             {/* Bên phải: User Thumbnail (1/3) */}
             <div className="lg:col-span-1">
-              <UserThumbnail user={selectedUser} />
+              <UserThumbnail onRoleUpdate={handleRoleUpdate} user={selectedUser} />
             </div>
           </div>
         </div>

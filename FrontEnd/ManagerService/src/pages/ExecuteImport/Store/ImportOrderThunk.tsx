@@ -4,12 +4,13 @@ import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {
     ImportItemCreate, ImportOrderItem,
-    initToTalPage,
     OrderRequestImportCreate,
     setOrderImportItemList,
     setOrderImportList, setUpdateOrderImport
-} from "@/Store/ImportOrder.tsx";
+} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import {ImportOrderRequest, mapImportItemToRequest} from "@/Utils/mapImportItemToRequest .tsx";
+import {ReceiptWarehouseCreate} from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
+import {AddReceipt} from "@/pages/ExecuteImport/Store/WarehousReceipteThunk.tsx";
 
 export const AddItemOrderBatch = createAsyncThunk(
     "importOrder/AddItemOrderBatch",
@@ -67,6 +68,19 @@ export const MiddleAddOrderImport = (orderImport:OrderRequestImportCreate, items
         }
     };
 };
+export const GetAllWarehouseReceiptPageByIdWarehouse = createAsyncThunk(
+    "importOrder/GetAllWarehouseReceiptPageByIdWarehouse",
+    async (
+        { warehouseId}: { warehouseId:string},
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES.order.importOrder(null).readyForReceipt(warehouseId),
+            undefined,
+            rejectWithValue
+        )
+);
 export const GetAllOrder = createAsyncThunk(
     "importOrder/GetAllOrder",
     async (
@@ -76,6 +90,19 @@ export const GetAllOrder = createAsyncThunk(
         await callApiThunk(
             "GET",
             API_ROUTES.order.importOrder(page).search().byWarehouseId(warehouseId,null).getAll,
+            null,
+            rejectWithValue
+        )
+);
+export const MarkGoodsArrivedOrderItem = createAsyncThunk(
+    "importOrder/MarkGoodsArrivedOrderItem",
+    async (
+        { orderId }: { orderId: string },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "PUT",
+            API_ROUTES.order.importOrder(null).changeStatus(orderId).markGoodsArrived,
             null,
             rejectWithValue
         )
@@ -122,12 +149,12 @@ export const RejectOrderItemByOrderId = createAsyncThunk(
 export const ImportOrderItemForOrder = createAsyncThunk(
     "importOrder/ImportOrderItemForOrder",
     async (
-        { orderId,items }: { orderId: string,items: ImportOrderItem[]},
+        { orderId,items }: { orderId: string|null,items: ImportOrderItem[]},
         { rejectWithValue }
     ) =>
         await callApiThunk(
             "POST",
-            API_ROUTES.order.orderItems(null).AddItemForOrder(orderId).byOrderId,
+            API_ROUTES.order.orderItems(null).AddItemForOrder(orderId||"").byOrderId,
             items,
             rejectWithValue
         )
@@ -136,7 +163,7 @@ export const ImportOrderItemForOrder = createAsyncThunk(
 export const GetAllOrderByStatus = createAsyncThunk(
     "importOrder/GetAllOrderByStatus",
     async (
-        { page,warehouseId,status }: {page:pageApi, warehouseId: string,status:string },
+        { page,warehouseId,status }: {page:pageApi, warehouseId: string,status:string|null },
         { rejectWithValue }
     ) =>
         await callApiThunk(
@@ -160,7 +187,21 @@ export const MiddleGetAllOrderItem = (orderId:string) => {
         }
     };
 };
-export const MiddleGetAllImportOrderByStatus = (warehouse:string,status:string, page:pageApi) => {
+export const MiddleGetAllOrderItemByStatus = (warehouseId:string) => {
+    return async function (dispatch: any) {
+        try {
+            const action = await dispatch(GetAllWarehouseReceiptPageByIdWarehouse({ warehouseId }));
+            dispatch(setOrderImportList(action.payload.result));
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
+export const MiddleGetAllImportOrderByStatus = (warehouse:string,status:string|null, page:pageApi) => {
     return async function (dispatch: any) {
         try {
             const action = await dispatch(GetAllOrderByStatus({ page,warehouseId:warehouse,status }));
@@ -203,11 +244,35 @@ export const MiddleChangeTypeOrderItem = (orderId:string,access:boolean,note:str
         }
     };
 };
-export const MiddleImportOrder = (orderId: string | null, ListOrderItem: ImportOrderItem[]) => {
+
+
+
+export const MiddleMarkGoodsArrived = (orderId: string) => {
+    return async function (dispatch: any) {
+        try {
+            const action = await dispatch(MarkGoodsArrivedOrderItem({ orderId }));
+            dispatch(setUpdateOrderImport(action.payload.result));
+            showToast({
+                title: "Cập nhật thành công",
+                description: "Đã đánh dấu hàng đã đến kho",
+                color: "Success",
+            });
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
+export const MiddleImportOrder = (orderId: string | null, ListOrderItem: ImportOrderItem[],receipt:ReceiptWarehouseCreate) => {
     return async function (dispatch: any) {
         try {
             console.log(ListOrderItem)
-             await dispatch(ImportOrderItemForOrder({orderId,items:ListOrderItem}));
+            console.log(receipt)
+            await dispatch(AddReceipt({payload:receipt}));
+            await dispatch(ImportOrderItemForOrder({orderId,items:ListOrderItem}));
 
             // Final success notification
             showToast({
@@ -225,14 +290,13 @@ export const MiddleImportOrder = (orderId: string | null, ListOrderItem: ImportO
         }
     };
 };
-export const MiddleGetAllOrder = (page: pageApi) => {
-    return async function (dispatch: any,getState:any) {
+export const MiddleGetAllOrderItemByOrderId = (orderId: string | undefined) => {
+    return async function (dispatch: any) {
         try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
-            const action = await dispatch(GetAllOrder({ page,warehouseId }));
-            dispatch(setOrderImportList(action.payload.result.content));
-            dispatch(initToTalPage(action.payload.result.totalPages));
+            if(orderId){
+                const action2 = await dispatch(GetAllOrderItemByOrderId({ orderId }));
+                dispatch(setOrderImportItemList(action2.payload.result));
+            }
 
         } catch (error: any) {
             showToast({

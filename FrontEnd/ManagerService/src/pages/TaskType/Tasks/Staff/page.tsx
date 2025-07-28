@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {useDispatch, useSelector} from "react-redux";
 import {
     Card,
     CardBody,
@@ -14,140 +15,86 @@ import {
     TableRow,
     TableCell,
     Select,
-    SelectItem
+    SelectItem,
+    Spinner
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import { callApiThunk } from "@/Store/Store.tsx";
+import { API_ROUTES } from "@/Api/UrlApi.tsx";
+import {MiddleGetAllTaskUserByUserId} from "@/Store/Thunk/TaskUserThunk.tsx";
+import {TaskUserSelector} from "@/Store/Selector.tsx";
 
-interface Task {
-    taskId: string;
-    taskType: {
-        taskName: string;
-    };
-    description: string;
+interface TaskUser {
+    id: string;
     status: "Pending" | "In_Progress" | "Complete" | "Cancel";
-    level: "Low" | "Medium" | "High";
+    note: string;
     completeAt: string;
+    createdAt: string;
+    updatedAt: string;
+    task: {
+        taskId: string;
+        taskType: {
+            taskName: string;
+        };
+        description: string;
+        level: "Low" | "Medium" | "High";
+        warehouses: {
+            warehouseId: string;
+            warehouseName: string;
+        };
+    };
 }
 
 export default function MyTasksPage() {
-    const [tasks, setTasks] = useState<Task[]>([
-        {
-            "taskId": "task-001-uuid-string",
-            "taskType": {
-                "taskTypeId": "task-type-001-uuid-string",
-                "taskName": "Kiểm kê hàng hóa"
-            },
-            "status": "Pending",
-            "level": "High",
-            "description": "Kiểm tra số lượng và chất lượng hàng hóa trong kho A",
-            "taskUsers": [
-                {
-                    "taskUserId": "task-user-001-uuid-string",
-                    "userId": "user-002-uuid-string",
-                    "status": "Assigned",
-                    "note": "Nhiệm vụ ưu tiên cao"
-                }
-            ],
-            "warehouses": {
-                "warehouseId": "wh-001-uuid-string",
-                "warehouseName": "Kho Trung Tâm Hà Nội"
-            },
-            "completeAt": "2024-01-25T17:00:00Z"
-        },
-        {
-            "taskId": "task-002-uuid-string",
-            "taskType": {
-                "taskTypeId": "task-type-002-uuid-string",
-                "taskName": "Sắp xếp hàng hóa"
-            },
-            "status": "In_Progress",
-            "level": "Medium",
-            "description": "Sắp xếp lại hàng hóa trong dãy Stack-B theo quy chuẩn mới",
-            "taskUsers": [
-                {
-                    "taskUserId": "task-user-002-uuid-string",
-                    "userId": "user-002-uuid-string",
-                    "status": "In_Progress",
-                    "note": "Đang thực hiện"
-                }
-            ],
-            "warehouses": {
-                "warehouseId": "wh-001-uuid-string",
-                "warehouseName": "Kho Trung Tâm Hà Nội"
-            },
-            "completeAt": "2024-01-24T16:00:00Z"
-        },
-        {
-            "taskId": "task-003-uuid-string",
-            "taskType": {
-                "taskTypeId": "task-type-003-uuid-string",
-                "taskName": "Vệ sinh kho"
-            },
-            "status": "Complete",
-            "level": "Low",
-            "description": "Vệ sinh tổng thể khu vực kho và các bin chứa hàng",
-            "taskUsers": [
-                {
-                    "taskUserId": "task-user-003-uuid-string",
-                    "userId": "user-002-uuid-string",
-                    "status": "Completed",
-                    "note": "Hoàn thành đúng hạn"
-                }
-            ],
-            "warehouses": {
-                "warehouseId": "wh-001-uuid-string",
-                "warehouseName": "Kho Trung Tâm Hà Nội"
-            },
-            "completeAt": "2024-01-20T15:30:00Z"
-        },
-        {
-            "taskId": "task-004-uuid-string",
-            "taskType": {
-                "taskTypeId": "task-type-004-uuid-string",
-                "taskName": "Kiểm tra thiết bị"
-            },
-            "status": "Pending",
-            "level": "Medium",
-            "description": "Kiểm tra và bảo trì các thiết bị xe nâng và scanner",
-            "taskUsers": [
-                {
-                    "taskUserId": "task-user-004-uuid-string",
-                    "userId": "user-002-uuid-string",
-                    "status": "Assigned",
-                    "note": "Cần hoàn thành trước cuối tuần"
-                }
-            ],
-            "warehouses": {
-                "warehouseId": "wh-001-uuid-string",
-                "warehouseName": "Kho Trung Tâm Hà Nội"
-            },
-            "completeAt": "2024-01-26T18:00:00Z"
-        },
-        {
-            "taskId": "task-005-uuid-string",
-            "taskType": {
-                "taskTypeId": "task-type-005-uuid-string",
-                "taskName": "Cập nhật hệ thống"
-            },
-            "status": "Cancel",
-            "level": "Low",
-            "description": "Cập nhật thông tin sản phẩm trong hệ thống quản lý",
-            "taskUsers": [
-                {
-                    "taskUserId": "task-user-005-uuid-string",
-                    "userId": "user-002-uuid-string",
-                    "status": "Cancelled",
-                    "note": "Hủy do thay đổi yêu cầu"
-                }
-            ],
-            "warehouses": {
-                "warehouseId": "wh-001-uuid-string",
-                "warehouseName": "Kho Trung Tâm Hà Nội"
-            },
-            "completeAt": "2024-01-23T12:00:00Z"
-        }
-    ]);
+    const TaskUser=useSelector(TaskUserSelector);
+    const [taskUsers, setTaskUsers] = useState<TaskUser[]>([]);
+    const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState("all");
+    const [stats, setStats] = useState({
+        pending: 0,
+        inProgress: 0,
+        completed: 0,
+        highPriority: 0
+    });
+    const dispatch = useDispatch();
+
+    // Lấy userId từ localStorage hoặc auth context
+
+    useEffect(() => {
+        loadUserTasks();
+    }, []);
+    useEffect(() => {
+        if(TaskUser){
+            setTaskUsers(TaskUser);
+            calculateStats(TaskUser);
+        }
+    }, [TaskUser]);
+    const loadUserTasks = async () => {
+        setLoading(true);
+        try {
+            await (dispatch as any)(MiddleGetAllTaskUserByUserId({pageNumber:0,pageSize:10}));
+
+        } catch (error) {
+            console.error('Failed to load user tasks:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const calculateStats = (tasks: TaskUser[]) => {
+        const stats = {
+            pending: tasks.filter(t => t.status === "Pending").length,
+            inProgress: tasks.filter(t => t.status === "In_Progress").length,
+            completed: tasks.filter(t => t.status === "Complete").length,
+            highPriority: tasks.filter(t => t.task.level === "High").length
+        };
+        setStats(stats);
+    };
+
+    const filteredTasks = taskUsers.filter(taskUser => {
+        if (statusFilter === "all") return true;
+        return taskUser.status === statusFilter;
+    });
 
     const statusColorMap = {
         Pending: "warning",
@@ -162,14 +109,34 @@ export default function MyTasksPage() {
         High: "danger"
     };
 
-    const handleUpdateStatus = (taskId: string, newStatus: string) => {
-        console.log(`Updating task ${taskId} to ${newStatus}`);
+    const handleUpdateStatus = async (taskUserId: string, newStatus: string) => {
+        try {
+            // API call để update status TaskUser
+            await callApiThunk(
+                "PUT",
+                `${API_ROUTES.user.taskUsers(null).base}/${taskUserId}/status`,
+                { status: newStatus },
+                (error: any) => error
+            );
+
+            // Reload tasks sau khi update
+            await loadUserTasks();
+        } catch (error) {
+            console.error('Failed to update task status:', error);
+        }
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 flex items-center justify-center">
+                <Spinner size="lg" />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
             <div className="max-w-7xl mx-auto space-y-8">
-
                 {/* Header */}
                 <div className="text-center space-y-2">
                     <div className="flex justify-center items-center gap-3">
@@ -186,10 +153,10 @@ export default function MyTasksPage() {
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-2 mb-6 md:grid-cols-4 gap-4">
                     {[
-                        { icon: "mdi:clock-outline", label: "Đang chờ", value: 5, color: "text-warning" },
-                        { icon: "mdi:progress-clock", label: "Đang thực hiện", value: 3, color: "text-primary" },
-                        { icon: "mdi:check-circle", label: "Hoàn thành", value: 12, color: "text-success" },
-                        { icon: "mdi:alert-circle", label: "Ưu tiên cao", value: 2, color: "text-danger" },
+                        { icon: "mdi:clock-outline", label: "Đang chờ", value: stats.pending, color: "text-warning" },
+                        { icon: "mdi:progress-clock", label: "Đang thực hiện", value: stats.inProgress, color: "text-primary" },
+                        { icon: "mdi:check-circle", label: "Hoàn thành", value: stats.completed, color: "text-success" },
+                        { icon: "mdi:alert-circle", label: "Ưu tiên cao", value: stats.highPriority, color: "text-danger" },
                     ].map((stat, index) => (
                         <Card key={index} className="shadow-sm">
                             <CardBody className="text-center">
@@ -201,7 +168,6 @@ export default function MyTasksPage() {
                     ))}
                 </div>
 
-                {/* Tasks Table Section */}
                 {/* Tasks Table */}
                 <Card>
                     <CardHeader className="flex justify-between">
@@ -230,47 +196,61 @@ export default function MyTasksPage() {
                                 <TableColumn>Mức độ</TableColumn>
                                 <TableColumn>Trạng thái</TableColumn>
                                 <TableColumn>Hạn hoàn thành</TableColumn>
+                                <TableColumn>Ghi chú</TableColumn>
                                 <TableColumn>Thao tác</TableColumn>
                             </TableHeader>
-                            <TableBody>
-                                {tasks.map((task) => (
-                                    <TableRow key={task.taskId}>
-                                        <TableCell>{task.taskType.taskName}</TableCell>
-                                        <TableCell>{task.description}</TableCell>
+                            <TableBody emptyContent="Không có nhiệm vụ nào">
+                                {filteredTasks.map((taskUser) => (
+                                    <TableRow key={taskUser.id}>
+                                        <TableCell>{taskUser.task.taskType.taskName}</TableCell>
+                                        <TableCell>{taskUser.task.description}</TableCell>
                                         <TableCell>
                                             <Chip
                                                 size="sm"
-                                                color={levelColorMap[task.level]}
+                                                color={levelColorMap[taskUser.task.level]}
                                                 variant="flat"
                                             >
-                                                {task.level}
+                                                {taskUser.task.level}
                                             </Chip>
                                         </TableCell>
                                         <TableCell>
                                             <Chip
                                                 size="sm"
-                                                color={statusColorMap[task.status]}
+                                                color={statusColorMap[taskUser.status]}
                                                 variant="flat"
                                             >
-                                                {task.status}
+                                                {taskUser.status}
                                             </Chip>
                                         </TableCell>
                                         <TableCell>
-                                            {task.completeAt ? new Date(task.completeAt).toLocaleDateString('vi-VN') : 'N/A'}
+                                            {taskUser.completeAt ? new Date(taskUser.completeAt).toLocaleDateString('vi-VN') : 'N/A'}
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="text-sm text-gray-600">{taskUser.note}</span>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex gap-2">
                                                 <Button size="sm" color="primary" variant="light">
                                                     <Icon icon="mdi:eye" />
                                                 </Button>
-                                                {task.status === "Pending" && (
+                                                {taskUser.status === "Pending" && (
                                                     <Button
                                                         size="sm"
                                                         color="success"
                                                         variant="light"
-                                                        onClick={() => handleUpdateStatus(task.taskId, "In_Progress")}
+                                                        onClick={() => handleUpdateStatus(taskUser.id, "In_Progress")}
                                                     >
                                                         <Icon icon="mdi:play" />
+                                                    </Button>
+                                                )}
+                                                {taskUser.status === "In_Progress" && (
+                                                    <Button
+                                                        size="sm"
+                                                        color="warning"
+                                                        variant="light"
+                                                        onClick={() => handleUpdateStatus(taskUser.id, "Complete")}
+                                                    >
+                                                        <Icon icon="mdi:check" />
                                                     </Button>
                                                 )}
                                             </div>
@@ -281,7 +261,6 @@ export default function MyTasksPage() {
                         </Table>
                     </CardBody>
                 </Card>
-
             </div>
         </div>
     );

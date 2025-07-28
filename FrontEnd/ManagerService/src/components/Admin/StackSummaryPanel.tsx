@@ -8,25 +8,24 @@ import {
   Package,
   AlertTriangle,
   CheckCircle,
-  Activity,
   TrendingUp
 } from "lucide-react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 type StackSummaryPanelProps = {
-  stack?: StackType;
+  stack: StackType|null;
 };
 
 const StackSummaryPanel: React.FC<StackSummaryPanelProps> = ({ stack }) => {
   const total = stack?.bin?.length ?? 0;
   const maintenance = stack?.bin?.filter((b) => b.status === "MAINTENANCE").length ?? 0;
-  const full = stack?.bin?.filter((b) => b.status === "AVAILABLE").length ?? 0;
+  const full = stack?.bin?.filter((b) => b.status === "FULL").length ?? 0;
   const empty = stack?.bin?.filter((b) => b.status === "EMPTY").length ?? 0;
   const usagePercent = total > 0 ? Math.round(((full + maintenance) / total) * 100) : 0;
 
   const chartData = {
-    labels: ["Available", "In Use", "Maintenance"],
+    labels: ["Available", "FULL", "Maintenance"],
     datasets: [
       {
         data: [empty, full, maintenance],
@@ -126,7 +125,7 @@ const StackSummaryPanel: React.FC<StackSummaryPanelProps> = ({ stack }) => {
                       icon={<CheckCircle className="w-4 h-4" />}
                   />
                   <StatCard
-                      label="In Use"
+                      label="Full"
                       value={full}
                       total={total}
                       color="primary"
@@ -197,7 +196,7 @@ const StackSummaryPanel: React.FC<StackSummaryPanelProps> = ({ stack }) => {
                     />
                     <LegendItem
                         color="bg-blue-500"
-                        label="In Use"
+                        label="Full"
                         value={full}
                     />
                     <LegendItem

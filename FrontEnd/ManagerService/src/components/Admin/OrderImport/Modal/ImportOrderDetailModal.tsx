@@ -18,10 +18,10 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { getStatusColor, getStatusText } from "@/Utils/statusHelpers.tsx";
-import {ImportOrder, ImportOrderItem} from "@/Store/ImportOrder.tsx";
+import {ImportOrder, ImportOrderItem} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import {useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { MiddleGetAllOrderItem} from "@/Store/Thunk/ImportOrderThunk.tsx";
+import { MiddleGetAllOrderItem} from "@/pages/ExecuteImport/Store/ImportOrderThunk.tsx";
 import {OrderItemSelector} from "@/Store/Selector.tsx";
 
 interface ImportOrderDetailModalProps {
@@ -31,9 +31,10 @@ interface ImportOrderDetailModalProps {
     onApprove: (orderId: string) => void;
     onReject: (order: ImportOrder) => void;
     onItemClick: (item: ImportOrderItem) => void;
+    onMarkGoodsArrived: (orderId: string) => void;
 }
 
-export default function ImportOrderDetailModal({
+export default function ImportOrderDetailModal({onMarkGoodsArrived,
                                                    isOpen,
                                                    onClose,
                                                    selectedOrder,
@@ -258,6 +259,16 @@ export default function ImportOrderDetailModal({
                 </ModalBody>
 
                 <ModalFooter className="border-t border-gray-200 dark:border-gray-700">
+                    {selectedOrder?.status === "InProgress" && (
+                        <Button
+                            size="sm"
+                            color="success"
+                            variant="flat"
+                            onClick={() => onMarkGoodsArrived(selectedOrder.importOrderId)}
+                        >
+                            Hàng đã đến
+                        </Button>
+                    )}
                     {selectedOrder?.status === "Created" && (
                         <>
                             <Button color="success" startContent={<Icon icon="mdi:check" />} onClick={() => onApprove(selectedOrder.importOrderId)}>

@@ -1,50 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { Input, Textarea, Button, Divider } from '@heroui/react';
-import { Building2, MapPin, Phone, Mail, Save, X } from 'lucide-react';
-import { useDispatch } from 'react-redux';
-import {Supplier} from "@/Store/SupplierSlice.tsx";
-// import { MiddleUpdateSupplier } from '@/Store/Thunk/ShupplierThunk';
+import React, {useState, useEffect} from 'react';
+import {Input, Textarea, Button, Divider} from '@heroui/react';
+import {Building2, MapPin, Phone, Mail, Save, X} from 'lucide-react';
+import {useDispatch} from 'react-redux';
+import {Supplier, SupplierCreate} from "@/Store/SupplierSlice.tsx";
+import {MiddleUpdateSupplier} from "@/Store/Thunk/ShupplierThunk.tsx";
+import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 
 interface SupplierEditFormProps {
-    supplier: Supplier;
-    onUpdate: (supplier: any) => void;
-    loading: boolean;
-    setLoading: (loading: boolean) => void;
+    onUpdate: (supplier: any) => void,
+    loading: boolean,
+    setLoading: (loading: boolean) => void,
+    supplier?: Supplier
 }
 
 const SupplierEditForm: React.FC<SupplierEditFormProps> = ({
                                                                supplier,
                                                                onUpdate,
                                                                loading,
-                                                               setLoading
+                                                               setLoading,
                                                            }) => {
     const dispatch = useDispatch();
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<SupplierCreate>({
+        urlSupplier: "",
         supplierName: '',
         email: '',
         phoneNumber: '',
         address: '',
         street: '',
         district: '',
-        country: '',
+        country: ''
     });
 
     useEffect(() => {
         if (supplier) {
             setFormData({
+                urlSupplier: supplier.urlSupplier,
                 supplierName: supplier.supplierName || '',
                 email: supplier.email || '',
                 phoneNumber: supplier.phoneNumber || '',
                 address: supplier.address || '',
                 street: supplier.street || '',
                 district: supplier.district || '',
-                country: supplier.country || '',
+                country: supplier.country || ''
             });
         }
     }, [supplier]);
 
     const handleChange = (key: string, value: string) => {
-        setFormData(prev => ({ ...prev, [key]: value }));
+        setFormData(prev => ({...prev, [key]: value}));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -52,8 +55,13 @@ const SupplierEditForm: React.FC<SupplierEditFormProps> = ({
         setLoading(true);
 
         try {
-            // await (dispatch as any)(MiddleUpdateSupplier(supplier.supplierId, formData));
-            onUpdate({ ...supplier, ...formData });
+            await (dispatch as any)(MiddleUpdateSupplier(supplier?.supplierId, formData));
+            showToast({
+                title: "Update Supplier",
+                description: `Message: Update Supplier ${supplier?.supplierName||""} Successfully`,
+                color: "Success",
+            });
+            onUpdate({...supplier, ...formData});
         } catch (error) {
             console.error('Error updating supplier:', error);
         } finally {
@@ -66,7 +74,7 @@ const SupplierEditForm: React.FC<SupplierEditFormProps> = ({
             {/* Basic Information */}
             <div className="space-y-4">
                 <div className="flex items-center gap-2 mb-4">
-                    <Building2 className="w-5 h-5 text-blue-600" />
+                    <Building2 className="w-5 h-5 text-blue-600"/>
                     <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                         Thông tin cơ bản
                     </h3>
@@ -78,7 +86,7 @@ const SupplierEditForm: React.FC<SupplierEditFormProps> = ({
                         placeholder="Nhập tên nhà cung cấp"
                         value={formData.supplierName}
                         onValueChange={(val) => handleChange('supplierName', val)}
-                        startContent={<Building2 className="w-4 h-4 text-gray-400" />}
+                        startContent={<Building2 className="w-4 h-4 text-gray-400"/>}
                         isRequired
                     />
 
@@ -88,7 +96,7 @@ const SupplierEditForm: React.FC<SupplierEditFormProps> = ({
                         placeholder="supplier@example.com"
                         value={formData.email}
                         onValueChange={(val) => handleChange('email', val)}
-                        startContent={<Mail className="w-4 h-4 text-gray-400" />}
+                        startContent={<Mail className="w-4 h-4 text-gray-400"/>}
                         isRequired
                     />
                 </div>
@@ -98,17 +106,17 @@ const SupplierEditForm: React.FC<SupplierEditFormProps> = ({
                     placeholder="0123456789"
                     value={formData.phoneNumber}
                     onValueChange={(val) => handleChange('phoneNumber', val)}
-                    startContent={<Phone className="w-4 h-4 text-gray-400" />}
+                    startContent={<Phone className="w-4 h-4 text-gray-400"/>}
                     isRequired
                 />
             </div>
 
-            <Divider />
+            <Divider/>
 
             {/* Address Information */}
             <div className="space-y-4">
                 <div className="flex items-center gap-2 mb-4">
-                    <MapPin className="w-5 h-5 text-green-600" />
+                    <MapPin className="w-5 h-5 text-green-600"/>
                     <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                         Thông tin địa chỉ
                     </h3>
@@ -142,18 +150,18 @@ const SupplierEditForm: React.FC<SupplierEditFormProps> = ({
                     placeholder="Nhập địa chỉ đầy đủ của nhà cung cấp"
                     value={formData.address}
                     onValueChange={(val) => handleChange('address', val)}
-                    startContent={<MapPin className="w-4 h-4 text-gray-400" />}
+                    startContent={<MapPin className="w-4 h-4 text-gray-400"/>}
                 />
             </div>
 
-            <Divider />
+            <Divider/>
 
             {/* Action Buttons */}
             <div className="flex gap-4 justify-end">
                 <Button
                     color="danger"
                     variant="light"
-                    startContent={<X className="w-4 h-4" />}
+                    startContent={<X className="w-4 h-4"/>}
                     type="button"
                 >
                     Hủy bỏ
@@ -163,7 +171,7 @@ const SupplierEditForm: React.FC<SupplierEditFormProps> = ({
                     color="primary"
                     type="submit"
                     isLoading={loading}
-                    startContent={<Save className="w-4 h-4" />}
+                    startContent={<Save className="w-4 h-4"/>}
                 >
                     {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
                 </Button>

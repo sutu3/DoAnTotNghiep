@@ -3,38 +3,26 @@ import { API_ROUTES } from '@/Api/UrlApi.tsx';
 import {fetchApi} from "@/Api/FetchApi.tsx";
 import {ApiResponse} from "@/types";
 
-export interface NearFullStacksResponse {
-    warehouseId: string;
-    warehouseName: string;
-    totalStacks: number;
-    nearFullStacksCount: number;
-    nearFullPercentage: number;
-    nearFullStacks: StackCapacityInfo[];
+
+
+export interface ToTalStockLevel {
+    minStockLevel:number;
+    maxStockLevel:number;
 }
 
-export interface StackCapacityInfo {
-    stackId: string;
-    stackName: string;
-    totalBins: number;
-    occupiedBins: number;
-    emptyBins: number;
-    utilizationPercentage: number;
-    status: "critical" | "warning" | "normal";
-}
-
-export const useNearFullStacks = (warehouseId: string, threshold: number = 90) => {
-    const [data, setData] = useState<NearFullStacksResponse[]|null>(null);
+export const useStockLevel = (productId: string | null) => {
+    const [data, setData] = useState<ToTalStockLevel|null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     useEffect(() => {
         const fetchData = async () => {
-            if (!warehouseId) return;
+            if (!productId) return;
 
             setLoading(true);
             try {
-                const response:ApiResponse<NearFullStacksResponse[]> = await fetchApi({
+                const response:ApiResponse<ToTalStockLevel> = await fetchApi({
                     method:"GET",
-                    url:API_ROUTES.warehouse.warehouses(null).nearFullStacks(warehouseId, threshold),
+                    url:API_ROUTES.inventory.InventoryProduct(null).search().byProductId(productId).getProduct,
                     headers:undefined,
                     body:undefined});
                 const result =response.result;
@@ -43,10 +31,10 @@ export const useNearFullStacks = (warehouseId: string, threshold: number = 90) =
                 setLoading(false);
             }
         };
-        if(warehouseId!=""){
+        if(productId!=""){
             fetchData();
         }
-    }, [warehouseId, threshold]);
+    }, [productId]);
 
     return { data, loading, error };
 };

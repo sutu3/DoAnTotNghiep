@@ -20,7 +20,6 @@ const CategoryPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState<boolean>(true);
 
-
     const isDarkMode = localStorage.getItem("theme") === "dark";
 
     useEffect(() => {
@@ -28,7 +27,7 @@ const CategoryPage = () => {
         setSelectedCategory(null)
         setLoading(true);
         const fetch=async ()=>{
-            const PageApi: pageApi = { pageNumber: page - 1, pageSize: 10 };
+            const PageApi: pageApi = { pageNumber: page - 1, pageSize: 5 };
             await (dispatch as any)(MiddleGetAllCategory(PageApi));
             setLoading(false);
         }

@@ -18,7 +18,6 @@ export const fetchApi = async <T = any>({
                                             headers = {},
                                         }: FetchOptions): Promise<T> => {
     const token = localStorage.getItem("token"); // hoặc từ cookies
-    console.log(token);
     const options: RequestInit = {
         method,
         headers: {

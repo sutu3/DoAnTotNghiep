@@ -19,7 +19,6 @@ import Task from "@/pages/TaskType/page.tsx";
 import GroupUnit from "@/pages/Unit/page.tsx";
 import DetailUnit from "@/pages/Unit/DetailUnit/page.tsx";
 import CategoryPage from "@/pages/Category/page.tsx";
-import SupplierPage from "@/pages/Supplier/page.tsx";
 import AddNewSupplierPage from "@/pages/Supplier/Addnew/page.tsx";
 import ProductPage from "@/pages/Product/page.tsx";
 import LoginPage from "@/pages/Login/page.tsx";
@@ -35,15 +34,15 @@ import StorageLimitsPage from "@/pages/StorageLimits/page.tsx";
 import AdminExportOrderManagement from "@/pages/ApproveOrderExport/page.tsx";
 import Daskboard from "@/pages/Dashboard/page.tsx";
 import EditSupplierPage from "@/pages/Supplier/Edit/EditSupplierPage.tsx";
-import ExecuteImportPage from "@/pages/ExecuteImport/test.tsx";
 import ImportOrderDetailsPage from "@/pages/ExecuteImport/Detail/page.tsx";
-import UserProfilePage from "@/pages/Profile/page.tsx";
 import TaskAssignmentsPage from "@/pages/TaskAssignments/page.tsx";
 import CreateTaskAssignmentPage from "@/pages/TaskType/CreateTask/CreateTaskAssignmentPage";
 import EmployeeInventoryCheckPage from "@/pages/InventoryCheck/page.tsx";
 import WarehousePage from "@/pages/WarehouseManager/page.tsx";
 import EditProductPage from "@/pages/Product/Edit/EditProductPage.tsx";
 import AddWarehousePage from "@/pages/WarehouseManager/AddNew/AddWarehousePage.tsx";
+import SupplierPage from "@/pages/Supplier/page";
+import WarehouseReceiptManagementPage from "@/pages/ExecuteImport/page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -80,7 +79,7 @@ const router = createBrowserRouter([
       { path: "/admin/task-assignments", element: <TaskAssignmentsPage /> },
       { path: "/staff/request-import", element: <OrderRequestImportForm /> },
       { path: "/staff/tasks", element: <MyTasksPage /> },
-      { path: "/staff/import", element: <ExecuteImportPage /> },
+      { path: "/staff/import", element: <WarehouseReceiptManagementPage /> },
       { path: "/staff/import/details", element: <ImportOrderDetailsPage /> },
       { path: "/staff/export", element: <ExecuteExportPage /> },
       { path: "/staff/request-export", element: <CreateExportOrderPage /> },

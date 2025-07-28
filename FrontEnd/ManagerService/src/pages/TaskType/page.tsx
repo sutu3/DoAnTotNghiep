@@ -48,7 +48,6 @@ const StaffTaskDashboard = () => {
 
     // Handler để mở modal chi tiết task
     const handleViewTaskDetail = (task: any) => {
-        console.log(task)
         setSelectedTask(task);
         setTaskId(task?.taskId)
         setIsTaskDetailOpen(true);

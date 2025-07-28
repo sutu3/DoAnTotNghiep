@@ -1,4 +1,4 @@
-import {ImportItemCreate} from "@/Store/ImportOrder.tsx";
+import {ImportItemCreate} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import {create} from "zustand";
 
 interface ImportOrderState {
