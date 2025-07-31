@@ -11,6 +11,7 @@ import com.example.order.Exception.AppException;
 import com.example.order.Exception.ErrorCode;
 import com.example.order.Mapper.ExportOrderMapper;
 import com.example.order.Module.ExportOrder;
+import com.example.order.Repo.ExportItemRepo;
 import com.example.order.Repo.ExportOrderRepo;
 import com.example.order.Service.ExportOrderService;
 import com.example.order.Utils.DateUtils;
@@ -36,6 +37,7 @@ public class ExportOrderServiceImpl implements ExportOrderService {
     ExportOrderRepo exportOrderRepo;
     ExportOrderMapper exportOrderMapper;
     AsyncServiceImpl asyncServiceImpl;
+    private final ExportItemRepo exportItemRepo;
 
     @Override
     public ExportOrderResponse createExportOrder(ExportOrderRequest request) {
@@ -197,7 +199,6 @@ public class ExportOrderServiceImpl implements ExportOrderService {
                 .map(exportOrderMapper::toClient)
                 .collect(Collectors.toList());
     }
-
     @Override
     public List<ExportOrderResponseClient> getCompletedExportOrdersByWarehouse(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate) {
         List<ExportOrder> orders = exportOrderRepo.findAllByWarehouseAndStatusAndCreatedAtBetweenAndIsDeletedFalse(
@@ -205,5 +206,20 @@ public class ExportOrderServiceImpl implements ExportOrderService {
         return orders.stream()
                 .map(exportOrderMapper::toClient)
                 .collect(Collectors.toList());
+    }
+    @Override
+    public List<ExportOrderResponse> getOrdersReadyForDelivery(String warehouseId) {
+        List<ExportOrder> orders = exportOrderRepo.findAllByWarehouseAndStatusAndIsDeleted(
+                warehouseId, ExportOrderStatus.APPROVED, false);
+
+        return orders.stream()
+                .map(this::entry)
+                .collect(Collectors.toList());
+    }
+    @Override
+    public Integer getApprovedOrdersByProduct(String productId, String warehouseId) {
+        return exportItemRepo.countApprovedItemsByProductAndWarehouse(
+                productId, warehouseId, false
+        );
     }
 }

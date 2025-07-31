@@ -1,11 +1,17 @@
 package com.example.order.Service.Impl;
 
+import com.example.order.Client.ProductService.Dto.Response.ProductResponse;
+import com.example.order.Client.ProductService.Dto.Response.UnitNameResponse;
+import com.example.order.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.order.Client.UserService.Dto.Response.UserResponse;
 import com.example.order.Client.UserService.UserController;
+import com.example.order.Client.WarehouseService.Dto.Responses.Bin.BinResponse;
 import com.example.order.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.order.Dto.Request.ImportOrderRequest;
+import com.example.order.Dto.Response.ImportItem.ImportResponseItem;
 import com.example.order.Dto.Response.ImportOrder.ImportOrderResponse;
 import com.example.order.Dto.Response.ImportOrder.ImportOrderResponseClient;
+import com.example.order.Dto.Response.ReceiptItem.ReceiptItemResponse;
 import com.example.order.Enum.OrderStatus;
 import com.example.order.Enum.OrderType;
 import com.example.order.Exception.AppException;
@@ -14,6 +20,7 @@ import com.example.order.Form.ImportOrderForm;
 import com.example.order.Form.StatusForm;
 import com.example.order.Mapper.ImportItemMapper;
 import com.example.order.Mapper.ImportOrderMapper;
+import com.example.order.Module.ImportItem;
 import com.example.order.Module.ImportOrder;
 import com.example.order.Repo.ImportItemRepo;
 import com.example.order.Repo.ImportOrderRepo;
@@ -67,10 +74,8 @@ public class ImportOrderServiceImpl implements ImportOrderService {
 
     @Override
     public Page<ImportOrderResponse> getAllByStatus(String warehouse, String status, Pageable pageable) {
-        log.info("heheheheheheheh");
         Specification<ImportOrder> specification = Specification.where(ImportOrderSpecification.hasWarehouse(warehouse))
                 .and(ImportOrderSpecification.hasStatus(status));
-        log.info("heheheheheheheh");
         Page<ImportOrder> importOrders = importOrderRepo.findAll(specification, pageable);
         return importOrders.map(this::entry);
     }
@@ -145,23 +150,108 @@ public class ImportOrderServiceImpl implements ImportOrderService {
 
     @Override
     public ImportOrderResponse entry(ImportOrder importOrder) {
-        CompletableFuture<WarehousesResponse> warehouseFuture = asyncServiceImpl
-                .getWarehouseAsync(importOrder.getWarehouse());
-        CompletableFuture<UserResponse> userFuture = asyncServiceImpl
-                .getUserAsync(importOrder.getCreateByUser());
-        CompletableFuture.allOf(warehouseFuture, userFuture).join();
+        try {
+            // Parallel async calls for required data
+            CompletableFuture<WarehousesResponse> warehouseFuture = asyncServiceImpl
+                    .getWarehouseAsync(importOrder.getWarehouse());
+            CompletableFuture<UserResponse> userFuture = asyncServiceImpl
+                    .getUserAsync(importOrder.getCreateByUser());
 
-        ImportOrderResponse importOrderResponse = importOrderMapper.toResponse(importOrder);
-        if (importOrder.getAccessByAdmin() != null && !importOrder.getAccessByAdmin().isEmpty()) {
-            UserResponse access = userController
-                    .getUser(importOrder.getAccessByAdmin()).getResult();
-            importOrderResponse.setAccessByAdmin(access);
+            // Optional async call for admin access
+            CompletableFuture<UserResponse> adminFuture = null;
+            if (importOrder.getAccessByAdmin() != null && !importOrder.getAccessByAdmin().isEmpty()) {
+                adminFuture = asyncServiceImpl.getUserAsync(importOrder.getAccessByAdmin());
+            }
+
+            // Wait for all required futures
+            CompletableFuture<Void> allRequiredFutures = CompletableFuture.allOf(warehouseFuture, userFuture);
+            if (adminFuture != null) {
+                allRequiredFutures = CompletableFuture.allOf(warehouseFuture, userFuture, adminFuture);
+            }
+            allRequiredFutures.join();
+
+            // Build response
+            ImportOrderResponse importOrderResponse = importOrderMapper.toResponse(importOrder);
+
+            // Set enriched data
+            importOrderResponse.setWarehouse(warehouseFuture.join());
+            importOrderResponse.setCreateByUser(userFuture.join());
+
+            List<ImportResponseItem> itemResponse = importOrder.getImportItems().stream()
+                    .map(this::entryOrderItem)
+                    .collect(Collectors.toList());
+            importOrderResponse.setImportItems(itemResponse);
+            if (adminFuture != null) {
+                importOrderResponse.setAccessByAdmin(adminFuture.join());
+            }
+            // Set item count
+            importOrderResponse.setItemCount(
+                    importItemRepo.countByImportOrder_ImportOrderIdAndIsDeleted(
+                            importOrder.getImportOrderId(), false
+                    )
+            );
+
+            return importOrderResponse;
+
+        } catch (Exception e) {
+            log.error("Failed to enrich import order response for order: {}",
+                    importOrder.getImportOrderId(), e);
+            // Fallback: return basic response without enrichment
+            return importOrderMapper.toResponse(importOrder);
         }
-        importOrderResponse.setItemCount(importItemRepo.countByImportOrder_ImportOrderIdAndIsDeleted(importOrder.getImportOrderId(),false));
-        importOrderResponse.setWarehouse(warehouseFuture.join());
-        importOrderResponse.setCreateByUser(userFuture.join());
+    }
+    @Override
+    public ImportResponseItem entryOrderItem(ImportItem importItem) {
+        try {
+            // Parallel async calls for required data
+            CompletableFuture<UnitNameResponse> unitFuture = asyncServiceImpl
+                    .getUnitAsync(importItem.getUnit());
+            CompletableFuture<ProductResponse> productFuture = asyncServiceImpl
+                    .getProductAsync(importItem.getProduct());
+            CompletableFuture<SupplierResponse> supplierFuture = asyncServiceImpl
+                    .getSupplierAsync(importItem.getSupplier());
+            CompletableFuture<UserResponse> userFuture = asyncServiceImpl
+                    .getUserAsync(importItem.getCreateByUser());
 
-        return importOrderResponse;
+            // Optional async call for bin
+            CompletableFuture<BinResponse> binFuture = null;
+            if (importItem.getBin() != null && !importItem.getBin().isEmpty()) {
+                binFuture = asyncServiceImpl.getBinAsync(importItem.getBin());
+            }
+
+            // Wait for all required futures
+            CompletableFuture<Void> allRequiredFutures = CompletableFuture.allOf(
+                    unitFuture, productFuture, supplierFuture, userFuture
+            );
+
+            if (binFuture != null) {
+                allRequiredFutures = CompletableFuture.allOf(
+                        unitFuture, productFuture, supplierFuture, userFuture, binFuture
+                );
+            }
+            allRequiredFutures.join();
+
+            // Build response
+            ImportResponseItem importResponseItem = importItemMapper.toResponse(importItem);
+
+            // Set enriched data
+            importResponseItem.setUnit(unitFuture.join());
+            importResponseItem.setProduct(productFuture.join());
+            importResponseItem.setSupplier(supplierFuture.join());
+            importResponseItem.setCreateByUser(userFuture.join());
+
+            if (binFuture != null) {
+                importResponseItem.setBin(binFuture.join());
+            }
+
+            return importResponseItem;
+
+        } catch (Exception e) {
+            log.error("Failed to enrich import item response for item: {}",
+                    importItem.getItemId(), e);
+            // Fallback: return basic response without enrichment
+            return importItemMapper.toResponse(importItem);
+        }
     }
 
     @Override
@@ -226,5 +316,13 @@ public class ImportOrderServiceImpl implements ImportOrderService {
         return orders.stream()
                 .map(this::entry)
                 .collect(Collectors.toList());
+    }
+    @Override
+    public Integer getApprovedOrdersByProduct(String productId, String warehouseId) {
+        log.info("Giá trị sản phẩm nhập dự kiến"+importItemRepo.countApprovedItemsByProductAndWarehouse(
+                productId, warehouseId, false));
+        return importItemRepo.countApprovedItemsByProductAndWarehouse(
+                productId, warehouseId, false
+        );
     }
 }

@@ -40,4 +40,5 @@ public interface ExportOrderRepo extends JpaRepository<ExportOrder, String> {
 
     List<ExportOrder> findAllByWarehouseAndStatusAndCreatedAtBetweenAndIsDeletedFalse(
             String warehouse, ExportOrderStatus status, LocalDateTime fromDate, LocalDateTime toDate);
+    List<ExportOrder> findAllByWarehouseAndStatusAndIsDeleted(String warehouse, ExportOrderStatus status,boolean isDeleted);
 }

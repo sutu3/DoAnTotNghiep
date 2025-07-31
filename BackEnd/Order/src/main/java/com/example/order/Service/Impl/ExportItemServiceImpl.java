@@ -10,6 +10,7 @@ import com.example.order.Client.WarehouseService.Dto.Responses.Bin.BinResponse;
 import com.example.order.Dto.Request.ExportItemRequest;
 import com.example.order.Dto.Response.Exporttem.ExportItemResponse;
 import com.example.order.Dto.Response.ImportItem.ImportResponseItem;
+import com.example.order.Enum.DeliveryStatus;
 import com.example.order.Enum.ExportItemStatus;
 import com.example.order.Enum.ExportOrderStatus;
 import com.example.order.Enum.OrderStatus;
@@ -20,10 +21,12 @@ import com.example.order.Mapper.ExportItemMapper;
 import com.example.order.Module.ExportItem;
 import com.example.order.Module.ExportOrder;
 import com.example.order.Module.ImportOrder;
+import com.example.order.Module.WarehouseDelivery;
 import com.example.order.Repo.ExportItemRepo;
 import com.example.order.Repo.ExportOrderRepo;
 import com.example.order.Service.ExportItemService;
 import com.example.order.Service.ExportOrderService;
+import com.example.order.Service.WarehouseDeliveryService;
 import com.example.order.Utils.UpdateOrderTotalPrice;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -51,7 +54,6 @@ public class ExportItemServiceImpl implements ExportItemService {
     ExportItemRepo exportItemRepo;
     ExportOrderRepo exportOrderRepo;
     ExportOrderService exportOrderService;
-    InventoryController inventoryController;
     UpdateOrderTotalPrice updateOrderTotalPrice;
 
     @Override
@@ -152,120 +154,35 @@ public class ExportItemServiceImpl implements ExportItemService {
     @Override
     @Transactional
     public void executeExport(String orderId, List<ExportItemRequest> items) {
-        log.info("=== STARTING EXPORT EXECUTION ===");
-        log.info("Executing export for order: {}", orderId);
-        var idUser=GetCurrentUserId.getCurrentUserId();
         try {
-            // Update order status to IN_PROGRESS
-            log.info("Step 1: Updating order status to IN_PROGRESS for order: {}", orderId);
-            exportOrderService.updateExportOrderStatus(orderId, ExportOrderStatus.IN_PROGRESS);
-            log.info("Order status updated successfully to IN_PROGRESS");
 
             // Get all items by order
-            log.info("Step 2: Fetching all export items for order: {}", orderId);
             List<ExportItemResponse> list = getAllByOrder(orderId);
-            log.info("Found {} export items for order: {}", list.size(), orderId);
 
             // Process each item
             int itemIndex = 0;
             for (ExportItemResponse item : list) {
                 itemIndex++;
-                log.info("=== PROCESSING ITEM {}/{} ===", itemIndex, list.size());
-                log.info("Item details - ID: {}, Product: {}, Quantity: {}, Bin: {}",
-                        item.getExportItemId(),
-                        item.getProduct().getProductName(),
-                        item.getQuantity(),
-                        item.getBin().getBinCode());
-
                 try {
                     // Update item status to PICKED
-                    log.info("Step 3.{}.1: Fetching export item entity by ID: {}", itemIndex, item.getExportItemId());
                     ExportItem exportItem = getById(item.getExportItemId());
-                    log.info("Export item found - Current status: {}", exportItem.getStatus());
 
-                    log.info("Step 3.{}.2: Updating item status to PICKED", itemIndex);
-                    exportItem.setStatus(ExportItemStatus.PICKED);
-                    exportItemRepo.save(exportItem);
-                    log.info("Item status updated to PICKED successfully");
-
-                    // Get inventory warehouse info
-                    log.info("Step 3.{}.3: Calling inventory service to get warehouse info for bin: {}",
-                            itemIndex, item.getBin().getBinId());
-                    InventoryWarehouseResponse inventoryWarehouseResponse = inventoryController
-                            .getInventoryWarehouse(item.getBin().getBinId()).getResult();
-                    log.info("Inventory warehouse response received - ID: {}, Available quantity: {}",
-                            inventoryWarehouseResponse.getInventoryWarehouseId());
-
-                    // Create stock movement for export
-                    log.info("Step 3.{}.4: Creating stock movement request", itemIndex);
-                    StockMovementRequest stockMovementRequest = StockMovementRequest.builder()
-                            .product(item.getProduct().getProductId())
-                            .inventoryWarehouseId(inventoryWarehouseResponse.getInventoryWarehouseId())
-                            .quantity(BigDecimal.valueOf(item.getQuantity()))
-                            .movementType("Export")
-                            .referenceOrderId(orderId)
-                            .performedBy(idUser)
-                            .unitCost(item.getUnitPrice())
-                            .note("Export execution for order: " + orderId)
-                            .build();
-//                    StockMovementRequest stockMovementRequest = new StockMovementRequest(
-//                            inventoryWarehouseResponse.getInventoryWarehouseId(), // Sử dụng ID từ response
-//                            item.getProduct().getProductId(),
-//                            "Export",
-//                            item.getQuantity(),
-//                            orderId,
-//                            item.getCreateByUser().getUserId(), // Thêm user thực hiện
-//                            "Export execution for order: " + orderId, // Thêm note
-//                            item.getUnitPrice()
-//                    );
-
-                    log.info("Stock movement request: {}", stockMovementRequest);
-
-                    // Call inventory service to create stock movement
-                    log.info("Step 3.{}.5: Calling inventory service to create stock movement...", itemIndex);
-                    var stockMovementResponse = inventoryController.createStockMovement(stockMovementRequest);
-                    log.info("Stock movement created successfully - Response: {}", stockMovementResponse);
-
-                    // Update item status to SHIPPED
-                    log.info("Step 3.{}.6: Updating item status to SHIPPED", itemIndex);
                     exportItem.setStatus(ExportItemStatus.SHIPPED);
                     exportItemRepo.save(exportItem);
-                    log.info("Item status updated to SHIPPED successfully");
 
-                    log.info("=== ITEM {}/{} PROCESSED SUCCESSFULLY ===", itemIndex, list.size());
 
                 } catch (Exception itemException) {
-                    log.error("=== FAILED TO PROCESS ITEM {}/{} ===", itemIndex, list.size());
-                    log.error("Item ID: {}, Product: {}, Bin: {}",
-                            item.getExportItemId(),
-                            item.getProduct().getProductName(),
-                            item.getBin().getBinCode());
-                    log.error("Exception details:", itemException);
                     throw itemException;
                 }
             }
 
-            // Update order status to COMPLETED
-            log.info("Step 4: All items processed successfully. Updating order status to COMPLETED");
-            exportOrderService.updateExportOrderStatus(orderId, ExportOrderStatus.COMPLETED);
-            log.info("Order status updated to COMPLETED successfully");
-
-            log.info("=== EXPORT EXECUTION COMPLETED SUCCESSFULLY ===");
-            log.info("Export execution completed for order: {} with {} items processed", orderId, list.size());
+            exportOrderService.updateExportOrderStatus(orderId, ExportOrderStatus.IN_PROGRESS);
 
         } catch (Exception e) {
-            log.error("=== EXPORT EXECUTION FAILED ===");
-            log.error("Export execution failed for order: {}", orderId);
-            log.error("Exception type: {}", e.getClass().getSimpleName());
-            log.error("Exception message: {}", e.getMessage());
-            log.error("Full stack trace:", e);
 
             try {
-                log.info("Step 5: Setting order status to CANCELLED due to failure");
                 exportOrderService.updateExportOrderStatus(orderId, ExportOrderStatus.CANCELLED);
-                log.info("Order status set to CANCELLED successfully");
             } catch (Exception statusUpdateException) {
-                log.error("Failed to update order status to CANCELLED", statusUpdateException);
             }
 
             throw new AppException(ErrorCode.EXPORT_EXECUTION_FAILED);
