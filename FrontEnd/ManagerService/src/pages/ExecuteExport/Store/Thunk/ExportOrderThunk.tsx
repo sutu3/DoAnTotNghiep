@@ -5,10 +5,12 @@ import OrderExportSlice, {
     ExportItemCreate, ExportItemCreateUI,
     ExportOrder, ExportOrderItem,
     OrderRequestExportCreate,
-} from "@/Store/ExportOrderSlice.tsx";
+} from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 import {setExpiringError} from "@/Store/InventoryOverView.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {mapExportOrderItemsToCreateList} from "@/Utils/mapExportItemToRequest.tsx";
+import {setAddListDelivery, WarehouseDeliveryRequest} from "@/pages/ExecuteExport/Store/WarehouseDeliverySlice.tsx";
+import {AddDeliveryWarehouseForOrder} from "@/pages/ExecuteExport/Store/Thunk/WarehouseDeliveryThunk.tsx";
 
 export const AddOrderExport = createAsyncThunk(
     "exportOrder/AddOrderExport",
@@ -129,13 +131,13 @@ export const MiddleGetOrderItem = (orderId:string) => {
         }
     };
 };
-export const MiddleExportOrder = (orderId: string, ListOrderItem: ExportOrderItem[]) => {
+export const MiddleExportOrder = (request:WarehouseDeliveryRequest, ListOrderItem: ExportOrderItem[]) => {
     return async function (dispatch: any) {
         try {
-
-            const convertItem=mapExportOrderItemsToCreateList(ListOrderItem,orderId)
-            await dispatch(ExportOrderItemForOrder({orderId,items:convertItem}));
-
+            const action=await dispatch(AddDeliveryWarehouseForOrder({request}));
+            dispatch(setAddListDelivery(action?.payload?.result));
+            const convertItem=mapExportOrderItemsToCreateList(ListOrderItem,request.exportOrderId)
+            await dispatch(ExportOrderItemForOrder({orderId:request.exportOrderId,items:convertItem}));
             // Final success notification
             showToast({
                 title: "Import Complete",

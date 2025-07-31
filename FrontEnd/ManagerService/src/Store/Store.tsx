@@ -14,10 +14,11 @@ import ProductSlice from "@/Store/ProductSlice.tsx";
 import ImportOrder from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import InventorySlice from "@/Store/InventoryOverView.tsx";
 import InventoryWarehouseSlice from "@/Store/InventoryWarehouseSlice.tsx";
-import ExportOrderSlice from "@/Store/ExportOrderSlice.tsx";
+import ExportOrderSlice from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 import TaskUserSlice from "@/Store/TaskUserSlice.tsx";
 import StockMovementSlice from "@/Store/StockMovementSlice.tsx";
 import WarehousReceipteSlice from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
+import WarehouseDeliverySlice from "@/pages/ExecuteExport/Store/WarehouseDeliverySlice.tsx";
 
 const ThemeReducer = (state = { value: true }, action: any) => {
   switch (action.type) {
@@ -32,6 +33,7 @@ const ThemeReducer = (state = { value: true }, action: any) => {
 
 const store = configureStore({
   reducer: {
+    warehouseDelivery:WarehouseDeliverySlice.reducer,
     themeReducer: ThemeReducer,
     warehouse: WarehouseSlice.reducer,
     stack: StackSlice.reducer,

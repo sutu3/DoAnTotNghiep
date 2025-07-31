@@ -169,7 +169,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({isOpen, onClose, produ
                                 <Tabs aria-label="Unit categories" size="sm">
                                     <Tab key="basic" title="Cơ bản">
                                         <div className="grid grid-cols-3 gap-2 mt-2">
-                                            {units.filter((u: Unit) => u.ratioToBase === 1).map((unit: any) => (
+                                            {units.filter((u: Unit) => u.ratioToBase === product?.unit?.ratioToBase).map((unit: any) => (
                                                 <Button
                                                     key={unit.unitID}
                                                     variant={formData.unit === unit.unitID ? "solid" : "bordered"}
@@ -185,7 +185,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({isOpen, onClose, produ
                                     </Tab>
                                     <Tab key="converted" title="Quy đổi">
                                         <div className="grid grid-cols-2 gap-2 mt-2">
-                                            {units.filter((u: Unit) => u.ratioToBase !== 1).map((unit: any) => (
+                                            {units.filter((u: Unit) => u.ratioToBase !== 1&&u.ratioToBase>=product?.unit?.ratioToBase).map((unit: Unit) => (
                                                 <Button
                                                     key={unit.unitID}
                                                     variant={formData.unit === unit.unitID ? "solid" : "bordered"}
@@ -253,8 +253,8 @@ const AddProductModal: React.FC<AddProductModalProps> = ({isOpen, onClose, produ
                                     <div className="flex justify-between text-gray-600">
                                         <span>Quy đổi:</span>
                                         <span>
-                                            {formData.requestQuantity} × {units.find((u: Unit) => u.unitID === formData.unit)?.ratioToBase || 1} = {' '}
-                                            {formData.requestQuantity * (units.find((u: Unit) => u.unitID === formData.unit)?.ratioToBase || 1)} {product.unit?.unitName}
+                                            {formData.requestQuantity} × {units.find((u: Unit) => u.unitID === formData.unit)?.ratioToBase || 1}/{product?.unit?.ratioToBase} = {' '}
+                                            {formData.requestQuantity * (units.find((u: Unit) => u.unitID === formData.unit)?.ratioToBase || 1)/product?.unit?.ratioToBase} {product.unit?.unitName}
                                         </span>
                                     </div>
                                 )}

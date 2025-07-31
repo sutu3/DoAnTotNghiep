@@ -17,11 +17,11 @@ import {
     TableCell, Spinner
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import OrderExportSlice, {ExportOrder, ExportOrderItem} from "@/Store/ExportOrderSlice.tsx";
+import OrderExportSlice, {ExportOrder, ExportOrderItem} from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { ExportOrderItemSelector} from "@/Store/Selector.tsx";
-import {MiddleGetOrderItem} from "@/Store/Thunk/ExportOrderThunk.tsx";
+import {MiddleGetOrderItem} from "@/pages/ExecuteExport/Store/Thunk/ExportOrderThunk.tsx";
+import {ExportOrderItemSelector} from "@/pages/ExecuteExport/Store/Selector.tsx";
 
 interface ExportOrderDetailModalProps {
     isOpen: boolean;
