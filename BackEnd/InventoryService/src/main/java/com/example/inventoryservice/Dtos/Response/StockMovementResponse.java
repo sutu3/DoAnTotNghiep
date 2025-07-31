@@ -32,6 +32,7 @@ public class StockMovementResponse {
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     Boolean isDeleted;
+    String checkSheetId;
 
     // Enriched fields từ external services
     ProductResponse productDetails;

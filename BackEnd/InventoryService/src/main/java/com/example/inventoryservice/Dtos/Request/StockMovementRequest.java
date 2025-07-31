@@ -1,5 +1,6 @@
 package com.example.inventoryservice.Dtos.Request;
 
+import io.micrometer.common.lang.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,5 +21,6 @@ public class StockMovementRequest {
     private String performedBy;
     private String note;
     private BigDecimal unitCost;
+    private @Nullable String checkSheetId;
 }
 
