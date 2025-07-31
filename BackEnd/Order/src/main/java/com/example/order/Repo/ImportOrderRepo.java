@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -23,6 +25,7 @@ public interface ImportOrderRepo extends JpaRepository<ImportOrder,String>, JpaS
             String warehouse, List<OrderStatus> statuses, Boolean isDeleted);
     List<ImportOrder> findAllByWarehouseAndStatusAndIsDeleted(
             String warehouse, OrderStatus statuses, Boolean isDeleted);
+
     List<ImportOrder> findAllByWarehouseAndStatusAndCreatedAtBetweenAndIsDeleted(
             String warehouse, OrderStatus status, LocalDateTime fromDate, LocalDateTime toDate, Boolean isDeleted);
 }

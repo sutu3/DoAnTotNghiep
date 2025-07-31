@@ -25,6 +25,7 @@ public class ProductResponse {
     String description;
     String urlImageProduct;
     BigDecimal price;
+    UnitNameResponse unit;
     Boolean isActive;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

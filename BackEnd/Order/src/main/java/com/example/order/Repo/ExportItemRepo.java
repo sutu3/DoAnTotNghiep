@@ -1,6 +1,7 @@
 package com.example.order.Repo;
 
 import com.example.order.Enum.ExportItemStatus;
+import com.example.order.Enum.ExportOrderStatus;
 import com.example.order.Module.ExportItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,4 +23,14 @@ public interface ExportItemRepo extends JpaRepository<ExportItem, String> {
 
     @Query("SELECT ei FROM ExportItem ei WHERE ei.exportOrder.exportOrderId = :orderId AND ei.status = :status AND ei.isDeleted = false")
     List<ExportItem> findByOrderIdAndStatus(@Param("orderId") String orderId, @Param("status") ExportItemStatus status);
+    @Query("SELECT COALESCE(SUM(ii.quantity), 0) FROM ExportItem ii " +
+            "JOIN ii.exportOrder io " +
+            "WHERE ii.product = :productId AND io.warehouse = :warehouseId " +
+            "AND io.status = 'APPROVED' AND ii.isDeleted = :isDeleted")
+    Integer countApprovedItemsByProductAndWarehouse(
+            @Param("productId") String productId,
+            @Param("warehouseId") String warehouseId,
+            @Param("isDeleted") Boolean isDeleted
+    );
+    Integer countByProductAndIsDeletedAndExportOrder_StatusAndExportOrder_Warehouse(String product, Boolean isDeleted, ExportOrderStatus status, String warehouse);
 }

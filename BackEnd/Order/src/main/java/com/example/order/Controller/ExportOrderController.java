@@ -58,7 +58,18 @@ public class ExportOrderController {
                 .success(true)
                 .build();
     }
-
+    @GetMapping("/approved-orders/product/{productId}/warehouse/{warehouseId}")
+    public ApiResponse<Integer> getApprovedExportOrdersByProduct(
+            @PathVariable String productId,
+            @PathVariable String warehouseId
+    ) {
+        return ApiResponse.<Integer>builder()
+                .Result(exportOrderService.getApprovedOrdersByProduct(productId, warehouseId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
     @GetMapping("/search/warehouse/{warehouseId}/status/pending")
     public ApiResponse<List<ExportOrderResponseClient>> getPendingExportOrdersByWarehouse(
             @PathVariable String warehouseId

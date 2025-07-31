@@ -217,7 +217,7 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService {
                     inventoryResponse.getResult().getInventoryWarehouseId(), // Sử dụng ID từ response
                     item.getImportItem().getProduct(),
                     "Import",
-                    convertToBaseUnit.convertToBaseUnitPrecise(item),
+                    convertToBaseUnit.convertToBaseUnitPreciseReceipt(item),
                     orderResponse.getImportOrder().getImportOrderId(),
                     GetCurrentUserId.getCurrentUserId(), // Thêm user thực hiện
                     "Import from order: " + orderResponse.getImportOrder().getImportOrderId(), // Thêm note
@@ -236,7 +236,7 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService {
 
     private void updateInventory(ReceiptItem receiptItem) {
         // Tạo StockMovementRequest để ghi nhận việc nhập hàng
-        BigDecimal quantity=convertToBaseUnit.convertToBaseUnitPrecise(receiptItem);
+        BigDecimal quantity=convertToBaseUnit.convertToBaseUnitPreciseReceipt(receiptItem);
         log.info("Updating inventory record with ID: {}",quantity.toString());
         StockMovementRequest stockMovementRequest = StockMovementRequest.builder()
                 .product(receiptItem.getImportItem().getProduct())

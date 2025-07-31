@@ -23,6 +23,12 @@ public enum ErrorCode {
     EXPORT_ITEM_NOT_FOUND(1002,"Export Item not found", HttpStatus.NOT_FOUND),
     RECEIPT_ITEM_NOT_FOUND(1003,"Receipt Item not found", HttpStatus.NOT_FOUND),
     SYNC_FAILED(1007,"Sync failed", HttpStatus.SERVICE_UNAVAILABLE),
+    DELIVERY_NOT_FOUND(404, "Delivery not found",HttpStatus.NOT_FOUND),
+    DELIVERY_ITEM_NOT_FOUND(404, "Delivery item not found",HttpStatus.NOT_FOUND),
+    DELIVERY_ALREADY_COMPLETED(400, "Delivery already completed",HttpStatus.BAD_REQUEST),
+    DELIVERY_COMPLETION_FAILED(500, "Failed to complete delivery",HttpStatus.BAD_REQUEST),
+    CANNOT_DELETE_COMPLETED_DELIVERY(400, "Cannot delete completed delivery",HttpStatus.BAD_REQUEST),
+    INVENTORY_UPDATE_FAILED(500, "Failed to update inventory",HttpStatus.BAD_REQUEST),
     EXPORT_ITEM_EXISTS(1003,"Export Item already exists", HttpStatus.CONFLICT),
     IMPORT_ORDER_NOT_FOUND(1002,"Import Order not found", HttpStatus.NOT_FOUND),
     IMPORT_ORDER_EXISTS(1003,"Import Order already exists", HttpStatus.CONFLICT),
@@ -30,7 +36,6 @@ public enum ErrorCode {
     EXPORT_ORDER_EXISTS(1003,"Export Order already exists", HttpStatus.CONFLICT),
     WAREHOUSE_RECEIPT_NOT_FOUND(1003,"Warehouse receipt not found", HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(1004,"Khong du quyen truy cap",HttpStatus.UNAUTHORIZED),
-    INVENTORY_UPDATE_FAILED(1006,"Inventory update failed", HttpStatus.SERVICE_UNAVAILABLE),
     RECEIPT_ALREADY_COMPLETED(1005,"Receipt already completed", HttpStatus.CONFLICT),
     UNCATEGORIZED(9999,"Uncategorized", HttpStatus.INTERNAL_SERVER_ERROR);
     ErrorCode(int Code,String Message, HttpStatusCode sponse){
