@@ -168,8 +168,32 @@ const ProductTable: React.FC<ProductTableProps> = ({ warehouseId }) => {
                                             <div className="text-lg font-bold text-blue-600">
                                                 {product.quantity || 0}
                                             </div>
-                                            <div className="text-xs text-gray-500">
+                                            <div className="text-xs text-gray-500 mb-1">
                                                 {product.unit?.unitName || "đơn vị"}
+                                            </div>
+
+                                            {/* Compact view với tooltip */}
+                                            <div className="flex justify-center gap-1">
+                                                <Chip
+                                                    size="sm"
+                                                    color="success"
+                                                    variant="flat"
+                                                    className="text-xs"
+                                                >
+                                                    +{product.pendingApprovedImportQuantity || 0}
+                                                </Chip>
+                                                <Chip
+                                                    size="sm"
+                                                    color="warning"
+                                                    variant="flat"
+                                                    className="text-xs"
+                                                >
+                                                    -{product.pendingApprovedExportQuantity || 0}
+                                                </Chip>
+                                            </div>
+
+                                            <div className="text-xs font-medium mt-1">
+                                                Khả dụng: {(product.quantity || 0) - (product.pendingApprovedExportQuantity || 0)}
                                             </div>
                                         </div>
                                     </TableCell>

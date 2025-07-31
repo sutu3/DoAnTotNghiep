@@ -19,6 +19,8 @@ export interface ExportItemCreateUI {
     unitPrice: number;
     note?: string;
     batchNumber?: string;
+    maxQuantity?: number;
+    sku?: string;
 }
 export interface ExportItemCreate {
     exportOrderId: string;
@@ -31,9 +33,9 @@ export interface ExportItemCreate {
 }
 
 export interface ExportOrderItem {
-    itemId: string;
+    exportItemId: string;
     product: Product;
-    customer: Supplier;
+    customer?: Supplier;
     quantity: number;
     realityQuantity: number;
     unitPrice: number;
@@ -127,11 +129,11 @@ const OrderExportSlice = createSlice({
             state.orderExport =
             state.orderExport.filter((item) => item.exportOrderId != action.payload);
         },
-        setUpdateOrderExport: (state, action) => {
-            const updatedOrder: ExportOrder = action.payload;
-            const index = state.orderExport.findIndex(el => el.exportOrderId === updatedOrder.exportOrderId);
+        setUpdateOrderExportItem: (state, action) => {
+            const updatedOrderItem: ExportOrderItem = action.payload;
+            const index = state.orderItem.findIndex(el => el.exportItemId === updatedOrderItem.exportItemId);
             if (index !== -1) {
-                state.orderExport[index] = updatedOrder;
+                state.orderItem[index] = updatedOrderItem;
             }
         }
     },
@@ -143,7 +145,7 @@ export const {
     setExecuteExportItem,
     setOrderExportList,
     setCleanItemOrderCreate,
-    setUpdateOrderExport,
+    setUpdateOrderExportItem,
     setOrderExportItemList,
     setAddItemOrderExport,
     setAddItemOrderCreate,

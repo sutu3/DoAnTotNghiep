@@ -10,7 +10,7 @@ import {
 } from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import {ImportOrderRequest, mapImportItemToRequest} from "@/Utils/mapImportItemToRequest .tsx";
 import {ReceiptWarehouseCreate} from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
-import {AddReceipt} from "@/pages/ExecuteImport/Store/WarehousReceipteThunk.tsx";
+import {AddReceipt} from "@/pages/ExecuteImport/Store/Thunk/WarehousReceipteThunk.tsx";
 
 export const AddItemOrderBatch = createAsyncThunk(
     "importOrder/AddItemOrderBatch",

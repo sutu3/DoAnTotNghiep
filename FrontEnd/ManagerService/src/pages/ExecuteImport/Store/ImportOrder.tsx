@@ -45,6 +45,7 @@ export interface ImportOrder {
     importOrderId: string;
     warehouse: Warehouse;
     createByUser: User;
+    accessByAdmin:User;
     description: string;
     itemCount: number,
     totalPrice: number,

@@ -25,7 +25,7 @@ import WarehouseReceiptSlice, {
 } from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {ReceiptItemSelector, StacksSelector} from "@/Store/Selector.tsx";
-import {syncWithBackend, UpdateReceiptComplete} from "@/pages/ExecuteImport/Store/WarehousReceipteThunk.tsx";
+import {syncWithBackend, UpdateReceiptComplete} from "@/pages/ExecuteImport/Store/Thunk/WarehousReceipteThunk.tsx";
 import {MiddleGetAllStackList} from "@/Store/Thunk/StackThunk.tsx";
 import {Bin, StackType} from "@/Store/StackSlice.tsx";
 import LocationSelectionModal from "@/components/Staff/ExecuteImport/Modal/LocationSelectionModal.tsx";

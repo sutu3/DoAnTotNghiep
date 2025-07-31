@@ -21,7 +21,7 @@ import { getStatusColor, getStatusText } from "@/Utils/statusHelpers.tsx";
 import {ImportOrder, ImportOrderItem} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import {useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { MiddleGetAllOrderItem} from "@/pages/ExecuteImport/Store/ImportOrderThunk.tsx";
+import { MiddleGetAllOrderItem} from "@/pages/ExecuteImport/Store/Thunk/ImportOrderThunk.tsx";
 import {OrderItemSelector} from "@/Store/Selector.tsx";
 
 interface ImportOrderDetailModalProps {

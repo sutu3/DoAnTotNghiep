@@ -1,5 +1,4 @@
-// FrontEnd/ManagerService/src/pages/Inventory/Overview/page.tsx
-import React, { useEffect } from "react";
+import  { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { warehouseSelector } from "@/Store/Selector.tsx";
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
@@ -7,7 +6,6 @@ import LowStockAlert from "@/components/Admin/Inventory/Overview/LowStockAlert.t
 import ExpiringProducts from "@/components/Admin/Inventory/Overview/ExpiringProducts.tsx";
 import RecentMovements from "@/components/Admin/Inventory/Overview/RecentMovements.tsx";
 import {MiddleLoadAllInventoryData} from "@/Store/Thunk/InventoryOverviewThunk.tsx";
-import WarehouseCapacity from "@/components/Admin/Inventory/Overview/WarehouseCapacity.tsx";
 import InventoryStatsCards from "@/components/Staff/InventoryCheck/InventoryStatsOverview.tsx";
 import WarehouseCapacityWidget from "@/components/Staff/InventoryCheck/WarehouseCapacityWidget.tsx";
 

@@ -55,12 +55,7 @@ export const ReceiptItemSelector = (state: { warehousReceipt: {receiptItem: any}
 export const TotalPageReceipt = (state: { warehousReceipt: { totalPage: number } }) =>
     state.warehousReceipt.totalPage;
 
-export const ExportItemCreateSelector = (state: { exportOrder: {exportItemCreate:any} }) =>
-    state.exportOrder.exportItemCreate;
-export const ExportOrderSelector = (state: { exportOrder: {orderExport:any} }) =>
-    state.exportOrder.orderExport;
-export const ExportOrderItemSelector = (state: { exportOrder: {orderItem:any} }) =>
-    state.exportOrder.orderItem;
+
 export const UnitSelector = (state: { unit: {unitList: any} }) =>
     state.unit.unitList;
 export const TotalPageUnit = (state: { unit: { totalPage: number } }) =>

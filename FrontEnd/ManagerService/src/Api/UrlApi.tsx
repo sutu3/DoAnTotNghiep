@@ -152,6 +152,7 @@ export const API_ROUTES = {
     },
     receiptWarehouse:(page: pageApi | null)=>{
       const base = `${TestGateWay}/orders/api/warehouse-receipts`;
+      const pageUrl = page ? `pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
       return{
         addReceipt:base,
         getByReceiptId:(receiptId:string)=>base+"/"+receiptId,
@@ -163,6 +164,32 @@ export const API_ROUTES = {
             byWarehouseId:(warehouseId:string)=>search+"/warehouse/"+warehouseId,
           }
         }
+      }
+    },
+    deliveryWarehouse:(page: pageApi | null)=>{
+      const base = `${TestGateWay}/orders/api/warehouse-deliveries`;
+      const pageUrl = page ? `pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      return{
+        addReceipt:base,
+        getByReceiptId:(deliveryId:string)=>base+"/"+deliveryId,
+        updateComplete:(deliveryId:string)=>base+`/${deliveryId}/complete`,
+        updateItem:(receiptId:string,receiptItemId:string)=>base+`/${receiptId}/items/${receiptItemId}`,
+
+        search:(()=>{
+          const search=base+"/search";
+          return{
+            byWarehouseId:(warehouseId: string|null,status:string|null)=>{
+              const params: string[] = [];
+              if (warehouseId) params.push(`warehouseId=${warehouseId}`);
+              if (status) params.push(`status=${status}`);
+              const url = search+"/getAllPage" + "?" + params.join("&");
+              return {
+                byStatus: url.slice(0,url.length)+"&"+pageUrl,
+                getAll: `${search}/warehouse/${warehouseId}?${pageUrl}`,
+              };
+            }
+          }
+        })
       }
     },
     importOrder:(page: pageApi | null)=>{

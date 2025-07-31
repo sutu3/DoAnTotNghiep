@@ -1,6 +1,6 @@
 import { Card, CardBody } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { ExportOrder } from "@/Store/ExportOrderSlice.tsx";
+import { ExportOrder } from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 
 interface ExportStatsCardsProps {
     exportOrders: ExportOrder[];

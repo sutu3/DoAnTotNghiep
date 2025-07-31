@@ -8,7 +8,7 @@ import ImportOrderDetailModal from "@/components/Admin/OrderImport/Modal/ImportO
 import RejectReasonModal from "@/components/Admin/OrderImport/Modal/RejectReasonModal.tsx";
 import {ImportOrder, ImportOrderItem} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import ProductInventoryStatsModal from "@/components/Admin/OrderImport/Modal/ProductInventoryStatsModal.tsx";
-import {MiddleChangeTypeOrderItem, MiddleMarkGoodsArrived} from "@/pages/ExecuteImport/Store/ImportOrderThunk.tsx";
+import {MiddleChangeTypeOrderItem, MiddleMarkGoodsArrived} from "@/pages/ExecuteImport/Store/Thunk/ImportOrderThunk.tsx";
 import {useDispatch} from "react-redux";
 
 export interface BinLocation {

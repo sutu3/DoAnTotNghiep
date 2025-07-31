@@ -26,7 +26,7 @@ const SelectWarehouseApprove = ({ warehouse, setWarehouse }: SelectProps) => {
 
     // Gán kho mặc định sau khi fetch xong
     useEffect(() => {
-        if (defaultWarehouse.length > 0 && !warehouse) {
+        if (defaultWarehouse?.length > 0 && !warehouse) {
             setWarehouse(defaultWarehouse[0].warehouseId);
         }
     }, [defaultWarehouse, warehouse, setWarehouse]);

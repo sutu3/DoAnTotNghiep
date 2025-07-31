@@ -5,7 +5,68 @@
     0%, 100% { transform: translateY(0px) rotate(0deg); }
     50% { transform: translateY(-20px) rotate(5deg); }
 }
+@media print {
+    .no-print {
+        display: none !important;
+    }
 
+    .print-content {
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+        margin: 0;
+        padding: 0;
+        box-shadow: none !important;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .bg-gradient-to-br {
+        background: #f0f9ff !important;
+    }
+
+    .summary-section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    .signature-section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        margin-top: 20px;
+    }
+
+    table {
+        page-break-inside: auto;
+    }
+
+    table tr {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+}
+
+/* Styling cho màn hình */
+.print-content {
+    font-family: 'Times New Roman', serif;
+    line-height: 1.4;
+}
+
+.print-content h1, .print-content h2, .print-content h3, .print-content h4 {
+    font-family: 'Arial', sans-serif;
+}
+
+/* Styling cho màn hình */
+.print-content {
+    font-family: 'Times New Roman', serif;
+    line-height: 1.4;
+}
+
+.print-content h1, .print-content h2, .print-content h3, .print-content h4 {
+    font-family: 'Arial', sans-serif;
+}
 @keyframes float-medium {
     0%, 100% { transform: translateY(0px) rotate(0deg); }
     50% { transform: translateY(-15px) rotate(-3deg); }

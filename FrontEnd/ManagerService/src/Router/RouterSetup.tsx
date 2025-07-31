@@ -24,8 +24,6 @@ import ProductPage from "@/pages/Product/page.tsx";
 import LoginPage from "@/pages/Login/page.tsx";
 import OrderRequestImportForm from "@/pages/OrderImport/page.tsx";
 import MyTasksPage from "@/pages/TaskType/Tasks/Staff/page.tsx";
-import ExecuteExportPage from "@/pages/ExecuteExport/page.tsx";
-import CreateExportOrderPage from "@/pages/OrderExport/page.tsx";
 import StackDetailPage from "@/pages/Stack/Bin/page.tsx";
 import AdminImportOrderManagement from "@/pages/ApproveOrderImport/page.tsx";
 import InventoryOverviewPage from "@/pages/Inventory/OverView/page.tsx";
@@ -34,7 +32,6 @@ import StorageLimitsPage from "@/pages/StorageLimits/page.tsx";
 import AdminExportOrderManagement from "@/pages/ApproveOrderExport/page.tsx";
 import Daskboard from "@/pages/Dashboard/page.tsx";
 import EditSupplierPage from "@/pages/Supplier/Edit/EditSupplierPage.tsx";
-import ImportOrderDetailsPage from "@/pages/ExecuteImport/Detail/page.tsx";
 import TaskAssignmentsPage from "@/pages/TaskAssignments/page.tsx";
 import CreateTaskAssignmentPage from "@/pages/TaskType/CreateTask/CreateTaskAssignmentPage";
 import EmployeeInventoryCheckPage from "@/pages/InventoryCheck/page.tsx";
@@ -43,6 +40,8 @@ import EditProductPage from "@/pages/Product/Edit/EditProductPage.tsx";
 import AddWarehousePage from "@/pages/WarehouseManager/AddNew/AddWarehousePage.tsx";
 import SupplierPage from "@/pages/Supplier/page";
 import WarehouseReceiptManagementPage from "@/pages/ExecuteImport/page.tsx";
+import ExportOrderPage from "@/pages/OrderExport/TestPage.tsx";
+import WarehouseDeliveryPage from "@/pages/ExecuteExport/page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -80,9 +79,8 @@ const router = createBrowserRouter([
       { path: "/staff/request-import", element: <OrderRequestImportForm /> },
       { path: "/staff/tasks", element: <MyTasksPage /> },
       { path: "/staff/import", element: <WarehouseReceiptManagementPage /> },
-      { path: "/staff/import/details", element: <ImportOrderDetailsPage /> },
-      { path: "/staff/export", element: <ExecuteExportPage /> },
-      { path: "/staff/request-export", element: <CreateExportOrderPage /> },
+      { path: "/staff/export", element: <WarehouseDeliveryPage /> },
+      { path: "/staff/request-export", element: <ExportOrderPage /> },
       { path: "/staff/check-inventory", element: <EmployeeInventoryCheckPage /> },
 
     ],

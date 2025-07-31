@@ -9,7 +9,7 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
-import { ExportOrder } from "@/Store/ExportOrderSlice.tsx";
+import { ExportOrder } from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 
 interface ExportOrderRejectModalProps {
     isOpen: boolean;

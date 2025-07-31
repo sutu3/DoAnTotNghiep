@@ -15,12 +15,12 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import {useEffect, useState} from "react";
-import OrderExportSlice, { ExportOrder } from "@/Store/ExportOrderSlice.tsx";
+import OrderExportSlice, { ExportOrder } from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 import {pageApi} from "@/Api/UrlApi.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {MiddleGetOrderExportPending_Approve} from "@/Store/Thunk/ExportOrderThunk.tsx";
-import {ExportOrderSelector} from "@/Store/Selector.tsx";
+import {MiddleGetOrderExportPending_Approve} from "@/pages/ExecuteExport/Store/Thunk/ExportOrderThunk.tsx";
 import SelectWarehouseApprove from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
+import {ExportOrderSelector} from "@/pages/ExecuteExport/Store/Selector.tsx";
 
 interface ExportOrderTableProps {
     searchValue: string;
