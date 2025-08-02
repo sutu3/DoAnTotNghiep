@@ -134,6 +134,9 @@ public class StockMovementServiceImpl implements StockMovementService {
                 case ADJUSTMENT:
                     log.info("Processing ADJUSTMENT movement");
                     stockMovement.setQuantityAfter(request.getQuantity());
+                    if (request.getCheckSheetId() != null) {
+                        stockMovement.setCheckSheetId(request.getCheckSheetId());
+                    }
                     log.info("ADJUSTMENT: Set quantity to {}", request.getQuantity());
 
                     // Bổ sung logic cho trường hợp quantity = 0

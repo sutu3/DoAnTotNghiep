@@ -70,5 +70,16 @@ public interface OrderController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate
     );
+    @GetMapping(value = "/api/importOrders/approved-orders/product/{productId}/warehouse/{warehouseId}")
+    ApiResponse<Integer> getApprovedImportOrdersByProduct(
+            @PathVariable String productId,
+            @PathVariable String warehouseId
+    );
+
+    @GetMapping(value = "/api/exportOrders/approved-orders/product/{productId}/warehouse/{warehouseId}")
+    ApiResponse<Integer> getApprovedExportOrdersByProduct(
+            @PathVariable String productId,
+            @PathVariable String warehouseId
+    );
 
 }

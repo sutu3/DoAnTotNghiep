@@ -16,6 +16,12 @@ public enum ErrorCode {
     INVENTORY_PRODUCT_NOT_FOUND(1003,"Inventory product not found", HttpStatus.NOT_FOUND),
     INVENTORY_PRODUCT_EXISTS(1003,"Inventory product exists", HttpStatus.CONFLICT),
     INSUFFICIENT_STOCK(1003,"Insufficient stock", HttpStatus.FORBIDDEN),
+    INVENTORY_CHECK_SHEET_NOT_FOUND(1040, "Inventory check sheet not found", HttpStatus.NOT_FOUND),
+    INVENTORY_CHECK_DETAIL_NOT_FOUND(1041, "Inventory check detail not found",HttpStatus.NOT_FOUND),
+    CHECK_SHEET_NUMBER_EXISTS(1042, "Check sheet number already exists",HttpStatus.BAD_REQUEST),
+    CHECK_SHEET_CANNOT_BE_MODIFIED(1043, "Check sheet cannot be modified", HttpStatus.BAD_REQUEST),
+    CHECK_SHEET_CANNOT_BE_DELETED(1044, "Check sheet cannot be deleted", HttpStatus.BAD_REQUEST),
+    CHECK_SHEET_ALREADY_PROCESSED(1045, "Check sheet already processed", HttpStatus.BAD_REQUEST),
     INVENTORY_WAREHOUSE_NOT_FOUND(1004,"Warehouse not found", HttpStatus.NOT_FOUND),
 
     STOCK_MOVEMENT_NOT_FOUND(1004,"StockMovement not found", HttpStatus.NOT_FOUND),

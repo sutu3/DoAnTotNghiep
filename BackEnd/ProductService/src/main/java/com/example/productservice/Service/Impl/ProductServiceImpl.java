@@ -183,21 +183,27 @@ public class ProductServiceImpl implements ProductService {
             return List.of();
         }
 
-        // 3. Tạo Map<productId, quantity> từ kết quả inventory
-        Map<String, BigDecimal> productQuantityMap = filteredProductDtos.stream()
-                .collect(Collectors.toMap(ProductClientRequest::getProductId, ProductClientRequest::getQuantity));
+        // 3. Tạo Map từ kết quả inventory (bao gồm approved quantities)
+        Map<String, ProductClientRequest> productDataMap = filteredProductDtos.stream()
+                .collect(Collectors.toMap(ProductClientRequest::getProductId, p -> p));
 
-        // 4. Trả về danh sách enriched ProductResponse
+        // 4. Trả về danh sách enriched ProductResponse với approved quantities
         List<ProductResponse> result = listProduct.stream()
-                .filter(p -> productQuantityMap.containsKey(p.getProductId()))
+                .filter(p -> productDataMap.containsKey(p.getProductId()))
                 .map(p -> {
                     ProductResponse response = enrich(p);
-                    response.setQuantity(productQuantityMap.get(p.getProductId())); // Gán quantity thực tế từ kho
+                    ProductClientRequest productData = productDataMap.get(p.getProductId());
+
+                    // Set inventory data
+                    response.setQuantity(productData.getQuantity());
+                    response.setPendingApprovedImportQuantity(productData.getPendingApprovedImportQuantity());
+                    response.setPendingApprovedExportQuantity(productData.getPendingApprovedExportQuantity());
+
                     return response;
                 })
                 .toList();
 
-        log.info("✅ Returning {} enriched products with warehouse quantity", result.size());
+        log.info("✅ Returning {} enriched products with warehouse quantity and approved orders", result.size());
         return result;
     }
 

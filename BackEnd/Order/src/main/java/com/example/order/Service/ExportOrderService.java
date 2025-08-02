@@ -44,4 +44,6 @@ public interface ExportOrderService {
     List<ExportOrderResponseClient> getExportOrdersByWarehouseAndDateRange(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate);
     List<ExportOrderResponseClient> getPendingExportOrdersByWarehouse(String warehouseId);
     List<ExportOrderResponseClient> getCompletedExportOrdersByWarehouse(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate);
+    List<ExportOrderResponse> getOrdersReadyForDelivery(String warehouseId);
+    Integer getApprovedOrdersByProduct(String productId, String warehouseId);
 }
