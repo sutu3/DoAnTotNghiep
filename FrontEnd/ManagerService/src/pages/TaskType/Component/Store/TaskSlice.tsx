@@ -3,7 +3,7 @@ import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {callApiThunk} from "@/Store/Store.tsx";
 import { TaskTypeCreated} from "@/Store/TaskTypeSlice.tsx";
-import {TaskUser, TaskUserCreate} from "@/Store/TaskUserSlice.tsx";
+import TaskUserSlice, {TaskUser, TaskUserCreate} from "@/pages/TaskType/Component/Store/TaskUserSlice.tsx";
 
 interface Warehouse {
     warehouseName: string;
@@ -26,6 +26,7 @@ export interface Task {
     status: "Pending" | "In_Progress" | "Complete"| "Cancel" | string; // Enum if possible
     level: "Low" | "Medium" | "Hight" | string; // Enum nếu backend cố định giá trị
     description: string;
+    requiresEvidence?:boolean;
     taskUsers: TaskUser[];
     warehouses: Warehouse
     completeAt: string; // ISO date string
@@ -33,6 +34,7 @@ export interface Task {
 export interface TaskNoList {
     taskId: string;
     taskType: TaskTypeCreated
+    warehouses:Warehouse
     status: "Pending" | "In_Progress" | "Complete"| "Cancel" | string; // Enum if possible
     level: "Low" | "Medium" | "Hight" | string; // Enum nếu backend cố định giá trị
     description: string;
@@ -44,6 +46,7 @@ export interface TaskCreated {
     description: string;
     completeAt: string;
     warehouses:string,
+    requiresEvidence:boolean,
 }
 interface TaskState  {
     tasks: Task[],
@@ -62,6 +65,15 @@ const TaskSlice = createSlice({
         initToTalPage: (state, action) => {
             state.totalPage = action.payload || 0;
         },
+        setUpdateTask:(state, action) => {
+            const updatedTask: Task = action.payload;
+            const index = state.tasks.findIndex(task => task.taskId === updatedTask.taskId);
+            if (index !== -1) {
+                state.tasks[index] = updatedTask;
+            }else{
+                state.tasks=[...state.tasks,updatedTask];
+            }
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -117,4 +129,6 @@ export const MiddleGetAllTask = (page: pageApi,warehouseId:string,taskType:strin
         }
     };
 };
+export const {setUpdateTask, initToTalPage} = TaskSlice.actions;
+
 export default TaskSlice;

@@ -6,7 +6,7 @@ import {Calendar} from "@heroui/react";
 import LevelDropdown from "@/components/Admin/Tasks/LevelDropdown.tsx";
 import {parseDate} from "@internationalized/date";
 import {TaskType} from "@/Store/TaskTypeSlice.tsx";
-import {TaskCreated} from "@/Store/TaskSlice.tsx";
+import {TaskCreated} from "@/pages/TaskType/Component/Store/TaskSlice.tsx";
 
 
 interface Props {

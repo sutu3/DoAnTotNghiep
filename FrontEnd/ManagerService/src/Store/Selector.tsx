@@ -97,3 +97,5 @@ export const InventoryErrorsSelector = (state: { inventory: { errors: any } }) =
     state.inventory.errors;
 export const InventoryWarehouseSelector = (state: { inventoryWarehouse: { inventoryWarehouses: any } }) =>
     state.inventoryWarehouse.inventoryWarehouses;
+export const InventoryProductSelector = (state: { inventoryWarehouse: { inventoryProducts: any } }) =>
+    state.inventoryWarehouse.inventoryProducts;
