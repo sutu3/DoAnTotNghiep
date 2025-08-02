@@ -19,7 +19,7 @@ public interface InventoryCheckSheetRepo extends JpaRepository<InventoryCheckShe
 
     Page<InventoryCheckSheet> findAllByWarehouseAndIsDeleted(String warehouseId, Boolean isDeleted, Pageable pageable);
 
-    List<InventoryCheckSheet> findAllByPerformedByAndIsDeleted(String performedBy, Boolean isDeleted);
+    Page<InventoryCheckSheet> findAllByPerformedByAndIsDeleted(String performedBy, Boolean isDeleted, Pageable pageable);
 
     List<InventoryCheckSheet> findAllByStatusAndIsDeleted(CheckSheetStatus status, Boolean isDeleted);
 

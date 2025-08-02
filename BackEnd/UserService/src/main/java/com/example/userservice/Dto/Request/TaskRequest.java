@@ -8,5 +8,6 @@ public record TaskRequest(
         String level,
         String description,
         String warehouses,
+        Boolean requiresEvidence,
         LocalDate completeAt) {
 }

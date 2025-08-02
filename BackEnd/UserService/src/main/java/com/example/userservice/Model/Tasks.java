@@ -30,6 +30,8 @@ public class Tasks extends BaseEntity {
     StatusTaskEnum status;
     @Enumerated(EnumType.STRING)
     LevelEnum level;
+    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE COMMENT 'Có yêu cầu upload ảnh minh chứng hay không'")
+    Boolean requiresEvidence;
     @Column(columnDefinition = "VARCHAR(36) COMMENT 'mã id của warehouse của từng nhiệm vụ'",nullable = false)
     String warehouses;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'mô tả nhiệm vụ'")

@@ -3,6 +3,7 @@ package com.example.inventoryservice.Controller;
 import com.example.inventoryservice.Dtos.ApiResponse;
 import com.example.inventoryservice.Dtos.Request.InventoryCheckSheetRequest;
 import com.example.inventoryservice.Dtos.Response.InventoryCheckSheetResponse;
+import com.example.inventoryservice.Form.AttachmentUrl;
 import com.example.inventoryservice.Form.InventoryCheckSheetForm;
 import com.example.inventoryservice.Service.InventoryCheckSheetService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,16 +45,40 @@ public class InventoryCheckSheetController {
                 .build();
     }
 
-    @GetMapping("/performed-by/{performedBy}")
-    public ApiResponse<List<InventoryCheckSheetResponse>> getAllByPerformedBy(@PathVariable String performedBy) {
+    @GetMapping("/performed-by")
+    public ApiResponse<List<InventoryCheckSheetResponse>> getAllByPerformedBy(
+            @RequestParam("pageNumber") int page,
+            @RequestParam("pageSize") int size) {
+        Pageable pageable = PageRequest.of(page, size);
         return ApiResponse.<List<InventoryCheckSheetResponse>>builder()
-                .Result(inventoryCheckSheetService.getAllByPerformedBy(performedBy))
+                .Result(inventoryCheckSheetService.getAllByPerformedBy(pageable))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)
                 .build();
     }
-
+    @PutMapping("/{id}/status-completed")
+    public ApiResponse<InventoryCheckSheetResponse> updateStatusCompleted(@PathVariable String id)
+    {
+        return ApiResponse.<InventoryCheckSheetResponse>builder()
+                .Result(inventoryCheckSheetService.updateStatusCompleted(id))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @PutMapping("/{id}/status-Approve")
+    public ApiResponse<InventoryCheckSheetResponse> updateStatusCompleted(
+            @PathVariable String id,
+            @RequestBody AttachmentUrl attachmentUrl)
+    {
+        return ApiResponse.<InventoryCheckSheetResponse>builder()
+                .Result(inventoryCheckSheetService.updateStatusApprove(id,attachmentUrl))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
     @GetMapping("/{id}")
     public ApiResponse<InventoryCheckSheetResponse> getById(@PathVariable String id) {
         return ApiResponse.<InventoryCheckSheetResponse>builder()

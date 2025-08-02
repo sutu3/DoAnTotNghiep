@@ -139,6 +139,25 @@ public class InventoryWarehouseController {
                 .build();
     }
     /**
+     * Lấy danh sách inventory warehouse theo product và warehouse
+     * @param productId ID của sản phẩm
+     * @param warehouseId ID của warehouse
+     * @return List<InventoryWarehouseResponse> - Danh sách inventory theo từng bin
+     */
+    @GetMapping("/search/product/{productId}/warehouse/{warehouseId}")
+    public ApiResponse<List<InventoryWarehouseResponse>> getByProductAndWarehouse(
+            @PathVariable String productId,
+            @PathVariable String warehouseId
+    ) {
+        return ApiResponse.<List<InventoryWarehouseResponse>>builder()
+                .Result(inventoryWarehouseService.getAllByProductAndWarehouse(productId, warehouseId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+
+    /**
      * Tạo mới inventory warehouse (đặt hàng vào bin cụ thể)
      * @param request Thông tin inventory warehouse cần tạo
      * @return InventoryWarehouseResponse - Thông tin inventory warehouse vừa được tạo

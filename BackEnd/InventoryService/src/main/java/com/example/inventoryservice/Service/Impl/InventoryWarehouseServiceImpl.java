@@ -74,6 +74,15 @@ public class InventoryWarehouseServiceImpl implements InventoryWarehouseService 
     }
 
     @Override
+    public List<InventoryWarehouseResponse> getAllByProductAndWarehouse(String product, String warehouse) {
+        List<InventoryWarehouse> entities = inventoryWarehouseRepo
+                .findAllByProductAndWarehouseAndIsDeleted(product, warehouse, false);
+        return entities.stream()
+                .map(this::enrich)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public InventoryWarehouse getById(String id) {
         return inventoryWarehouseRepo.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.INVENTORY_WAREHOUSE_NOT_FOUND));

@@ -12,8 +12,10 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)public class TaskUserResponseNoList{
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class TaskUserResponseNoList{
     String id;
+    String evidenceImages;
     StatusTaskUserEnum status;
     String note;
     LocalDateTime completeAt;

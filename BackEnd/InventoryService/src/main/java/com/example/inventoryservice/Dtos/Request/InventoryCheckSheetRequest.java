@@ -19,10 +19,6 @@ public class InventoryCheckSheetRequest {
     String checkSheetNumber;
     @NotBlank
     String warehouse;
-    @NotNull
-    LocalDateTime checkDate;
-    CheckSheetStatus status;
     String notes;
-    String attachmentUrl;
     List<InventoryCheckDetailRequest> checkDetails;
 }
