@@ -61,8 +61,9 @@ public class InventoryCheckDetailServiceImpl implements InventoryCheckDetailServ
         inventoryWarehouseService.getById(request.getInventoryWarehouseId());
 
         InventoryCheckDetail detail = inventoryCheckDetailMapper.toEntity(request);
+        detail.setDifference(detail.getActualQuantity().subtract(detail.getSystemQuantity()));
         detail.setCheckSheet(checkSheet);
-
+        detail.setIsDeleted(false);
         InventoryCheckDetail savedDetail = inventoryCheckDetailRepo.save(detail);
         return enrich(savedDetail);
     }

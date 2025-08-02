@@ -17,6 +17,7 @@ public interface InventoryWarehouseService {
     List<InventoryWarehouseResponse> getAllByBin(String bin);
     InventoryWarehouseResponse getByBin(String bin);
     List<InventoryWarehouseResponse> getAllByProduct(String product);
+    List<InventoryWarehouseResponse> getAllByProductAndWarehouse(String product, String warehouse);
     InventoryWarehouse getById(String id);
     InventoryWarehouseResponse getByIdResponse(String id);
     InventoryWarehouseResponse createInventoryWarehouse(InventoryWarehouseRequest request);

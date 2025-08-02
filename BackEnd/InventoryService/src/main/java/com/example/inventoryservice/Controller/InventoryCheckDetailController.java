@@ -94,7 +94,6 @@ public class InventoryCheckDetailController {
                 .success(true)
                 .build();
     }
-
     @GetMapping("/check-sheet/{checkSheetId}/total-discrepancy")
     public ApiResponse<BigDecimal> getTotalDiscrepancy(@PathVariable String checkSheetId) {
         return ApiResponse.<BigDecimal>builder()

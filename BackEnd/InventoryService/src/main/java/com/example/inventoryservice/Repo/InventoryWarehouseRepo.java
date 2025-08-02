@@ -22,6 +22,7 @@ public interface InventoryWarehouseRepo extends JpaRepository<InventoryWarehouse
     List<InventoryWarehouse> findAllByBinAndIsDeleted(String bin, Boolean isDeleted);
     InventoryWarehouse findByBinAndIsDeleted(String bin, Boolean isDeleted);
     List<InventoryWarehouse> findAllByProductAndIsDeleted(String product, Boolean isDeleted);
+    List<InventoryWarehouse> findAllByProductAndWarehouseAndIsDeleted(String product, String warehouse, Boolean isDeleted);
 
     // Tìm theo product và bin
     Optional<InventoryWarehouse> findByProductAndBinAndIsDeleted(String product, String bin, Boolean isDeleted);

@@ -12,6 +12,7 @@ import com.example.inventoryservice.Dtos.Response.InventoryCheckSheetResponse;
 import com.example.inventoryservice.Enum.CheckSheetStatus;
 import com.example.inventoryservice.Exception.AppException;
 import com.example.inventoryservice.Exception.ErrorCode;
+import com.example.inventoryservice.Form.AttachmentUrl;
 import com.example.inventoryservice.Form.InventoryCheckSheetForm;
 import com.example.inventoryservice.Mapper.InventoryCheckDetailMapper;
 import com.example.inventoryservice.Mapper.InventoryCheckSheetMapper;
@@ -60,8 +61,9 @@ public class InventoryCheckSheetServiceImpl implements InventoryCheckSheetServic
     }
 
     @Override
-    public List<InventoryCheckSheetResponse> getAllByPerformedBy(String performedBy) {
-        return inventoryCheckSheetRepo.findAllByPerformedByAndIsDeleted(performedBy, false)
+    public List<InventoryCheckSheetResponse> getAllByPerformedBy(Pageable pageable) {
+        var userId = GetCurrentUserId.getCurrentUserId();
+        return inventoryCheckSheetRepo.findAllByPerformedByAndIsDeleted(userId, false,pageable)
                 .stream()
                 .map(this::enrich)
                 .collect(Collectors.toList());
@@ -93,13 +95,15 @@ public class InventoryCheckSheetServiceImpl implements InventoryCheckSheetServic
 
         // Create check sheet
         InventoryCheckSheet checkSheet = inventoryCheckSheetMapper.toEntity(request);
+        checkSheet.setCheckDate(LocalDateTime.now());
         checkSheet.setIsDeleted(false);
+        checkSheet.setPerformedBy(userId);
         checkSheet.setStatus(CheckSheetStatus.DRAFT);
 
         InventoryCheckSheet savedCheckSheet = inventoryCheckSheetRepo.save(checkSheet);
 
         // Create check details if provided
-        if (request.getCheckDate() != null && !request.getCheckDetails().isEmpty()) {
+        if (!request.getCheckDetails().isEmpty()) {
             for (InventoryCheckDetailRequest detailRequest : request.getCheckDetails()) {
                 inventoryCheckDetailService.createInventoryCheckDetail(detailRequest, savedCheckSheet.getCheckSheetId());
             }
@@ -111,18 +115,46 @@ public class InventoryCheckSheetServiceImpl implements InventoryCheckSheetServic
     @Override
     public InventoryCheckSheetResponse updateInventoryCheckSheet(InventoryCheckSheetForm form, String id) {
         InventoryCheckSheet checkSheet = getById(id);
+        inventoryCheckSheetMapper.update(checkSheet, form);
+        checkSheet.setUpdatedAt(LocalDateTime.now());
+        InventoryCheckSheet savedCheckSheet= inventoryCheckSheetRepo.save(checkSheet);
+        return enrich(savedCheckSheet);
+    }
 
-        // Only allow updates if status is DRAFT
+
+    @Override
+    public InventoryCheckSheetResponse updateStatusCompleted(String checkSheetId) {
+        InventoryCheckSheet checkSheet = getById(checkSheetId);
+        // Only allow status update if current status is DRAFT
         if (checkSheet.getStatus() != CheckSheetStatus.DRAFT) {
             throw new AppException(ErrorCode.CHECK_SHEET_CANNOT_BE_MODIFIED);
         }
 
-        inventoryCheckSheetMapper.update(checkSheet, form);
+        checkSheet.setStatus(CheckSheetStatus.COMPLETED);
+        checkSheet.setUpdatedAt(LocalDateTime.now());
+
+        InventoryCheckSheet savedCheckSheet = inventoryCheckSheetRepo.save(checkSheet);
+        return enrich(savedCheckSheet);
+    }
+
+    @Override
+    public InventoryCheckSheetResponse updateStatusApprove(String checkSheetId, AttachmentUrl attachmentUrl) {
+        InventoryCheckSheet checkSheet = getById(checkSheetId);
+        checkSheet.setAttachmentUrl(attachmentUrl.attachmentUrl());
+        // Only allow status update if current status is DRAFT
+        if (checkSheet.getStatus() != CheckSheetStatus.COMPLETED) {
+            throw new AppException(ErrorCode.CHECK_SHEET_CANNOT_BE_MODIFIED);
+        }
+
+        checkSheet.setStatus(CheckSheetStatus.APPROVED);
         checkSheet.setUpdatedAt(LocalDateTime.now());
 
         InventoryCheckSheet updatedCheckSheet = inventoryCheckSheetRepo.save(checkSheet);
-        return enrich(updatedCheckSheet);
+        InventoryCheckSheetResponse checkSheetResponse=processCheckSheet(checkSheetId);
+        return checkSheetResponse;
     }
+
+
 
     @Override
     public void deleteInventoryCheckSheet(String id) {
@@ -151,7 +183,7 @@ public class InventoryCheckSheetServiceImpl implements InventoryCheckSheetServic
     public InventoryCheckSheetResponse processCheckSheet(String id) {
         InventoryCheckSheet checkSheet = getById(id);
 
-        if (checkSheet.getStatus() != CheckSheetStatus.DRAFT) {
+        if (checkSheet.getStatus() != CheckSheetStatus.APPROVED) {
             throw new AppException(ErrorCode.CHECK_SHEET_ALREADY_PROCESSED);
         }
 

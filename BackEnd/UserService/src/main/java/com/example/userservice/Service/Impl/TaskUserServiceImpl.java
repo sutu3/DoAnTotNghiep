@@ -4,9 +4,12 @@ import com.example.userservice.Dto.Request.StatusRequest;
 import com.example.userservice.Dto.Request.TaskRequest;
 import com.example.userservice.Dto.Request.TaskUserRequest;
 import com.example.userservice.Dto.Responses.TaskUser.TaskUserResponse;
+import com.example.userservice.Enum.StatusTaskEnum;
 import com.example.userservice.Enum.StatusTaskUserEnum;
 import com.example.userservice.Exception.AppException;
 import com.example.userservice.Exception.ErrorCode;
+import com.example.userservice.Form.EvidenceImages;
+import com.example.userservice.Form.NoteForm;
 import com.example.userservice.Mapper.TaskUserMapper;
 import com.example.userservice.Model.TaskUser;
 import com.example.userservice.Model.Tasks;
@@ -44,7 +47,8 @@ public class TaskUserServiceImpl implements TaskUserService {
     public Page<TaskUserResponse> getAllByUserId( Pageable pageable) {
         var userId=GetCurrentUserId.getCurrentUserId();
         userService.findById(userId);
-        return taskUserRepo.findAllByUser_UserId(userId,pageable).map(taskUserMapper::toResponse);
+        List<StatusTaskEnum> statuses = List.of(StatusTaskEnum.In_Progress, StatusTaskEnum.Complete);
+        return taskUserRepo.findAllByUser_UserIdAndTask_StatusIn(userId,statuses,pageable).map(taskUserMapper::toResponse);
     }
 
     @Override
@@ -89,11 +93,37 @@ public class TaskUserServiceImpl implements TaskUserService {
     public TaskUserResponse findByIdToResponse(String id) {
         return taskUserMapper.toResponse(findById(id));
     }
-
     @Override
     public TaskUserResponse updateTaskUserStatus(StatusRequest statusRequest, String id) {
         TaskUser taskUser=findById(id);
         taskUser.setStatus(StatusTaskUserEnum.valueOf(statusRequest.status()));
+        return taskUserMapper.toResponse(taskUserRepo.save(taskUser));
+    }
+    @Override
+    public TaskUserResponse updateTaskUserCancel(String id, NoteForm note) {
+        TaskUser taskUser = findById(id);
+        if(taskUser.getStatus() == StatusTaskUserEnum.Complete) {
+            throw new AppException(ErrorCode.TASK_USER_CANNOT_BE_CANCELLED);
+        }
+        String noteUser = "Task cancelled For: " + note;
+        taskUser.setStatus(StatusTaskUserEnum.Cancel);
+        taskUser.setNote(STR."\{taskUser.getNote()} \{noteUser}");
+        return taskUserMapper.toResponse(taskUserRepo.save(taskUser));
+    }
+    @Override
+    public TaskUserResponse updateTaskUserCompleted(EvidenceImages request, String id) {
+        TaskUser taskUser = findById(id);
+        if(taskUser.getStatus() != StatusTaskUserEnum.In_Progress) {
+            throw new AppException(ErrorCode.TASK_USER_CANNOT_BE_COMPLETED);
+        }
+        if(taskUser.getTask().getRequiresEvidence()){
+            if(request.evidenceImages() == null || request.evidenceImages().isEmpty()) {
+                throw new AppException(ErrorCode.EVIDENCE_IMAGES_REQUIRED);
+            }
+            taskUser.setEvidenceImages(request.evidenceImages());
+        }
+        taskUser.setEvidenceImages(request.evidenceImages());
+        taskUser.setStatus(StatusTaskUserEnum.Complete);
         return taskUserMapper.toResponse(taskUserRepo.save(taskUser));
     }
 
