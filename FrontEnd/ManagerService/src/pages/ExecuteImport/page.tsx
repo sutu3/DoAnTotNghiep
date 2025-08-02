@@ -127,6 +127,7 @@ export default function WarehouseReceiptManagementPage() {
                         <ReceiptDetailComponent
                             receipt={selectedReceipt}
                             onEdit={() => setActiveTab("update")}
+                            onBack={() =>setActiveTab("list")}
                         />
                     )}
 

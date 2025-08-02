@@ -10,10 +10,10 @@ import {
     TableHeader,
     TableRow
 } from "@heroui/react";
-import ExportOrderSlice, {ExportItemCreateUI} from "@/Store/ExportOrderSlice.tsx";
+import ExportOrderSlice, {ExportItemCreateUI} from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 import {Icon} from "@iconify/react";
 import {useDispatch, useSelector} from "react-redux";
-import {ExportItemCreateSelector} from "@/Store/Selector.tsx";
+import { ExportItemCreateSelector } from "@/pages/ExecuteExport/Store/Selector";
 
 const TableUI = () => {
     const items = useSelector(ExportItemCreateSelector)

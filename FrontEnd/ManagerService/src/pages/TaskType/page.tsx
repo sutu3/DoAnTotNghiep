@@ -8,7 +8,8 @@ import TaskDetailModal from "@/components/Admin/TaskType/Modal/TaskDetail.tsx";
 import TaskSidebar from "@/components/Admin/TaskType/TaskSidebar.tsx";
 import SelectWarehouse from "@/components/Admin/Tasks/SelectWarehouse.tsx";
 import {MiddleGetWarehouseByUser} from "@/Store/Thunk/WarehouseThunk.tsx";
-import {MiddleGetAllTask} from "@/Store/TaskSlice.tsx";
+import {MiddleGetAllTask} from "@/pages/TaskType/Component/Store/TaskSlice.tsx";
+import {MiddleUpdateTaskStatus} from "@/pages/TaskType/Component/Store/TaskThunk.tsx";
 
 const StaffTaskDashboard = () => {
     const dispatch = useDispatch();
@@ -56,8 +57,7 @@ const StaffTaskDashboard = () => {
     // Handler để cập nhật status task
     const handleUpdateTaskStatus = async (taskId: string, status: string) => {
         try {
-            // await (dispatch as any)(MiddleUpdateTaskStatus(taskId, status));
-            await loadTasks(); // Reload tasks sau khi update
+             await (dispatch as any)(MiddleUpdateTaskStatus(taskId, status));
         } catch (error) {
             console.error('Error updating task status:', error);
         }

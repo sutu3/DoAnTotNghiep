@@ -13,7 +13,7 @@ import {
     Chip, Spinner
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { ExportOrder } from "@/Store/ExportOrderSlice.tsx";
+import { ExportOrder } from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 import SelectWarehouseApproved from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
 
 interface ExportOrdersTableProps {

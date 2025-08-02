@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardBody, CardHeader } from "@heroui/react";
 import { Package } from "lucide-react";
 import { useImportOrderStore } from "@/zustand/importOrderStore.tsx";
-import { MiddleAddOrderImport } from "@/pages/ExecuteImport/Store/ImportOrderThunk.tsx";
+import { MiddleAddOrderImport } from "@/pages/ExecuteImport/Store/Thunk/ImportOrderThunk.tsx";
 import { useDispatch } from "react-redux";
 import SelectWarehouse from "@/components/Admin/OrderImport/select/SelectWarehouse.tsx";
 import ProductTable from "./components/ProductTable";

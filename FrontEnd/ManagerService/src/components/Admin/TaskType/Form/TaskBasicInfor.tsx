@@ -1,12 +1,12 @@
 import React from 'react';
-import { Card, CardBody, CardHeader, Input, Textarea, Select, SelectItem } from '@heroui/react';
-import { Package, AlertTriangle, Calendar, Building2 } from 'lucide-react';
+import { Card, CardBody, CardHeader, Input, Textarea, Select, SelectItem, Checkbox } from '@heroui/react';
+import { Package, AlertTriangle, Calendar, Building2, FileText } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { warehouseListSelector } from '@/Store/Selector';
 
 interface TaskBasicInfoFormProps {
     formData: any;
-    onChange: (key: string, value: string) => void;
+    onChange: (key: string, value: string|boolean) => void;
     taskTypes: any[];
     currentStep: number;
     onStepChange: (step: number) => void;
@@ -142,6 +142,45 @@ const TaskBasicInfoForm: React.FC<TaskBasicInfoFormProps> = ({
                     startContent={<Calendar className="w-4 h-4 text-gray-400" />}
                     variant="bordered"
                 />
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <FileText className="w-5 h-5 text-orange-600" />
+                            </div>
+                            <div>
+                                <h4 className="font-semibold text-gray-800">Yêu cầu minh chứng</h4>
+                                <p className="text-sm text-gray-600">
+                                    Nhân viên cần upload ảnh khi hoàn thành nhiệm vụ
+                                </p>
+                            </div>
+                        </div>
+                        <Checkbox
+                            isSelected={formData.requiresEvidence || false}
+                            onValueChange={(checked) =>
+                                onChange("requiresEvidence",checked )
+                            }
+                            color="warning"
+                        />
+                    </div>
+
+                    {/* Hiển thị thông tin bổ sung khi bật requiresEvidence */}
+                    {formData.requiresEvidence && (
+                        <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                            <div className="flex items-start gap-2">
+                                <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <span className="text-white text-xs font-bold">!</span>
+                                </div>
+                                <div className="text-sm text-orange-800">
+                                    <p className="font-medium mb-1">Lưu ý quan trọng:</p>
+                                    <ul className="space-y-1 text-xs">
+                                        <li>• Nhân viên bắt buộc phải upload ảnh minh chứng</li>
+                                        <li>• Không thể hoàn thành nhiệm vụ nếu thiếu ảnh</li>
+                                        <li>• Ảnh sẽ được lưu trữ để kiểm tra sau này</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    )}
             </CardBody>
         </Card>
     );

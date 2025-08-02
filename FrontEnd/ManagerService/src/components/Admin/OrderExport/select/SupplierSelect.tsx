@@ -3,7 +3,7 @@ import {Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal, useEff
 import {useDispatch, useSelector} from "react-redux";
 import { SupplierSelector} from "@/Store/Selector.tsx";
 import {MiddleGetAllSupplierList,} from "@/Store/Thunk/ShupplierThunk.tsx";
-import {ExportItemCreateUI} from "@/Store/ExportOrderSlice.tsx";
+import {ExportItemCreateUI} from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 
 interface SelectProps {
     formData:  ExportItemCreateUI;

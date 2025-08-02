@@ -8,10 +8,10 @@ export interface Bin {
   capacity: number;
   currentOccupancy: number;
   status?: "EMPTY"|"FULL"| "MAINTENANCE"|"AVAILABLE"
-  createdAt: string;
-  updatedAt: string;
-  isDeleted: boolean;
-  deletedAt: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  isDeleted?: boolean;
+  deletedAt?: string | null;
 }
 export const columns = [
   { name: "ID", uid: "stackId", sortable: true },

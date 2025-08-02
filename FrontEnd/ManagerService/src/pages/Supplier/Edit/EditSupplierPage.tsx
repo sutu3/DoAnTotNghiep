@@ -1,4 +1,3 @@
-// pages/Supplier/Edit/page.tsx
 import  { useState, useEffect } from 'react';
 import {useParams, useNavigate, useSearchParams} from 'react-router-dom';
 import { Card, CardBody, CardHeader } from '@heroui/react';

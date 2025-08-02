@@ -10,17 +10,21 @@ import {
     Textarea,
     Card,
     CardBody,
-    Chip
+    Chip, CardHeader
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { InventoryWarehouse } from "@/Store/InventoryWarehouseSlice.tsx";
-import {StockMovementCreate} from "@/Store/StockMovementSlice.tsx";
+import {InventoryProduct, InventoryWarehouse} from "@/Store/InventoryWarehouseSlice.tsx";
+import {useDispatch, useSelector} from 'react-redux';
+import {MiddleGetInventoryWarehouseByProductIdAndWarehouseId} from "@/Store/Thunk/InventoryWarehouseThunk.tsx";
+import {InventoryWarehouseSelector} from "@/Store/Selector.tsx";
+import {AdjustmentData, InventoryCheckDetailCreate} from "@/pages/InventoryCheck/Store/InventoryCheckSlice.tsx";
+import {useInventoryCheckStore} from "@/zustand/InventoryCheck.tsx";
 
 interface StockMovementAdjustmentModalProps {
     isOpen: boolean;
     onClose: () => void;
-    inventoryItem: InventoryWarehouse | null;
-    onSubmit: (adjustmentData: StockMovementCreate) => Promise<void>;
+    inventoryItem: InventoryProduct | null;
+    onSubmit: (adjustmentData: AdjustmentData, inventoryWarehouse: InventoryWarehouse|null) => void;
 }
 
 
@@ -35,7 +39,7 @@ const StockMovementAdjustmentModal: React.FC<StockMovementAdjustmentModalProps> 
     const [adjustmentReason, setAdjustmentReason] = useState<string>("");
     const [note, setNote] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const {addItem}=useInventoryCheckStore();
     const adjustmentReasons = [
         { key: "DAMAGED", label: "Hàng hỏng" },
         { key: "EXPIRED", label: "Hết hạn sử dụng" },
@@ -44,32 +48,58 @@ const StockMovementAdjustmentModal: React.FC<StockMovementAdjustmentModalProps> 
         { key: "RECOUNT", label: "Kiểm kê lại" },
         { key: "OTHER", label: "Lý do khác" }
     ];
-
+    const productBins:InventoryWarehouse[]=useSelector(InventoryWarehouseSelector);
+    const [isLoadingBins, setIsLoadingBins] = useState(false);
+    const [selectBinWarehouse,setSelectBinWarehouse] = useState<InventoryWarehouse|null>(null);
+    const dispatch=useDispatch();
     useEffect(() => {
-        if (isOpen && inventoryItem) {
-            setNewQuantity(inventoryItem.quantity);
+        if (productBins && productBins.length > 0) {
+            setSelectBinWarehouse(productBins[0]);
+            setNewQuantity(productBins[0]?.quantity);
             setAdjustmentReason("");
             setNote("");
         }
+    }, [productBins]);
+
+// Fetch danh sách bins khi modal mở
+    useEffect(() => {
+        if (isOpen && inventoryItem?.productDetails?.productId) {
+            fetchProductBins(inventoryItem);
+
+        }
     }, [isOpen, inventoryItem]);
+
+    const fetchProductBins = async (inventoryProduct: InventoryProduct) => {
+        setIsLoadingBins(true);
+        try {
+            await (dispatch as any)(MiddleGetInventoryWarehouseByProductIdAndWarehouseId(inventoryProduct?.productDetails?.productId, inventoryProduct?.warehouseDetails?.warehouseId));
+        } catch (error) {
+            console.error("Error fetching product bins:", error);
+        } finally {
+            setIsLoadingBins(false);
+        }
+    };
+
 
     const handleSubmit = async () => {
         if (!inventoryItem || newQuantity < 0 || !adjustmentReason.trim()) return;
 
         setIsSubmitting(true);
         try {
-            const adjustmentData: StockMovementCreate = {
-                inventoryWarehouseId: inventoryItem.inventoryWarehouseId,
+            const adjustmentData: AdjustmentData = {
                 quantity: newQuantity,
-                movementType: "ADJUSTMENT",
-                note: `${adjustmentReason}: ${note}`.trim(),
-                performedBy: "", // Sẽ được thay thế bằng user ID thực tế,
-                product: inventoryItem?.productDetails?.productId,
-                referenceOrderId: '',
-                unitCost: 0
+                reason: adjustmentReason,
+                notes: note,
             };
-
-            await onSubmit(adjustmentData);
+            const item:InventoryCheckDetailCreate={
+                inventoryWarehouseId: selectBinWarehouse?.inventoryWarehouseId||"",
+                systemQuantity: selectBinWarehouse?.quantity||0,
+                actualQuantity: newQuantity,
+                adjustmentReason: adjustmentReason,
+                notes: note,
+            }
+            addItem(item);
+            onSubmit(adjustmentData,selectBinWarehouse);
             onClose();
         } catch (error) {
             console.error("Error submitting adjustment:", error);
@@ -78,7 +108,7 @@ const StockMovementAdjustmentModal: React.FC<StockMovementAdjustmentModalProps> 
         }
     };
 
-    const quantityDifference = inventoryItem ? newQuantity - inventoryItem.quantity : 0;
+    const quantityDifference = selectBinWarehouse ? newQuantity - selectBinWarehouse.quantity : 0;
     const isValidAdjustment = newQuantity >= 0 && adjustmentReason.trim() !== "";
 
     const getReasonIcon = (reasonKey: string) => {
@@ -107,7 +137,7 @@ const StockMovementAdjustmentModal: React.FC<StockMovementAdjustmentModalProps> 
                     <div>
                         <h3 className="text-xl font-semibold">Điều Chỉnh Tồn Kho</h3>
                         <p className="text-sm text-gray-500">
-                            {inventoryItem?.productDetails?.productName} - {inventoryItem?.binDetails?.binCode}
+                            {inventoryItem?.productDetails?.productName} - {selectBinWarehouse?.binDetails?.binCode}
                         </p>
                     </div>
                 </ModalHeader>
@@ -125,13 +155,68 @@ const StockMovementAdjustmentModal: React.FC<StockMovementAdjustmentModalProps> 
                                         </div>
                                         <div>
                                             <span className="text-gray-600 dark:text-gray-400">Vị trí:</span>
-                                            <p className="font-medium">{inventoryItem.binDetails?.binCode}</p>
+                                            <p className="font-medium">{selectBinWarehouse?.binDetails?.binCode}</p>
                                         </div>
                                         <div>
                                             <span className="text-gray-600 dark:text-gray-400">Số lượng hiện tại:</span>
-                                            <p className="font-medium text-blue-600">{inventoryItem.quantity}</p>
+                                            <p className="font-medium text-blue-600">{selectBinWarehouse?.quantity}</p>
                                         </div>
                                     </div>
+                                </CardBody>
+                            </Card>
+                            <Card>
+                                <CardHeader>
+                                    <div className="flex items-center gap-2">
+                                        <Icon icon="mdi:map-marker-multiple" className="text-blue-600" />
+                                        <h4 className="font-semibold">Các vị trí chứa sản phẩm này</h4>
+                                    </div>
+                                </CardHeader>
+                                <CardBody>
+                                    {isLoadingBins ? (
+                                        <div className="flex justify-center py-4">
+                                            <Icon icon="mdi:loading" className="animate-spin text-blue-600" />
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-40 overflow-y-auto">
+                                            {productBins.map((bin:InventoryWarehouse) => (
+                                                <div
+                                                    key={bin.inventoryWarehouseId}
+                                                    className={`p-3 rounded-lg border-2 transition-colors ${
+                                                        bin.inventoryWarehouseId === selectBinWarehouse?.inventoryWarehouseId
+                                                            ? 'border-blue-500 bg-blue-50'
+                                                            : 'border-gray-200 hover:border-gray-300'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                            <Icon icon="mdi:package" className="text-gray-600" />
+                                                            <div>
+                                                                <p className="font-medium text-sm">
+                                                                    {bin.binDetails?.binCode}
+                                                                </p>
+                                                                <p className="text-xs text-gray-500">
+                                                                    {bin.warehouseDetails?.warehouseName}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <p className="font-semibold text-blue-600">
+                                                                {bin.quantity}
+                                                            </p>
+                                                            <p className="text-xs text-gray-500">
+                                                                {bin.status === "AVAILABLE" ? "Có sẵn" : "Hạn chế"}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    {bin.inventoryWarehouseId === selectBinWarehouse?.inventoryWarehouseId && (
+                                                        <Chip size="sm" color="primary" variant="flat" className="mt-2">
+                                                            Đang chỉnh sửa
+                                                        </Chip>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </CardBody>
                             </Card>
 
@@ -143,7 +228,10 @@ const StockMovementAdjustmentModal: React.FC<StockMovementAdjustmentModalProps> 
                                         label="Số lượng mới"
                                         placeholder="Nhập số lượng sau điều chỉnh"
                                         value={newQuantity.toString()}
-                                        onValueChange={(value) => setNewQuantity(parseInt(value) || 0)}
+                                        onValueChange={(value) => {
+                                            const parsed = parseInt(value);
+                                            setNewQuantity(isNaN(parsed) ? 0 : parsed);
+                                        }}
                                         min={0}
                                         variant="bordered"
                                         startContent={<Icon icon="mdi:package-variant" className="text-gray-400" />}
@@ -217,19 +305,21 @@ const StockMovementAdjustmentModal: React.FC<StockMovementAdjustmentModalProps> 
                             </div>
 
                             {/* Warning for significant changes */}
-                            {Math.abs(quantityDifference) > inventoryItem.quantity * 0.2 && (
-                                <Card>
-                                    <CardBody className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500">
-                                        <div className="flex items-center gap-2">
-                                            <Icon icon="mdi:alert" className="text-yellow-600" />
-                                            <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                                                <strong>Cảnh báo:</strong> Thay đổi lớn về số lượng ({'>'}{Math.round(Math.abs(quantityDifference) / inventoryItem.quantity * 100)}%).
-                                                Vui lòng kiểm tra kỹ và ghi rõ lý do.
-                                            </p>
-                                        </div>
-                                    </CardBody>
-                                </Card>
-                            )}
+                            {selectBinWarehouse &&
+                                Math.abs(quantityDifference) > selectBinWarehouse.quantity * 0.2 && (
+                                    <Card>
+                                        <CardBody className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500">
+                                            <div className="flex items-center gap-2">
+                                                <Icon icon="mdi:alert" className="text-yellow-600" />
+                                                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                                                    <strong>Cảnh báo:</strong> Thay đổi lớn về số lượng ({'>'}{Math.round(Math.abs(quantityDifference) / (selectBinWarehouse?selectBinWarehouse?.quantity:0) * 100)}%).
+                                                    Vui lòng kiểm tra kỹ và ghi rõ lý do.
+                                                </p>
+                                            </div>
+                                        </CardBody>
+                                    </Card>
+                                )}
+
                         </div>
                     )}
                 </ModalBody>

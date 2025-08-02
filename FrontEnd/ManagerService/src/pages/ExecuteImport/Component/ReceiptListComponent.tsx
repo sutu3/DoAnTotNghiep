@@ -20,10 +20,10 @@ import {
 } from "@heroui/react";
 import {Calendar, Edit, Eye, Package, Plus, Search} from "lucide-react";
 import {useDispatch, useSelector} from "react-redux";
-import {MiddleGetAllOrderItemByStatus} from "@/pages/ExecuteImport/Store/ImportOrderThunk.tsx";
+import {MiddleGetAllOrderItemByStatus} from "@/pages/ExecuteImport/Store/Thunk/ImportOrderThunk.tsx";
 import {OrderSelector, ReceiptWarehousesSelector} from "@/Store/Selector.tsx";
 import SelectWarehouseApproved from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
-import {MiddleGetReceiptByWarehouseId} from "@/pages/ExecuteImport/Store/WarehousReceipteThunk.tsx";
+import {MiddleGetReceiptByWarehouseId} from "@/pages/ExecuteImport/Store/Thunk/WarehousReceipteThunk.tsx";
 import WarehousReceipteSlice from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
 import OrderImportSlice from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 

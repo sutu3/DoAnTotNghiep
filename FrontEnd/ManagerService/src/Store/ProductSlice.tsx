@@ -33,6 +33,8 @@ export interface Product {
     isActive: boolean;
     category: Category;
     unit: Unit;
+    pendingApprovedImportQuantity?: number,
+    pendingApprovedExportQuantity?: number,
     createdAt: Date;
     updatedAt: Date;
 }

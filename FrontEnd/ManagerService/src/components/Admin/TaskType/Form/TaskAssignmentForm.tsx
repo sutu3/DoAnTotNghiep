@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardBody, CardHeader, Input, Checkbox, Avatar, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react';
 import { Users, Search, User, Edit, Calendar, FileText } from 'lucide-react';
-import {TaskUserAssignment} from "@/Store/TaskUserSlice.tsx";
+import {TaskUserAssignment} from "@/pages/TaskType/Component/Store/TaskUserSlice.tsx";
 
 
 interface TaskAssignmentFormProps {
