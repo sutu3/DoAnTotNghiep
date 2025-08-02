@@ -34,8 +34,6 @@ export default function ProductForm({formData,setformData,warehouses,setWarehous
         e.preventDefault();
         // Logic submit form
         setLoading(true);
-
-
         const imageResponse:UploadResponse=await (dispatch as any)(MiddleUploadImage());
         const newFormData:ProductCreate = {
             ...formData,

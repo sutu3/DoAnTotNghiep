@@ -54,7 +54,6 @@ const TaskTypeCreateModal: React.FC<TaskTypeCreateModalProps> = ({
         setFormData({
             taskName: '',
             description: '',
-            warehouses: ''
         });
         onClose();
     };

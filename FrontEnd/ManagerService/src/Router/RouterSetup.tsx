@@ -34,7 +34,6 @@ import Daskboard from "@/pages/Dashboard/page.tsx";
 import EditSupplierPage from "@/pages/Supplier/Edit/EditSupplierPage.tsx";
 import TaskAssignmentsPage from "@/pages/TaskAssignments/page.tsx";
 import CreateTaskAssignmentPage from "@/pages/TaskType/CreateTask/CreateTaskAssignmentPage";
-import EmployeeInventoryCheckPage from "@/pages/InventoryCheck/page.tsx";
 import WarehousePage from "@/pages/WarehouseManager/page.tsx";
 import EditProductPage from "@/pages/Product/Edit/EditProductPage.tsx";
 import AddWarehousePage from "@/pages/WarehouseManager/AddNew/AddWarehousePage.tsx";
@@ -42,6 +41,7 @@ import SupplierPage from "@/pages/Supplier/page";
 import WarehouseReceiptManagementPage from "@/pages/ExecuteImport/page.tsx";
 import ExportOrderPage from "@/pages/OrderExport/TestPage.tsx";
 import WarehouseDeliveryPage from "@/pages/ExecuteExport/page.tsx";
+import InventoryCheckSheetPage from "@/pages/InventoryCheck/Testpage1.tsx";
 
 const router = createBrowserRouter([
   {
@@ -81,7 +81,7 @@ const router = createBrowserRouter([
       { path: "/staff/import", element: <WarehouseReceiptManagementPage /> },
       { path: "/staff/export", element: <WarehouseDeliveryPage /> },
       { path: "/staff/request-export", element: <ExportOrderPage /> },
-      { path: "/staff/check-inventory", element: <EmployeeInventoryCheckPage /> },
+      { path: "/staff/check-inventory", element: <InventoryCheckSheetPage /> },
 
     ],
   },

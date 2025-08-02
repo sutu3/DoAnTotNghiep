@@ -4,7 +4,7 @@ import WarehouseSlice from "@/Store/WarehouseSlice.tsx";
 import StackSlice from "@/Store/StackSlice.tsx";
 import {fetchApi} from "@/Api/FetchApi.tsx";
 import TaskTypeSlice from "@/Store/TaskTypeSlice.tsx";
-import TaskSlice from "@/Store/TaskSlice.tsx";
+import TaskSlice from "@/pages/TaskType/Component/Store/TaskSlice.tsx";
 import UserSlice from "@/Store/UserSlice.tsx";
 import GroupUnit from "@/Store/GroupUnit.tsx";
 import UnitSlice from "@/Store/Unit.tsx";
@@ -15,10 +15,11 @@ import ImportOrder from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import InventorySlice from "@/Store/InventoryOverView.tsx";
 import InventoryWarehouseSlice from "@/Store/InventoryWarehouseSlice.tsx";
 import ExportOrderSlice from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
-import TaskUserSlice from "@/Store/TaskUserSlice.tsx";
+import TaskUserSlice from "@/pages/TaskType/Component/Store/TaskUserSlice.tsx";
 import StockMovementSlice from "@/Store/StockMovementSlice.tsx";
 import WarehousReceipteSlice from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
 import WarehouseDeliverySlice from "@/pages/ExecuteExport/Store/WarehouseDeliverySlice.tsx";
+import InventoryCheckSlice from "@/pages/InventoryCheck/Store/InventoryCheckSlice.tsx";
 
 const ThemeReducer = (state = { value: true }, action: any) => {
   switch (action.type) {
@@ -51,7 +52,8 @@ const store = configureStore({
     inventoryWarehouse:InventoryWarehouseSlice.reducer,
     stockMovement:StockMovementSlice.reducer,
     exportOrder:ExportOrderSlice.reducer,
-    warehousReceipt:WarehousReceipteSlice.reducer
+    warehousReceipt:WarehousReceipteSlice.reducer,
+    inventoryCheck:InventoryCheckSlice.reducer,
   },
 });
 export const callApiThunk = async (

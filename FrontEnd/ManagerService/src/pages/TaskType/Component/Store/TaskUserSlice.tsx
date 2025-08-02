@@ -1,16 +1,15 @@
 import { createSlice} from "@reduxjs/toolkit";
 import {UserData} from "@/Store/UserSlice.tsx";
-import {Task, TaskNoList} from "@/Store/TaskSlice.tsx";
+import { TaskNoList} from "@/pages/TaskType/Component/Store/TaskSlice.tsx";
 
 
 
-/*
-enum('ASSIGNED','CANCELED','COMPLETED','IN_PROGRESS')
-*/
+
 export interface TaskUser {
     id: string;
     user: UserData;
-    tasks:TaskNoList;
+    task:TaskNoList;
+    evidenceImages?:string;
     status: string; // tùy enum bạn dùng
     note: string;
     completeAt: string; // ISO date string, thường từ backend sẽ là kiểu này
@@ -63,44 +62,19 @@ const TaskUserSlice = createSlice({
         },
         setTaskUsers: (state, action) => {
             state.taskUsers = action.payload;
+        },
+        setUpdateTaskUsers: (state, action) => {
+            const updatedTaskUser = action.payload;
+            const index = state.taskUsers.findIndex(taskUser => taskUser.id === updatedTaskUser.id);
+            if (index !== -1) {
+                state.taskUsers[index] = updatedTaskUser;
+            } else {
+                state.taskUsers= [...state.taskUsers, updatedTaskUser];
+            }
         }
-    },
-    extraReducers: (builder) => {
-        builder
-            /*.addCase(GetAllTask.fulfilled, (state, action) => {
-
-            })*/
-
     },
 });
-/*export const GetAllTask = createAsyncThunk(
-    "stack/getAllTask", // sửa tên action đúng với mục đích
-    async (
-        { warehouseId, page }: { warehouseId: string; page: pageApi },
-        { rejectWithValue },
-    ) => await
-        callApiThunk("GET",API_ROUTES.user.task.search(page,warehouseId).GetAll,undefined,rejectWithValue)
-);
-export const MiddleGetAllTask = (page: pageApi) => {
-    return async function check(dispatch: any, getState: any) {
-        try {
-            const { warehouse } = getState().warehouse;
-            const warehouseId = warehouse?.warehouseId;
 
-            const action = await dispatch(GetAllTask({ warehouseId, page }));
-
-            dispatch(
-                TaskSlice.actions.initToTalPage(action.payload.result.totalPages),
-            );
-        } catch (error: any) {
-            showToast({
-                title: "Error",
-                description: `Message: ${error.message || error}`,
-                color: "danger",
-            });
-        }
-    };
-};*/
-export const {setTaskUsers, initToTalPage} = TaskUserSlice.actions;
+export const {setTaskUsers, initToTalPage,setUpdateTaskUsers} = TaskUserSlice.actions;
 
 export default TaskUserSlice;
