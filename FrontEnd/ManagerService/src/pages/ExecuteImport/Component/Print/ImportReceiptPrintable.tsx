@@ -1,55 +1,44 @@
 import { Button, Chip, Divider } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useRef } from "react";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
-import {WarehouseReceiptResponse} from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
+import {ReceiptItemResponse, WarehouseReceiptResponse} from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
 
 interface ImportReceiptPrintableProps {
+    items:ReceiptItemResponse[]
     receipt: WarehouseReceiptResponse;
     onExportPDF?: () => void;
 }
 
-export default function ImportReceiptPrintable({ receipt, onExportPDF }: ImportReceiptPrintableProps) {
-    const componentRef = useRef<HTMLDivElement>(null);
+export default function ImportReceiptPrintable({ receipt, onExportPDF,items }: ImportReceiptPrintableProps) {
+    const printRef = useRef<HTMLDivElement>(null);
 
     const exportToPDF = async () => {
-        if (componentRef.current) {
-            try {
-                const canvas = await html2canvas(componentRef.current, {
-                    scale: 1.5,
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: '#ffffff'
-                });
+        if (!printRef.current) return;
 
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = pdf.internal.pageSize.getHeight();
-                const imgWidth = pdfWidth;
-                const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+        const checkSheetCode = receipt?.receiptId || 'Không rõ mã phiếu';
+        const printContents = printRef.current.innerHTML;
 
-                let heightLeft = imgHeight;
-                let position = 0;
+        const headerTitle = `<h1 style="text-align:center">Phiếu kiểm kho - ${checkSheetCode}</h1><hr/>`;
+        const originalContents = document.body.innerHTML;
+        const originalTitle = document.title;
 
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pdfHeight;
 
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pdfHeight;
-                }
 
-                pdf.save(`Phieu-nhap-kho-${receipt.receiptId?.slice(-8)}.pdf`);
-                onExportPDF?.();
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-            }
-        }
-    };
+        const afterPrintHandler = () => {
+            document.body.innerHTML = originalContents;
+            document.title = originalTitle;
+            window.location.reload();
+
+
+            // Hủy sự kiện sau khi dùng
+            window.onafterprint = null;
+        };
+
+        window.onafterprint = afterPrintHandler;
+
+        document.body.innerHTML = headerTitle + printContents;
+        document.title = `Phiếu kiểm kho - ${checkSheetCode}`;
+        window.print();};
 
     const calculateTotalValue = () => {
         return receipt.receiptItems?.reduce((total: number, item: any) => {
@@ -71,7 +60,7 @@ export default function ImportReceiptPrintable({ receipt, onExportPDF }: ImportR
             </div>
 
             {/* Printable content */}
-            <div ref={componentRef} className="bg-white p-8 min-h-[297mm] w-[210mm] mx-auto shadow-lg print-content">
+            <div ref={printRef} className="bg-white p-8 min-h-[297mm] w-[210mm] mx-auto shadow-lg print-content">
                 {/* Header - Company Info */}
                 <div className="text-center mb-8 border-b-2 border-blue-500 pb-6">
                     <div className="flex items-center justify-center gap-4 mb-4">
@@ -194,7 +183,7 @@ export default function ImportReceiptPrintable({ receipt, onExportPDF }: ImportR
                         </tr>
                         </thead>
                         <tbody>
-                        {receipt.receiptItems?.map((item: any, index: number) => (
+                        {items?.map((item: any, index: number) => (
                             <tr key={index} className="hover:bg-gray-50">
                                 <td className="border border-gray-400 p-3 text-center">{index + 1}</td>
                                 <td className="border border-gray-400 p-3">

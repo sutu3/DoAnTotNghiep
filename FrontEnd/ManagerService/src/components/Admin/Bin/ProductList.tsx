@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import { MiddleGetInventoryWarehouse} from "@/Store/Thunk/InventoryWarehouseThunk.tsx";
 import {InventoryWarehouseSelector} from "@/Store/Selector.tsx";
 import { InventoryWarehouse } from "@/Store/InventoryWarehouseSlice";
+import StockMovementModal from "@/components/Staff/InventoryCheck/Modal/StockMovementModal.tsx";
 
 interface ProductListProps {
     selectedBinId?: string;
@@ -20,7 +21,9 @@ export const ProductList: React.FC<ProductListProps> = ({
     const [loading, setLoading] = useState(false);
     const productsSelect: InventoryWarehouse[] = useSelector(InventoryWarehouseSelector) || [];
     const products:InventoryWarehouse[] = productsSelect.length !== 0 ? productsSelect : [];
+    const [selectedItem, setSelectedItem] = useState<InventoryWarehouse | null>(null);
     const dispatch = useDispatch();
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         if (selectedBinId) {
@@ -47,7 +50,10 @@ export const ProductList: React.FC<ProductListProps> = ({
             default: return "default";
         }
     };
-
+    const handleClick = (item: InventoryWarehouse) => {
+        setSelectedItem(item);
+        setIsModalOpen(true);
+    };
     const getStockLevelColor = (current: number, min: number, maxStockLevel: number) => {
         if (current <= min) return "danger";
         if (current <= min * 1.5) return "warning";
@@ -236,7 +242,7 @@ export const ProductList: React.FC<ProductListProps> = ({
                         </TableHeader>
                         <TableBody items={products}>
                             {(item) => (
-                                <TableRow key={item.inventoryWarehouseId}>
+                                <TableRow onClick={()=>handleClick(item)} key={item.inventoryWarehouseId}>
                                     {(columnKey) => (
                                         <TableCell>
                                             {renderCell(item, columnKey as string)}
@@ -248,6 +254,11 @@ export const ProductList: React.FC<ProductListProps> = ({
                     </Table>
                 )}
             </CardBody>
+            <StockMovementModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                inventoryItem={selectedItem}
+            />
         </Card>
     );
 };

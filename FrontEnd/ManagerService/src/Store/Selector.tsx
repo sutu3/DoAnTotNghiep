@@ -34,8 +34,10 @@ export const TotalPageTask = (state: { taskType: { totalPage: number } }) =>
 export const TaskTypeSelector = (state: { taskType: any }) =>
     state.taskType.taskTypes;
 
-export const UserSelector = (state: { users: {userList: any} }) =>
+export const UsersSelector = (state: { users: {userList: any} }) =>
     state.users.userList;
+export const UserSelector = (state: { users: {user: any} }) =>
+    state.users.user;
 export const TotalPageUser = (state: { users: { totalPage: number } }) =>
     state.users.totalPage;
 

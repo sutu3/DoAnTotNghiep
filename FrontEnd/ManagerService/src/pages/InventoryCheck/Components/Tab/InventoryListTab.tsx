@@ -34,7 +34,6 @@ const CheckSheetListTab = ({onEditCheckSheet,onViewDetail,onCreateNew}:CheckShee
     const printRef = useRef<HTMLDivElement>(null);
     const [warehouse,setWarehouse] = useState("");
     const checkSheets: InventoryCheckSheet[] = useSelector(InventoryCheckSelector);
-    console.log(checkSheets)
     useEffect(() => {
         setLoading(true);
         const fetchCheckSheets = async () => {
@@ -138,7 +137,7 @@ const CheckSheetListTab = ({onEditCheckSheet,onViewDetail,onCreateNew}:CheckShee
                 );
             case 'summary':
                 const total = item.checkDetails?.length || 0;
-                const diff = item.checkDetails?.filter(d => d.difference !== 0).length || 0;
+                const diff = item.checkDetails?.filter(d => d.difference !== 0)?.length || 0;
                 return <span>{total} SP, {diff} lệch</span>;
             case 'actions':
                 return (
@@ -160,13 +159,13 @@ const CheckSheetListTab = ({onEditCheckSheet,onViewDetail,onCreateNew}:CheckShee
         }
     };
 
-    const filtered = checkSheets.filter(sheet =>
+    const filtered = checkSheets?.filter(sheet =>
         sheet.checkSheetNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
         sheet.performedByDetails?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         sheet.warehouseDetails?.warehouseName?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const paginated = filtered?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
         <div className="p-4 space-y-4">
@@ -194,7 +193,7 @@ const CheckSheetListTab = ({onEditCheckSheet,onViewDetail,onCreateNew}:CheckShee
                             isLoading={loading}
                             loadingContent={<Spinner label="Đang tải sản phẩm..." />}
                             emptyContent="Không có dữ liệu.">
-                            {paginated.map((item) => (
+                            {paginated?.map((item) => (
                                 <TableRow key={item.checkSheetId}>
                                     {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                                 </TableRow>
@@ -204,14 +203,14 @@ const CheckSheetListTab = ({onEditCheckSheet,onViewDetail,onCreateNew}:CheckShee
 
                     <div className="flex justify-between items-center px-4 py-2">
                         <Pagination
-                            total={Math.ceil(filtered.length / itemsPerPage)}
+                            total={Math.ceil(filtered?.length / itemsPerPage)}
                             page={currentPage}
                             onChange={setCurrentPage}
                             size="sm"
                             showControls
                         />
                         <span className="text-sm text-gray-500">
-              {`Hiển thị ${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, filtered.length)} / ${filtered.length}`}
+              {`Hiển thị ${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, filtered?.length)} / ${filtered?.length}`}
             </span>
                     </div>
                 </CardBody>

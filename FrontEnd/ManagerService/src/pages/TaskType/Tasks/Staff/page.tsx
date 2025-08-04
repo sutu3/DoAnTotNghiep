@@ -15,10 +15,12 @@ import CompleteTaskModal from "@/pages/TaskType/Component/Modal/CompleteTaskModa
 import {TaskUser} from "@/pages/TaskType/Component/Store/TaskUserSlice.tsx";
 import TaskStatsCards from "@/pages/TaskType/Component/Card/TaskStatsCards.tsx";
 import {MiddleUploadImage, UploadResponse} from "@/Store/Thunk/UploadThunk.tsx";
+import {useGetStatsTaskUser} from "@/Hooks/useTaskUser.tsx";
 
 
 
 export default function MyTasksPage() {
+    const {data}=useGetStatsTaskUser();
     const TaskUser = useSelector(TaskUserSelector);
     const [taskUsers, setTaskUsers] = useState<TaskUser[]>([]);
     const [loading, setLoading] = useState(true);
@@ -34,7 +36,7 @@ export default function MyTasksPage() {
         pending: 0,
         inProgress: 0,
         completed: 0,
-        highPriority: 0
+        highPriority:0,
     });
 
     const dispatch = useDispatch();
@@ -46,9 +48,16 @@ export default function MyTasksPage() {
     useEffect(() => {
         if (TaskUser) {
             setTaskUsers(TaskUser);
-            calculateStats(TaskUser);
         }
-    }, [TaskUser]);
+    }, [TaskUser,data]);
+    useEffect(() => {
+        setStats({
+            pending: data?.totalTaskPending ?? 0,
+            inProgress: data?.totalTasksInProgress ?? 0,
+            completed: data?.totalTasksCompleted ?? 0,
+            highPriority: data?.totalTasksHightLevel ?? 0
+        });
+    }, [data]);
 
     const loadUserTasks = async () => {
         setLoading(true);
@@ -61,15 +70,7 @@ export default function MyTasksPage() {
         }
     };
 
-    const calculateStats = (tasks: TaskUser[]) => {
-        const stats = {
-            pending: tasks.filter(t => t.status === "Pending").length,
-            inProgress: tasks.filter(t => t.status === "In_Progress").length,
-            completed: tasks.filter(t => t.status === "Complete").length,
-            highPriority: tasks.filter(t => t?.task?.level === "High").length
-        };
-        setStats(stats);
-    };
+
 
     const handleViewDetail = (taskUser: TaskUser) => {
         setSelectedTask(taskUser);

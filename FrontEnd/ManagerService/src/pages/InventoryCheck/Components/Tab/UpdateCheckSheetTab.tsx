@@ -96,7 +96,6 @@ const UpdateCheckSheetTab: React.FC<UpdateCheckSheetTabProps> = ({
                 const imageResponse:UploadResponse=await (dispatch as any)(MiddleUploadImage());
                 const payload:InventoryCheckSheet= await (dispatch as any)(MiddleUpdateStatusApproveCheckSheets(checkSheet,imageResponse?.urlImage))
                 setCheckSheet(payload)
-
             }
 
 

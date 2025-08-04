@@ -2,8 +2,6 @@ import { Card, CardBody, CardHeader, Chip, Divider, Avatar } from "@heroui/react
 import { Icon } from "@iconify/react";
 import DeliveryReceiptPrintable from "@/pages/ExecuteExport/Component/Print/DeliveryReceiptPrintable.tsx";
 import {Button} from "@heroui/button";
-import html2canvas from "html2canvas";
-import {jsPDF} from "jspdf";
 import {useRef} from "react";
 
 interface DeliveryDetailViewProps {
@@ -12,7 +10,34 @@ interface DeliveryDetailViewProps {
 }
 
 export default function DeliveryDetailView({ delivery, onBack,  }: DeliveryDetailViewProps) {
-    const componentRef = useRef<HTMLDivElement>(null);
+    const printRef = useRef<HTMLDivElement>(null);
+    const exportToPDF = async () => {
+        if (!printRef.current) return;
+
+        const checkSheetCode = delivery?.deliveryId || 'Không rõ mã phiếu';
+        const printContents = printRef.current.innerHTML;
+
+        const headerTitle = `<h1 style="text-align:center">Phiếu kiểm kho - ${checkSheetCode}</h1><hr/>`;
+        const originalContents = document.body.innerHTML;
+        const originalTitle = document.title;
+
+
+
+        const afterPrintHandler = () => {
+            document.body.innerHTML = originalContents;
+            document.title = originalTitle;
+            window.location.reload();
+
+
+            // Hủy sự kiện sau khi dùng
+            window.onafterprint = null;
+        };
+
+        window.onafterprint = afterPrintHandler;
+
+        document.body.innerHTML = headerTitle + printContents;
+        document.title = `Phiếu kiểm kho - ${checkSheetCode}`;
+        window.print();};
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -29,48 +54,6 @@ export default function DeliveryDetailView({ delivery, onBack,  }: DeliveryDetai
             case 'IN_PROGRESS': return 'Đang xử lý';
             case 'COMPLETED': return 'Hoàn thành';
             default: return status;
-        }
-    };
-    const exportToPDF = async () => {
-        if (componentRef.current) {
-            try {
-                // Tăng scale để có chất lượng tốt hơn
-                const canvas = await html2canvas(componentRef.current, {
-                    scale: 1.5, // Giảm scale để tránh quá lớn
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: '#ffffff',
-                    height: componentRef.current.scrollHeight, // Sử dụng scrollHeight
-                    width: componentRef.current.scrollWidth
-                });
-
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF('p', 'mm', 'a4');
-
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = pdf.internal.pageSize.getHeight();
-                const imgWidth = pdfWidth;
-                const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-
-                let heightLeft = imgHeight;
-                let position = 0;
-
-                // Thêm trang đầu tiên
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pdfHeight;
-
-                // Thêm các trang tiếp theo nếu cần
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pdfHeight;
-                }
-
-                pdf.save(`Phieu-xuat-kho-${delivery.deliveryId?.slice(-8)}.pdf`);
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-            }
         }
     };
 
@@ -290,10 +273,12 @@ export default function DeliveryDetailView({ delivery, onBack,  }: DeliveryDetai
                         </Card>
                     </div>
                 </div>
-            {false&&<DeliveryReceiptPrintable
-                delivery={delivery}
-                onExportPDF={()=>console.log("Export PDF")}
-            />}
+            <div className={"hidden"} ref={printRef}>
+                <DeliveryReceiptPrintable
+                    delivery={delivery}
+                    onExportPDF={()=>console.log("Export PDF")}
+                />
+            </div>
         </div>
     );
 }

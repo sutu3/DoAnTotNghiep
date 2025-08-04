@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
     Modal,
     ModalContent,
@@ -22,7 +22,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {MiddleGetAllStockMovement} from "@/Store/Thunk/StockMovementThunk.tsx";
 import {pageApi} from "@/Api/UrlApi.tsx";
 import {StockMovementSelector, TotalPageStockMovement} from "@/Store/Selector.tsx";
-
+import StockMovementReport from "@/pages/Stack/Component/Print/StoreMovement.tsx";
 
 
 interface StockMovementModalProps {
@@ -42,6 +42,45 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({
     const totalPage=useSelector(TotalPageStockMovement)
     const [pageNumber,setPageNumber]=useState(1);
     const dispatch=useDispatch()
+    const printRef = useRef<HTMLDivElement>(null);
+
+    const handlePrint = () => {
+        if (!printRef.current) return;
+
+        const checkSheetCode = inventoryItem?.inventoryWarehouseId || 'Không rõ mã phiếu';
+        const printContents = printRef.current.innerHTML;
+
+        const headerTitle = `<h1 style="text-align:center">Phiếu kiểm kho - ${checkSheetCode}</h1><hr/>`;
+        const originalContents = document.body.innerHTML;
+        const originalTitle = document.title;
+        setTimeout(() => {
+            window.print();
+        }, 100);
+
+        // Đánh dấu "đã in"
+
+
+        const afterPrintHandler = () => {
+            document.body.innerHTML = originalContents;
+            document.title = originalTitle;
+            window.location.reload();
+
+            // Gọi đánh dấu
+            // Hủy sự kiện sau khi dùng
+            window.onafterprint = null;
+        };
+
+        window.onafterprint = afterPrintHandler;
+
+        document.body.innerHTML = headerTitle + printContents;
+        document.title = `Phiếu kiểm kho - ${checkSheetCode}`;
+        window.print(); // Sau khi người dùng đóng hộp thoại in, `afterPrintHandler` sẽ chạy
+    };
+
+
+// Trong JSX
+
+
     useEffect(() => {
         if (isOpen && inventoryItem) {
             fetchStockMovements();
@@ -252,8 +291,8 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({
                                     isLoading={loading}
                                     loadingContent={<Spinner label="Đang tải..." />}
                                 >
-                                    {movements.map((movement) => (
-                                        <TableRow key={movement.stockMovementId}>
+                                    {movements.map((movement,index) => (
+                                        <TableRow key={index}>
                                             {(columnKey) => (
                                                 <TableCell>
                                                     {renderCell(movement, columnKey as string)}
@@ -265,8 +304,14 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({
                             </Table>
                         </div>
                     )}
-                </ModalBody>
 
+                        <div ref={printRef} className={"hidden"}>
+                         <StockMovementReport
+                            movement={movements}
+                            inventoryWarehouse={inventoryItem}
+                        />
+                    </div>
+                </ModalBody>
                 <ModalFooter>
                     <Button variant="light" onPress={onClose}>
                         Đóng
@@ -274,10 +319,7 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({
                     <Button
                         color="primary"
                         startContent={<Icon icon="mdi:download" />}
-                        onPress={() => {
-                            // Export functionality
-                            console.log("Export movements data");
-                        }}
+                        onPress={handlePrint}
                     >
                         Xuất dữ liệu
                     </Button>

@@ -1,10 +1,9 @@
-// pages/Admin/TaskAssignments/Create/page.tsx
 import  { useEffect, useState } from 'react';
 import { Card, CardBody, Button } from '@heroui/react';
 import { ArrowLeft, Save  } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { TaskTypeSelector, UserSelector } from '@/Store/Selector';
+import { TaskTypeSelector, UsersSelector } from '@/Store/Selector';
 import { MiddleGetAllTaskType } from '@/Store/TaskTypeSlice';
 import { MiddleGetAllUser } from '@/Store/Thunk/UserThunk';
 import {  TaskCreated } from '@/pages/TaskType/Component/Store/TaskSlice.tsx';
@@ -21,7 +20,7 @@ const CreateTaskAssignmentPage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const taskTypes = useSelector(TaskTypeSelector);
-    const users = useSelector(UserSelector);
+    const users = useSelector(UsersSelector);
 
     const [loading, setLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);

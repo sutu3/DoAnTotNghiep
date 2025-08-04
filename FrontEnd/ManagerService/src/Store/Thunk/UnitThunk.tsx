@@ -44,7 +44,36 @@ export const GetAllUnitByIdUnitGroup = createAsyncThunk(
             rejectWithValue
         )
 );
-
+export const GetAllUnitName = createAsyncThunk(
+    "unit/GetAllUnitByIdUnitGroup",
+    async (
+         _: { },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES.product
+                .unit(null)
+                .search()
+                .unitName,
+            undefined,
+            rejectWithValue
+        )
+);
+export const MiddleGetAllUnitName = () => {
+    return async function (dispatch: any) {
+        try {
+            const action = await dispatch(GetAllUnitName({ }));
+            dispatch(setUnitList(action.payload.result));
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
 export const MiddleGetAllUnit = (page: pageApi,unitGroupName:string) => {
     return async function (dispatch: any) {
         try {

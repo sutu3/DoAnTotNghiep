@@ -62,17 +62,6 @@ const StaffTaskDashboard = () => {
             console.error('Error updating task status:', error);
         }
     };
-
-    // Existing logic...
-    const getTasksByStatus = (status: string) => {
-        return tasks?.filter((task: any) => task.statusTask === status) || [];
-    };
-
-    // const pendingTasks = getTasksByStatus('pending');
-    // const inProgressTasks = getTasksByStatus('in_progress');
-    // const completedTasks = getTasksByStatus('completed');
-    // const overdueTasks = getTasksByStatus('overdue');
-
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">

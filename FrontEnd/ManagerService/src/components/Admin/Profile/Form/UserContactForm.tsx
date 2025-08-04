@@ -1,12 +1,11 @@
 // components/User/Profile/UserContactForm.tsx
 import React from 'react';
-import { Card, CardBody, CardHeader, Input, Select, SelectItem } from '@heroui/react';
-import { Mail, Phone, Building2 } from 'lucide-react';
-import { useSelector } from 'react-redux';
-import { warehouseListSelector } from '@/Store/Selector';
+import { Card, CardBody, CardHeader, Input } from '@heroui/react';
+import { Mail, Phone } from 'lucide-react';
+import {UserUpdate} from "@/Store/UserSlice.tsx";
 
 interface UserContactFormProps {
-    formData: any;
+    formData: UserUpdate|null;
     isEditing: boolean;
     onChange: (key: string, value: string) => void;
 }
@@ -16,8 +15,7 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
                                                              isEditing,
                                                              onChange
                                                          }) => {
-    const warehouses = useSelector(warehouseListSelector);
-
+    console.log(formData);
     return (
         <Card className="shadow-lg">
             <CardHeader>
@@ -36,7 +34,7 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
                         label="Email"
                         type="email"
                         placeholder="user@example.com"
-                        value={formData.email}
+                        value={formData?.email}
                         onValueChange={(value) => onChange('email', value)}
                         startContent={<Mail className="w-4 h-4 text-gray-400" />}
                         isReadOnly={!isEditing}
@@ -48,7 +46,7 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
                     <Input
                         label="Số điện thoại"
                         placeholder="0123456789"
-                        value={formData.phoneNumber}
+                        value={formData?.phoneNumber}
                         onValueChange={(value) => onChange('phoneNumber', value)}
                         startContent={<Phone className="w-4 h-4 text-gray-400" />}
                         isReadOnly={!isEditing}
@@ -58,33 +56,6 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
                     />
                 </div>
 
-                {isEditing && (
-                    <Select
-                        label="Kho làm việc"
-                        placeholder="Chọn kho"
-                        selectedKeys={formData.warehouses ? [formData.warehouses] : []}
-                        onSelectionChange={(keys) => {
-                            const selectedId = Array.from(keys)[0]?.toString();
-                            if (selectedId) {
-                                onChange('warehouses', selectedId);
-                            }
-                        }}
-                        startContent={<Building2 className="w-4 h-4 text-gray-400" />}
-                    >
-                        {warehouses?.map((warehouse: any) => (
-                            <SelectItem
-                                key={warehouse.warehouseId}
-                                value={warehouse.warehouseId}
-                                textValue={warehouse.warehouseName}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Building2 className="w-4 h-4 text-blue-600" />
-                                    <span>{warehouse.warehouseName}</span>
-                                </div>
-                            </SelectItem>
-                        ))}
-                    </Select>
-                )}
             </CardBody>
         </Card>
     );
