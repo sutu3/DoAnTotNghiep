@@ -1,5 +1,6 @@
 package com.example.userservice.Model;
 
+import com.example.userservice.Enum.GenderEnum;
 import com.example.userservice.Enum.StatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -7,6 +8,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -52,6 +54,16 @@ public class Users extends BaseEntity{
     StatusEnum status;
     @Column(columnDefinition = "VARCHAR(255) COMMENT 'số điện thoại của user'", nullable = false,unique = true)
     String phoneNumber;
+    @Column(columnDefinition = "DATE COMMENT 'ngày sinh của user'")
+    LocalDate dateOfBirth;
+
+    @Column(columnDefinition = "VARCHAR(10) COMMENT 'giới tính của user'")
+    @Enumerated(EnumType.STRING)
+    GenderEnum gender;
+
+    @Column(columnDefinition = "VARCHAR(255) COMMENT 'địa chỉ nhà của user'")
+    String homeAddress;
+
     @OneToMany(mappedBy="user")
     List<TaskUser> taskUsers;
 

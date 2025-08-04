@@ -3,7 +3,9 @@ package com.example.userservice.Service.Impl;
 import com.example.userservice.Dto.Request.StatusRequest;
 import com.example.userservice.Dto.Request.TaskRequest;
 import com.example.userservice.Dto.Request.TaskUserRequest;
+import com.example.userservice.Dto.Responses.TaskUser.StatsResponse;
 import com.example.userservice.Dto.Responses.TaskUser.TaskUserResponse;
+import com.example.userservice.Enum.LevelEnum;
 import com.example.userservice.Enum.StatusTaskEnum;
 import com.example.userservice.Enum.StatusTaskUserEnum;
 import com.example.userservice.Exception.AppException;
@@ -14,6 +16,7 @@ import com.example.userservice.Mapper.TaskUserMapper;
 import com.example.userservice.Model.TaskUser;
 import com.example.userservice.Model.Tasks;
 import com.example.userservice.Model.Users;
+import com.example.userservice.Repo.TaskRepo;
 import com.example.userservice.Repo.TaskUserRepo;
 import com.example.userservice.Service.TaskService;
 import com.example.userservice.Service.TaskTypeService;
@@ -39,6 +42,7 @@ public class TaskUserServiceImpl implements TaskUserService {
     TaskUserMapper taskUserMapper;
     UserService userService;
     TaskUserRepo taskUserRepo;
+    TaskRepo taskRepo;
     TaskService taskService;
     TaskTypeService taskTypeService;
     private final GetCurrentUserId getCurrentUserId;
@@ -125,6 +129,24 @@ public class TaskUserServiceImpl implements TaskUserService {
         taskUser.setEvidenceImages(request.evidenceImages());
         taskUser.setStatus(StatusTaskUserEnum.Complete);
         return taskUserMapper.toResponse(taskUserRepo.save(taskUser));
+    }
+
+    @Override
+    public StatsResponse getStatsByUserId() {
+        var userId = GetCurrentUserId.getCurrentUserId();
+        Integer pendingCount = taskUserRepo.countByStatusAndUser_UserIdAndIsDeleted( StatusTaskUserEnum.Pending,userId,false);
+        Integer InProgressCount = taskUserRepo.countByStatusAndUser_UserIdAndIsDeleted( StatusTaskUserEnum.In_Progress,userId,false);
+        Integer completeCount = taskUserRepo.countByStatusAndUser_UserIdAndIsDeleted( StatusTaskUserEnum.Complete,userId,false);
+        Integer hightCount=taskUserRepo.countByTask_LevelAndUser_UserIdAndIsDeleted( LevelEnum.Hight,userId,false);
+        Integer totalTasks = taskUserRepo.countByUser_UserIdAndIsDeleted(userId, false);
+        StatsResponse statsResponse = StatsResponse.builder()
+                .totalTasks(totalTasks)
+                .totalTasksCompleted(completeCount)
+                .totalTasksHightLevel(hightCount)
+                .totalTasksInProgress(InProgressCount)
+                .totalTasksPending(pendingCount)
+                .build();
+        return statsResponse;
     }
 
     @Override

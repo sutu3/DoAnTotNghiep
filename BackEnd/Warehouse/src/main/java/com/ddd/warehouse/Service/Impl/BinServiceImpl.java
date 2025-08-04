@@ -83,20 +83,24 @@ public class BinServiceImpl implements BinService {
     @Override
     @Transactional
     public void updateCurrentOccupancy(String binId, BigDecimal occupancyChange) {
+        log.info("🔁 Updating occupancy for Bin ID: {}, Change: {}", binId, occupancyChange);
+
         Bins bin = getById(binId);
 
-        BigDecimal newOccupancy = bin.getCurrentOccupancy().add(occupancyChange);
+        BigDecimal current = bin.getCurrentOccupancy();
+        BigDecimal newOccupancy = current.add(occupancyChange);
 
+        log.info("📦 Current occupancy: {}, New occupancy: {}", current, newOccupancy);
 
         // Validate không âm
         if (newOccupancy.compareTo(BigDecimal.ZERO) < 0) {
+            log.error("❌ Invalid occupancy update. Resulting occupancy < 0 for bin {}", binId);
             throw new AppException(ErrorCode.INVALID_OCCUPANCY);
         }
 
-
         bin.setCurrentOccupancy(newOccupancy);
 
-// Cập nhật status dựa trên occupancy với BigDecimal
+        // Cập nhật status dựa trên occupancy với BigDecimal
         if (newOccupancy.compareTo(BigDecimal.ZERO) == 0) {
             bin.setStatus(BinStatus.EMPTY);
         } else if (newOccupancy.compareTo(bin.getCapacity()) >= 0) {
@@ -105,10 +109,11 @@ public class BinServiceImpl implements BinService {
             bin.setStatus(BinStatus.AVAILABLE);
         }
 
+        log.info("✅ Updated Bin status to {}, occupancy now: {}/{}",
+                bin.getStatus(), newOccupancy, bin.getCapacity());
+
         binRepo.save(bin);
-
     }
-
     @Override
     public void resetCurrentOccupancy(String binId) {
         Bins bin = getById(binId);

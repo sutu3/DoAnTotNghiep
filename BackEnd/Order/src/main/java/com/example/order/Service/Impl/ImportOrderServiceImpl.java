@@ -176,11 +176,11 @@ public class ImportOrderServiceImpl implements ImportOrderService {
             // Set enriched data
             importOrderResponse.setWarehouse(warehouseFuture.join());
             importOrderResponse.setCreateByUser(userFuture.join());
-
-            List<ImportResponseItem> itemResponse = importOrder.getImportItems().stream()
-                    .map(this::entryOrderItem)
-                    .collect(Collectors.toList());
-            importOrderResponse.setImportItems(itemResponse);
+//
+//            List<ImportResponseItem> itemResponse = importOrder.getImportItems().stream()
+//                    .map(this::entryOrderItem)
+//                    .collect(Collectors.toList());
+//            importOrderResponse.setImportItems(itemResponse);
             if (adminFuture != null) {
                 importOrderResponse.setAccessByAdmin(adminFuture.join());
             }

@@ -4,6 +4,7 @@ import com.example.userservice.Dto.Request.StatusRequest;
 import com.example.userservice.Dto.Request.TaskUserAndTaskRequest;
 import com.example.userservice.Dto.Request.TaskUserRequest;
 import com.example.userservice.Dto.Responses.ApiResponse;
+import com.example.userservice.Dto.Responses.TaskUser.StatsResponse;
 import com.example.userservice.Dto.Responses.TaskUser.TaskUserResponse;
 import com.example.userservice.Form.EvidenceImages;
 import com.example.userservice.Form.NoteForm;
@@ -43,12 +44,22 @@ public class TaskUserController {
                 .success(true)
                 .build();
     }
+
     @GetMapping("/search/tasks/{id}")
     public ApiResponse<List<TaskUserResponse>> getAllByIdTask(
             @PathVariable String id
     ){
         return ApiResponse.<List<TaskUserResponse>>builder()
                 .Result(taskUserService.getAllByTaskId(id))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/stats")
+    public ApiResponse<StatsResponse> getStats(){
+        return ApiResponse.<StatsResponse>builder()
+                .Result(taskUserService.getStatsByUserId())
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

@@ -13,10 +13,12 @@ import com.example.userservice.Dto.Responses.User.UserResponse;
 import com.example.userservice.Enum.StatusEnum;
 import com.example.userservice.Exception.AppException;
 import com.example.userservice.Exception.ErrorCode;
+import com.example.userservice.Form.UserForm;
 import com.example.userservice.Mapper.UserMapper;
 import com.example.userservice.Model.Users;
 import com.example.userservice.Repo.UserRepo;
 import com.example.userservice.Service.UserService;
+import com.example.userservice.Util.DateUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -111,10 +114,21 @@ public class UsersServiceImpl implements UserService {
         return  userMapper.toResponse(users);
     }
 
+
     @Override
     public UserResponse getByUserId() {
         var idUser=GetCurrentUserId.getCurrentUserId();
         return enrich(findById(idUser));
+    }
+
+    @Override
+    public UserResponse updateUser(UserForm updateUser, String id) {
+        Users users=findById(id);
+        userMapper.update(users,updateUser);
+        users.setDateOfBirth(DateUtils.parseToLocalDate(updateUser.dateOfBirth())
+                .orElseThrow(()-> new AppException(ErrorCode.INVALID_DATE_FORMAT)));
+        Users savedUser = userRepo.save(users);
+        return enrich(savedUser);
     }
 
     @Override

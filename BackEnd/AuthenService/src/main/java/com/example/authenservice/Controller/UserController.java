@@ -1,6 +1,7 @@
 package com.example.authenservice.Controller;
 
 import com.example.authenservice.Dtos.ApiResponse;
+import com.example.authenservice.Dtos.Request.ForgotPasswordRequest;
 import com.example.authenservice.Dtos.Request.UpdateRole;
 import com.example.authenservice.Dtos.Request.UserRequest;
 import com.example.authenservice.Dtos.Response.RoleResponse;
@@ -51,6 +52,7 @@ public class UserController {
                 .code(0)
                 .build();
     }
+
 
     @PutMapping("/{id}")
     public ApiResponse<UserResponse> updateUser(@PathVariable String id, @RequestBody UserRequest request) {

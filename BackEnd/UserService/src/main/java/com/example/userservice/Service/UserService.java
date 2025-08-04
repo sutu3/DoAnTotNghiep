@@ -5,6 +5,7 @@ import com.example.userservice.Dto.Request.UpdateRole;
 import com.example.userservice.Dto.Request.UserRequest;
 import com.example.userservice.Dto.Responses.User.IdWarehouseResponse;
 import com.example.userservice.Dto.Responses.User.UserResponse;
+import com.example.userservice.Form.UserForm;
 import com.example.userservice.Model.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +28,7 @@ public interface UserService {
     UserResponse getByIdResponse(String id);
     UserResponse findByEmail(String email);
     UserResponse getByUserId();
+    UserResponse updateUser(UserForm updateUser, String id);
     UserResponse enrich(Users users);
     List<UserResponse> getActiveUsersByWarehouse(String warehouseId);
 
