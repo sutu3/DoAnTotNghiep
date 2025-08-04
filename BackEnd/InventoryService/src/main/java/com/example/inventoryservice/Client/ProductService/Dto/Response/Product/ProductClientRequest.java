@@ -20,14 +20,16 @@ public class ProductClientRequest {
     String sku;
     String description;
     String urlImageProduct;
-    Boolean isActive;
     BigDecimal quantity;
+    Boolean isActive;
     BigDecimal price;
     String supplier;
     String createByUser;
     Boolean IsActive;
     String category;
     String unit;
+    Integer minStockLevel;
+    Integer maxStockLevel;
     Integer pendingApprovedImportQuantity;
     Integer pendingApprovedExportQuantity;
 }

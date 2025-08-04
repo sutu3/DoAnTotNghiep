@@ -31,15 +31,16 @@ public class ExportOrderController {
 
     ExportOrderService exportOrderService;
 
-    @GetMapping("/search/warehouse/{warehouseId}")
+    @GetMapping("/search")
     public ApiResponse<Page<ExportOrderResponse>> getAllByWarehouse(
+            @RequestParam(required = false) String warehouseId,
+            @RequestParam(required = false) String status,
             @RequestParam("pageNumber") int page,
-            @RequestParam("pageSize") int size,
-            @PathVariable String warehouseId
+            @RequestParam("pageSize") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         return ApiResponse.<Page<ExportOrderResponse>>builder()
-                .Result(exportOrderService.getExportOrdersByWarehouse(warehouseId, pageable))
+                .Result(exportOrderService.getExportOrdersByWarehouse(warehouseId, pageable,status))
                 .code(0)
                 .message("Success")
                 .success(true)

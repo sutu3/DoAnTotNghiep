@@ -23,7 +23,7 @@ public interface ExportOrderService {
 
     Page<ExportOrderResponse> getAllExportOrders(Pageable pageable);
 
-    Page<ExportOrderResponse> getExportOrdersByWarehouse(String warehouse, Pageable pageable);
+    Page<ExportOrderResponse> getExportOrdersByWarehouse(String warehouse, Pageable pageable,String status);
 
     Page<ExportOrderResponse> getExportOrdersByUser(String userId, Pageable pageable);
 

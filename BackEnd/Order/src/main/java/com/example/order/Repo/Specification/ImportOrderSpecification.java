@@ -1,7 +1,6 @@
 package com.example.order.Repo.Specification;
 
 
-import com.example.order.Enum.OrderStatus;
 import com.example.order.Enum.OrderType;
 import com.example.order.Module.ImportOrder;
 import org.springframework.data.jpa.domain.Specification;
