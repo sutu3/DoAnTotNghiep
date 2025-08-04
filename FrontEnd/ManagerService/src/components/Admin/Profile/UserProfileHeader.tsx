@@ -1,9 +1,10 @@
 import React from 'react';
 import { Card, CardBody, Avatar, Chip, Button } from '@heroui/react';
 import { ArrowLeft, Edit3, User as UserIcon } from 'lucide-react';
+import {UserData} from "@/Store/UserSlice.tsx";
 
 interface UserProfileHeaderProps {
-    user: any;
+    user: UserData;
     isEditing: boolean;
     onEdit: () => void;
     onBack: () => void;
@@ -44,7 +45,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
                                     {user.fullName || user.userName}
                                 </h1>
                                 <p className="text-gray-500 dark:text-gray-400 mb-3">
-                                    @{user.userName}
+                                    @{user.email}
                                 </p>
                                 <div className="flex gap-2">
                                     <Chip

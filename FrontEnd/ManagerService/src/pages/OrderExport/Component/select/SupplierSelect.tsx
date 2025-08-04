@@ -1,8 +1,8 @@
-import { Select, SelectItem } from "@heroui/react";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { SupplierSelector } from "@/Store/Selector";
-import { MiddleGetAllSupplierList} from "@/Store/Thunk/ShupplierThunk.tsx";
+import {Select, SelectItem} from "@heroui/react";
+import {useEffect} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {SupplierSelector} from "@/Store/Selector";
+import {MiddleGetAllSupplierList} from "@/Store/Thunk/ShupplierThunk.tsx";
 
 interface SupplierSelectProps {
     formData: any;
@@ -20,6 +20,7 @@ export default function SupplierSelect({ formData, setFormData }: SupplierSelect
     return (
         <Select
             label="Khách hàng"
+            aria-labelledby="Input"
             placeholder="Chọn khách hàng"
             selectedKeys={formData.customer ? [formData.customer] : []}
             onSelectionChange={(keys) => {
@@ -31,7 +32,8 @@ export default function SupplierSelect({ formData, setFormData }: SupplierSelect
             }}
         >
             {suppliers.map((supplier: any) => (
-                <SelectItem key={supplier.supplierId}>
+                <SelectItem aria-labelledby="Input"
+                            key={supplier.supplierId}>
                     {supplier.supplierName}
                 </SelectItem>
             ))}

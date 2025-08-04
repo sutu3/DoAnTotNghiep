@@ -11,7 +11,7 @@ export const getUserRoleFromToken = async (): Promise<string | null> => {
         const now = Date.now();
 
         // Check if token is expired
-        if (exp < now) {
+        if (exp-300 < now) {
             console.log("Token expired, attempting refresh...");
 
             try {

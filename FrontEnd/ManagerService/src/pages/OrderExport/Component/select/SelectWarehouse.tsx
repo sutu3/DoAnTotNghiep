@@ -1,6 +1,6 @@
-import { Select, SelectItem } from "@heroui/react";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import {Select, SelectItem} from "@heroui/react";
+import {useEffect} from "react";
+import {useDispatch, useSelector} from "react-redux";
 import {MiddleGetWarehouseByUser} from "@/Store/Thunk/WarehouseThunk.tsx";
 import {warehouseListSelector} from "@/Store/Selector.tsx";
 import {OrderRequestExportCreate} from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
@@ -15,11 +15,15 @@ export default function SelectWarehouse({ formData, setFormData }: SelectWarehou
     const warehouses = useSelector(warehouseListSelector);
 
     useEffect(() => {
-        (dispatch as any)(MiddleGetWarehouseByUser({pageSize:0,pageNumber:10}));
+        const fetch = async () => {
+            await (dispatch as any)(MiddleGetWarehouseByUser({pageSize: 0, pageNumber: 10}));
+        }
+        fetch();
     }, [dispatch]);
 
     return (
         <Select
+            aria-labelledby="Input"
             label="Kho xuất hàng"
             placeholder="Chọn kho xuất hàng"
             selectedKeys={formData.warehouse ? [formData.warehouse] : []}
@@ -32,7 +36,8 @@ export default function SelectWarehouse({ formData, setFormData }: SelectWarehou
             }}
         >
             {warehouses.map((warehouse: any) => (
-                <SelectItem key={warehouse.warehouseId}>
+                <SelectItem aria-labelledby="Input"
+                            key={warehouse.warehouseId}>
                     {warehouse.warehouseName}
                 </SelectItem>
             ))}

@@ -4,8 +4,7 @@ import {callApiThunk} from "@/Store/Store.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {
     ReceiptItemCreate,
-    ReceiptWarehouseCreate,
-    setReceiptWarehouse,
+    ReceiptWarehouseCreate, setAddReceiptList,
     setReceiptWarehouseList
 } from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
 
@@ -17,11 +16,12 @@ export const GetReceiptById = createAsyncThunk(
     ) =>
         await callApiThunk(
             "GET",
-            API_ROUTES.order.receiptWarehouse(null).getByReceiptId(receiptId),
+            API_ROUTES.order.receiptWarehouse(null).search().byWarehouseReceipts(receiptId),
             null,
             rejectWithValue
         )
 );
+
 export const GetReceiptByWarehouseId = createAsyncThunk(
     "warehousReceiptSlice/GetReceiptByWarehouseId",
     async (
@@ -74,11 +74,11 @@ export const UpdateReceiptComplete = createAsyncThunk(
             rejectWithValue
         )
 );
-export const MiddleGetReceiptById = (receiptId:string) => {
+export const MiddleGetReceiptItemByWarehouseReceiptId = (receiptId:string) => {
     return async function (dispatch: any) {
         try {
             const action = await dispatch(GetReceiptById({ receiptId }));
-            dispatch(setReceiptWarehouse(action.payload.result));
+            dispatch(setAddReceiptList(action.payload.result));
         } catch (error: any) {
             showToast({
                 title: "Error",

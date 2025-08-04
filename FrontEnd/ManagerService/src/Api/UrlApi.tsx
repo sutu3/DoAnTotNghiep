@@ -23,6 +23,8 @@ export const API_ROUTES = {
         login:baseUrl+"/login",
         logout:baseUrl+"/logout",
         refresh:baseUrl+"/refresh",
+          forgotPassword: `${baseUrl}/forgot-password`,
+          resetPassword: `${baseUrl}/reset-password`,
       }
     },
   },
@@ -40,14 +42,14 @@ export const API_ROUTES = {
       }
     },
     checkSheets:(page:pageApi|null)=> {
-      const base=`${TestGateWay}/inventories/api/inventory/check-sheets/`
+      const base=`${TestGateWay}/inventories/api/inventory/check-sheets`
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
       return{
         create: `${base}`,
         getAll: () => {
           return{
-            byWarehouse:(warehouseId:string)=>base+"warehouse/"+warehouseId+pageUrl,
-            byUser:()=>base+"/performed-by"
+            byWarehouse:(warehouseId:string)=>base+"/warehouse/"+warehouseId+pageUrl,
+            byUser:()=>base+"/performed-by"+pageUrl
           }
         },
         getById: (id: string) => `${TestGateWay}/inventories/api/inventory/check-sheets/${id}`,
@@ -190,6 +192,7 @@ export const API_ROUTES = {
         search:()=>{
           const search=base+"/search";
           return {
+            byWarehouseReceipts:(warehouseReceiptId:string)=>search+"/warehouseReceipt/"+warehouseReceiptId,
             byWarehouseId:(warehouseId:string)=>search+"/warehouse/"+warehouseId,
           }
         }
@@ -326,7 +329,7 @@ export const API_ROUTES = {
   product:{
     product:(page: pageApi | null) => {
       const base = `${TestGateWay}/products/api/products`;
-      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      const pageUrl = page ? `pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
     return{
       addProduct: base,
       deleteProduct:(productId:string)=>base+"/"+productId,
@@ -335,19 +338,24 @@ export const API_ROUTES = {
         return{
           byProduct:(productId:string)=>`${search}/productId/${productId}`,
           byWarehouseId: () => ({
-            getAll: `${search}/productPage${pageUrl}`,
+            getAll: `${search}/productPage?${pageUrl}`,
           }),
-          bySupplierAndWarehouse: (warehouseId: string | null, supplierId: string | null) => {
+          bySupplierAndWarehouse: (warehouseId: string | null, supplierId: string | null
+                                   ,categoryId:string|null,unitId:string|null
+                                   ,productName:string|null) => {
             const params: string[] = [];
 
             if (warehouseId) params.push(`warehouseId=${warehouseId}`);
             if (supplierId) params.push(`supplierId=${supplierId}`);
-            params.push(pageUrl); // đảm bảo pageUrl là chuỗi dạng `page=0&size=10` hoặc `pageUrl=''`
+            if (productName) params.push(`productName=${productName}`);
+            if (categoryId) params.push(`categoryId=${categoryId}`);
+            if (unitId) params.push(`unitId=${unitId}`);
+            params.push(pageUrl)
 
             const url = search + "?" + params.join("&");
 
             return {
-              getAll: url.slice(0,url.length-1),
+              getAll: url,
             };
           }
         }
@@ -423,6 +431,7 @@ export const API_ROUTES = {
     return {
       create: base,
       delete: (id: string) => `${base}/${id}`,
+      getMyInfor: `${base}/search/idUser`,
       search: (() => {
         const searchUrl = `${base}/search`;
         return {
@@ -433,7 +442,8 @@ export const API_ROUTES = {
             getAll: `${searchUrl}/userName/${username}${pageUrl}`,
           }),
           byUserId: (userId: string) => ({
-            role:`${searchUrl}/user/${userId}/roles`
+            role:`${searchUrl}/user/${userId}/roles`,
+            infor:`${searchUrl}/user/${userId}/infor`
           })
         };
       })(),
@@ -462,6 +472,7 @@ export const API_ROUTES = {
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
       return {
         addTaskUser: base,
+        statsInfor:base+"/stats",
         updateStatus: (taskUserId: string) => `${base}/${taskUserId}/status`,
         updateCompleted: (taskUserId: string) => `${base}/${taskUserId}/Complete`,
         updateCancel: (taskUserId: string) => `${base}/${taskUserId}/Cancel`,

@@ -13,19 +13,23 @@ import {
     Input,
     Chip,
     Spinner,
-    Avatar
+    Avatar, Pagination
 } from "@heroui/react";
 import { Package, Plus, Search } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { ProductSelector } from "@/Store/Selector.tsx";
+import {ProductSelector, TotalPageProduct} from "@/Store/Selector.tsx";
 import { MiddleGetAllProductBySearch } from "@/Store/Thunk/ProductThunk.tsx";
 import AddProductModal from "./AddProductModal";
+import {Filters} from "@/pages/OrderExport/page.tsx";
+import { setProductList } from "@/Store/ProductSlice";
+import {pageApi} from "@/Api/UrlApi.tsx";
 
 interface ProductTableProps {
     warehouseId: string;
+    filters?:Filters;
 }
 
-const ProductTable: React.FC<ProductTableProps> = ({ warehouseId }) => {
+const ProductTable: React.FC<ProductTableProps> = ({ warehouseId,filters }) => {
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
@@ -33,23 +37,25 @@ const ProductTable: React.FC<ProductTableProps> = ({ warehouseId }) => {
 
     const products = useSelector(ProductSelector) || [];
     const dispatch = useDispatch();
-
+    const initialProduct = useSelector(TotalPageProduct);
+    const [page, setPage] = useState(1);
     useEffect(() => {
         if (warehouseId) {
-            fetchProducts();
+            dispatch(setProductList([]));
+            setLoading(true);
+            const supplierId= filters?.supplierFilter === "all" ? null : filters?.supplierFilter;
+            const categoryId = filters?.categoryFilter === "all" ? null : filters?.categoryFilter;
+            const unitId= filters?.unitFilter === "all" ? null : filters?.unitFilter;
+            const productName=filters?.searchTerm=== "" ? null : filters?.searchTerm;
+            const pageApi:pageApi={ pageNumber: page - 1, pageSize: 5 };
+            const fetch= async () => {
+                (dispatch as any)(MiddleGetAllProductBySearch(supplierId, warehouseId, categoryId, unitId, productName, pageApi))
+                    .finally(() => setLoading(false));
+            }
+            fetch();
         }
-    }, [warehouseId]);
-
-    const fetchProducts = async () => {
-        setLoading(true);
-        try {
-            await (dispatch as any)(MiddleGetAllProductBySearch(null, warehouseId));
-        } catch (error) {
-            console.error("Error fetching products:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    }, [warehouseId, filters]);
+    const pages = initialProduct;
 
     const filteredProducts = products.filter((product: any) =>
         product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -67,7 +73,19 @@ const ProductTable: React.FC<ProductTableProps> = ({ warehouseId }) => {
             currency: 'VND'
         }).format(price);
     };
-
+    const bottomContent = (
+        <div className="py-2 px-2 flex justify-between items-center">
+            <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="primary"
+                page={page}
+                total={pages}
+                onChange={setPage}
+            />
+        </div>
+    );
     return (
         <>
             <Card className="shadow-sm">
@@ -104,6 +122,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ warehouseId }) => {
 
                     {/* Products Table */}
                     <Table
+                        bottomContent={bottomContent}
                         aria-label="Products table"
                         classNames={{
                             wrapper: "shadow-none border border-gray-200 rounded-lg",

@@ -26,7 +26,6 @@ export interface ReceiptItemResponse {
     createdAt: string;
     updatedAt: string;
     isDeleted: boolean;
-
     // Enriched
     importItem: ImportOrderItem;
     binDetails: Bin;
@@ -35,6 +34,7 @@ export interface WarehouseReceiptResponse {
     receiptId: string;
     importOrderId: string;
     createdByUser?: User;
+    quantityReceiveItem?:number;
     receivedDate: string; // ISO 8601 (LocalDateTime)
     status: "PENDING" | "COMPLETED" | "PARTIAL" | string; // enum ReceiptStatus
     note: string;
@@ -45,7 +45,7 @@ export interface WarehouseReceiptResponse {
     // Enriched
     importOrder: ImportOrder|null;
     createdByUserDetails: UserResponse|null;
-    receiptItems: ReceiptItemResponse[];
+    receiptItems?: ReceiptItemResponse[];
 }
 interface ReceiptWarehouseState {
     warehouseReceiptsResponse: WarehouseReceiptResponse[];

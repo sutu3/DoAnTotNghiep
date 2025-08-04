@@ -1,6 +1,6 @@
 "use client";
 
-import {  useRef } from "react";
+import {useEffect, useRef, useState} from "react";
 import {
     Card,
     CardBody,
@@ -8,13 +8,14 @@ import {
     Button,
     Chip,
     Avatar,
-    Divider
+    Divider, Spinner
 } from "@heroui/react";
-import { WarehouseReceiptResponse } from "../Store/WarehouseReceiptSlice";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import {setAddReceiptList, WarehouseReceiptResponse} from "../Store/WarehouseReceiptSlice";
 import {ArrowLeft, ClipboardList, FileDown, FileEdit, FileText} from "lucide-react";
 import ImportReceiptPrintable from "@/pages/ExecuteImport/Component/Print/ImportReceiptPrintable.tsx";
+import {useDispatch, useSelector} from "react-redux";
+import {MiddleGetReceiptItemByWarehouseReceiptId} from "@/pages/ExecuteImport/Store/Thunk/WarehousReceipteThunk.tsx";
+import {ReceiptItemSelector} from "@/Store/Selector.tsx";
 
 interface ReceiptDetailComponentProps {
     receipt: WarehouseReceiptResponse;
@@ -23,7 +24,21 @@ interface ReceiptDetailComponentProps {
 }
 
 export default function ImportReceiptDetailView({ receipt,onBack, onEdit }: ReceiptDetailComponentProps) {
-    const componentRef = useRef<HTMLDivElement>(null);
+    const dispatch = useDispatch();
+    const [loading,setLoading]=useState(false);
+    useEffect(() => {
+        if(receipt) {
+            setLoading(true)
+            const fetch= async () => {
+                dispatch(setAddReceiptList([]));
+                await (dispatch as any)(MiddleGetReceiptItemByWarehouseReceiptId(receipt.receiptId));
+                setLoading(false);
+            }
+            fetch();
+        }
+    }, []);
+    const items=useSelector(ReceiptItemSelector);
+    const printRef = useRef<HTMLDivElement>(null);
     console.log("Receipt Detail View", receipt);
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -44,41 +59,32 @@ export default function ImportReceiptDetailView({ receipt,onBack, onEdit }: Rece
     };
 
     const exportToPDF = async () => {
-        if (componentRef.current) {
-            try {
-                const canvas = await html2canvas(componentRef.current, {
-                    scale: 1.5,
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: '#ffffff'
-                });
+        if (!printRef.current) return;
 
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = pdf.internal.pageSize.getHeight();
-                const imgWidth = pdfWidth;
-                const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+        const checkSheetCode = receipt?.receiptId || 'Không rõ mã phiếu';
+        const printContents = printRef.current.innerHTML;
 
-                let heightLeft = imgHeight;
-                let position = 0;
+        const headerTitle = `<h1 style="text-align:center">Phiếu kiểm kho - ${checkSheetCode}</h1><hr/>`;
+        const originalContents = document.body.innerHTML;
+        const originalTitle = document.title;
 
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pdfHeight;
 
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pdfHeight;
-                }
 
-                pdf.save(`Phieu-nhap-kho-${receipt.receiptId?.slice(-8)}.pdf`);
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-            }
-        }
-    };
+        const afterPrintHandler = () => {
+            document.body.innerHTML = originalContents;
+            document.title = originalTitle;
+            window.location.reload();
+
+
+            // Hủy sự kiện sau khi dùng
+            window.onafterprint = null;
+        };
+
+        window.onafterprint = afterPrintHandler;
+
+        document.body.innerHTML = headerTitle + printContents;
+        document.title = `Phiếu kiểm kho - ${checkSheetCode}`;
+        window.print();};
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -140,7 +146,7 @@ export default function ImportReceiptDetailView({ receipt,onBack, onEdit }: Rece
                 </Card>
 
                 {/* Nội dung chi tiết */}
-                <div ref={componentRef} className="print-content">
+                <div className="print-content">
                     <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
                         <div className="xl:col-span-3">
                             {/* Thông tin đơn nhập gốc */}
@@ -196,34 +202,41 @@ export default function ImportReceiptDetailView({ receipt,onBack, onEdit }: Rece
                                 <CardHeader>
                                     <h3 className="font-semibold flex items-center gap-2">
                                         <FileText className="text-blue-600" />
-                                        Sản Phẩm Đã Nhập ({receipt.receiptItems?.length || 0})
+                                        Sản Phẩm Đã Nhập ({receipt.quantityReceiveItem || 0})
                                     </h3>
                                 </CardHeader>
                                 <CardBody>
                                     <div className="space-y-4">
-                                        {receipt.receiptItems?.map((item: any, index: number) => (
-                                            <div key={index} className="border rounded-lg p-4 bg-gray-50">
-                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                                                    <div>
-                                                        <p className="text-gray-600">Sản phẩm:</p>
-                                                        <p className="font-medium">{item.importItem?.product?.productName}</p>
-                                                        <p className="text-xs text-gray-500">SKU: {item.importItem?.product?.sku}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-gray-600">Số lượng nhập:</p>
-                                                        <p className="font-medium">{item.receivedQuantity} {item.importItem?.unit?.unitName}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-gray-600">Vị trí bin:</p>
-                                                        <p className="font-medium">{item.binDetails?.binCode}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-gray-600">Ghi chú:</p>
-                                                        <p className="font-medium">{item.note || '-'}</p>
+                                        {loading ? (
+                                            <div className="flex justify-center py-8">
+                                                <Spinner size="lg" label="Đang tải sản phẩm..." />
+                                            </div>
+                                        ) :
+                                            (items?.map((item: any, index: number) => (
+                                                <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                                        <div>
+                                                            <p className="text-gray-600">Sản phẩm:</p>
+                                                            <p className="font-medium">{item.importItem?.product?.productName}</p>
+                                                            <p className="text-xs text-gray-500">SKU: {item.importItem?.product?.sku}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-gray-600">Số lượng nhập:</p>
+                                                            <p className="font-medium">{item.receivedQuantity} {item.importItem?.unit?.unitName}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-gray-600">Vị trí bin:</p>
+                                                            <p className="font-medium">{item.binDetails?.binCode}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-gray-600">Ghi chú:</p>
+                                                            <p className="font-medium">{item.note || '-'}</p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            )))
+                                        }
+
                                     </div>
                                 </CardBody>
                             </Card>
@@ -339,10 +352,13 @@ export default function ImportReceiptDetailView({ receipt,onBack, onEdit }: Rece
                     </div>
                 </div>
             </div>
-            <ImportReceiptPrintable
-                receipt={receipt}
-                onExportPDF={() => console.log('PDF exported successfully')}
-            />
+            <div ref={printRef} className={"hidden"}>
+                <ImportReceiptPrintable
+                    items={items}
+                    receipt={receipt}
+                    onExportPDF={() => console.log('PDF exported successfully')}
+                />
+            </div>
         </div>
     );
 }
