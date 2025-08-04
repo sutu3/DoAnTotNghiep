@@ -127,7 +127,7 @@ public class StockMovementServiceImpl implements StockMovementService {
                                 inventoryWarehouse.getQuantity(), request.getQuantity());
                         throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
                     }
-                    BigDecimal newQuantityExport = inventoryWarehouse.getQuantity().subtract(request.getQuantity());
+                    BigDecimal newQuantityExport = inventoryWarehouse.getQuantity().subtract(request.getQuantity().multiply(BigDecimal.valueOf(-1)));
                     stockMovement.setQuantityAfter(newQuantityExport);
                     log.info("EXPORT: {} - {} = {}", inventoryWarehouse.getQuantity(), request.getQuantity(), newQuantityExport);
                     break;
@@ -192,7 +192,7 @@ public class StockMovementServiceImpl implements StockMovementService {
         try {
             BigDecimal  occupancyChange = switch (movementType) {
                 case IMPORT -> quantityChange;
-                case EXPORT -> quantityChange.negate();
+                case EXPORT -> quantityChange.negate().multiply(BigDecimal.valueOf(-1));
                 case TRANSFER -> BigDecimal.ZERO;
                 case ADJUSTMENT -> quantityChange; // Có thể âm hoặc dương
             };

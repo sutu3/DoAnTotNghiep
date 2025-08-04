@@ -8,9 +8,9 @@ spring:
     name: Order
 
   datasource:
-    url: ${MYSQL_URL}
-    username: ${MYSQL_USERNAME}
-    password: ${MYSQL_PASSWORD}
+    url: jdbc:mysql://localhost:3306/orderDB?createDatabaseIfNotExist=true&serverTimezone=UTC&ssl-mode=REQUIRED
+    username: root
+    password: root
     driver-class-name: "com.mysql.cj.jdbc.Driver"
   jpa:
     database: mysql
@@ -22,5 +22,5 @@ spring:
         format_sql: true
         use_sql_comments: true
 server:
-  port: 8080
+  port: 8085
   address: 0.0.0.0

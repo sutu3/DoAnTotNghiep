@@ -30,8 +30,8 @@ public class WarehouseReceiptResponse {
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     Boolean isDeleted;
-
+    Integer quantityReceiveItem;
     // Enriched data
     ImportOrderResponse importOrder;
-    List<ReceiptItemResponse> receiptItems;
+//    List<ReceiptItemResponse> receiptItems;
 }

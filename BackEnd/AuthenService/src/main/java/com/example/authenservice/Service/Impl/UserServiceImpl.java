@@ -1,6 +1,7 @@
 package com.example.authenservice.Service.Impl;
 
 import com.example.authenservice.Client.UserService.Redis.UserController;
+import com.example.authenservice.Dtos.Request.NotificationForgotPassword;
 import com.example.authenservice.Dtos.Request.UpdateRole;
 import com.example.authenservice.Dtos.Request.UserRequest;
 import com.example.authenservice.Dtos.Response.RoleResponse;
@@ -13,6 +14,7 @@ import com.example.authenservice.Modal.Role;
 import com.example.authenservice.Modal.User;
 import com.example.authenservice.Repo.RoleRepo;
 import com.example.authenservice.Repo.UserRepo;
+import com.example.authenservice.Service.JavaMailSenderService;
 import com.example.authenservice.Service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,7 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
     UserController userServiceClient; // Feign client để gọi UserService
     PasswordEncoder passwordEncoder;
+    private final JavaMailSenderService javaMailSenderService;
 
     @Override
     @PreAuthorize("hasRole('MANAGER')")
@@ -152,6 +155,8 @@ public class UserServiceImpl implements UserService {
         List<User> users=userRepo.findAllByRolesAndIsDeleted(role,false);
         return List.of();
     }
+
+
 
     private void syncUpdateWithUserService(User authUser, UserRequest request) {
             UserRequest businessUserRequest =

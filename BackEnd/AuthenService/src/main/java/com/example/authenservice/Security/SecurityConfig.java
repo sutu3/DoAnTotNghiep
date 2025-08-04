@@ -34,6 +34,7 @@ public class SecurityConfig {
             "/authentication/token",
             "/authentication/introspect",
             "/authentication/logout",
+            "/api/auth/forgot-password",
             "/api/auth/login",
             "/api/auth/introspect",
             "/api/auth/logout",

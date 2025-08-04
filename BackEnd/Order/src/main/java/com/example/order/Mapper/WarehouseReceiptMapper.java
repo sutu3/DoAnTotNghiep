@@ -18,6 +18,6 @@ public interface WarehouseReceiptMapper {
 
     @Mapping(target = "importOrderId", source = "importOrder.importOrderId")
     @Mapping(target = "importOrder", ignore = true)
-    @Mapping(target = "receiptItems", ignore = true)
+    @Mapping(target = "quantityReceiveItem", ignore = true)
     WarehouseReceiptResponse toResponse(WarehouseReceipt entity);
 }

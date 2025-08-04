@@ -3,6 +3,7 @@ package com.example.order.Controller;
 import com.example.order.Dto.Request.ReceiptItemRequest;
 import com.example.order.Dto.Request.WarehouseReceiptRequest;
 import com.example.order.Dto.Response.ApiResponse;
+import com.example.order.Dto.Response.ReceiptItem.ReceiptItemResponse;
 import com.example.order.Dto.Response.WarehouseReceipt.WarehouseReceiptResponse;
 import com.example.order.Service.WarehouseReceiptService;
 import jakarta.validation.Valid;
@@ -80,4 +81,14 @@ public class WarehouseReceiptController {
                 .success(true)
                 .build();
     }
+    @GetMapping("/search/warehouseReceipt/{receiptId}")
+    public ApiResponse<List<ReceiptItemResponse>> getById(@PathVariable String receiptId){
+        return ApiResponse.<List<ReceiptItemResponse>>builder()
+                .Result(warehouseReceiptService.getAllReceiptItemsByReceiptId(receiptId))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+
 }

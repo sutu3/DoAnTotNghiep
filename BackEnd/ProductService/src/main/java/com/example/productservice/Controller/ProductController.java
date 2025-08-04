@@ -43,12 +43,24 @@ public class ProductController {
                 .build();
     }
     @GetMapping("/search")
-    public ApiResponse<List<ProductResponse>> searchProducts(
+    public ApiResponse<Page<ProductResponse>> searchProducts(
             @RequestParam(required = false) String supplierId,
-            @RequestParam(required = false) String warehouseId
+            @RequestParam(required = false) String warehouseId,
+            @RequestParam(required = false) String productName,
+            @RequestParam(required = false) String unitId,
+            @RequestParam(required = false) String categoryId,
+            @RequestParam("pageNumber") int page,
+            @RequestParam("pageSize") int size
     ) {
-        return ApiResponse.<List<ProductResponse>>builder()
-                .Result(productService.getProductsBySupplierFilteredByWarehouse(supplierId,warehouseId))
+        Pageable pageable= PageRequest.of(page,size);
+
+        return ApiResponse.<Page<ProductResponse>>builder()
+                .Result(productService.getProductsBySupplierFilteredByWarehouse(
+                        supplierId,
+                        warehouseId,
+                        productName,
+                        categoryId,
+                        unitId,pageable))
                 .code(0)
                 .message("SuccessFully")
                 .success(true)

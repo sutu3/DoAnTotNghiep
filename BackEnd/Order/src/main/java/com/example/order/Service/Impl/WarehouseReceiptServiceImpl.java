@@ -177,6 +177,15 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService {
     }
 
     @Override
+    public List<ReceiptItemResponse> getAllReceiptItemsByReceiptId(String receiptId) {
+        WarehouseReceipt receipt = warehouseReceiptRepo.findById(receiptId)
+                .orElseThrow(() -> new AppException(ErrorCode.WAREHOUSE_RECEIPT_NOT_FOUND));
+        return receipt.getReceiptItems().stream().map(
+                this::enrichReceiptItem
+        ).collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public void completeReceipt(String receiptId) {
         WarehouseReceipt receipt = warehouseReceiptRepo.findById(receiptId)
@@ -291,12 +300,12 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService {
         ImportOrderResponse importOrderResponse = importOrderService.entry(receipt.getImportOrder());
         response.setImportOrder(importOrderResponse);
         response.setCreatedByUser(receipt.getCreatedByUser());
-
+        response.setQuantityReceiveItem(receipt.getReceiptItems().size());
         // Populate ReceiptItems
-        List<ReceiptItemResponse> receiptItemResponses = receipt.getReceiptItems().stream()
-                .map(this::enrichReceiptItem)
-                .collect(Collectors.toList());
-        response.setReceiptItems(receiptItemResponses);
+//        List<ReceiptItemResponse> receiptItemResponses = receipt.getReceiptItems().stream()
+//                .map(this::enrichReceiptItem)
+//                .collect(Collectors.toList());
+//        response.setReceiptItems(receiptItemResponses);
 
         return response;
     }
