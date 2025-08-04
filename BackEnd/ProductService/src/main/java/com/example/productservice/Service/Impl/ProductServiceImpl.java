@@ -217,7 +217,8 @@ public class ProductServiceImpl implements ProductService {
                 .map(p -> {
                     ProductResponse response = enrich(p);
                     ProductClientRequest productData = productDataMap.get(p.getProductId());
-
+                    response.setMaxStockLevel(productData.getMaxStockLevel());
+                    response.setMinStockLevel(productData.getMinStockLevel());
                     response.setQuantity(productData.getQuantity());
                     response.setPendingApprovedImportQuantity(productData.getPendingApprovedImportQuantity());
                     response.setPendingApprovedExportQuantity(productData.getPendingApprovedExportQuantity());

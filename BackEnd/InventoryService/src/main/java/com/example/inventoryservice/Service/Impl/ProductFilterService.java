@@ -2,8 +2,10 @@ package com.example.inventoryservice.Service.Impl;
 
 import com.example.inventoryservice.Client.OrderService.OrderController;
 import com.example.inventoryservice.Client.ProductService.Dto.Response.Product.ProductClientRequest;
+import com.example.inventoryservice.Dtos.Response.InventoryProductTotalStock;
 import com.example.inventoryservice.Module.InventoryProduct;
 import com.example.inventoryservice.Repo.InventoryProductRepo;
+import com.example.inventoryservice.Service.InventoryProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ public class ProductFilterService {
 
     private final InventoryProductRepo inventoryProductRepo;
     private final OrderController orderController; // Thêm OrderService client
+    private final InventoryProductService inventoryProductService;
 
     public List<ProductClientRequest> filterByWarehouse(String warehouseId, List<ProductClientRequest> products) {
         log.info("🔎 Filtering products by warehouseId = {}", warehouseId);
@@ -40,7 +43,9 @@ public class ProductFilterService {
                 .filter(p -> productQuantityMap.containsKey(p.getProductId()))
                 .map(p -> {
                     p.setQuantity(productQuantityMap.get(p.getProductId()));
-
+                    InventoryProductTotalStock inventoryProductTotalStock=inventoryProductService.getInventoryProductTotalStock(p.getProductId());
+                    p.setMaxStockLevel(inventoryProductTotalStock.getMaxStockLevel());
+                    p.setMinStockLevel(inventoryProductTotalStock.getMinStockLevel());
                     // Gọi API để lấy approved pending quantities
                     try {
                         Integer approvedImport = orderController.getApprovedImportOrdersByProduct(

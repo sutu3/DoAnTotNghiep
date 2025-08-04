@@ -25,9 +25,12 @@ import com.example.order.Mapper.ReceiptItemMapper;
 import com.example.order.Mapper.WarehouseReceiptMapper;
 import com.example.order.Module.ImportOrder;
 import com.example.order.Module.ReceiptItem;
+import com.example.order.Module.WarehouseDelivery;
 import com.example.order.Module.WarehouseReceipt;
 import com.example.order.Repo.ImportOrderRepo;
 import com.example.order.Repo.ReceiptItemRepo;
+import com.example.order.Repo.Specification.WarehouseDeliverySpecification;
+import com.example.order.Repo.Specification.WarehouseReceiptSpecification;
 import com.example.order.Repo.WarehouseReceiptRepo;
 import com.example.order.Service.ImportItemService;
 import com.example.order.Service.ImportOrderService;
@@ -38,6 +41,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -61,7 +67,6 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService {
     ImportItemService importItemService;
     WarehouseReceiptMapper warehouseReceiptMapper;
     AsyncServiceImpl asyncServiceImpl;
-    ImportOrderMapper importOrderMapper;
     ReceiptItemMapper receiptItemMapper;
     InventoryController inventoryController;
     ConvertToBaseUnit convertToBaseUnit;
@@ -169,11 +174,14 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService {
     }
 
     @Override
-    public List<WarehouseReceiptResponse> getAllByWarehouseId(String warehouseId) {
-        List<WarehouseReceipt> warehouseReceipts=warehouseReceiptRepo.findAllByWarehouseAndIsDeleted(warehouseId, false);
-        return warehouseReceipts.stream()
-                .map(this::entry)
-                .collect(Collectors.toList());
+    public Page<WarehouseReceiptResponse> getAllByWarehouseId(String warehouseId, String status, String receiptId, Pageable page) {
+        Specification<WarehouseReceipt> specification = Specification
+                .where(WarehouseReceiptSpecification.hasWarehouse(warehouseId))
+                .and(WarehouseReceiptSpecification.hasStatus(status))
+                .and(WarehouseReceiptSpecification.hasReceiptId(receiptId))
+                .and(WarehouseReceiptSpecification.isDelete(false));
+        Page<WarehouseReceipt> receipts = warehouseReceiptRepo.findAll(specification, page);
+        return receipts.map(this::entry);
     }
 
     @Override
@@ -299,7 +307,7 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService {
         // Populate ImportOrder
         ImportOrderResponse importOrderResponse = importOrderService.entry(receipt.getImportOrder());
         response.setImportOrder(importOrderResponse);
-        response.setCreatedByUser(receipt.getCreatedByUser());
+        response.setCreatedByUser(userFuture.join());
         response.setQuantityReceiveItem(receipt.getReceiptItems().size());
         // Populate ReceiptItems
 //        List<ReceiptItemResponse> receiptItemResponses = receipt.getReceiptItems().stream()

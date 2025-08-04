@@ -13,6 +13,8 @@ import com.example.order.Mapper.ExportOrderMapper;
 import com.example.order.Module.ExportOrder;
 import com.example.order.Repo.ExportItemRepo;
 import com.example.order.Repo.ExportOrderRepo;
+import com.example.order.Repo.Specification.ExportOrderSpecification;
+import com.example.order.Repo.Specification.ImportOrderSpecification;
 import com.example.order.Service.ExportOrderService;
 import com.example.order.Utils.DateUtils;
 import lombok.AccessLevel;
@@ -21,6 +23,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -73,9 +76,12 @@ public class ExportOrderServiceImpl implements ExportOrderService {
     }
 
     @Override
-    public Page<ExportOrderResponse> getExportOrdersByWarehouse(String warehouse, Pageable pageable) {
-        return exportOrderRepo.findAllByWarehouseAndIsDeletedFalse(warehouse, pageable)
-                .map(this::entry);    }
+    public Page<ExportOrderResponse> getExportOrdersByWarehouse(String warehouse, Pageable pageable,String status) {
+        Specification<ExportOrder> specification = Specification.where(ExportOrderSpecification.hasWarehouse(warehouse))
+                .and(ExportOrderSpecification.hasStatus(status));
+        Page<ExportOrder> exportOrders = exportOrderRepo.findAll(specification, pageable);
+        return exportOrderRepo.findAll(specification, pageable).map(this::entry);
+    }
 
     @Override
     public Page<ExportOrderResponse> getExportOrdersByUser(String userId, Pageable pageable) {

@@ -33,6 +33,8 @@ public class ProductResponse{
     Boolean isActive;
     CategoryResponseNoList category;
     UnitResponseNoList unit;
+    Integer minStockLevel;
+    Integer maxStockLevel;
     Integer pendingApprovedImportQuantity;
     Integer pendingApprovedExportQuantity;
     LocalDateTime createdAt;

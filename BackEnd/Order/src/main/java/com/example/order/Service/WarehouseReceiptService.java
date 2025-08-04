@@ -6,6 +6,8 @@ import com.example.order.Dto.Response.ReceiptItem.ReceiptItemResponse;
 import com.example.order.Dto.Response.WarehouseReceipt.WarehouseReceiptResponse;
 import com.example.order.Enum.ReceiptStatus;
 import com.example.order.Module.WarehouseReceipt;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,7 +20,7 @@ public interface WarehouseReceiptService {
     List<WarehouseReceiptResponse> getByOrderId(String orderId);
     WarehouseReceiptResponse addReceiptItem(String receiptId, ReceiptItemRequest request);
     WarehouseReceiptResponse updateReceiptStatus(String receiptId, ReceiptStatus status);
-    List<WarehouseReceiptResponse> getAllByWarehouseId(String warehouseId);
+    Page<WarehouseReceiptResponse> getAllByWarehouseId(String warehouseId, String status, String receiptId, Pageable page);
     List<ReceiptItemResponse> getAllReceiptItemsByReceiptId(String receiptId);
     void completeReceipt(String receiptId);
     WarehouseReceiptResponse entry(WarehouseReceipt receipt);

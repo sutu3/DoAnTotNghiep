@@ -23,7 +23,7 @@ public class WarehouseReceiptResponse {
 
     String receiptId;
     String importOrderId;
-    String createdByUser;
+    UserResponse createdByUser;
     LocalDateTime receivedDate;
     ReceiptStatus status;
     String note;
