@@ -19,6 +19,7 @@ public enum ErrorCode {
     UNAUTHENTICATED(1005,"Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNCATEGORIZED(9999,"Uncategorized",HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_KEY(1001,"Invalid key",HttpStatus.BAD_REQUEST),
+    NOTIFICATION_SEND_FAILED(1006,"Notification send failed",HttpStatus.INTERNAL_SERVER_ERROR),
     ROLE_IS_EXITED(1003,"Role Is Exited", HttpStatus.BAD_REQUEST),
     ROLE_NOT_FOUND(1001,"Role Not Found", HttpStatus.NOT_FOUND),
     INVENTORY_NOT_FOUND(1001,"Inventory Not Found", HttpStatus.NOT_FOUND),

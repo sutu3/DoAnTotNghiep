@@ -2,6 +2,7 @@ package com.example.order.Service;
 
 import com.example.order.Dto.Request.ReceiptItemRequest;
 import com.example.order.Dto.Request.WarehouseReceiptRequest;
+import com.example.order.Dto.Response.ReceiptItem.ReceiptItemResponse;
 import com.example.order.Dto.Response.WarehouseReceipt.WarehouseReceiptResponse;
 import com.example.order.Enum.ReceiptStatus;
 import com.example.order.Module.WarehouseReceipt;
@@ -18,6 +19,7 @@ public interface WarehouseReceiptService {
     WarehouseReceiptResponse addReceiptItem(String receiptId, ReceiptItemRequest request);
     WarehouseReceiptResponse updateReceiptStatus(String receiptId, ReceiptStatus status);
     List<WarehouseReceiptResponse> getAllByWarehouseId(String warehouseId);
+    List<ReceiptItemResponse> getAllReceiptItemsByReceiptId(String receiptId);
     void completeReceipt(String receiptId);
     WarehouseReceiptResponse entry(WarehouseReceipt receipt);
     WarehouseReceiptResponse updateReceiptItem(String receiptId, String receiptItemId, ReceiptItemRequest request);

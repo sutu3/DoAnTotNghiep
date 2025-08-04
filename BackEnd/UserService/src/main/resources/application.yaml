@@ -7,9 +7,12 @@ spring:
   application:
     name: UserService
   datasource:
-    url: jdbc:mysql://mysql-32d8e507-minhdaimk111-0ea4.l.aivencloud.com:25644/userDB?createDatabaseIfNotExist=true&serverTimezone=UTC&ssl-mode=REQUIRED
-    username: "avnadmin"
-    password: "AVNS_qlIFCPONWrpyRD8A4Rr"
+#    url: jdbc:mysql://mysql-32d8e507-minhdaimk111-0ea4.l.aivencloud.com:25644/userDB?createDatabaseIfNotExist=true&serverTimezone=UTC&ssl-mode=REQUIRED
+#    username: "avnadmin"
+#    password: "AVNS_qlIFCPONWrpyRD8A4Rr"
+    url: jdbc:mysql://localhost:3306/userDB?createDatabaseIfNotExist=true&serverTimezone=UTC&ssl-mode=REQUIRED
+    username: root
+    password: root
     driver-class-name: "com.mysql.cj.jdbc.Driver"
 
   jpa:
@@ -21,3 +24,5 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
+server:
+  port: 8081

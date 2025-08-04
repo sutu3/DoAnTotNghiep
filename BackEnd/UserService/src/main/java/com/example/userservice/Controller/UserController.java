@@ -5,6 +5,7 @@ import com.example.userservice.Dto.Request.UserRequest;
 import com.example.userservice.Dto.Responses.ApiResponse;
 import com.example.userservice.Dto.Responses.User.IdWarehouseResponse;
 import com.example.userservice.Dto.Responses.User.UserResponse;
+import com.example.userservice.Form.UserForm;
 import com.example.userservice.Service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -59,6 +60,18 @@ public class UserController {
     ) {
         return ApiResponse.<UserResponse>builder()
                 .Result(userService.UpdateRoleUser(userId,updateRole))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+    @PutMapping("/search/user/{userId}/infor")
+    public ApiResponse<UserResponse> updateInforUser(
+            @PathVariable String userId,
+            @RequestBody UserForm updateUser
+    ) {
+        return ApiResponse.<UserResponse>builder()
+                .Result(userService.updateUser(updateUser,userId))
                 .code(0)
                 .message("Success")
                 .success(true)

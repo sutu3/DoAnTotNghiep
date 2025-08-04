@@ -1,8 +1,6 @@
 package com.example.productservice.Service;
 
-import com.example.productservice.Dto.Requests.ProductClientRequest;
 import com.example.productservice.Dto.Requests.ProductCreateWrapper;
-import com.example.productservice.Dto.Requests.ProductRequest;
 import com.example.productservice.Dto.Responses.Product.ProductResponse;
 import com.example.productservice.Form.ProductForm;
 import com.example.productservice.Model.Product;
@@ -60,11 +58,14 @@ public interface ProductService {
     /**
      * Tìm kiếm danh sách sản phẩm dựa trên mã nhà sản xuất và mã kho.
      *
-     * @param supplierId Mã  nhà sản xuất của sản phẩm.
+     * @param supplierId  Mã  nhà sản xuất của sản phẩm.
      * @param warehouseId Mã  nhà kho của sản phẩm.
+     * @param categoryId  Mã danh mục của sản phẩm (có thể null).
+     * @param unitId      Mã đơn vị của sản phẩm (có thể null).
+     * @param productName Tên sản phẩm (có thể null).
      * @return {@link ProductResponse} của sản phẩm nếu tìm thấy.
      */
-    List<ProductResponse> getProductsBySupplierFilteredByWarehouse(String supplierId, String warehouseId);
+    Page<ProductResponse> getProductsBySupplierFilteredByWarehouse(String supplierId, String warehouseId,String productName, String categoryId, String unitId, Pageable pageable);
 
     /**
      * Tìm kiếm sản phẩm dựa trên mã SKU.

@@ -3,6 +3,7 @@ package com.example.userservice.Service;
 import com.example.userservice.Dto.Request.StatusRequest;
 import com.example.userservice.Dto.Request.TaskRequest;
 import com.example.userservice.Dto.Request.TaskUserRequest;
+import com.example.userservice.Dto.Responses.TaskUser.StatsResponse;
 import com.example.userservice.Dto.Responses.TaskUser.TaskUserResponse;
 import com.example.userservice.Form.EvidenceImages;
 import com.example.userservice.Form.NoteForm;
@@ -27,5 +28,6 @@ public interface TaskUserService {
     TaskUserResponse updateTaskUserStatus(StatusRequest statusRequest,String id);
     TaskUserResponse updateTaskUserCancel(String id, NoteForm note);
     TaskUserResponse updateTaskUserCompleted(EvidenceImages request, String id);
+    StatsResponse getStatsByUserId();
     String deleteTaskUser(String id);
 }

@@ -1,10 +1,7 @@
 package com.example.authenservice.Controller;
 
 import com.example.authenservice.Dtos.ApiResponse;
-import com.example.authenservice.Dtos.Request.AuthenticationRequest;
-import com.example.authenservice.Dtos.Request.IntrospectRequest;
-import com.example.authenservice.Dtos.Request.LogoutRequest;
-import com.example.authenservice.Dtos.Request.RefreshRequest;
+import com.example.authenservice.Dtos.Request.*;
 import com.example.authenservice.Dtos.Response.AuthenticationResponse;
 import com.example.authenservice.Dtos.Response.IntrospectResponse;
 import com.example.authenservice.Service.Impl.AuthenticationService;
@@ -13,10 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 @RestController
@@ -62,6 +56,24 @@ public class AuthenController {
         return ApiResponse.<String>builder()
                 .Result("Logged out successfully")
                 .message("Logout successful")
+                .success(true)
+                .code(0)
+                .build();
+    }
+    @PostMapping("/forgot-password")
+    public ApiResponse<AuthenticationResponse> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        return ApiResponse.<AuthenticationResponse>builder()
+                .Result(authService.forgotPassword(request.email()))
+                .message("Send Mail successful")
+                .success(true)
+                .code(0)
+                .build();
+    }
+    @PutMapping("/reset-password")
+    public ApiResponse<AuthenticationResponse> resetPassword(@RequestBody ResetPasswordRequest request) {
+        return ApiResponse.<AuthenticationResponse>builder()
+                .Result(authService.resetPassword(request))
+                .message("Reset Password successful")
                 .success(true)
                 .code(0)
                 .build();

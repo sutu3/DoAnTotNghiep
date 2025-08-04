@@ -7,9 +7,9 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
   datasource:
-    url: ${MYSQL_URL}
-    username: ${MYSQL_USERNAME}
-    password: ${MYSQL_PASSWORD}
+    url: jdbc:mysql://localhost:3306/fileDB?createDatabaseIfNotExist=true&serverTimezone=UTC&ssl-mode=REQUIRED
+    username: root
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -18,12 +18,12 @@ spring:
     show-sql: true
 
 cloudinary:
-  api_key: ${CLOUDINARY_API_KEY}
-  api_secret: ${CLOUDINARY_API_SECRET}
-  cloud_name: ${CLOUDINARY_CLOUD_NAME}
+  api_key: 532361965492273
+  api_secret: XgJlA8F_LcyNwpiIXdnLEZnJsKo
+  cloud_name: dclib4xzd
 
 server:
-  port: 8080
+  port: 8084
   address: 0.0.0.0
 
 springdoc:
