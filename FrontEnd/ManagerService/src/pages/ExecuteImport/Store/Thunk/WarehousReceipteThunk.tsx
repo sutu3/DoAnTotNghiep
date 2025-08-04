@@ -1,8 +1,8 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {API_ROUTES} from "@/Api/UrlApi.tsx";
+import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {callApiThunk} from "@/Store/Store.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
-import {
+import {initTotalPage,
     ReceiptItemCreate,
     ReceiptWarehouseCreate, setAddReceiptList,
     setReceiptWarehouseList
@@ -25,12 +25,12 @@ export const GetReceiptById = createAsyncThunk(
 export const GetReceiptByWarehouseId = createAsyncThunk(
     "warehousReceiptSlice/GetReceiptByWarehouseId",
     async (
-        { warehouseId }: {warehouseId: string },
+        { warehouseId,status,receiptId,page }: {warehouseId: string|null, status: string|null, receiptId: string|null,page:pageApi },
         { rejectWithValue }
     ) =>
         await callApiThunk(
             "GET",
-            API_ROUTES.order.receiptWarehouse(null).search().byWarehouseId(warehouseId),
+            API_ROUTES.order.receiptWarehouse(page).search().byWarehouseId(warehouseId,status,receiptId).getAll,
             null,
             rejectWithValue
         )
@@ -88,11 +88,17 @@ export const MiddleGetReceiptItemByWarehouseReceiptId = (receiptId:string) => {
         }
     };
 };
-export const MiddleGetReceiptByWarehouseId = (warehouseId:string) => {
+export const MiddleGetReceiptByWarehouseId = (
+    warehouseId: string|null,
+    status: string|null,
+    receiptId: string|null,
+    page:pageApi) => {
     return async function (dispatch: any) {
         try {
-            const action = await dispatch(GetReceiptByWarehouseId({ warehouseId }));
-            dispatch(setReceiptWarehouseList(action.payload.result));
+            console.log("Ma phieu"+ receiptId);
+            const action = await dispatch(GetReceiptByWarehouseId({ warehouseId,status,receiptId,page }));
+            dispatch(setReceiptWarehouseList(action.payload.result?.content));
+            dispatch(initTotalPage(action.payload.result?.totalPages));
         } catch (error: any) {
             showToast({
                 title: "Error",

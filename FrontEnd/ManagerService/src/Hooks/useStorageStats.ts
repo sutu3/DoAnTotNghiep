@@ -99,7 +99,6 @@ export const useStorageStats = (warehouseId: string, timeFilter: string) => {
                     stacks: stackData
                 });
             } catch (err) {
-                console.error("Lỗi khi lấy dữ liệu storage stats:", err);
                 setError(err);
             } finally {
                 setLoading(false);

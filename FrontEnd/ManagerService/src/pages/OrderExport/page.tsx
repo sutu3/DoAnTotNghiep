@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { MiddleAddOrderExport } from "@/pages/ExecuteExport/Store/Thunk/ExportOrderThunk.tsx";
-import { useExportOrderStore } from "@/zustand/ExportOrderStore";
+import {useState} from "react";
+import {useDispatch} from "react-redux";
+import {MiddleAddOrderExport} from "@/pages/ExecuteExport/Store/Thunk/ExportOrderThunk.tsx";
+import {useExportOrderStore} from "@/zustand/ExportOrderStore";
 import ExportOrderHeader from "./Component/ExportOrderHeader";
 import WarehouseSelectionCard from "./Component/WarehouseSelectionCard";
 import ProductExportTable from "./Component/Table/ProductExportTable";
 import ExportCart from "@/pages/OrderExport/Component/Cart/ExportCart.tsx";
 import ExportOrderSummary from "./Component/ExportOrderSummary";
-import { OrderRequestExportCreate } from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
+import {OrderRequestExportCreate} from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 import ProductFilterPanel from "@/pages/OrderExport/Component/select/SelectProductFilter.tsx";
+import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 
 export interface Filters{
     searchTerm: string;
@@ -42,6 +43,10 @@ export default function ExportOrderPage() {
     const handleFilterChange = (key: string, value: string) => {
         setFilters(prev => ({ ...prev, [key]: value }));
     };
+    const handleOnChange = (key: string, value: string) => {
+        setFormData(prev => ({ ...prev, [key]: value }));
+    };
+
 
     const handleClearFilters = () => {
         setFilters({
@@ -53,21 +58,40 @@ export default function ExportOrderPage() {
     };
 
     const handleSubmit = async () => {
-        setLoading(true);
-        try {
-            await (dispatch as any)(MiddleAddOrderExport(formData, items));
-            clearItems();
-            setFormData({
-                warehouse: "",
-                customer: "",
-                deliveryDate: "",
-                description: ""
+
+        if(formData.deliveryDate!=""){
+            if(formData?.customer!=""){
+                setLoading(true);
+
+                try {
+                    await (dispatch as any)(MiddleAddOrderExport(formData, items));
+                    clearItems();
+                    setFormData({
+                        warehouse: "",
+                        customer: "",
+                        deliveryDate: "",
+                        description: ""
+                    });
+                } catch (error) {
+                    console.error("Error creating export order:", error);
+                } finally {
+                    setLoading(false);
+                }
+            }else{
+                showToast({
+                    title: "Chọn khách hàng trước khi tiếp tục",
+                    description: "Vui lòng chọn một khách hàng để thêm sản phẩm vào đơn hàng.",
+                    color: "warning", // hoặc "danger" nếu muốn nổi bật mạnh
+                });
+            }
+        }else{
+            showToast({
+                title: "Chọn ngay giao hàng",
+                description: "Vui lòng chọn ngày giao hàng trước khi tạo đơn xuất",
+                color: "warning",
             });
-        } catch (error) {
-            console.error("Error creating export order:", error);
-        } finally {
-            setLoading(false);
         }
+
     };
 
     return (
@@ -77,7 +101,7 @@ export default function ExportOrderPage() {
                 <ExportOrderHeader />
 
                 {/* Warehouse Selection */}
-                <WarehouseSelectionCard formData={formData} setFormData={setFormData} />
+                <WarehouseSelectionCard formData={formData} handleOnChange={handleOnChange} />
                 <div className="xl:col-span-1">
                     <div className="sticky top-6 space-y-6">
                         <ProductFilterPanel
@@ -94,11 +118,11 @@ export default function ExportOrderPage() {
                     </div>
                 </div>
                 {/* Main Content Grid - Improved Layout */}
-                <div className="grid grid-cols-1 xl:grid-cols-6 gap-6">
-                    <div className="xl:col-span-4">
+                <div className="grid grid-cols-1 xl:grid-cols-7 gap-6">
+                    <div className="xl:col-span-5">
                         {formData.warehouse && (
                             <ProductExportTable
-                                warehouseId={formData.warehouse}
+                                formData={formData}
                                 filters={filters}
                             />
                         )}

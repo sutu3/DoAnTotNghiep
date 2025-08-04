@@ -7,10 +7,10 @@ import {OrderRequestExportCreate} from "@/pages/ExecuteExport/Store/ExportOrderS
 
 interface WarehouseSelectionCardProps {
     formData: OrderRequestExportCreate;
-    setFormData: (formData: (prev: any) => any) => void;
+    handleOnChange: (key:string, value: string) => void;
 }
 
-export default function WarehouseSelectionCard({ formData, setFormData }: WarehouseSelectionCardProps) {
+export default function WarehouseSelectionCard({ formData, handleOnChange }: WarehouseSelectionCardProps) {
     return (
         <Card className="mb-6 shadow-sm border-l-4 border-l-green-500">
             <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
@@ -21,8 +21,8 @@ export default function WarehouseSelectionCard({ formData, setFormData }: Wareho
             </CardHeader>
             <CardBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <SelectWarehouse formData={formData} setFormData={setFormData} />
-                    <SupplierSelect formData={formData} setFormData={setFormData} />
+                    <SelectWarehouse formData={formData} handleOnChange={(value)=>handleOnChange("warehouse",value)} />
+                    <SupplierSelect formData={formData} handleOnChange={(value)=>handleOnChange("customer",value)} />
                 </div>
             </CardBody>
         </Card>

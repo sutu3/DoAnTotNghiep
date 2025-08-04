@@ -54,9 +54,9 @@ const ProductTable: React.FC<ProductTableProps> = ({ warehouseId,filters }) => {
             }
             fetch();
         }
-    }, [warehouseId, filters]);
+    }, [warehouseId, filters,page]);
     const pages = initialProduct;
-
+    console.log(pages)
     const filteredProducts = products.filter((product: any) =>
         product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.sku.toLowerCase().includes(searchTerm.toLowerCase())

@@ -43,7 +43,7 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({
     const [pageNumber,setPageNumber]=useState(1);
     const dispatch=useDispatch()
     const printRef = useRef<HTMLDivElement>(null);
-
+    const pages=totalPage;
     const handlePrint = () => {
         if (!printRef.current) return;
 
@@ -85,7 +85,7 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({
         if (isOpen && inventoryItem) {
             fetchStockMovements();
         }
-    }, [isOpen, inventoryItem]);
+    }, [isOpen, inventoryItem,pageNumber]);
     useEffect(() => {
         setMovements(movementList)
     }, [movementList]);
@@ -94,7 +94,7 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({
 
         setLoading(true);
         try {
-            const page:pageApi={pageNumber:pageNumber-1,pageSize:5}
+            const page:pageApi={pageNumber:pageNumber-1,pageSize:3}
             dispatch(StockMovementSlice.actions.setStockMovementList([]))
             await (dispatch as any)(MiddleGetAllStockMovement(inventoryItem?.inventoryWarehouseId,page))
         } catch (error) {
@@ -216,7 +216,7 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({
                 showControls
                 showShadow
                 color="primary"
-                page={pageNumber}
+                page={pages}
                 total={totalPage}
                 onChange={setPageNumber}
             />

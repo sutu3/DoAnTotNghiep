@@ -10,10 +10,12 @@ import {
     Pagination,
     Chip,
     Tooltip,
-    Progress, Spinner
+    Progress, Spinner,
+    Input
 } from "@heroui/react";
 import {
     Eye,
+    Search,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { StacksSelector, TotalPageStack } from "@/Store/Selector.tsx";
@@ -50,7 +52,6 @@ export const StackTable: React.FC<StackTableProps> = ({
     const [filterValue, setFilterValue] = useState("");
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortDescriptor, setSortDescriptor] = useState({
         column: "stackName",
         direction: "ascending" as "ascending" | "descending"
@@ -64,16 +65,17 @@ export const StackTable: React.FC<StackTableProps> = ({
             dispatch(StackSlice.actions.setStackList([]))
             const pageApi: pageApi = {
                 pageNumber: page - 1,
-                pageSize: rowsPerPage
+                pageSize: 5
             };
             if(data.warehouse.length!=0){
-                await dispatch(MiddleGetAllStack(pageApi,data.warehouse) as any);
+                const stackName=filterValue==""?null:filterValue;
+                await dispatch(MiddleGetAllStack(pageApi,data.warehouse,stackName) as any);
                 setLoading(false)
             }
         }
         fetch()
 
-    }, [page, rowsPerPage, dispatch,data?.warehouse]);
+    }, [page, dispatch,data?.warehouse,filterValue]);
 
     // Filter and sort data
     const filteredItems = useMemo(() => {
@@ -228,16 +230,39 @@ export const StackTable: React.FC<StackTableProps> = ({
                     onChange={setPage}
                 />
                 <span className="w-[30%] text-small text-default-400">
-          Showing {((page - 1) * rowsPerPage) + 1} to {Math.min(page * rowsPerPage, stacks.length)} of {stacks.length} entries
+          Showing {((page - 1) * 5) + 1} to {Math.min(page * 5, stacks.length)} of {stacks.length} entries
         </span>
             </div>
         );
-    }, [page, totalPages, rowsPerPage, stacks.length]);
+    }, [page, totalPages, 5, stacks.length]);
+    const topContent = useMemo(() => {
+        return (
+            <div className="flex flex-col gap-4">
+                <div className="flex justify-between gap-3 items-end">
+                    <Input
+                        isClearable
+                        className="w-full sm:max-w-[44%]"
+                        placeholder="Tìm kiếm theo tên stack"
+                        startContent={<Search className="w-4 h-4" />}
+                        value={filterValue}
+                        onClear={() => setFilterValue("")}
+                        onValueChange={setFilterValue}
+                    />
 
+                </div>
+                <div className="flex justify-between items-center">
+                <span className="text-default-400 text-small">
+                    Tổng {filteredItems.length} stack
+                </span>
+                </div>
+            </div>
+        );
+    }, [filterValue, filteredItems.length]);
     return (
         <Table
             aria-label="Stack management table"
             isHeaderSticky
+            topContent={topContent}
             bottomContent={bottomContent}
             bottomContentPlacement="outside"
             classNames={{

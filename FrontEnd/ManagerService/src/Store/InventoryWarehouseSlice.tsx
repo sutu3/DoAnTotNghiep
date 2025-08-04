@@ -73,7 +73,6 @@ const InventoryWarehouseSlice = createSlice({
             state.totalPage = action.payload;
         },
         setInventoryWarehouseList: (state, action) => {
-            console.log(action.payload);
             state.inventoryWarehouses = action.payload;
         },
         setInventoryProductList: (state, action) => {

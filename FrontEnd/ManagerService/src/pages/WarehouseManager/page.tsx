@@ -36,7 +36,6 @@ const WarehousePage = () => {
             const PageApi: pageApi = { pageNumber: page - 1, pageSize: 10 };
             const result = await (dispatch as any)(GetAllWarehouse({ page: PageApi }));
 
-            console.log("Warehouse API result:", result); // <- xem có payload không
 
             if (result?.payload?.result?.content) {
                 dispatch(setAllWarehouse(result.payload.result.content));

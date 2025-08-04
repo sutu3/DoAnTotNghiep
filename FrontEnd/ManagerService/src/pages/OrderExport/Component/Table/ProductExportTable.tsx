@@ -16,7 +16,6 @@ import {
     Badge,
     Tooltip
 } from "@heroui/react";
-import { Icon } from "@iconify/react";
 import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {ProductSelector, TotalPageProduct} from "@/Store/Selector.tsx";
@@ -25,15 +24,16 @@ import ExportItemModal from "@/pages/OrderExport/Component/Modal/ExportItemModal
 import {Product, setProductList} from "@/Store/ProductSlice.tsx";
 import {Filters} from "@/pages/OrderExport/page.tsx";
 import {pageApi} from "@/Api/UrlApi.tsx";
-import {Package, Plus, Eye, Info, Building2, Tag, DollarSign} from "lucide-react";
+import {Package, Plus, Info, Building2, Tag, DollarSign} from "lucide-react";
+import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
+import {OrderRequestExportCreate} from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 
 interface ProductExportTableProps {
-    warehouseId: string;
+    formData:OrderRequestExportCreate;
     filters?:Filters;
 }
 
-const ProductExportTable: React.FC<ProductExportTableProps> = ({
-                                                                   warehouseId,
+const ProductExportTable: React.FC<ProductExportTableProps> = ({formData,
                                                                    filters
                                                                }) => {
     const dispatch = useDispatch();
@@ -43,9 +43,8 @@ const ProductExportTable: React.FC<ProductExportTableProps> = ({
     const [loading, setLoading] = useState(false);
     const initialProduct = useSelector(TotalPageProduct);
     const [page, setPage] = useState(1);
-
     useEffect(() => {
-        if (warehouseId) {
+        if (formData.warehouse) {
             dispatch(setProductList([]));
             setLoading(true);
             const supplierId= filters?.supplierFilter === "all" ? null : filters?.supplierFilter;
@@ -53,16 +52,17 @@ const ProductExportTable: React.FC<ProductExportTableProps> = ({
             const unitId= filters?.unitFilter === "all" ? null : filters?.unitFilter;
             const productName=filters?.searchTerm=== "" ? null : filters?.searchTerm;
             const pageApi:pageApi={ pageNumber: page - 1, pageSize: 5 };
-            (dispatch as any)(MiddleGetAllProductBySearch(supplierId, warehouseId,categoryId, unitId,productName,pageApi))
+            (dispatch as any)(MiddleGetAllProductBySearch(supplierId, formData.warehouse,categoryId, unitId,productName,pageApi))
                 .finally(() => setLoading(false));
         }
-    }, [warehouseId, filters, page]);
+    }, [formData.warehouse, filters, page]);
 
     const pages = initialProduct;
 
     const handleAddToCart = (product: any) => {
-        setSelectedProduct(product);
-        setIsModalOpen(true);
+            setSelectedProduct(product);
+            setIsModalOpen(true);
+
     };
 
     const filteredProducts: Product[] = useMemo(() => {
@@ -75,7 +75,7 @@ const ProductExportTable: React.FC<ProductExportTableProps> = ({
         {
             key: "product",
             label: "Thông tin sản phẩm",
-            width: "35%"
+            width: "25%"
         },
         {
             key: "category",
@@ -162,7 +162,7 @@ const ProductExportTable: React.FC<ProductExportTableProps> = ({
                             color="primary"
                             startContent={<Info className="w-4 h-4" />}
                         >
-                            {filteredProducts.length * pages} sản phẩm
+                            {filteredProducts.length } sản phẩm
                         </Chip>
                     </div>
                 </CardHeader>
@@ -338,7 +338,7 @@ const ProductExportTable: React.FC<ProductExportTableProps> = ({
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 product={selectedProduct}
-                warehouseId={warehouseId}
+                warehouseId={formData.warehouse}
             />
         </>
     );

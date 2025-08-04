@@ -4,7 +4,7 @@ import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {
     ImportItemCreate, ImportOrderItem,
-    OrderRequestImportCreate,
+    OrderRequestImportCreate,initToTalPage,
     setOrderImportItemList,
     setOrderImportList, setUpdateOrderImport
 } from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
@@ -211,6 +211,7 @@ export const MiddleGetAllImportOrderByStatus = (warehouse:string,status:string|n
                 dispatch(setOrderImportItemList(action2.payload.result));
             }
             dispatch(setOrderImportList(action.payload.result.content));
+            dispatch(initToTalPage(action.payload.result.totalPages));
         } catch (error: any) {
             showToast({
                 title: "Error",
@@ -294,6 +295,7 @@ export const MiddleGetAllOrderItemByOrderId = (orderId: string | undefined) => {
     return async function (dispatch: any) {
         try {
             if(orderId){
+                dispatch(setOrderImportItemList([]));
                 const action2 = await dispatch(GetAllOrderItemByOrderId({ orderId }));
                 dispatch(setOrderImportItemList(action2.payload.result));
             }

@@ -17,7 +17,7 @@ export const BinGrid: React.FC<BinGridProps> = ({
     const getBinStatusColor = (status?: "EMPTY"|"FULL"|"MAINTENANCE"|"AVAILABLE") => {
         switch (status) {
             case "EMPTY": return "bg-emerald-100 border-emerald-300 hover:bg-emerald-200";
-            case "AVAILABLE": return "bg-blue-100 border-blue-300 hover:bg-blue-200";
+            case "FULL": return "bg-blue-100 border-blue-300 hover:bg-blue-200";
             case "MAINTENANCE": return "bg-amber-100 border-amber-300 hover:bg-amber-200";
             default: return "bg-gray-100 border-gray-300 hover:bg-gray-200";
         }
@@ -26,7 +26,7 @@ export const BinGrid: React.FC<BinGridProps> = ({
     const getBinStatusIcon = (status?: "EMPTY"|"FULL"|"MAINTENANCE"|"AVAILABLE") => {
         switch (status) {
             case "EMPTY": return <CheckCircle className="w-4 h-4 text-emerald-600" />;
-            case "AVAILABLE": return <Package className="w-4 h-4 text-blue-600" />;
+            case "FULL": return <Package className="w-4 h-4 text-blue-600" />;
             case "MAINTENANCE": return <AlertTriangle className="w-4 h-4 text-amber-600" />;
             default: return null;
         }

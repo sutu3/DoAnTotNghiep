@@ -45,10 +45,10 @@ export const GetPendingExportOrders = createAsyncThunk(
 );
 export const GetExportOrdersByStatus = createAsyncThunk(
     "exportOrder/GetExportOrdersByStatus",
-    async ({status,warehouseId,page}:{status:string,warehouseId:string,page:pageApi}, { rejectWithValue }) =>
+    async ({status,warehouseId,page}:{status:string|null,warehouseId:string,page:pageApi}, { rejectWithValue }) =>
         await callApiThunk(
             "GET",
-            API_ROUTES.order.exportOrder(page).search().ByStatus(status).getByWarehouse(warehouseId),
+            API_ROUTES.order.exportOrder(page).search().Filter(warehouseId,status).getAll,
             null,
             rejectWithValue
         )
@@ -154,7 +154,7 @@ export const MiddleExportOrder = (request:WarehouseDeliveryRequest, ListOrderIte
         }
     };
 };
-export const MiddleGetAllExportOrderByStatus = (warehouse:string, status:string, page:pageApi) => {
+export const MiddleGetAllExportOrderByStatus = (warehouse:string, status:string|null, page:pageApi) => {
     return async function (dispatch: any) {
         try {
             const action=await dispatch(GetExportOrdersByStatus({status,warehouseId:warehouse,page}))

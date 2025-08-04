@@ -7,10 +7,10 @@ import {OrderRequestExportCreate} from "@/pages/ExecuteExport/Store/ExportOrderS
 
 interface SelectWarehouseProps {
     formData: OrderRequestExportCreate;
-    setFormData: (formData: (prev: any) => any) => void;
+    handleOnChange: (value: string) => void;
 }
 
-export default function SelectWarehouse({ formData, setFormData }: SelectWarehouseProps) {
+export default function SelectWarehouse({ formData, handleOnChange }: SelectWarehouseProps) {
     const dispatch = useDispatch();
     const warehouses = useSelector(warehouseListSelector);
 
@@ -29,10 +29,7 @@ export default function SelectWarehouse({ formData, setFormData }: SelectWarehou
             selectedKeys={formData.warehouse ? [formData.warehouse] : []}
             onSelectionChange={(keys) => {
                 const warehouseId = Array.from(keys)[0]?.toString();
-                setFormData(prev => ({
-                    ...prev,
-                    warehouse: warehouseId,
-                }));
+                handleOnChange(warehouseId);
             }}
         >
             {warehouses.map((warehouse: any) => (

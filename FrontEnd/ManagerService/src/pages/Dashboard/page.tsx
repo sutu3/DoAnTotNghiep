@@ -148,7 +148,7 @@ export default function Dashboard() {
                       Giá trị tồn kho
                     </p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {statsLoading ? <Spinner size="sm" /> : `${(stats?.totalInventoryValue / 1000000)?.toFixed(1) || "0"}M ₫`}
+                      {statsLoading ? <Spinner size="sm" /> : `${(stats?.totalInventoryValue / 1000000)?.toFixed(3) || "0"}M ₫`}
                     </p>
                     <p className="text-xs text-green-600 mt-1">
                       <Icon icon="mdi:trending-up" className="inline mr-1" />

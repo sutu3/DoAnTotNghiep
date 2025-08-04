@@ -18,7 +18,10 @@ import {useEffect, useState} from "react";
 import OrderExportSlice, { ExportOrder } from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 import {pageApi} from "@/Api/UrlApi.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {MiddleGetOrderExportPending_Approve} from "@/pages/ExecuteExport/Store/Thunk/ExportOrderThunk.tsx";
+import {
+    MiddleGetAllExportOrderByStatus,
+    MiddleGetOrderExportPending_Approve
+} from "@/pages/ExecuteExport/Store/Thunk/ExportOrderThunk.tsx";
 import SelectWarehouseApprove from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
 import {ExportOrderSelector} from "@/pages/ExecuteExport/Store/Selector.tsx";
 
@@ -51,10 +54,11 @@ export default function ExportOrderTable({
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const PageApi: pageApi = { pageNumber: currentPage - 1, pageSize: totalPages };
+            const page: pageApi = { pageNumber: currentPage - 1, pageSize: totalPages };
             dispatch(OrderExportSlice.actions.setOrderExportList([]));
             try {
-                await (dispatch as any)(MiddleGetOrderExportPending_Approve(warehouses,PageApi));
+                const status=statusFilter==="all"?null:statusFilter;
+                await (dispatch as any)(MiddleGetAllExportOrderByStatus(warehouses,status,page));
             } finally {
                 setLoading(false);
             }

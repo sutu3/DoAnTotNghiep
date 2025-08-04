@@ -24,6 +24,7 @@ import {MiddleGetAllUnit} from "@/Store/Thunk/UnitThunk.tsx";
 import {Unit} from "@/Store/Unit.tsx";
 import {Product} from "@/Store/ProductSlice.tsx";
 import {ExportItemCreateUI} from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
+import {InventoryWarehouse} from "@/Store/InventoryWarehouseSlice.tsx";
 
 interface ExportItemModalProps {
     isOpen: boolean;
@@ -37,14 +38,13 @@ export default function ExportItemModal({ isOpen, onClose, product }: ExportItem
     const inventoryWarehouses = useSelector(InventoryWarehouseSelector);
     const { addItem } = useExportOrderStore();
 
-    const [selectedBin, setSelectedBin] = useState<any>(null);
+    const [selectedBin, setSelectedBin] = useState<InventoryWarehouse|null>(null);
     const [quantity, setQuantity] = useState(1);
     const [baseQuantity, setBaseQuantity] = useState(1); // Thêm state để lưu số lượng gốc
     const [batchNumber, setBatchNumber] = useState("");
     const [unitConversions, setUnitConversions] = useState<Unit[]>([]);
     const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
     const units = useSelector(UnitSelector);
-
     const calculatedPrice = useMemo(() => {
         if (!product || !selectedUnit) return 0;
 
@@ -68,14 +68,10 @@ export default function ExportItemModal({ isOpen, onClose, product }: ExportItem
     };
     const handleUnitSelect = (unit: Unit) => {
         setSelectedUnit(unit);
-
+        setQuantity(1)
         // Nếu chọn đơn vị cơ sở (ratioToBase = 1), sử dụng baseQuantity
         if (unit.ratioToBase === 1) {
             setQuantity(baseQuantity);
-        } else {
-            // Quy đổi từ đơn vị cơ sở sang đơn vị được chọn
-            const convertedQuantity = baseQuantity * unit.ratioToBase;
-            setQuantity(parseFloat(convertedQuantity.toFixed(3)));
         }
     };
 
@@ -112,12 +108,14 @@ export default function ExportItemModal({ isOpen, onClose, product }: ExportItem
     }, [units]);
 
     const handleAddToCart = () => {
-        if (!selectedBin || quantity <= 0) return;
+        const maxQuantity=((selectedBin?.quantity||0)*(product?.unit?.ratioToBase||1)/(selectedUnit?.ratioToBase||1));
+        console.log(quantity);
+        if (!selectedBin || quantity > maxQuantity) return;
         const exportItem:ExportItemCreateUI = {
             product: product?.productId||"",
             bin: selectedBin.binDetails.binId,
             requestQuantity: quantity,
-            batchNumber: batchNumber || selectedBin.batchNumber,
+            batchNumber: batchNumber,
             itemId: "",
             productName: product?.productName||"",
             customer: "",
@@ -146,77 +144,183 @@ export default function ExportItemModal({ isOpen, onClose, product }: ExportItem
                 </ModalHeader>
 
                 <ModalBody>
-                    <Tabs aria-label="Export options">
-                        <Tab key="location" title="Vị trí & Số lượng">
-                            <div className="space-y-4">
-                                <BinLocationSelector
-                                    selectedUnit={selectedUnit}
-                                    product={product}
-                                    binLocations={inventoryWarehouses}
-                                    selectedBin={selectedBin}
-                                    onBinSelect={handleBinSelect} // Sử dụng handler mới
-                                />
+                    {/* Thêm Product Info Section */}
+                    <div className="space-y-6">
+                        {/* Product Information Card */}
+                        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200">
+                            <CardBody>
+                                <div className="flex items-start gap-4">
+                                    <div className="flex-shrink-0">
+                                        <img
+                                            src={product?.urlImageProduct}
+                                            alt={product?.productName}
+                                            className="w-20 h-20 object-cover rounded-lg border border-gray-200"
+                                            onError={(e) => {
+                                                e.currentTarget.src = '/placeholder-product.png';
+                                            }}
+                                        />
+                                    </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Input
-                                        type="number"
-                                        label={`Số lượng xuất (${selectedUnit?.unitName || product?.unit?.unitName})`}
-                                        value={quantity.toString()}
-                                        onValueChange={(value) => {
-                                            const newQuantity = parseFloat(value) || 0;
-                                            console.log("newQuantity: "+newQuantity)
-                                            console.log("selectedUnit:"+selectedUnit?.ratioToBase)
-                                            setQuantity(newQuantity);
-                                            // Cập nhật baseQuantity nếu đang ở đơn vị cơ sở
-                                            if (selectedUnit?.ratioToBase === 1) {
-                                                setBaseQuantity(newQuantity);
-                                            } else {
-                                                // Tính ngược về đơn vị cơ sở
-                                                setBaseQuantity(newQuantity / (selectedUnit?.ratioToBase || 1));
-                                            }
-                                        }}
-                                        max={(selectedBin?.quantity||0)*(selectedUnit?.ratioToBase || 0)}
-                                        startContent={<Icon icon="mdi:package-variant" />}
-                                        step="0.001"
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-start justify-between">
+                                            <div>
+                                                <h4 className="text-lg font-semibold text-gray-900 truncate">
+                                                    {product?.productName}
+                                                </h4>
+                                                <p className="text-sm text-gray-500">SKU: {product?.sku}</p>
+                                                <p className="text-sm text-gray-600">
+                                                    Nhà cung cấp: {product?.supplier?.supplierName || "N/A"}
+                                                </p>
+                                            </div>
+
+                                            <div className="text-right">
+                                                <div className="text-lg font-bold text-green-600">
+                                                    {new Intl.NumberFormat('vi-VN', {
+                                                        style: 'currency',
+                                                        currency: 'VND'
+                                                    }).format(product?.price || 0)}
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+                                                    per {product?.unit?.unitName}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Stock Information */}
+                                        <div className="mt-3 grid grid-cols-3 gap-3">
+                                            <div className="bg-white rounded-lg p-2 border border-gray-200">
+                                                <div className="text-xs text-gray-500">Tồn kho hiện tại</div>
+                                                <div className="text-sm font-semibold text-blue-600">
+                                                    {(product?.quantity || 0).toLocaleString()} {product?.unit?.unitName}
+                                                </div>
+                                            </div>
+                                            <div className="bg-white rounded-lg p-2 border border-gray-200">
+                                                <div className="text-xs text-gray-500">Khả dụng</div>
+                                                <div className="text-sm font-semibold text-green-600">
+                                                    {((product?.quantity || 0) - (product?.pendingApprovedExportQuantity || 0)).toLocaleString()}
+                                                </div>
+                                            </div>
+                                            <div className="bg-white rounded-lg p-2 border border-gray-200">
+                                                <div className="text-xs text-gray-500">Đang chờ xuất</div>
+                                                <div className="text-sm font-semibold text-orange-600">
+                                                    {(product?.pendingApprovedExportQuantity || 0).toLocaleString()}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardBody>
+                        </Card>
+
+                        {/* Tabs Section */}
+                        <Tabs aria-label="Export options" className="w-full">
+                            <Tab key="location" title={
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="mdi:map-marker" className="w-4 h-4" />
+                                    <span>Vị trí & Số lượng</span>
+                                </div>
+                            }>
+                                <div className="space-y-4 mt-4">
+                                    <BinLocationSelector
+                                        selectedUnit={selectedUnit}
+                                        product={product}
+                                        binLocations={inventoryWarehouses}
+                                        selectedBin={selectedBin}
+                                        onBinSelect={handleBinSelect}
+                                    />
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <Input
+                                            type="number"
+                                            label={`Số lượng xuất (${selectedUnit?.unitName || product?.unit?.unitName})`}
+                                            value={quantity.toString()}
+                                            onValueChange={(value) => {
+                                                const newQuantity = parseFloat(value) || 0;
+                                                setQuantity(newQuantity);
+                                                if (selectedUnit?.ratioToBase === 1) {
+                                                    setBaseQuantity(newQuantity);
+                                                } else {
+                                                    setBaseQuantity(newQuantity / (selectedUnit?.ratioToBase || 1));
+                                                }
+                                            }}
+                                            max={((selectedBin?.quantity||0)*(product?.unit?.ratioToBase||1)/(selectedUnit?.ratioToBase||1))}
+                                            startContent={<Icon icon="mdi:package-variant" />}
+                                            step="0.001"
+                                            description={selectedBin ? `Tối đa: ${((selectedBin?.quantity||0)*(product?.unit?.ratioToBase||1)/(selectedUnit?.ratioToBase||1))}` : "Chọn bin để xem số lượng khả dụng"}
+                                        />
+
+                                        <Input
+                                            label="Batch Number"
+                                            value={batchNumber}
+                                            onValueChange={setBatchNumber}
+                                            startContent={<Icon icon="mdi:barcode" />}
+                                            description="Tự động tạo khi chọn bin"
+                                            isReadOnly
+                                        />
+                                    </div>
+
+                                    {/* Conversion Info Card */}
+                                    {selectedBin && (
+                                        <Card className="bg-blue-50 border border-blue-200">
+                                            <CardBody>
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <Icon icon="mdi:calculator" className="w-4 h-4 text-blue-600" />
+                                                        <span className="font-medium text-blue-800">Thông tin quy đổi</span>
+                                                    </div>
+
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div className="flex justify-between items-center">
+                                                            <span className="text-sm">Số lượng có sẵn:</span>
+                                                            <Chip color="primary" variant="flat" size="sm">
+                                                                {selectedBin.quantity} {product?.unit?.unitName}
+                                                            </Chip>
+                                                        </div>
+
+                                                        {selectedUnit && selectedUnit.unitID !== product?.unit?.unitID && (
+                                                            <div className="flex justify-between items-center">
+                                                                <span className="text-sm">Tương đương:</span>
+                                                                <Chip color="success" variant="flat" size="sm">
+                                                                    {(selectedBin.quantity * selectedUnit.ratioToBase).toFixed(3)} {selectedUnit.unitName}
+                                                                </Chip>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex justify-between items-center pt-2 border-t border-blue-200">
+                                                        <span className="text-sm font-medium">Tổng giá trị xuất:</span>
+                                                        <span className="font-bold text-green-600">
+                                            {new Intl.NumberFormat('vi-VN', {
+                                                style: 'currency',
+                                                currency: 'VND'
+                                            }).format(calculatedPrice * quantity)}
+                                        </span>
+                                                    </div>
+                                                </div>
+                                            </CardBody>
+                                        </Card>
+                                    )}
+                                </div>
+                            </Tab>
+
+                            <Tab key="conversion" title={
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="mdi:swap-horizontal" className="w-4 h-4" />
+                                    <span>Quy đổi đơn vị</span>
+                                </div>
+                            }>
+                                <div className="mt-4">
+                                    <UnitConversionTable
+                                        conversions={unitConversions}
+                                        baseQuantity={baseQuantity}
+                                        baseUnit={product?.unit||null}
+                                        selectedUnit={selectedUnit}
+                                        onUnitSelect={handleUnitSelect}
                                     />
                                 </div>
-
-                                {/* Hiển thị thông tin quy đổi */}
-                                {selectedBin && (
-                                    <Card>
-                                        <CardBody className="bg-blue-50">
-                                            <div className="space-y-2">
-                                                <div className="flex justify-between items-center">
-                                                    <span>Số lượng có sẵn:</span>
-                                                    <Chip color="primary" variant="flat">
-                                                        {selectedBin.quantity} {product?.unit?.unitName}
-                                                    </Chip>
-                                                </div>
-                                                {selectedUnit && selectedUnit.unitID !== product?.unit?.unitID && (
-                                                    <div className="flex justify-between items-center">
-                                                        <span>Tương đương:</span>
-                                                        <Chip color="success" variant="flat">
-                                                            {(selectedBin.quantity * selectedUnit.ratioToBase).toFixed(3)} {selectedUnit.unitName}
-                                                        </Chip>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </CardBody>
-                                    </Card>
-                                )}
-                            </div>
-                        </Tab>
-
-                        <Tab key="conversion" title="Quy đổi đơn vị">
-                            <UnitConversionTable
-                                conversions={unitConversions}
-                                baseQuantity={baseQuantity}
-                                baseUnit={product?.unit||null}
-                                selectedUnit={selectedUnit}
-                                onUnitSelect={handleUnitSelect}
-                            />
-                        </Tab>
-                    </Tabs>
+                            </Tab>
+                        </Tabs>
+                    </div>
                 </ModalBody>
                 <ModalFooter>
                     <Button variant="light" onPress={onClose}>

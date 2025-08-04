@@ -84,7 +84,6 @@ export const MiddleAddProduct = (productCreate:ProductCreate,warehouseList:strin
 export const MiddleUpdateProduct = (productId:string,payload:ProductCreate) => {
     return async function (dispatch: any) {
         try {
-            console.log(payload)
             const action=await dispatch(UpdateProduct({payload,productId}));
             dispatch(ProductSlice.actions.setAddProduct(action?.payload?.result));
             showToast({

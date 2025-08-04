@@ -21,11 +21,12 @@ import {
 import {Calendar, Edit, Eye, Package, Plus, Search} from "lucide-react";
 import {useDispatch, useSelector} from "react-redux";
 import {MiddleGetAllOrderItemByStatus} from "@/pages/ExecuteImport/Store/Thunk/ImportOrderThunk.tsx";
-import {OrderSelector, ReceiptWarehousesSelector} from "@/Store/Selector.tsx";
+import {OrderSelector, ReceiptWarehousesSelector, TotalPageReceipt} from "@/Store/Selector.tsx";
 import SelectWarehouseApproved from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
 import {MiddleGetReceiptByWarehouseId} from "@/pages/ExecuteImport/Store/Thunk/WarehousReceipteThunk.tsx";
 import WarehousReceipteSlice from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
 import OrderImportSlice from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
+import {pageApi} from "@/Api/UrlApi.tsx";
 
 interface ReceiptListComponentProps {
     onViewDetail: (receipt: any) => void;
@@ -46,20 +47,27 @@ const ReceiptListComponent: React.FC<ReceiptListComponentProps> = ({
     const [currentPage, setCurrentPage] = useState(1);
     const [warehouse, setWarehouse] = useState("");
     const dispatch = useDispatch();
+    const totalPage=useSelector(TotalPageReceipt)
     useEffect(() => {
          loadReceipts();
         loadReadyOrders();
-    }, [warehouse]);
+    }, [warehouse,statusFilter, searchTerm, currentPage]);
     useEffect(() => {
         dispatch(OrderImportSlice.actions.setOrderImportList([]))
     }, []);
+    console.log(totalPage)
+    const pages=totalPage;
     const loadReceipts = async () => {
         setLoading(true);
         dispatch(WarehousReceipteSlice.actions.setReceiptWarehouseList([]))
         try {
             // API call to get warehouse receipts
             if (warehouse != "") {
-                await (dispatch as any)(MiddleGetReceiptByWarehouseId(warehouse))
+                console.log("Mã phieeus:", searchTerm);
+                const status=statusFilter=="all" ? null : statusFilter;
+                const receiptId=searchTerm=="" ? null : searchTerm;
+                const page :pageApi= {pageNumber:currentPage-1,pageSize:5}
+                await (dispatch as any)(MiddleGetReceiptByWarehouseId(warehouse,status,receiptId,page))
             }
         } catch (error) {
             console.error("Error loading receipts:", error);
@@ -67,6 +75,7 @@ const ReceiptListComponent: React.FC<ReceiptListComponentProps> = ({
             setLoading(false);
         }
     };
+
 
     const loadReadyOrders = async () => {
         try {
@@ -105,12 +114,7 @@ const ReceiptListComponent: React.FC<ReceiptListComponentProps> = ({
         }
     };
 
-    const filteredReceipts = receipts?.filter((receipt: any) => {
-        const matchesSearch = receipt.receiptId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            receipt.importOrder?.importOrderId.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = statusFilter === 'all' || receipt.status === statusFilter;
-        return matchesSearch && matchesStatus;
-    });
+    const filteredReceipts = receipts;
 
     return (
         <div className="space-y-6">
@@ -283,7 +287,7 @@ const ReceiptListComponent: React.FC<ReceiptListComponentProps> = ({
                     {/* Pagination */}
                     <div className="flex justify-center mt-4">
                         <Pagination
-                            total={Math.ceil(filteredReceipts.length / 10)}
+                            total={pages}
                             page={currentPage}
                             onChange={setCurrentPage}
                             showControls

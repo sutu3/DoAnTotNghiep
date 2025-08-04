@@ -25,7 +25,6 @@ export const MiddleUploadImage = () => {
 
             const formData = new FormData();
             formData.append("file", file); // ✅ gán file vào form data
-            console.log(formData.get("file"));
             const res = await fetch(API_ROUTES.file.uploadImage, {
                 method: "POST",
                 body: formData,

@@ -48,7 +48,7 @@ export default function ImportOrderTable({
     const orders = useSelector(OrderSelector);
     const [loading, setLoading] = useState(false);
     const [warehouse, setWarehouse] = useState<string>("");
-
+    const pages=totalPages;
     useEffect(() => {
         setLoading(true);
         const PageApi: pageApi = { pageNumber: currentPage - 1, pageSize: 5 };
@@ -297,7 +297,7 @@ export default function ImportOrderTable({
                         )}
                     </div>
                     <Pagination
-                        total={totalPages}
+                        total={pages}
                         page={currentPage}
                         onChange={setCurrentPage}
                         size="sm"

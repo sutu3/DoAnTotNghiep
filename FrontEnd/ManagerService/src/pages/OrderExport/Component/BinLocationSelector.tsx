@@ -2,13 +2,14 @@ import { Card, CardBody, Chip } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import {Unit} from "@/Store/Unit.tsx";
 import {Product} from "@/Store/ProductSlice.tsx";
+import {InventoryWarehouse} from "@/Store/InventoryWarehouseSlice.tsx";
 
 interface BinLocationSelectorProps {
     selectedUnit:Unit|null;
     product:Product|null;
-    binLocations: any[];
-    selectedBin: any;
-    onBinSelect: (bin: any) => void;
+    binLocations: InventoryWarehouse[];
+    selectedBin: InventoryWarehouse|null;
+    onBinSelect: (bin: InventoryWarehouse) => void;
 }
 
 export default function BinLocationSelector({ binLocations, selectedBin, onBinSelect,product,selectedUnit }: BinLocationSelectorProps) {
@@ -26,7 +27,7 @@ export default function BinLocationSelector({ binLocations, selectedBin, onBinSe
             </h4>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto">
-                {binLocations.map((inventory) => (
+                {binLocations.map((inventory:InventoryWarehouse) => (
                     <Card
                         key={inventory.inventoryWarehouseId}
                         isPressable

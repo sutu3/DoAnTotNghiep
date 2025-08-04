@@ -3,9 +3,10 @@ import { Icon } from "@iconify/react";
 import DeliveryReceiptPrintable from "@/pages/ExecuteExport/Component/Print/DeliveryReceiptPrintable.tsx";
 import {Button} from "@heroui/button";
 import {useRef} from "react";
+import {WarehouseDeliveryResponse} from "@/pages/ExecuteExport/Store/WarehouseDeliverySlice.tsx";
 
 interface DeliveryDetailViewProps {
-    delivery: any;
+    delivery: WarehouseDeliveryResponse;
     onBack: () => void;
 }
 

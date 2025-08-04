@@ -152,6 +152,18 @@ export const API_ROUTES = {
           byWarehouseId:(warehouseId:string)=>({
              getAllOrdersByStatusPendingAndApprove:base+"/pending-approvals/search/warehouse/"+warehouseId+pageUrl,
            }),
+            Filter:(warehouseId: string | null, status: string | null) => {
+              const pages = page ? `pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+
+              const params: string[] = [];
+                if (warehouseId) params.push(`warehouseId=${warehouseId}`);
+                if (status) params.push(`status=${status}`);
+              params.push(pages)
+              const url = search + "?" + params.join("&");
+                return {
+                    getAll: url,
+                };
+            },
           }
         }),
         changeStatus:(orderId:string)=>{
@@ -193,7 +205,18 @@ export const API_ROUTES = {
           const search=base+"/search";
           return {
             byWarehouseReceipts:(warehouseReceiptId:string)=>search+"/warehouseReceipt/"+warehouseReceiptId,
-            byWarehouseId:(warehouseId:string)=>search+"/warehouse/"+warehouseId,
+            byWarehouseId:(warehouseId: string|null,status:string|null,receiptId:string|null)=>{
+              const params: string[] = [];
+              if (warehouseId) params.push(`warehouseId=${warehouseId}`);
+              if (status) params.push(`status=${status}`);
+              if (receiptId) params.push(`receiptId=${receiptId}`);
+              params.push(pageUrl)
+              const url = search + "?" + params.join("&");
+
+              return {
+                getAll: url,
+              };
+            }
           }
         }
       }
@@ -285,15 +308,29 @@ export const API_ROUTES = {
   warehouse: {
     stacks: (page: pageApi | null) => {
       const base = `${TestGateWay}/warehouses/api/stacks`;
-      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      const pageUrl = page ? `pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
       return {
         updateStacks:(stackId:string)=>base+"/"+stackId,
         addStacks: base,
-        search: {
-          byWarehouseId: (warehouseId: string) => ({
-            getAll: `${base}/ByWarehouse/${warehouseId}${pageUrl}`,
-            getAllList: `${base}/ByWarehouse/${warehouseId}/list`,
-          }),
+        search:()=> {
+          const search = `${base}/search`
+            return {
+              Filter: (warehouseId: string | null, stackName: string | null) => {
+                const params: string[] = [];
+                if (warehouseId) params.push(`warehouseId=${warehouseId}`);
+                if (stackName) params.push(`stackName=${stackName}`);
+                params.push(pageUrl)
+                const url = search+"/filter" + "?" + params.join("&");
+
+                return {
+                  getAll: url,
+                };
+              },
+              byWarehouseId: (warehouseId: string) => ({
+                getAllList: `${base}/ByWarehouse/${warehouseId}/list`,
+              }),
+
+            }
         },
       };
     },

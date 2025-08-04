@@ -3,13 +3,14 @@ import {useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {SupplierSelector} from "@/Store/Selector";
 import {MiddleGetAllSupplierList} from "@/Store/Thunk/ShupplierThunk.tsx";
+import {OrderRequestExportCreate} from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 
 interface SupplierSelectProps {
-    formData: any;
-    setFormData: (formData: (prev: any) => any) => void;
+    formData: OrderRequestExportCreate;
+    handleOnChange: (value:string) => void;
 }
 
-export default function SupplierSelect({ formData, setFormData }: SupplierSelectProps) {
+export default function SupplierSelect({ formData, handleOnChange }: SupplierSelectProps) {
     const dispatch = useDispatch();
     const suppliers = useSelector(SupplierSelector);
 
@@ -25,10 +26,10 @@ export default function SupplierSelect({ formData, setFormData }: SupplierSelect
             selectedKeys={formData.customer ? [formData.customer] : []}
             onSelectionChange={(keys) => {
                 const customerId = Array.from(keys)[0]?.toString();
-                setFormData(prev => ({
-                    ...prev,
-                    customer: customerId
-                }));
+                handleOnChange(customerId);
+                console.log("Selected customer ID:", customerId);
+
+
             }}
         >
             {suppliers.map((supplier: any) => (

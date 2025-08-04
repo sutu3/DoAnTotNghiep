@@ -25,6 +25,7 @@ interface ReceiptDetailComponentProps {
 
 export default function ImportReceiptDetailView({ receipt,onBack, onEdit }: ReceiptDetailComponentProps) {
     const dispatch = useDispatch();
+    console.log(receipt)
     const [loading,setLoading]=useState(false);
     useEffect(() => {
         if(receipt) {
@@ -202,7 +203,7 @@ export default function ImportReceiptDetailView({ receipt,onBack, onEdit }: Rece
                                 <CardHeader>
                                     <h3 className="font-semibold flex items-center gap-2">
                                         <FileText className="text-blue-600" />
-                                        Sản Phẩm Đã Nhập ({receipt.quantityReceiveItem || 0})
+                                        Sản Phẩm Đã Nhập ({receipt.quantityReceiveItem})
                                     </h3>
                                 </CardHeader>
                                 <CardBody>
@@ -283,7 +284,7 @@ export default function ImportReceiptDetailView({ receipt,onBack, onEdit }: Rece
                                         <div className="flex justify-between items-center">
                                             <span className="text-sm text-gray-700">Tổng sản phẩm:</span>
                                             <span className="font-semibold text-lg">
-                                                {receipt.receiptItems?.length || 0} sản phẩm
+                                                {receipt.quantityReceiveItem} sản phẩm
                                             </span>
                                         </div>
                                         <Divider />
