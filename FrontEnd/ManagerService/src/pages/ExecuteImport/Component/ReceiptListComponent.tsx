@@ -249,7 +249,7 @@ const ReceiptListComponent: React.FC<ReceiptListComponentProps> = ({
                                     </TableCell>
                                     <TableCell>
                                         <span className="text-sm">
-                                            {receipt.receiptItems?.length || 0} sản phẩm
+                                            {receipt.quantityReceiveItem || 0} sản phẩm
                                         </span>
                                     </TableCell>
                                     <TableCell>

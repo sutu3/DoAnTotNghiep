@@ -39,9 +39,12 @@ import EditProductPage from "@/pages/Product/Edit/EditProductPage.tsx";
 import AddWarehousePage from "@/pages/WarehouseManager/AddNew/AddWarehousePage.tsx";
 import SupplierPage from "@/pages/Supplier/page";
 import WarehouseReceiptManagementPage from "@/pages/ExecuteImport/page.tsx";
-import ExportOrderPage from "@/pages/OrderExport/TestPage.tsx";
+import ExportOrderPage from "@/pages/OrderExport/page.tsx";
 import WarehouseDeliveryPage from "@/pages/ExecuteExport/page.tsx";
 import InventoryCheckSheetPage from "@/pages/InventoryCheck/Testpage1.tsx";
+import UserProfilePage from "@/pages/Profile/page.tsx";
+import ForgotPasswordPage from "@/pages/Login/ForgotPassword/page.tsx";
+import ResetPasswordPage from "@/pages/Login/ResetPassword/page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -72,6 +75,8 @@ const router = createBrowserRouter([
       { path: "/admin/import-approvals", element: <AdminImportOrderManagement /> },
       { path: "/admin/storage-alerts", element: <StorageLimitsPage /> },
       { path: "/admin/export-approvals", element: <AdminExportOrderManagement /> },
+      { path: "/admin/settings", element: <UserProfilePage /> },
+      { path: "/staff/settings", element: <UserProfilePage /> },
       { path: "/admin/inventory", element: <InventoryOverviewPage /> },
       { path: "/admin/warehouses", element: <WarehousePage /> },
       { path: "/admin/warehouses/addnew", element: <AddWarehousePage /> },
@@ -86,6 +91,23 @@ const router = createBrowserRouter([
     ],
   },
   { path: "/login", element: <LoginPage /> },
+  {
+    path: "/forgot-password",
+    element: (
+        <HeroUIProviderWrapper>
+          <ForgotPasswordPage />
+        </HeroUIProviderWrapper>
+    ),
+  },
+  {
+    path: "/reset-password",
+    element: (
+        <HeroUIProviderWrapper>
+          <ResetPasswordPage />
+        </HeroUIProviderWrapper>
+    ),
+  },
+
 ]);
 
 export default function RouterSetup() {

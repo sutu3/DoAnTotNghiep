@@ -1,7 +1,7 @@
 import  { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
-import { UserSelector, TotalPageUser } from "@/Store/Selector.tsx";
+import { UsersSelector, TotalPageUser } from "@/Store/Selector.tsx";
 import {MiddleGetAllUser, MiddleUpdateUser} from "@/Store/Thunk/UserThunk.tsx";
 import {UserTableSection} from "@/components/Admin/User/UserTableSection.tsx";
 import UserThumbnail from "@/components/Admin/User/UserThumbnail.tsx";
@@ -11,7 +11,7 @@ import UserModal from "@/components/Admin/User/UserModal.tsx";
 
 const UserPage = () => {
   const dispatch = useDispatch();
-  const users = useSelector(UserSelector);
+  const users = useSelector(UsersSelector);
   const totalPage = useSelector(TotalPageUser);
   const [selectedUser, setSelectedUser] = useState(null);
   const [page, setPage] = useState(1);

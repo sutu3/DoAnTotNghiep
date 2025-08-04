@@ -22,12 +22,14 @@ export const AddProduct = createAsyncThunk(
 export const GetAllProductBySearch = createAsyncThunk(
     "product/GetAllProductBySearch",
     async (
-        { warehouseId,supplierId }: { warehouseId: string|null,supplierId: string|null },
+        { warehouseId,supplierId,productName,categoryId,unitId,page }: {
+            warehouseId: string|null,supplierId: string|null,productName: string|null,
+            categoryId: string|null,unitId: string|null,page: pageApi },
         { rejectWithValue }
     ) =>
         await callApiThunk(
             "GET",
-            API_ROUTES.product.product(null).search().bySupplierAndWarehouse(warehouseId, supplierId).getAll,
+            API_ROUTES.product.product(page).search().bySupplierAndWarehouse(warehouseId, supplierId,categoryId,unitId,productName).getAll,
             null,
             rejectWithValue
         )
@@ -131,12 +133,17 @@ export const GetAllProductIdWarehouse = createAsyncThunk(
             rejectWithValue
         )
 );
-export const MiddleGetAllProductBySearch = (supplierId:string|null,warehouseId:string|null) => {
+export const MiddleGetAllProductBySearch = (
+    supplierId:string|null,
+    warehouseId:string|null,
+    categoryId:string|null,
+    unitId:string|null,productName:string|null,page:pageApi) => {
     return async function (dispatch: any) {
         try {
 
-            const action = await dispatch(GetAllProductBySearch({ warehouseId,supplierId }));
-            dispatch(setProductList(action.payload.result));
+            const action = await dispatch(GetAllProductBySearch({ warehouseId,supplierId,productName,categoryId,unitId,page }));
+            dispatch(setProductList(action.payload.result?.content));
+            dispatch(initToTalPage(action.payload.result?.totalPages));
         } catch (error: any) {
             showToast({
                 title: "Error",

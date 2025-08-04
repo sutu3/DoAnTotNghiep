@@ -10,7 +10,7 @@ import {
   Button,
   Select,
   SelectItem,
-  Spinner
+  Spinner, CardFooter
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { StacksSelector } from "@/Store/Selector.tsx";
@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { useDashboardStats } from "@/Hooks/useDashboardStats.ts";
 import SelectWarehouseApproved from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
 import {useStockMovements} from "@/Hooks/useStockMovements.tsx";
+import ProductTable from "@/pages/Dashboard/Component/ProductTable.tsx";
 
 export default function Dashboard() {
   const stacks = useSelector(StacksSelector);
@@ -232,6 +233,26 @@ export default function Dashboard() {
               </div>
             </CardBody>
           </Card>
+          <Card className="lg:col-span-3">
+            <CardHeader>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Sản phẩm trong kho
+              </h3>
+            </CardHeader>
+            <CardBody>
+              {statsLoading ? (
+                  <div className="flex items-center justify-center h-64">
+                    <Spinner size="lg" />
+                  </div>
+              ) : (
+                  <ProductTable
+                      warehouseId={warehouse}
+                      showActions={true}
+                      maxHeight="500px"
+                  />
+              )}
+            </CardBody>
+          </Card>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Activities - Thay thế bằng Stock Movements thực */}
@@ -399,7 +420,9 @@ export default function Dashboard() {
                   </div>
                 </div>
               </CardBody>
+
             </Card>
+            {/* Product Table - Thay thế bằng ProductTable */}
           </div>
         </div>
       </div>
