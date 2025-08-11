@@ -18,6 +18,20 @@ export const GetInventoryWarehouseByBinId = createAsyncThunk(
             rejectWithValue
         )
 );
+
+export const GetInventoryWarehouseByProductIdAndWarehouseId = createAsyncThunk(
+    "inventoryWarehouse/GetInventoryWarehouseByProductIdAndWarehouseId",
+    async (
+        {  warehouseId,productId }: { warehouseId:string,productId:string  },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES.inventory.InventoryWarehouse(null).search().byProductId(productId).getWarehouse(warehouseId),
+            undefined,
+            rejectWithValue
+        )
+);
 export const GetAllInventoryWarehouseByProduct = createAsyncThunk(
     "inventoryWarehouse/GetAllInventoryWarehouseByProduct",
     async (
@@ -64,6 +78,20 @@ export const MiddleGetInventoryWarehouseByProductId = (productId:string) => {
     return async function (dispatch: any) {
         try {
             const action = await dispatch(GetAllInventoryWarehouseByProduct({  productId }));
+            dispatch(setInventoryWarehouseList(action.payload.result));
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
+export const MiddleGetInventoryWarehouseByProductIdAndWarehouseId = (productId:string,warehouseId:string) => {
+    return async function (dispatch: any) {
+        try {
+            const action = await dispatch(GetInventoryWarehouseByProductIdAndWarehouseId({ warehouseId, productId }));
             dispatch(setInventoryWarehouseList(action.payload.result));
         } catch (error: any) {
             showToast({

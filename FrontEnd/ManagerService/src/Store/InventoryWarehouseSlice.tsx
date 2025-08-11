@@ -13,8 +13,8 @@ export interface InventoryWarehouse {
     inventoryProduct:InventoryProduct;
     warehouseDetails:Warehouse;
     status: "AVAILABLE" | "QUARANTINE" | "RESERVED"|"EXPIRED";
-    createdAt: Date | null;
-    updatedAt: Date | null;
+    createdAt?: Date | null;
+    updatedAt?: Date | null;
 }
 export interface InventoryProduct{
     inventoryProductId:string;
@@ -26,6 +26,7 @@ export interface InventoryProduct{
     status:string;
     productDetails:Product;
     warehouseDetails:Warehouse;
+    updatedAt?: string;
 }
 export interface InventoryProductCreate{
     product:string,
@@ -48,6 +49,7 @@ interface InventoryWarehouseState {
     inventoryWarehouses: InventoryWarehouse[];
     totalPage: number;
     inventoryWarehouseCreate: InventoryWarehouseCreate;
+    inventoryProducts: InventoryProduct[];
 }
 
 const initialState: InventoryWarehouseState = {
@@ -61,6 +63,7 @@ const initialState: InventoryWarehouseState = {
         warehouse:"",
         status:"",
     },
+    inventoryProducts:[]
 };
 
 const InventoryWarehouseSlice = createSlice({
@@ -71,8 +74,10 @@ const InventoryWarehouseSlice = createSlice({
             state.totalPage = action.payload;
         },
         setInventoryWarehouseList: (state, action) => {
-            console.log(action.payload);
             state.inventoryWarehouses = action.payload;
+        },
+        setInventoryProductList: (state, action) => {
+            state.inventoryProducts = action.payload;
         },
         setAddInventoryWarehouse: (state, action) => {
             state.inventoryWarehouses = [...state.inventoryWarehouses, action.payload];
@@ -93,6 +98,7 @@ export const {
     setInventoryWarehouseList,
     setAddInventoryWarehouse,
     setUpdateInventoryWarehouse,
+    setInventoryProductList,
 } = InventoryWarehouseSlice.actions;
 
 export default InventoryWarehouseSlice;

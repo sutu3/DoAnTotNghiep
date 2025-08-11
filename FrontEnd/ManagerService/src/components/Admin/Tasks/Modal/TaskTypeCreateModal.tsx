@@ -41,7 +41,7 @@ const TaskTypeCreateModal: React.FC<TaskTypeCreateModalProps> = ({
         setLoading(true);
         try {
             await (dispatch as any)(MiddleAddTaskType(formData));
-            onSuccess();
+            // onSuccess();
             handleClose();
         } catch (error) {
             console.error('Error creating task type:', error);
@@ -54,7 +54,7 @@ const TaskTypeCreateModal: React.FC<TaskTypeCreateModalProps> = ({
         setFormData({
             taskName: '',
             description: '',
-            warehouses: ''
+            warehouses:formData.warehouses
         });
         onClose();
     };

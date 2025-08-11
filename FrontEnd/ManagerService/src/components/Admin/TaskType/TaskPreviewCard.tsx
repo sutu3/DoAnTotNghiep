@@ -3,7 +3,7 @@ import { Card, CardBody, CardHeader, Chip, Avatar, AvatarGroup, Divider } from '
 import { Package, Calendar, AlertTriangle, Users } from 'lucide-react';
 import {UserData} from "@/Store/UserSlice.tsx";
 import {TaskType} from "@/Store/TaskTypeSlice.tsx";
-import {TaskUserAssignment} from "@/Store/TaskUserSlice.tsx";
+import {TaskUserAssignment} from "@/pages/TaskType/Component/Store/TaskUserSlice.tsx";
 
 interface TaskPreviewCardProps {
     formData: any;

@@ -30,6 +30,19 @@ export const GetAllCategory = createAsyncThunk(
             rejectWithValue
         )
 );
+export const GetAllCategoryList = createAsyncThunk(
+    "category/GetAllCategoryList",
+    async (
+        _: { },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES.product.category(null).search().byWarehouseId().getAllName,
+            undefined,
+            rejectWithValue
+        )
+);
 export const MiddleAddCategory = (payload:CategoryCreate) => {
     return async function (dispatch: any) {
         try {
@@ -46,12 +59,18 @@ export const MiddleAddCategory = (payload:CategoryCreate) => {
         }
     };
 };
-export const MiddleGetAllCategory = (page: pageApi) => {
+export const MiddleGetAllCategory = (page: pageApi|null) => {
     return async function (dispatch: any) {
         try {
-            const action = await dispatch(GetAllCategory({ page }));
-            dispatch(setCategoryList(action.payload.result.content));
-            dispatch(initToTalPage(action.payload.result.totalPages));
+            if( page === null) {
+                const action = await dispatch(GetAllCategoryList({}));
+                dispatch(setCategoryList(action.payload.result));
+            }else{
+                const action = await dispatch(GetAllCategory({ page }));
+                dispatch(setCategoryList(action.payload.result.content));
+                dispatch(initToTalPage(action.payload.result.totalPages));
+            }
+
         } catch (error: any) {
             showToast({
                 title: "Error",

@@ -44,7 +44,6 @@ const SupplierSlice = createSlice({
     initialState,
     reducers: {
         initToTalPage: (state, action) => {
-            console.log(action.payload);
             state.totalPage = action.payload;
         },
         setSupplierList: (state, action) => {

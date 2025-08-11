@@ -18,7 +18,7 @@ import {getStatusColor, getStatusText} from "@/Utils/statusHelpers.tsx";
 import {useEffect, useState} from "react";
 import {pageApi} from "@/Api/UrlApi.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import { MiddleGetAllImportOrderByStatus} from "@/pages/ExecuteImport/Store/ImportOrderThunk.tsx";
+import { MiddleGetAllImportOrderByStatus} from "@/pages/ExecuteImport/Store/Thunk/ImportOrderThunk.tsx";
 import OrderImportSlice, {ImportOrder} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
 import {OrderSelector, TotalPageOrder} from "@/Store/Selector.tsx";
 import SelectWarehouseApprove from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
@@ -48,7 +48,7 @@ export default function ImportOrderTable({
     const orders = useSelector(OrderSelector);
     const [loading, setLoading] = useState(false);
     const [warehouse, setWarehouse] = useState<string>("");
-
+    const pages=totalPages;
     useEffect(() => {
         setLoading(true);
         const PageApi: pageApi = { pageNumber: currentPage - 1, pageSize: 5 };
@@ -297,7 +297,7 @@ export default function ImportOrderTable({
                         )}
                     </div>
                     <Pagination
-                        total={totalPages}
+                        total={pages}
                         page={currentPage}
                         onChange={setCurrentPage}
                         size="sm"

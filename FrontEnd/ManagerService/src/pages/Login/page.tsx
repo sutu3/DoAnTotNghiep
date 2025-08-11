@@ -5,11 +5,12 @@ import { Button, Input, Checkbox, Link, Form, Card, CardBody } from "@heroui/rea
 import { Icon } from "@iconify/react";
 import {API_ROUTES} from "@/Api/UrlApi.tsx";
 import {getUserRoleFromToken} from "@/Utils/auth.ts";
+import {useNavigate} from "react-router-dom";
 
 export default function LoginPage() {
     const [isVisible, setIsVisible] = React.useState(false);
     const toggleVisibility = () => setIsVisible(!isVisible);
-
+    const navigate=useNavigate();
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
@@ -38,7 +39,6 @@ export default function LoginPage() {
             // 🔒 Lưu token nếu có
             localStorage.setItem("token", data.result?.token || "");
             const role =await getUserRoleFromToken();
-            console.log(role)
             role == "manager" ? window.location.href = "/admin" : window.location.href = "/staff/tasks";
             // 🔁 Redirect sang dashboard hoặc trang chính
 
@@ -171,18 +171,9 @@ export default function LoginPage() {
                                 />
 
                                 <div className="flex items-center justify-between">
-                                    <Checkbox
-                                        defaultSelected
-                                        name="remember"
-                                        size="sm"
-                                        classNames={{
-                                            label: "text-gray-600 text-sm"
-                                        }}
-                                    >
-                                        Ghi nhớ đăng nhập
-                                    </Checkbox>
                                     <Link
-                                        href="#"
+                                        as="button"
+                                        onClick={() => navigate('/forgot-password')}
                                         size="sm"
                                         className="text-blue-600 hover:text-blue-700"
                                     >

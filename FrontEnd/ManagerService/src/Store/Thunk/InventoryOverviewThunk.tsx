@@ -12,9 +12,8 @@ import {
     setLowStockProducts, setMovementsError, setMovementsLoading, setRecentMovements, setWarehouseCapacity
 } from "@/Store/InventoryOverView.tsx";
 import { showToast } from "@/components/UI/Toast/ToastUI";
-import { API_ROUTES } from "@/Api/UrlApi.tsx";
-import {InventoryProductCreate} from "@/Store/InventoryWarehouseSlice.tsx";
-import {OrderRequestImportCreate} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
+import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
+import {initTotalPage, InventoryProductCreate, setInventoryProductList} from "@/Store/InventoryWarehouseSlice.tsx";
 
 export const GetLowStockProducts = createAsyncThunk(
     "inventory/getLowStock",
@@ -68,6 +67,37 @@ export const AddInventoryProduct = createAsyncThunk(
             rejectWithValue
         )
 );
+
+export const GetAllInventoryProduct = createAsyncThunk(
+    "inventory/GetAllInventoryProduct",
+    async (
+        { warehouseId,page }: { warehouseId: string,page:pageApi },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES.inventory.products(page).search.byWarehouse(warehouseId).getAll,
+            undefined,
+            rejectWithValue
+        )
+);
+
+export const MiddleGetAllInventoryProducts = (warehouseId: string,page:pageApi) => {
+    return async function (dispatch: any) {
+        try {
+            const action = await dispatch(GetAllInventoryProduct({ warehouseId,page }));
+            dispatch(setInventoryProductList(action.payload.result?.content));
+            dispatch(initTotalPage(action.payload.result?.totalPages));
+        } catch (error: any) {
+            dispatch(setExpiringError(error.message));
+            showToast({
+                title: "Error",
+                description: `Failed to load expiring products: ${error.message}`,
+                color: "danger",
+            });
+        }
+    };
+};
 export const MiddleGetExpiringProducts = (date: string) => {
     return async function (dispatch: any) {
         try {

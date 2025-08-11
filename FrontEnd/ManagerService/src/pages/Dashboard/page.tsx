@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { useDashboardStats } from "@/Hooks/useDashboardStats.ts";
 import SelectWarehouseApproved from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
 import {useStockMovements} from "@/Hooks/useStockMovements.tsx";
+import ProductTable from "@/pages/Dashboard/Component/ProductTable.tsx";
 
 export default function Dashboard() {
   const stacks = useSelector(StacksSelector);
@@ -87,24 +88,40 @@ export default function Dashboard() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Dashboard Quản Lý Kho
+                Dashboard Quản Lý Kho hàng
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Tổng quan hoạt động kho hàng {timeFilter === 'today' ? 'hôm nay' : timeFilter === 'week' ? 'tuần này' : 'tháng này'}
+                {warehouse === "ALL" ? "Tổng quan tất cả kho hàng" : "Tổng quan hoạt động kho hàng"} {timeFilter === 'today' ? 'hôm nay' : timeFilter === 'week' ? 'tuần này' : 'tháng này'}
               </p>
             </div>
-            <div className="flex gap-3 w-[400px]">
-              <SelectWarehouseApproved warehouse={warehouse} setWarehouse={setWarehouse}/>
+            <div className="flex gap-3 w-[500px]">
+              {/* Toggle Button cho Tổng Kho */}
+              {/*<Button*/}
+              {/*    variant={warehouse === "ALL" ? "solid" : "bordered"}*/}
+              {/*    color={warehouse === "ALL" ? "primary" : "default"}*/}
+              {/*    onClick={() => setWarehouse("ALL")}*/}
+              {/*    startContent={<Icon icon="mdi:warehouse-outline" />}*/}
+              {/*    className="min-w-[120px]"*/}
+              {/*>*/}
+              {/*  Tổng Kho*/}
+              {/*</Button>*/}
+
+              <SelectWarehouseApproved
+                  warehouse={warehouse === "ALL" ? "" : warehouse}
+                  setWarehouse={(value) => setWarehouse(value || "ALL")}
+                  disabled={warehouse === "ALL"}
+              />
               <Select
                   size="sm"
                   selectedKeys={[timeFilter]}
                   onSelectionChange={(keys) => setTimeFilter(Array.from(keys)[0] as string)}
-                  className="w-[250px]"
+                  className="w-[200px]"
               >
                 <SelectItem key="today">Hôm nay</SelectItem>
                 <SelectItem key="week">Tuần này</SelectItem>
                 <SelectItem key="month">Tháng này</SelectItem>
               </Select>
+
               <Button
                   color="primary"
                   startContent={<Icon icon="mdi:refresh" />}
@@ -114,7 +131,6 @@ export default function Dashboard() {
               </Button>
             </div>
           </div>
-
           {/* Stats Cards - Giữ nguyên như code cũ */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="border-l-4 border-l-blue-500">
@@ -147,7 +163,7 @@ export default function Dashboard() {
                       Giá trị tồn kho
                     </p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {statsLoading ? <Spinner size="sm" /> : `${(stats?.totalInventoryValue / 1000000)?.toFixed(1) || "0"}M ₫`}
+                      {statsLoading ? <Spinner size="sm" /> : `${(stats?.totalInventoryValue / 1000000)?.toFixed(3) || "0"}M ₫`}
                     </p>
                     <p className="text-xs text-green-600 mt-1">
                       <Icon icon="mdi:trending-up" className="inline mr-1" />
@@ -230,6 +246,26 @@ export default function Dashboard() {
                     </Button>
                 ))}
               </div>
+            </CardBody>
+          </Card>
+          <Card className="lg:col-span-3">
+            <CardHeader>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Sản phẩm trong kho
+              </h3>
+            </CardHeader>
+            <CardBody>
+              {statsLoading ? (
+                  <div className="flex items-center justify-center h-64">
+                    <Spinner size="lg" />
+                  </div>
+              ) : (
+                  <ProductTable
+                      warehouseId={warehouse}
+                      showActions={true}
+                      maxHeight="500px"
+                  />
+              )}
             </CardBody>
           </Card>
 
@@ -399,7 +435,9 @@ export default function Dashboard() {
                   </div>
                 </div>
               </CardBody>
+
             </Card>
+            {/* Product Table - Thay thế bằng ProductTable */}
           </div>
         </div>
       </div>

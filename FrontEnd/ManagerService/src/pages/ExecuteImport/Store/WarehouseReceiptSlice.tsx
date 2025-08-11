@@ -2,6 +2,7 @@ import {ImportOrder, ImportOrderItem} from "@/pages/ExecuteImport/Store/ImportOr
 import {Bin} from "@/Store/StackSlice.tsx";
 import {UserResponse} from "@/Store/Unit.tsx";
 import {createSlice} from "@reduxjs/toolkit";
+import {User} from "@/types";
 
 export interface ReceiptItemCreate {
     importItemId: string;        // Bắt buộc
@@ -10,9 +11,9 @@ export interface ReceiptItemCreate {
     note?: string;               // Không bắt buộc
 }
 export interface ReceiptWarehouseCreate {
-    importOrderId: string;        // Bắt buộc
-    note?: string;               // Không bắt buộc
-    receiptItems: ReceiptItemCreate[];        // Không bắt buộc
+    importOrderId: string;
+    note?: string;
+    receiptItems: ReceiptItemCreate[];
 }
 export interface ReceiptItemResponse {
     receiptItemId: string;
@@ -25,7 +26,6 @@ export interface ReceiptItemResponse {
     createdAt: string;
     updatedAt: string;
     isDeleted: boolean;
-
     // Enriched
     importItem: ImportOrderItem;
     binDetails: Bin;
@@ -33,7 +33,8 @@ export interface ReceiptItemResponse {
 export interface WarehouseReceiptResponse {
     receiptId: string;
     importOrderId: string;
-    createdByUser: string;
+    createdByUser?: User;
+    quantityReceiveItem?:number;
     receivedDate: string; // ISO 8601 (LocalDateTime)
     status: "PENDING" | "COMPLETED" | "PARTIAL" | string; // enum ReceiptStatus
     note: string;
@@ -44,7 +45,7 @@ export interface WarehouseReceiptResponse {
     // Enriched
     importOrder: ImportOrder|null;
     createdByUserDetails: UserResponse|null;
-    receiptItems: ReceiptItemResponse[];
+    receiptItems?: ReceiptItemResponse[];
 }
 interface ReceiptWarehouseState {
     warehouseReceiptsResponse: WarehouseReceiptResponse[];
@@ -60,7 +61,6 @@ const initialState: ReceiptWarehouseState = {
     warehouseReceiptResponse: {
         receiptId: "",
         importOrderId: "",
-        createdByUser: "",
         receivedDate: "",
         status: "",
         note: "",

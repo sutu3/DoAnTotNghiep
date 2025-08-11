@@ -8,10 +8,10 @@ export interface Bin {
   capacity: number;
   currentOccupancy: number;
   status?: "EMPTY"|"FULL"| "MAINTENANCE"|"AVAILABLE"
-  createdAt: string;
-  updatedAt: string;
-  isDeleted: boolean;
-  deletedAt: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  isDeleted?: boolean;
+  deletedAt?: string | null;
 }
 export const columns = [
   { name: "ID", uid: "stackId", sortable: true },
@@ -73,10 +73,28 @@ const StackSlice = createSlice({
     setStackList: (state, action) => {
       state.Stacks = action.payload;
     },
+    setUpdateBin: (state, action) => {
+      const { stackId, bin } = action.payload;
+
+      const stackIndex = state.Stacks.findIndex(stack => stack.stackId === stackId);
+
+      if (stackIndex !== -1) {
+        const stack = state.Stacks[stackIndex];
+
+        state.Stacks[stackIndex] = {
+          ...stack,
+          bin: stack.bin.map(b => b.binId === bin.binId ? bin : b)
+        };
+        console.log("Updated stack:", state.Stacks[stackIndex]);
+      } else {
+        console.warn("Stack not found with id:", stackId);
+      }
+    },
+
     setAddStack: (state, action) => {
       state.Stacks = [...state.Stacks, action.payload];
     }
   },
 });
-export const {initToTalPage,setStackList,setAddStack} = StackSlice.actions;
+export const {initToTalPage,setStackList,setAddStack,setUpdateBin} = StackSlice.actions;
 export default StackSlice;

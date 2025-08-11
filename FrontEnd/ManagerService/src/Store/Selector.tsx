@@ -34,8 +34,10 @@ export const TotalPageTask = (state: { taskType: { totalPage: number } }) =>
 export const TaskTypeSelector = (state: { taskType: any }) =>
     state.taskType.taskTypes;
 
-export const UserSelector = (state: { users: {userList: any} }) =>
+export const UsersSelector = (state: { users: {userList: any} }) =>
     state.users.userList;
+export const UserSelector = (state: { users: {user: any} }) =>
+    state.users.user;
 export const TotalPageUser = (state: { users: { totalPage: number } }) =>
     state.users.totalPage;
 
@@ -55,12 +57,7 @@ export const ReceiptItemSelector = (state: { warehousReceipt: {receiptItem: any}
 export const TotalPageReceipt = (state: { warehousReceipt: { totalPage: number } }) =>
     state.warehousReceipt.totalPage;
 
-export const ExportItemCreateSelector = (state: { exportOrder: {exportItemCreate:any} }) =>
-    state.exportOrder.exportItemCreate;
-export const ExportOrderSelector = (state: { exportOrder: {orderExport:any} }) =>
-    state.exportOrder.orderExport;
-export const ExportOrderItemSelector = (state: { exportOrder: {orderItem:any} }) =>
-    state.exportOrder.orderItem;
+
 export const UnitSelector = (state: { unit: {unitList: any} }) =>
     state.unit.unitList;
 export const TotalPageUnit = (state: { unit: { totalPage: number } }) =>
@@ -76,6 +73,8 @@ export const TotalPageStockMovement = (state: { stockMovement: { totalPage: numb
     state.stockMovement.totalPage;
 export const TaskSelector = (state: { tasks: any }) =>
     state.tasks.tasks;
+export const StatsSelector = (state: { stats: any }) =>
+    state.tasks.stats;
 
 export const TaskUserSelector = (state: { taskUser: {taskUsers:any} }) =>
     state.taskUser.taskUsers;
@@ -102,3 +101,5 @@ export const InventoryErrorsSelector = (state: { inventory: { errors: any } }) =
     state.inventory.errors;
 export const InventoryWarehouseSelector = (state: { inventoryWarehouse: { inventoryWarehouses: any } }) =>
     state.inventoryWarehouse.inventoryWarehouses;
+export const InventoryProductSelector = (state: { inventoryWarehouse: { inventoryProducts: any } }) =>
+    state.inventoryWarehouse.inventoryProducts;

@@ -36,7 +36,6 @@ const WarehousePage = () => {
             const PageApi: pageApi = { pageNumber: page - 1, pageSize: 10 };
             const result = await (dispatch as any)(GetAllWarehouse({ page: PageApi }));
 
-            console.log("Warehouse API result:", result); // <- xem có payload không
 
             if (result?.payload?.result?.content) {
                 dispatch(setAllWarehouse(result.payload.result.content));
@@ -92,7 +91,7 @@ const WarehousePage = () => {
                 {/* Layout 2 cột */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Bên trái: Warehouse Table (2/3) */}
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-3">
                         <WarehouseTableSection
                             loading={loading}
                             selectedWarehouse={selectedWarehouse}
@@ -105,9 +104,9 @@ const WarehousePage = () => {
                     </div>
 
                     {/* Bên phải: Warehouse Thumbnail (1/3) */}
-                    <div className="lg:col-span-1">
-                        <WarehouseThumbnail warehouse={selectedWarehouse} />
-                    </div>
+                    {/*<div className="lg:col-span-1">*/}
+                    {/*    <WarehouseThumbnail warehouse={selectedWarehouse} />*/}
+                    {/*</div>*/}
                 </div>
             </div>
 

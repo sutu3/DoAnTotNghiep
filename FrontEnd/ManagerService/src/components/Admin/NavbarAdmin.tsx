@@ -191,22 +191,12 @@ const NavbarAdmin = ({ collapsed, setCollapsed }) => {
               <div className="px-4 py-2 text-sm text-gray-700 dark:text-white font-semibold">
                 My Account
               </div>
+
               <Menu.Item>
                 {({ active }) => (
                   <button
-                    className={`flex w-full items-center px-4 py-2 text-sm ${
-                      active ? "bg-gray-100 dark:bg-blue-950" : ""
-                    }`}
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </button>
-                )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <button
-                    className={`flex w-full items-center px-4 py-2 text-sm ${
+                      onClick={()=> navigate("/staff/settings")}
+                      className={`flex w-full items-center px-4 py-2 text-sm ${
                       active ? "bg-gray-100 dark:bg-blue-950" : ""
                     }`}
                   >

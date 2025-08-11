@@ -4,7 +4,7 @@ import { Package, Clock, User, MapPin, Eye } from 'lucide-react';
 import {useDispatch, useSelector} from "react-redux";
 import {MiddleGetAllTaskType, TaskType} from "@/Store/TaskTypeSlice.tsx";
 import {TaskTypeSelector} from "@/Store/Selector.tsx";
-import {Task} from "@/Store/TaskSlice.tsx";
+import {Task} from "@/pages/TaskType/Component/Store/TaskSlice.tsx";
 
 interface TaskListProps {
     taskType:string;
@@ -140,12 +140,12 @@ const TaskList: React.FC<TaskListProps> = ({taskType,setTaskType,
                                         </div>
                                         <div className="flex flex-col items-end gap-2">
                                             <Chip
-                                                color={task.status === 'Completed' ? 'success' :
+                                                color={task.status === 'Complete' ? 'success' :
                                                     task.status === 'In_Progress' ? 'primary' : 'warning'}
                                                 variant="flat"
                                                 size="sm"
                                             >
-                                                {task.status === 'Completed' ? 'Hoàn thành' :
+                                                {task.status === 'Complete' ? 'Hoàn thành' :
                                                     task.status === 'In_Progress' ? 'Đang thực hiện' : 'Chờ xử lý'}
                                             </Chip>
 

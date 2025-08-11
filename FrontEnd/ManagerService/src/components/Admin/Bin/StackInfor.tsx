@@ -100,7 +100,7 @@ export const StackInfo: React.FC<StackInfoProps> = ({
                     </div>
                     <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                         <p className="text-2xl font-bold text-blue-600">
-                            {stack?.bin?.filter(b => b.status === "AVAILABLE").length || 0}
+                            {stack?.bin?.filter(b => b.status === "FULL").length || 0}
                         </p>
                         <p className="text-xs text-blue-600">In Use</p>
                     </div>

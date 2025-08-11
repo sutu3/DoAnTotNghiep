@@ -35,10 +35,11 @@ const UnitPage = () => {
 
     useEffect(() => {
         dispatch(UnitSlice.actions.setUnitList([]))
-        setLoading(true);
         const PageApi: pageApi = { pageNumber: page - 1, pageSize: 10 };
         const fetch=async ()=>{
-            (dispatch as any)(MiddleGetAllUnit(PageApi,object.groupName));
+            setLoading(true);
+
+            await (dispatch as any)(MiddleGetAllUnit(PageApi,object.groupName));
             setLoading(false);
         }
         fetch()

@@ -3,77 +3,66 @@
 import { useState, useEffect } from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {
-    Card,
-    CardBody,
-    CardHeader,
-    Chip,
-    Button,
-    Table,
-    TableHeader,
-    TableColumn,
-    TableBody,
-    TableRow,
-    TableCell,
-    Select,
-    SelectItem,
     Spinner
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { callApiThunk } from "@/Store/Store.tsx";
-import { API_ROUTES } from "@/Api/UrlApi.tsx";
-import {MiddleGetAllTaskUserByUserId} from "@/Store/Thunk/TaskUserThunk.tsx";
+import {MiddleGetAllTaskUserByUserId, MiddleUpdateTaskUser} from "@/pages/TaskType/Component/Store/TaskUserThunk.tsx";
 import {TaskUserSelector} from "@/Store/Selector.tsx";
+import TasksTable from "@/pages/TaskType/Component/Table/TasksTable";
+import TaskDetailModal from "@/pages/TaskType/Component/Modal/TaskDetailModal";
+import CancelTaskModal from "@/pages/TaskType/Component/Modal/CancelTaskModal";
+import CompleteTaskModal from "@/pages/TaskType/Component/Modal/CompleteTaskModal";
+import {TaskUser} from "@/pages/TaskType/Component/Store/TaskUserSlice.tsx";
+import TaskStatsCards from "@/pages/TaskType/Component/Card/TaskStatsCards.tsx";
+import {MiddleUploadImage, UploadResponse} from "@/Store/Thunk/UploadThunk.tsx";
+import {useGetStatsTaskUser} from "@/Hooks/useTaskUser.tsx";
 
-interface TaskUser {
-    id: string;
-    status: "Pending" | "In_Progress" | "Complete" | "Cancel";
-    note: string;
-    completeAt: string;
-    createdAt: string;
-    updatedAt: string;
-    task: {
-        taskId: string;
-        taskType: {
-            taskName: string;
-        };
-        description: string;
-        level: "Low" | "Medium" | "High";
-        warehouses: {
-            warehouseId: string;
-            warehouseName: string;
-        };
-    };
-}
+
 
 export default function MyTasksPage() {
-    const TaskUser=useSelector(TaskUserSelector);
+    const {data}=useGetStatsTaskUser();
+    const TaskUser = useSelector(TaskUserSelector);
     const [taskUsers, setTaskUsers] = useState<TaskUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState("all");
+    const [selectedTask, setSelectedTask] = useState<TaskUser | null>(null);
+
+    // Modal states
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
+
     const [stats, setStats] = useState({
         pending: 0,
         inProgress: 0,
         completed: 0,
-        highPriority: 0
+        highPriority:0,
     });
-    const dispatch = useDispatch();
 
-    // Lấy userId từ localStorage hoặc auth context
+    const dispatch = useDispatch();
 
     useEffect(() => {
         loadUserTasks();
     }, []);
+
     useEffect(() => {
-        if(TaskUser){
+        if (TaskUser) {
             setTaskUsers(TaskUser);
-            calculateStats(TaskUser);
         }
-    }, [TaskUser]);
+    }, [TaskUser,data]);
+    useEffect(() => {
+        setStats({
+            pending: data?.totalTaskPending ?? 0,
+            inProgress: data?.totalTasksInProgress ?? 0,
+            completed: data?.totalTasksCompleted ?? 0,
+            highPriority: data?.totalTasksHightLevel ?? 0
+        });
+    }, [data]);
+
     const loadUserTasks = async () => {
         setLoading(true);
         try {
-            await (dispatch as any)(MiddleGetAllTaskUserByUserId({pageNumber:0,pageSize:10}));
-
+            await (dispatch as any)(MiddleGetAllTaskUserByUserId({ pageNumber: 0, pageSize: 50 }));
         } catch (error) {
             console.error('Failed to load user tasks:', error);
         } finally {
@@ -81,186 +70,139 @@ export default function MyTasksPage() {
         }
     };
 
-    const calculateStats = (tasks: TaskUser[]) => {
-        const stats = {
-            pending: tasks.filter(t => t.status === "Pending").length,
-            inProgress: tasks.filter(t => t.status === "In_Progress").length,
-            completed: tasks.filter(t => t.status === "Complete").length,
-            highPriority: tasks.filter(t => t.task.level === "High").length
-        };
-        setStats(stats);
+
+
+    const handleCompleteTask = (taskUser: TaskUser) => {
+        setSelectedTask(taskUser);
+        if(!taskUser.task?.requiresEvidence){
+            // If the task does not require evidence, directly update status to In_Progress
+            const fetch= async () => {
+                await (dispatch as any)(MiddleUpdateTaskUser(taskUser?.id, "Complete", ""));
+            }
+            fetch();
+        }else{
+            setIsCompleteModalOpen(true);
+        }
     };
 
-    const filteredTasks = taskUsers.filter(taskUser => {
-        if (statusFilter === "all") return true;
-        return taskUser.status === statusFilter;
-    });
-
-    const statusColorMap = {
-        Pending: "warning",
-        In_Progress: "primary",
-        Complete: "success",
-        Cancel: "danger"
+    const handleStartTask = (taskUser: TaskUser) => {
+        setSelectedTask(taskUser);
+        // Directly update status to In_Progress
+        handleUpdateStatus(taskUser.id, "In_Progress");
     };
 
-    const levelColorMap = {
-        Low: "success",
-        Medium: "warning",
-        High: "danger"
+    const handleViewDetail = (taskUser: TaskUser) => {
+        setSelectedTask(taskUser);
+        setIsDetailModalOpen(true);
     };
 
-    const handleUpdateStatus = async (taskUserId: string, newStatus: string) => {
+    const handleCancelTask = (taskUser: TaskUser) => {
+        setSelectedTask(taskUser);
+        setIsCancelModalOpen(true);
+    };
+
+    const handleUpdateStatus = async (taskUserId: string,status:string) => {
         try {
-            // API call để update status TaskUser
-            await callApiThunk(
-                "PUT",
-                `${API_ROUTES.user.taskUsers(null).base}/${taskUserId}/status`,
-                { status: newStatus },
-                (error: any) => error
-            );
-
-            // Reload tasks sau khi update
-            await loadUserTasks();
+            // API call logic here
+            await (dispatch as any)(MiddleUpdateTaskUser(taskUserId,status,null));
         } catch (error) {
             console.error('Failed to update task status:', error);
         }
     };
+    const handleUpdateCompleteStatus = async (taskUserId: string,status:string) => {
+        try {
+            // API call logic here
+            const imageResponse:UploadResponse=await (dispatch as any)(MiddleUploadImage());
+            await (dispatch as any)(MiddleUpdateTaskUser(taskUserId,status,imageResponse.urlImage));
+            setIsCompleteModalOpen(false);
+        } catch (error) {
+            console.error('Failed to update task status:', error);
+        }
+    };
+    const handleUpdateCancelStatus = async (taskUserId: string,status:string,reason:string) => {
+        try {
+            // API call logic here
+            await (dispatch as any)(MiddleUpdateTaskUser(taskUserId,status,reason));
+            setIsCancelModalOpen(false);
+        } catch (error) {
+            console.error('Failed to update task status:', error);
+        }
+    }
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 flex items-center justify-center">
-                <Spinner size="lg" />
+            <div className="min-h-screen  p-6 flex items-center justify-center">
+                <div className="text-center">
+                    <Spinner size="lg" className="mb-4" />
+                    <p className="text-gray-600">Đang tải nhiệm vụ...</p>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
+        <div className="min-h-screen p-6">
             <div className="max-w-7xl mx-auto space-y-8">
-                {/* Header */}
-                <div className="text-center space-y-2">
-                    <div className="flex justify-center items-center gap-3">
-                        <Icon icon="mdi:clipboard-list" className="text-4xl text-blue-600" />
-                        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-                            Nhiệm Vụ Của Tôi
-                        </h1>
+                {/* Enhanced Header */}
+                <div className="text-center space-y-4">
+                    <div className="flex justify-center items-center gap-4">
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full p-4 shadow-lg">
+                            <Icon icon="mdi:clipboard-list" className="text-4xl text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-4xl font-bold text-gray-800">
+                                Nhiệm Vụ Của Tôi
+                            </h1>
+                            <p className="text-gray-600 text-lg">
+                                Quản lý và theo dõi các nhiệm vụ được giao
+                            </p>
+                        </div>
                     </div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
-                        Quản lý và theo dõi các nhiệm vụ được giao
-                    </p>
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-2 mb-6 md:grid-cols-4 gap-4">
-                    {[
-                        { icon: "mdi:clock-outline", label: "Đang chờ", value: stats.pending, color: "text-warning" },
-                        { icon: "mdi:progress-clock", label: "Đang thực hiện", value: stats.inProgress, color: "text-primary" },
-                        { icon: "mdi:check-circle", label: "Hoàn thành", value: stats.completed, color: "text-success" },
-                        { icon: "mdi:alert-circle", label: "Ưu tiên cao", value: stats.highPriority, color: "text-danger" },
-                    ].map((stat, index) => (
-                        <Card key={index} className="shadow-sm">
-                            <CardBody className="text-center">
-                                <Icon icon={stat.icon} className={`text-3xl mb-2 mx-auto ${stat.color}`} />
-                                <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
-                                <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-                            </CardBody>
-                        </Card>
-                    ))}
-                </div>
+                <TaskStatsCards stats={stats} />
 
                 {/* Tasks Table */}
-                <Card>
-                    <CardHeader className="flex justify-between">
-                        <h2 className="text-xl font-semibold">Danh Sách Nhiệm Vụ</h2>
-                        <Select
-                            size="sm"
-                            placeholder="Lọc theo trạng thái"
-                            className="w-48"
-                            selectedKeys={statusFilter !== "all" ? [statusFilter] : []}
-                            onSelectionChange={(keys) => {
-                                const selected = Array.from(keys)[0]?.toString();
-                                setStatusFilter(selected || "all");
-                            }}
-                        >
-                            <SelectItem key="all">Tất cả</SelectItem>
-                            <SelectItem key="Pending">Đang chờ</SelectItem>
-                            <SelectItem key="In_Progress">Đang thực hiện</SelectItem>
-                            <SelectItem key="Complete">Hoàn thành</SelectItem>
-                        </Select>
-                    </CardHeader>
-                    <CardBody>
-                        <Table>
-                            <TableHeader>
-                                <TableColumn>Loại nhiệm vụ</TableColumn>
-                                <TableColumn>Mô tả</TableColumn>
-                                <TableColumn>Mức độ</TableColumn>
-                                <TableColumn>Trạng thái</TableColumn>
-                                <TableColumn>Hạn hoàn thành</TableColumn>
-                                <TableColumn>Ghi chú</TableColumn>
-                                <TableColumn>Thao tác</TableColumn>
-                            </TableHeader>
-                            <TableBody emptyContent="Không có nhiệm vụ nào">
-                                {filteredTasks.map((taskUser) => (
-                                    <TableRow key={taskUser.id}>
-                                        <TableCell>{taskUser.task.taskType.taskName}</TableCell>
-                                        <TableCell>{taskUser.task.description}</TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                size="sm"
-                                                color={levelColorMap[taskUser.task.level]}
-                                                variant="flat"
-                                            >
-                                                {taskUser.task.level}
-                                            </Chip>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                size="sm"
-                                                color={statusColorMap[taskUser.status]}
-                                                variant="flat"
-                                            >
-                                                {taskUser.status}
-                                            </Chip>
-                                        </TableCell>
-                                        <TableCell>
-                                            {taskUser.completeAt ? new Date(taskUser.completeAt).toLocaleDateString('vi-VN') : 'N/A'}
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="text-sm text-gray-600">{taskUser.note}</span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex gap-2">
-                                                <Button size="sm" color="primary" variant="light">
-                                                    <Icon icon="mdi:eye" />
-                                                </Button>
-                                                {taskUser.status === "Pending" && (
-                                                    <Button
-                                                        size="sm"
-                                                        color="success"
-                                                        variant="light"
-                                                        onClick={() => handleUpdateStatus(taskUser.id, "In_Progress")}
-                                                    >
-                                                        <Icon icon="mdi:play" />
-                                                    </Button>
-                                                )}
-                                                {taskUser.status === "In_Progress" && (
-                                                    <Button
-                                                        size="sm"
-                                                        color="warning"
-                                                        variant="light"
-                                                        onClick={() => handleUpdateStatus(taskUser.id, "Complete")}
-                                                    >
-                                                        <Icon icon="mdi:check" />
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </CardBody>
-                </Card>
+                <TasksTable
+                    taskUsers={taskUsers}
+                    statusFilter={statusFilter}
+                    setStatusFilter={setStatusFilter}
+                    onViewDetail={handleViewDetail}
+                    onStartTask={handleStartTask}
+                    onCompleteTask={handleCompleteTask}
+                    onCancelTask={handleCancelTask}
+                />
+
+                {/* Modals */}
+                <TaskDetailModal
+                    isOpen={isDetailModalOpen}
+                    onClose={() => setIsDetailModalOpen(false)}
+                    taskUser={selectedTask}
+                />
+
+                <CancelTaskModal
+                    isOpen={isCancelModalOpen}
+                    onClose={() => setIsCancelModalOpen(false)}
+                    taskUser={selectedTask}
+                    onConfirm={(reason) => {
+                        if (selectedTask) {
+                            handleUpdateCancelStatus(selectedTask.id, "Cancel",reason);
+                        }
+                    }}
+                />
+
+                <CompleteTaskModal
+                    isOpen={isCompleteModalOpen}
+                    onClose={() => setIsCompleteModalOpen(false)}
+                    taskUser={selectedTask}
+                    onConfirm={() => {
+                        if (selectedTask) {
+                            handleUpdateCompleteStatus(selectedTask.id, "Complete");
+                        }
+
+                    }}
+                />
             </div>
         </div>
     );

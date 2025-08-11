@@ -5,7 +5,7 @@ import { useEffect} from "react";
 import {
     MiddleGetInventoryWarehouseByProductId
 } from "@/Store/Thunk/InventoryWarehouseThunk.tsx";
-import {ExportItemCreateUI} from "@/Store/ExportOrderSlice.tsx";
+import {ExportItemCreateUI} from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 import {InventoryWarehouse} from "@/Store/InventoryWarehouseSlice.tsx";
 
 interface SelectProps {

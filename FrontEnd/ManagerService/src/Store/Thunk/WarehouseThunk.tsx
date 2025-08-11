@@ -57,7 +57,6 @@ export const MiddleGetWarehouseByUser = (page: pageApi) => {
     return async function (dispatch: any) {
         try {
             const role =await getUserRoleFromToken();
-            console.log(role);
             if( role=="manager"){
                 const action=await dispatch(GetAllWarehouseList({page}))
                 dispatch(setAllWarehouse(action.payload.result));

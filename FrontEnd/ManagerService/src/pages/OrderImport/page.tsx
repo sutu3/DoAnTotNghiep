@@ -4,13 +4,19 @@ import { useState } from "react";
 import { Card, CardBody, CardHeader } from "@heroui/react";
 import { Package } from "lucide-react";
 import { useImportOrderStore } from "@/zustand/importOrderStore.tsx";
-import { MiddleAddOrderImport } from "@/pages/ExecuteImport/Store/ImportOrderThunk.tsx";
+import { MiddleAddOrderImport } from "@/pages/ExecuteImport/Store/Thunk/ImportOrderThunk.tsx";
 import { useDispatch } from "react-redux";
 import SelectWarehouse from "@/components/Admin/OrderImport/select/SelectWarehouse.tsx";
 import ProductTable from "./components/ProductTable";
 import ImportCart from "./components/ImportCart";
 import OrderSummary from "./components/OrderSummary";
-
+import ProductFilterPanel from "@/pages/OrderExport/Component/select/SelectProductFilter.tsx";
+export interface Filters{
+    searchTerm: string;
+    categoryFilter: string;
+    unitFilter: string;
+    supplierFilter: string;
+}
 export default function ImportOrderPage() {
     const { items, clearItems } = useImportOrderStore();
     const dispatch = useDispatch();
@@ -19,7 +25,24 @@ export default function ImportOrderPage() {
         note: ""
     });
     const [loading, setLoading] = useState(false);
+    const [filters, setFilters] = useState<Filters>({
+        searchTerm: "",
+        categoryFilter: "all",
+        unitFilter: "all",
+        supplierFilter: "all"
+    });
+    const handleFilterChange = (key: string, value: string) => {
+        setFilters(prev => ({ ...prev, [key]: value }));
+    };
 
+    const handleClearFilters = () => {
+        setFilters({
+            searchTerm: "",
+            categoryFilter: "all",
+            unitFilter: "all",
+            supplierFilter: "all"
+        });
+    };
     const handleSubmit = async () => {
         setLoading(true);
         try {
@@ -60,13 +83,30 @@ export default function ImportOrderPage() {
                     <CardBody>
                         <SelectWarehouse formData={formData} setFormData={setFormData} />
                     </CardBody>
-                </Card>
 
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                </Card>
+                <div className="xl:col-span-1">
+                    <div className="sticky top-6 space-y-6">
+                        <ProductFilterPanel
+                            searchTerm={filters.searchTerm}
+                            categoryFilter={filters.categoryFilter}
+                            unitFilter={filters.unitFilter}
+                            supplierFilter={filters.supplierFilter}
+                            onSearchChange={(value) => handleFilterChange('searchTerm', value)}
+                            onCategoryChange={(value) => handleFilterChange('categoryFilter', value)}
+                            onUnitChange={(value) => handleFilterChange('unitFilter', value)}
+                            onSupplierChange={(value) => handleFilterChange('supplierFilter', value)}
+                            onClearFilters={handleClearFilters}
+                        />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-4">
                     {/* Product Table */}
                     <div className="xl:col-span-2">
                         {formData.warehouse && (
-                            <ProductTable warehouseId={formData.warehouse} />
+                            <ProductTable warehouseId={formData.warehouse}
+                                          filters={filters} />
                         )}
                     </div>
 

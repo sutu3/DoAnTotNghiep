@@ -10,7 +10,7 @@ import {
     CardHeader,
     Input,
     Select,
-    SelectItem,
+    SelectItem, Spinner,
     Table,
     TableBody,
     TableCell,
@@ -21,11 +21,15 @@ import {
 } from "@heroui/react";
 import {ArrowLeft, MapPin, Package, Save} from "lucide-react";
 import OrderImportSlice, {ImportOrder, ImportOrderItem} from "@/pages/ExecuteImport/Store/ImportOrder.tsx";
-import {MiddleGetAllOrderItemByOrderId, MiddleImportOrder} from "@/pages/ExecuteImport/Store/ImportOrderThunk.tsx";
+import {
+    MiddleGetAllOrderItemByOrderId,
+    MiddleGetAllOrderItemByStatus,
+    MiddleImportOrder
+} from "@/pages/ExecuteImport/Store/Thunk/ImportOrderThunk.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {OrderItemSelector, OrderSelector, StacksSelector} from "@/Store/Selector.tsx";
 import {MiddleGetAllStackList} from "@/Store/Thunk/StackThunk.tsx";
-import {Bin, StackType} from "@/Store/StackSlice";
+import {Bin, setUpdateBin, StackType} from "@/Store/StackSlice";
 import LocationSelectionModal from "@/components/Staff/ExecuteImport/Modal/LocationSelectionModal.tsx";
 import {ReceiptWarehouseCreate} from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
 import SelectWarehouseApproved from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
@@ -48,6 +52,7 @@ const CreateReceiptComponent: React.FC<CreateReceiptComponentProps> = ({setSelec
     const [currentOrder, setCurrentOrder] = useState<ImportOrder | undefined>(selectedOrder);
     const [receiptNote, setReceiptNote] = useState("");
     const [loading, setLoading] = useState(false);
+    const [loadingData,setLoadingData] = useState(false);
     const [warehouse,setWarehouse] = useState("");
     const dispatch = useDispatch();
 
@@ -59,15 +64,19 @@ const CreateReceiptComponent: React.FC<CreateReceiptComponentProps> = ({setSelec
     }, []);
     const loadAvailableOrders = async () => {
         try {
-
-            await (dispatch as any)(MiddleGetAllOrderItemByOrderId(selectedOrder?.importOrderId));
+            setLoadingData(true)
             if(selectedOrder){
+                await (dispatch as any)(MiddleGetAllOrderItemByOrderId(selectedOrder?.importOrderId));
                 await (dispatch as any)(MiddleGetAllStackList(selectedOrder?.warehouse?.warehouseId));
             }else{
+
                 if(warehouse!=""){
+
+                    await (dispatch as any)(MiddleGetAllOrderItemByStatus(warehouse))
                     await (dispatch as any)(MiddleGetAllStackList(warehouse));
                 }
             }
+            setLoadingData(false)
         } catch (error) {
             console.error("Error loading orders:", error);
         }
@@ -88,7 +97,7 @@ const CreateReceiptComponent: React.FC<CreateReceiptComponentProps> = ({setSelec
         if (selectedItemIndex !== null) {
             // Tìm stack và bin chính xác
             const selectedStackData = stacksBinData.find((stack: StackType) => stack.stackId === stackId);
-            const selectedBinData = selectedStackData?.bin.find((bin: Bin) => bin.binId === binId);
+            const selectedBinData:Bin = selectedStackData?.bin.find((bin: Bin) => bin.binId === binId);
 
             // Cập nhật receiptItems với bin location
             const updatedItems = orderItem.map((item: ImportOrderItem, index: number) =>
@@ -99,7 +108,9 @@ const CreateReceiptComponent: React.FC<CreateReceiptComponentProps> = ({setSelec
                     }
                     : item
             );
-            console.log(updatedItems);
+            const newBin={...selectedBinData,status:"FULL"};
+            dispatch(setUpdateBin({stackId: selectedStackData?.stackId, bin: newBin}));
+            console.log(stacksBinData);
             // Dispatch action để update store
             dispatch(OrderImportSlice.actions.setOrderImportItemList(updatedItems));
 
@@ -125,6 +136,7 @@ const CreateReceiptComponent: React.FC<CreateReceiptComponentProps> = ({setSelec
                         }))
                 };
                 await (dispatch as any)(MiddleImportOrder(selectedOrder?.importOrderId || "", orderItem, receiptData));
+                onSuccess()
             }
         } catch (error) {
             console.error("Error creating receipt:", error);
@@ -233,7 +245,7 @@ const CreateReceiptComponent: React.FC<CreateReceiptComponentProps> = ({setSelec
                                 <TableColumn aria-labelledby="Input"
                                 >GHI CHÚ</TableColumn>
                             </TableHeader>
-                            <TableBody aria-labelledby="Input"
+                            <TableBody isLoading={loadingData} loadingContent={<Spinner label={"Loading Data"}/>} aria-labelledby="Input"
                             >
                                 {orderItem?.map((item: ImportOrderItem, index: number) => (
                                     <TableRow aria-labelledby="Input"
@@ -255,7 +267,7 @@ const CreateReceiptComponent: React.FC<CreateReceiptComponentProps> = ({setSelec
                                         <TableCell aria-labelledby="Input"
                                         >
                                             <span className="font-semibold text-blue-600">
-                                                {item.requestQuantity}
+                                                {item.requestQuantity} /{item.unit?.unitName}
                                             </span>
                                         </TableCell>
                                         <TableCell aria-labelledby="Input"

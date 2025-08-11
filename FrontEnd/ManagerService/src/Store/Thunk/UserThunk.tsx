@@ -1,7 +1,7 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {callApiThunk} from "@/Store/Store.tsx";
 import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
-import UserSlice, {initToTalPage, setUserList, UserCreate} from "@/Store/UserSlice.tsx";
+import UserSlice, {initToTalPage, setGetUser, setUserList, UserCreate, UserUpdate} from "@/Store/UserSlice.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 
 export const GetAllUser = createAsyncThunk(
@@ -17,6 +17,20 @@ export const GetAllUser = createAsyncThunk(
             rejectWithValue
         )
 );
+export const GetInforUser = createAsyncThunk(
+    "user/GetAllUser",
+    async (
+        _: {  },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES.user.users(null).getMyInfor,
+            undefined,
+            rejectWithValue
+        )
+);
+
 export const UpdateRoleUser = createAsyncThunk(
     "user/UpdateRoleUser",
     async (
@@ -27,6 +41,19 @@ export const UpdateRoleUser = createAsyncThunk(
             "PUT",
             API_ROUTES.user.users(null).search.byUserId(userId).role,
             {isManager},
+            rejectWithValue
+        )
+);
+export const UpdateInforUser = createAsyncThunk(
+    "user/UpdateInforUser",
+    async (
+        { userId,payload }: { userId: string,payload:UserUpdate },
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "PUT",
+            API_ROUTES.user.users(null).search.byUserId(userId).infor,
+            payload,
             rejectWithValue
         )
 );
@@ -46,9 +73,10 @@ export const AddUser = createAsyncThunk(
 export const MiddleAddUser = (user: UserCreate) => {
     return async function (dispatch: any) {
         try {
-            await dispatch(AddUser({user:
+            const action=await dispatch(AddUser({user:
                     { ...user,
                         urlImage:`https://dummyimage.com/300.png/09f/fff&text=${user.userName}}`}}));
+            dispatch(UserSlice.actions.setAddUser(action.payload.result));
         } catch (error: any) {
             showToast({
                 title: "Error",
@@ -79,6 +107,34 @@ export const MiddleUpdateUser = (userId:string,isManager:boolean) => {
         try {
             const action=await dispatch(UpdateRoleUser({ userId,isManager }));
             dispatch(UserSlice.actions.setUpdateUser(action.payload.result));
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
+export const MiddleUpdateInforUser = (userId:string,payload:UserUpdate) => {
+    return async function (dispatch: any) {
+        try {
+            const action=await dispatch(UpdateInforUser({userId,payload}));
+            dispatch(setGetUser(action.payload.result));
+        } catch (error: any) {
+            showToast({
+                title: "Error",
+                description: `Message: ${error.message || error}`,
+                color: "danger",
+            });
+        }
+    };
+};
+export const MiddleGetInforUser = () => {
+    return async function (dispatch: any) {
+        try {
+            const action=await dispatch(GetInforUser({}));
+            dispatch(setGetUser(action.payload.result));
         } catch (error: any) {
             showToast({
                 title: "Error",

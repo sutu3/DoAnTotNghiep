@@ -15,17 +15,21 @@ import {
     Input,
     Textarea,
     Avatar,
-    Chip
+    Chip, Spinner
 } from "@heroui/react";
 import {Package, Save, ArrowLeft, MapPin} from "lucide-react";
 import WarehouseReceiptSlice, {
     ReceiptItemCreate,
-    ReceiptItemResponse,
+    ReceiptItemResponse, setAddReceiptList,
     WarehouseReceiptResponse
 } from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {ReceiptItemSelector, StacksSelector} from "@/Store/Selector.tsx";
-import {syncWithBackend, UpdateReceiptComplete} from "@/pages/ExecuteImport/Store/WarehousReceipteThunk.tsx";
+import {
+    MiddleGetReceiptItemByWarehouseReceiptId,
+    syncWithBackend,
+    UpdateReceiptComplete
+} from "@/pages/ExecuteImport/Store/Thunk/WarehousReceipteThunk.tsx";
 import {MiddleGetAllStackList} from "@/Store/Thunk/StackThunk.tsx";
 import {Bin, StackType} from "@/Store/StackSlice.tsx";
 import LocationSelectionModal from "@/components/Staff/ExecuteImport/Modal/LocationSelectionModal.tsx";
@@ -46,12 +50,20 @@ const UpdateReceiptComponent: React.FC<UpdateReceiptComponentProps> = ({
     const receiptItems:ReceiptItemResponse[]=useSelector(ReceiptItemSelector);
     const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
     const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
+    const [loadingData, setLoadingData] = useState<boolean>(false);
     const stacksBinData = useSelector(StacksSelector);
     console.log(receipt);
     const dispatch=useDispatch();
     useEffect(() => {
         if (receipt) {
+            setLoadingData(true);
             initializeReceiptData();
+            const fetch=async ()=>{
+                dispatch(setAddReceiptList([]));
+                await (dispatch as any)(MiddleGetReceiptItemByWarehouseReceiptId(receipt.receiptId));
+                setLoadingData(false);
+            }
+            fetch();
         }
         if (receipt.importOrder?.warehouse?.warehouseId) {
             (dispatch as any)(MiddleGetAllStackList(receipt.importOrder.warehouse.warehouseId));
@@ -118,7 +130,7 @@ const UpdateReceiptComponent: React.FC<UpdateReceiptComponentProps> = ({
         try {
             // Lọc chỉ những items đã thay đổi
             const changedItemsData = receiptItems.filter(item =>
-                changedItems.has(item.receiptItemId)
+                changedItems.has(item?.receiptItemId)
             );
 
             // Xử lý tuần tự từng item đã thay đổi
@@ -161,7 +173,7 @@ const UpdateReceiptComponent: React.FC<UpdateReceiptComponentProps> = ({
     };
 
     const getTotalReceived = () => {
-        return receiptItems.reduce((total:number, item:ReceiptItemResponse) => total + item.receivedQuantity, 0);
+        return receiptItems?.reduce((total:number, item:ReceiptItemResponse) => total + item.receivedQuantity, 0);
     };
 
     return (
@@ -208,13 +220,16 @@ const UpdateReceiptComponent: React.FC<UpdateReceiptComponentProps> = ({
                     <Table>
                         <TableHeader>
                             <TableColumn>SẢN PHẨM</TableColumn>
+                            <TableColumn>NHÀ CUNG CẤP</TableColumn>
                             <TableColumn>SL YÊU CẦU</TableColumn>
                             <TableColumn>SL THỰC NHẬN</TableColumn>
                             <TableColumn>VỊ TRÍ</TableColumn>
                             <TableColumn>GHI CHÚ</TableColumn>
                         </TableHeader>
-                        <TableBody>
-                            {receiptItems.map((item:ReceiptItemResponse, index:number) => (
+                        <TableBody
+                            loadingContent={<Spinner label={"Loading Item"}/>}
+                            isLoading={loadingData} emptyContent={"Item is empty"}>
+                            {receiptItems?.map((item:ReceiptItemResponse, index:number) => (
                                 <TableRow
                                     key={index}
                                     className={changedItems.has(item.receiptItemId) ? "bg-yellow-50 border-l-4 border-l-yellow-400" : ""}
@@ -233,8 +248,21 @@ const UpdateReceiptComponent: React.FC<UpdateReceiptComponentProps> = ({
                                         </div>
                                     </TableCell>
                                     <TableCell>
+                                        <div className="flex items-center gap-3">
+                                            <Avatar
+                                                src={item?.importItem?.supplier?.urlSupplier}
+                                                size="sm"
+                                                fallback={<Package className="w-4 h-4" />}
+                                            />
+                                            <div>
+                                                <p className="font-medium">{item?.importItem?.supplier?.supplierName}</p>
+                                                <p className="text-xs text-gray-500">{item?.importItem?.supplier?.supplierId}</p>
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
                                         <span className="font-semibold text-blue-600">
-                                            {item?.importItem?.requestQuantity}
+                                            {item?.importItem?.requestQuantity} /{item?.importItem?.unit?.unitName}
                                         </span>
                                     </TableCell>
                                     <TableCell>

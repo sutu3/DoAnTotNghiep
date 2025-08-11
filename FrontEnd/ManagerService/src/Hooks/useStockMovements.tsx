@@ -13,13 +13,10 @@ export const useStockMovements = (warehouseId: string, timeFilter: string) => {
 
     useEffect(() => {
         const fetchMovements = async () => {
-            if (!warehouseId) return;
-
             setLoading(true);
             setError(null);
 
             try {
-                // Tính toán khoảng thời gian dựa trên timeFilter
                 const now = new Date();
                 let fromDate: Date;
 
@@ -40,8 +37,23 @@ export const useStockMovements = (warehouseId: string, timeFilter: string) => {
                 const fromDateStr = fromDate.toISOString();
                 const toDateStr = now.toISOString();
 
-                const url = `${API_ROUTES.inventory.movements(null).warehouseDateRange(warehouseId, fromDateStr, toDateStr)}`;
-                const response:ApiResponse<StockMovement[]> = await fetchApi({method:"GET",url,body:undefined,headers:undefined});
+                let url: string;
+                if (warehouseId === "ALL") {
+                    // API cho tất cả warehouse
+                    url = `${API_ROUTES.inventory.movements(null).allWarehouseDateRange(fromDateStr, toDateStr)}`;
+                } else if (warehouseId) {
+                    // API cho warehouse cụ thể
+                    url = `${API_ROUTES.inventory.movements(null).warehouseDateRange(warehouseId, fromDateStr, toDateStr)}`;
+                } else {
+                    return;
+                }
+
+                const response: ApiResponse<StockMovement[]> = await fetchApi({
+                    method: "GET",
+                    url,
+                    body: undefined,
+                    headers: undefined
+                });
 
                 if (!response.success) {
                     throw new Error('Failed to fetch stock movements');

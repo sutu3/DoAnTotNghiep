@@ -2,7 +2,7 @@ import React from 'react';
 import { BadgeCheck, Warehouse } from "lucide-react";
 import clsx from "clsx";
 import {getRandomLightColor} from "@/Utils/RandumColor.tsx";
-import {TaskType} from "@/Store/TaskSlice.tsx";
+import {TaskType} from "@/pages/TaskType/Component/Store/TaskSlice.tsx";
 
 // Renamed from TaskType to TaskTypeCard for clarity
 

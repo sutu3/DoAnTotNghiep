@@ -20,17 +20,48 @@ export const API_ROUTES = {
     Authen:()=>{
       const baseUrl = TestGateWay+"/authen/api/auth";
       return{
+        changePassword:baseUrl+"/change-password",
         login:baseUrl+"/login",
         logout:baseUrl+"/logout",
         refresh:baseUrl+"/refresh",
+          forgotPassword: `${baseUrl}/forgot-password`,
+          resetPassword: `${baseUrl}/reset-password`,
       }
     },
   },
   dashboard: {
+    allStats: (timeFilter: string) =>
+        `${TestGateWay}/inventories/api/dashboard/stats/all?timeFilter=${timeFilter}`,
     stats: (warehouseId: string, timeFilter: string) =>
         `${TestGateWay}/inventories/api/dashboard/stats/warehouse/${warehouseId}?timeFilter=${timeFilter}`
   },
   inventory:{
+    checkDetails:(page:pageApi|null)=> {
+      const base=`${TestGateWay}/inventories/api/inventory/check-details/`
+      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      return{
+        create: `${base}`,
+        update:(SheetId:string)=> `${base}/${SheetId}`,
+      }
+    },
+    checkSheets:(page:pageApi|null)=> {
+      const base=`${TestGateWay}/inventories/api/inventory/check-sheets`
+      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      return{
+        create: `${base}`,
+        getAll: () => {
+          return{
+            byWarehouse:(warehouseId:string)=>base+"/warehouse/"+warehouseId+pageUrl,
+            byUser:()=>base+"/performed-by"+pageUrl
+          }
+        },
+        getById: (id: string) => `${TestGateWay}/inventories/api/inventory/check-sheets/${id}`,
+        updateStatusComplete: (id: string) => `${base}/${id}/status-completed`,
+        updateStatusApprove: (id: string) => `${base}/${id}/status-Approve`,
+        process: (id: string) => `${TestGateWay}/inventories/api/inventory/check-sheets/${id}/process`,
+        delete: (id: string) => `${TestGateWay}/inventories/api/inventory/check-sheets/${id}`
+      }
+    },
     InventoryWarehouse:(page:pageApi|null)=>{
       const base=`${TestGateWay}/inventories/api/inventory/warehouses`
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
@@ -41,7 +72,8 @@ export const API_ROUTES = {
           const search=base+"/search";
           return{
             byProductId:(productId:string)=>({
-              getProduct:`${search}/product/${productId}`
+              getProduct:`${search}/product/${productId}`,
+              getWarehouse:(warehouseId:string)=>`${search}/product/${productId}/warehouse/${warehouseId}`,
             }),
             byWarehouseId:(warehouseId:string)=>({
               getWarehouse:`${search}/warehouse/${warehouseId}${pageUrl}`
@@ -64,7 +96,9 @@ export const API_ROUTES = {
               getProduct:`${search}/product/${productId}/getFirst`,
               getAll:`${search}/product/${productId}`,
             }),
-
+            byWarehouseId:(warehouseId:string)=>({
+              getWarehouse:`${search}/warehouse/${warehouseId}${pageUrl}`,
+            }),
           }
         })
       }
@@ -75,6 +109,8 @@ export const API_ROUTES = {
       return{
         addMovement: base,
         create: base,
+        allWarehouseDateRange: (fromDate: string, toDate: string) =>
+            `${base}/search/all-warehouses/date-range?fromDate=${fromDate}&toDate=${toDate}`,
         warehouseDateRange: (warehouseId: string, fromDate: string, toDate: string) =>
             `${base}/search/warehouse/${warehouseId}/date-range?fromDate=${fromDate}&toDate=${toDate}`,
         search:()=>{
@@ -121,6 +157,18 @@ export const API_ROUTES = {
           byWarehouseId:(warehouseId:string)=>({
              getAllOrdersByStatusPendingAndApprove:base+"/pending-approvals/search/warehouse/"+warehouseId+pageUrl,
            }),
+            Filter:(warehouseId: string | null, status: string | null) => {
+              const pages = page ? `pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+
+              const params: string[] = [];
+                if (warehouseId) params.push(`warehouseId=${warehouseId}`);
+                if (status) params.push(`status=${status}`);
+              params.push(pages)
+              const url = search + "?" + params.join("&");
+                return {
+                    getAll: url,
+                };
+            },
           }
         }),
         changeStatus:(orderId:string)=>{
@@ -152,6 +200,7 @@ export const API_ROUTES = {
     },
     receiptWarehouse:(page: pageApi | null)=>{
       const base = `${TestGateWay}/orders/api/warehouse-receipts`;
+      const pageUrl = page ? `pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
       return{
         addReceipt:base,
         getByReceiptId:(receiptId:string)=>base+"/"+receiptId,
@@ -160,9 +209,52 @@ export const API_ROUTES = {
         search:()=>{
           const search=base+"/search";
           return {
-            byWarehouseId:(warehouseId:string)=>search+"/warehouse/"+warehouseId,
+            byWarehouseReceipts:(warehouseReceiptId:string)=>search+"/warehouseReceipt/"+warehouseReceiptId,
+            byWarehouseId:(warehouseId: string|null,status:string|null,receiptId:string|null)=>{
+              const params: string[] = [];
+              if (warehouseId) params.push(`warehouseId=${warehouseId}`);
+              if (status) params.push(`status=${status}`);
+              if (receiptId) params.push(`receiptId=${receiptId}`);
+              params.push(pageUrl)
+              const url = search + "?" + params.join("&");
+
+              return {
+                getAll: url,
+              };
+            }
           }
         }
+      }
+    },
+    deliveryWarehouse:(page: pageApi | null)=>{
+      const base = `${TestGateWay}/orders/api/warehouse-deliveries`;
+      const pageUrl = page ? `pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      return{
+        addReceipt:base,
+        getByReceiptId:(deliveryId:string)=>base+"/"+deliveryId,
+        updateComplete:(deliveryId:string)=>base+`/${deliveryId}/complete`,
+        updateItem:(receiptId:string,receiptItemId:string)=>base+`/${receiptId}/items/${receiptItemId}`,
+
+        search:(()=>{
+          const search=base+"/search";
+          return{
+            byWarehouseId:(warehouseId: string|null,status:string|null)=>{
+              const params: string[] = [];
+              if (warehouseId) params.push(`warehouseId=${warehouseId}`);
+              if (status) params.push(`status=${status}`);
+              const url = search+"/getAllPage" + "?" + params.join("&");
+              return {
+                byStatus: url.slice(0,url.length)+"&"+pageUrl,
+                getAll: `${search}/warehouse/${warehouseId}?${pageUrl}`,
+              };
+            },
+            byDeliveryId:(deliveryId:string)=>{
+                return {
+                    getAll: `${search}/deliveryId/${deliveryId}`,
+                };
+            }
+          }
+        })
       }
     },
     importOrder:(page: pageApi | null)=>{
@@ -226,15 +318,29 @@ export const API_ROUTES = {
   warehouse: {
     stacks: (page: pageApi | null) => {
       const base = `${TestGateWay}/warehouses/api/stacks`;
-      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      const pageUrl = page ? `pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
       return {
         updateStacks:(stackId:string)=>base+"/"+stackId,
         addStacks: base,
-        search: {
-          byWarehouseId: (warehouseId: string) => ({
-            getAll: `${base}/ByWarehouse/${warehouseId}${pageUrl}`,
-            getAllList: `${base}/ByWarehouse/${warehouseId}/list`,
-          }),
+        search:()=> {
+          const search = `${base}/search`
+            return {
+              Filter: (warehouseId: string | null, stackName: string | null) => {
+                const params: string[] = [];
+                if (warehouseId) params.push(`warehouseId=${warehouseId}`);
+                if (stackName) params.push(`stackName=${stackName}`);
+                params.push(pageUrl)
+                const url = search+"/filter" + "?" + params.join("&");
+
+                return {
+                  getAll: url,
+                };
+              },
+              byWarehouseId: (warehouseId: string) => ({
+                getAllList: `${base}/ByWarehouse/${warehouseId}/list`,
+              }),
+
+            }
         },
       };
     },
@@ -270,7 +376,7 @@ export const API_ROUTES = {
   product:{
     product:(page: pageApi | null) => {
       const base = `${TestGateWay}/products/api/products`;
-      const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
+      const pageUrl = page ? `pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
     return{
       addProduct: base,
       deleteProduct:(productId:string)=>base+"/"+productId,
@@ -279,19 +385,24 @@ export const API_ROUTES = {
         return{
           byProduct:(productId:string)=>`${search}/productId/${productId}`,
           byWarehouseId: () => ({
-            getAll: `${search}/productPage${pageUrl}`,
+            getAll: `${search}/productPage?${pageUrl}`,
           }),
-          bySupplierAndWarehouse: (warehouseId: string | null, supplierId: string | null) => {
+          bySupplierAndWarehouse: (warehouseId: string | null, supplierId: string | null
+                                   ,categoryId:string|null,unitId:string|null
+                                   ,productName:string|null) => {
             const params: string[] = [];
 
             if (warehouseId) params.push(`warehouseId=${warehouseId}`);
             if (supplierId) params.push(`supplierId=${supplierId}`);
-            params.push(pageUrl); // đảm bảo pageUrl là chuỗi dạng `page=0&size=10` hoặc `pageUrl=''`
+            if (productName) params.push(`productName=${productName}`);
+            if (categoryId) params.push(`categoryId=${categoryId}`);
+            if (unitId) params.push(`unitId=${unitId}`);
+            params.push(pageUrl)
 
             const url = search + "?" + params.join("&");
 
             return {
-              getAll: url.slice(0,url.length-1),
+              getAll: url,
             };
           }
         }
@@ -367,6 +478,7 @@ export const API_ROUTES = {
     return {
       create: base,
       delete: (id: string) => `${base}/${id}`,
+      getMyInfor: `${base}/search/idUser`,
       search: (() => {
         const searchUrl = `${base}/search`;
         return {
@@ -377,7 +489,8 @@ export const API_ROUTES = {
             getAll: `${searchUrl}/userName/${username}${pageUrl}`,
           }),
           byUserId: (userId: string) => ({
-            role:`${searchUrl}/user/${userId}/roles`
+            role:`${searchUrl}/user/${userId}/roles`,
+            infor:`${searchUrl}/user/${userId}/infor`
           })
         };
       })(),
@@ -406,6 +519,10 @@ export const API_ROUTES = {
       const pageUrl = page ? `?pageNumber=${page.pageNumber}&pageSize=${page.pageSize}` : "";
       return {
         addTaskUser: base,
+        statsInfor:base+"/stats",
+        updateStatus: (taskUserId: string) => `${base}/${taskUserId}/status`,
+        updateCompleted: (taskUserId: string) => `${base}/${taskUserId}/Complete`,
+        updateCancel: (taskUserId: string) => `${base}/${taskUserId}/Cancel`,
         search:()=>{
           const searchUrl = `${base}/search`;
           return {
@@ -423,7 +540,7 @@ export const API_ROUTES = {
 
       return {
         addTask: base,
-
+        updateStatus: (taskId: string) => `${base}/${taskId}/status`,
         search: (() => {
           const searchUrl = `${base}/search`;
 
@@ -437,11 +554,23 @@ export const API_ROUTES = {
               if (warehouseId) params.append("warehouseId", warehouseId);
               if (taskType) params.append("taskName", taskType);
 
-
               return {
                 getAll: `${searchUrl}?${params.toString()}${pageUrl}`,
               };
             },
+              filter: (
+                  warehouseId: string | null,
+                  taskType: string | null,
+              ) => {
+                  const params = new URLSearchParams();
+
+                  if (warehouseId) params.append("warehouseId", warehouseId);
+                  if (taskType) params.append("taskName", taskType);
+
+                  return {
+                      stats: `${base}/stats?${params.toString()}`,
+                  };
+              },
           };
         })(),
       };

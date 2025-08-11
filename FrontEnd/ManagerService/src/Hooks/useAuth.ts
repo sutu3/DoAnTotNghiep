@@ -9,7 +9,6 @@ export const useAuth = () => {
         const checkAuth = async () => {
             const token = localStorage.getItem("token");
             const role = await getUserRoleFromToken(); // ← await để lấy giá trị thực
-            console.log(role); // giờ sẽ là "manager"
 
             setIsAuthenticated(!!token);
             setUserRole(role);

@@ -13,7 +13,7 @@ export interface StockMovement {
     referenceOrderId?: string;
     performedBy?: string;
     performedByUser?:User;
-    productDetails:Product
+    productDetails?:Product
 
     note?: string;
     unitCost?: number;
@@ -30,6 +30,7 @@ export interface StockMovementCreate {
     performedBy?: string;
     note?: string;
     unitCost?: number;
+    checkSheetId?:string;
 }
 
 interface StockMovementState {
@@ -52,6 +53,7 @@ const initialState: StockMovementState = {
         quantityAfter: 0,
         createdAt: null,
         updatedAt: null,
+        productDetails: undefined
     },
     stockMovementCreate: {
         inventoryWarehouseId: "",

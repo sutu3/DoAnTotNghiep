@@ -6,12 +6,12 @@ import { Icon } from "@iconify/react";
 import ExportOrderTable from "@/components/Admin/OrderExport/Table/ExportOrderTable.tsx";
 import ExportOrderDetailModal from "@/components/Admin/OrderExport/Modal/ExportOrderDetailModal.tsx";
 import ExportOrderRejectModal from "@/components/Admin/OrderExport/Modal/ExportOrderRejectModal.tsx";
-import OrderExportSlice, { ExportOrder } from "@/Store/ExportOrderSlice.tsx";
+import OrderExportSlice, { ExportOrder } from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 import BreadcrumbsUI from "@/components/UI/Breadcrumbs/BreadcrumbsUI.tsx";
 import {
     ApproveExportOrder,
     RejectExportOrder
-} from "@/Store/Thunk/ExportOrderThunk.tsx";
+} from "@/pages/ExecuteExport/Store/Thunk/ExportOrderThunk.tsx";
 import {useDispatch} from "react-redux";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 

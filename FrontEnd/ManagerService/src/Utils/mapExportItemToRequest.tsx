@@ -1,5 +1,5 @@
 // utils/mapExportItemToRequest.tsx
-import {ExportItemCreate, ExportOrderItem} from "@/Store/ExportOrderSlice.tsx";
+import {ExportItemCreate, ExportOrderItem} from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 
 export const mapExportOrderItemToCreate = (
     item: ExportOrderItem,

@@ -1,31 +1,31 @@
-// pages/Admin/TaskAssignments/Create/page.tsx
 import  { useEffect, useState } from 'react';
 import { Card, CardBody, Button } from '@heroui/react';
 import { ArrowLeft, Save  } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { TaskTypeSelector, UserSelector } from '@/Store/Selector';
+import { TaskTypeSelector, UsersSelector } from '@/Store/Selector';
 import { MiddleGetAllTaskType } from '@/Store/TaskTypeSlice';
 import { MiddleGetAllUser } from '@/Store/Thunk/UserThunk';
-import {  TaskCreated } from '@/Store/TaskSlice';
+import {  TaskCreated } from '@/pages/TaskType/Component/Store/TaskSlice.tsx';
 import TaskAssignmentForm from "@/components/Admin/TaskType/Form/TaskAssignmentForm.tsx";
 import TaskBasicInfoForm from "@/components/Admin/TaskType/Form/TaskBasicInfor.tsx";
 import PageHeader from "@/components/Admin/TaskType/PageHeader.tsx";
 import TaskPreviewCard from "@/components/Admin/TaskType/TaskPreviewCard.tsx";
 import {MiddleGetWarehouseByUser} from "@/Store/Thunk/WarehouseThunk.tsx";
-import {TaskUserAssignment} from "@/Store/TaskUserSlice.tsx";
-import {MiddleAddTaskUser} from "@/Store/Thunk/TaskUserThunk.tsx";
+import {TaskUserAssignment} from "@/pages/TaskType/Component/Store/TaskUserSlice.tsx";
+import {MiddleAddTaskUser} from "@/pages/TaskType/Component/Store/TaskUserThunk.tsx";
 
 const CreateTaskAssignmentPage = () => {
     const [assignedUsers, setAssignedUsers] = useState<TaskUserAssignment[]>([]);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const taskTypes = useSelector(TaskTypeSelector);
-    const users = useSelector(UserSelector);
+    const users = useSelector(UsersSelector);
 
     const [loading, setLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState<TaskCreated>({
+        requiresEvidence: false,
         taskType: '',
         level: 'Medium',
         description: '',

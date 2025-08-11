@@ -12,6 +12,16 @@ export const columns = [
   { name: "Status", uid: "status", sortable: true },
   { name: "Actions", uid: "actions" },
 ];
+export interface UserUpdate{
+  dateOfBirth?: string;
+  gender?: string;
+  homeAddress?: string;
+  userName: string;
+  fullName: string;
+  email: string;
+  urlImage: string;
+  phoneNumber: string;
+}
 export interface UserData {
   userId: string;
   userName: string;
@@ -19,10 +29,13 @@ export interface UserData {
   email: string;
   urlImage: string;
   phoneNumber: string;
-  roles:[]
-  status: "Active" | "InActive";
-  taskUsers: [];
-  warehouses: Warehouse;
+  roles?:[]
+  status?: "Active" | "InActive";
+  taskUsers?: [];
+  warehouses?: Warehouse;
+  dateOfBirth?: string;
+  gender?: string;
+  homeAddress?: string;
 }
 export interface UserCreate {
   userName: string;
@@ -35,31 +48,13 @@ export interface UserCreate {
 export interface UserState {
   userList: UserData[];
   totalPage: 0,
-  user: UserData;
+  user: UserData|null;
 }
 
 const initialState:UserState = {
   userList: [],
   totalPage:0,
-  user: {
-    userId: "3126d2f9-3810-44d3-8714-a6870855681d",
-    userName: "",
-    fullName: "",
-    email: "",
-    urlImage: "",
-    phoneNumber: "",
-    status: "Active",
-    taskUsers: [],
-    warehouses: {
-      warehouseId: "",
-      warehouseName: "",
-      address: "",
-      street: "",
-      district: "",
-      country: "",
-      managerId: ""
-    }
-  },
+  user:null ,
 };
 const UserSlice = createSlice({
   name: "user",
@@ -74,8 +69,20 @@ const UserSlice = createSlice({
     setUpdateUser:(state, action) => {
       state.userList=state.userList.map((user) =>
           user.userId == action.payload?.userId?action.payload:user);
+    },
+    setGetUser:(state, action) => {
+        state.user = action.payload || null;
+    },
+    setAddUser:(state, action) => {
+        const newUser: UserData = action.payload;
+        const existingUserIndex = state.userList.findIndex(user => user.userId === newUser.userId);
+        if (existingUserIndex !== -1) {
+            state.userList[existingUserIndex] = newUser; // Update existing user
+        } else {
+            state.userList.push(newUser); // Add new user
+        }
     }
   },
 });
-export const { initToTalPage,setUserList,setUpdateUser } = UserSlice.actions;
+export const { initToTalPage,setUserList,setAddUser,setUpdateUser,setGetUser } = UserSlice.actions;
 export default UserSlice;

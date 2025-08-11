@@ -30,9 +30,14 @@ export interface Product {
     supplier: Supplier;
     warehouses: Warehouse;
     createByUser: UserData;
+    quantity?: number;
     isActive: boolean;
     category: Category;
     unit: Unit;
+    minStockLevel?: number,
+    maxStockLevel?: number,
+    pendingApprovedImportQuantity?: number,
+    pendingApprovedExportQuantity?: number,
     createdAt: Date;
     updatedAt: Date;
 }

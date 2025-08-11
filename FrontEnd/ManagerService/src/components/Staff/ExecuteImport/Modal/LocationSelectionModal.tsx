@@ -24,18 +24,8 @@ export default function LocationSelectionModal({
                                                    onConfirmLocation,
                                                }: LocationSelectionModalProps) {
     const stackBinData=useSelector(StacksSelector);
-    const dispatch = useDispatch();
     const [selectedStack, setSelectedStack] = useState("");
     const [selectedBin, setSelectedBin] = useState("");
-
-    useEffect(() => {
-        if (isOpen && warehouseId) {
-            const fetchData = async () => {
-                await (dispatch as any)(MiddleGetAllStackList(warehouseId));
-            };
-            fetchData();
-        }
-    }, [isOpen, warehouseId]);
 
 
     const handleStackSelect = (stackId: string) => {

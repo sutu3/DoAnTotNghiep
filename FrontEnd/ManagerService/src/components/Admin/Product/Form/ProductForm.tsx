@@ -34,8 +34,6 @@ export default function ProductForm({formData,setformData,warehouses,setWarehous
         e.preventDefault();
         // Logic submit form
         setLoading(true);
-
-
         const imageResponse:UploadResponse=await (dispatch as any)(MiddleUploadImage());
         const newFormData:ProductCreate = {
             ...formData,
@@ -93,6 +91,7 @@ export default function ProductForm({formData,setformData,warehouses,setWarehous
                     placeholder="0"
                     value={product.price?.toString() || ''}
                     onChange={(e) => updateField('price', parseFloat(e.target.value) || 0)}
+                    max={10000000}
                     startContent={
                         <div className="pointer-events-none flex items-center">
                             <span className="text-default-400 text-small">₫</span>

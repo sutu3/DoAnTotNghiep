@@ -7,7 +7,6 @@ import {
     TableCell,
     Chip,
     Button,
-    Input,
     Select,
     SelectItem,
     Pagination,
@@ -15,12 +14,14 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import {useEffect, useState} from "react";
-import OrderExportSlice, { ExportOrder } from "@/Store/ExportOrderSlice.tsx";
+import OrderExportSlice, { ExportOrder } from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 import {pageApi} from "@/Api/UrlApi.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {MiddleGetOrderExportPending_Approve} from "@/Store/Thunk/ExportOrderThunk.tsx";
-import {ExportOrderSelector} from "@/Store/Selector.tsx";
+import {
+    MiddleGetAllExportOrderByStatus,
+} from "@/pages/ExecuteExport/Store/Thunk/ExportOrderThunk.tsx";
 import SelectWarehouseApprove from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
+import {ExportOrderSelector, ToTalPageOrderExport} from "@/pages/ExecuteExport/Store/Selector.tsx";
 
 interface ExportOrderTableProps {
     searchValue: string;
@@ -43,24 +44,26 @@ export default function ExportOrderTable({
                                          }: ExportOrderTableProps) {
     const [currentPage, setCurrentPage] = useState(1);
     const orders=useSelector(ExportOrderSelector);
-    const [totalPages, setTotalPages] = useState(5);
+    const totalPages=useSelector(ToTalPageOrderExport);
     const [loading,setLoading] = useState(false);
     const [warehouses, setWarehouses] = useState<string>("");
     const dispatch = useDispatch();
+    console.log(totalPages)
 // Trong useEffect để fetch data
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const PageApi: pageApi = { pageNumber: currentPage - 1, pageSize: totalPages };
+            const page: pageApi = { pageNumber: currentPage - 1, pageSize: 5 };
             dispatch(OrderExportSlice.actions.setOrderExportList([]));
             try {
-                await (dispatch as any)(MiddleGetOrderExportPending_Approve(warehouses,PageApi));
+                const status=statusFilter==="all"?null:statusFilter;
+                await (dispatch as any)(MiddleGetAllExportOrderByStatus(warehouses,status,page));
             } finally {
                 setLoading(false);
             }
         };
         fetchData();
-    }, [currentPage, totalPages,warehouses]);
+    }, [currentPage,warehouses,statusFilter]);
     const getStatusColor = (status: string) => {
         switch (status) {
             case "CREATED": return "warning";
@@ -108,9 +111,9 @@ export default function ExportOrderTable({
                             variant="bordered"
                         >
                             <SelectItem key="all">Tất cả</SelectItem>
-                            <SelectItem key="CREATED">Chờ duyệt</SelectItem>
+                            <SelectItem key="PENDING_APPROVAL">Chờ duyệt</SelectItem>
                             <SelectItem key="APPROVED">Đã duyệt</SelectItem>
-                            <SelectItem key="InProgress">Đang xử lý</SelectItem>
+                            <SelectItem key="IN_PROGRESS">Đang xử lý</SelectItem>
                             <SelectItem key="COMPLETED">Hoàn thành</SelectItem>
                             <SelectItem key="CANCELLED">Đã hủy</SelectItem>
                         </Select>
@@ -151,10 +154,10 @@ export default function ExportOrderTable({
                                 </TableCell>
                                 <TableCell>
                                     <div className="text-sm">
-                                        {new Date(order.requestDate).toLocaleDateString('vi-VN')}
+                                        {new Date(order.createdAt||"").toLocaleDateString('vi-VN')}
                                     </div>
                                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                                        {new Date(order.requestDate).toLocaleTimeString('vi-VN', {
+                                        {new Date(order?.createdAt||"").toLocaleTimeString('vi-VN', {
                                             hour: '2-digit',
                                             minute: '2-digit'
                                         })}
@@ -181,7 +184,7 @@ export default function ExportOrderTable({
                                         color="primary"
                                         startContent={<Icon icon="mdi:package-variant" className="text-xs" />}
                                     >
-                                        {order.itemCount || 0} sản phẩm
+                                        {order.itemCount} sản phẩm
                                     </Chip>
                                 </TableCell>
                                 <TableCell>

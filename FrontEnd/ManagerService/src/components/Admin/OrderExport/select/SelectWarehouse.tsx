@@ -6,7 +6,7 @@ import { Warehouse } from "@/Store/WarehouseSlice.tsx";
 import { MiddleGetWarehouseByUser } from "@/Store/Thunk/WarehouseThunk.tsx";
 import { pageApi } from "@/Api/UrlApi.tsx";
 import { Building2 } from "lucide-react";
-import {  OrderRequestExportCreate} from "@/Store/ExportOrderSlice.tsx";
+import {  OrderRequestExportCreate} from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 
 interface SelectProps {
     formData:  OrderRequestExportCreate;

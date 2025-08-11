@@ -26,7 +26,7 @@ export const updateStack = createAsyncThunk(
 export const GetAllStack = createAsyncThunk(
     "stack/getAllStack",
     async (
-        { warehouseId, page }: { warehouseId: string; page: pageApi },
+        { warehouseId,stackName, page }: { warehouseId: string|null,stackName:string|null, page: pageApi },
         { rejectWithValue }
     ) =>
         await callApiThunk(
@@ -34,9 +34,22 @@ export const GetAllStack = createAsyncThunk(
             API_ROUTES
                 .warehouse
                 .stacks(page)
-                .search
-                .byWarehouseId( warehouseId)
+                .search()
+                .Filter( warehouseId,stackName)
                 .getAll,
+            undefined,
+            rejectWithValue
+        )
+);
+export const GetStats = createAsyncThunk(
+    "stack/GetStats",
+    async (
+        { warehouse,taskType }: { warehouseId: string|null,stackName:string|null},
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES.user.tasks(null).search().byTaskTypeNameAndWarehouse(warehouse,taskType).getStats,
             undefined,
             rejectWithValue
         )
@@ -52,7 +65,7 @@ export const GetAllStackList = createAsyncThunk(
             API_ROUTES
                 .warehouse
                 .stacks(null)
-                .search
+                .search()
                 .byWarehouseId( warehouseId)
                 .getAllList,
             undefined,
@@ -60,11 +73,11 @@ export const GetAllStackList = createAsyncThunk(
         )
 );
 
-export const MiddleGetAllStack = (page: pageApi,warehouse:string) => {
+export const MiddleGetAllStack = (page: pageApi,warehouse:string|null,stackName:string|null) => {
     return async function check(dispatch: any) {
         try {
 
-            const action = await dispatch(GetAllStack({ warehouseId:warehouse, page }));
+            const action = await dispatch(GetAllStack({ warehouseId:warehouse,stackName, page }));
             dispatch(setStackList(action.payload.result.content));
             dispatch(initToTalPage(action.payload.result.totalPages));
         } catch (error: any) {
