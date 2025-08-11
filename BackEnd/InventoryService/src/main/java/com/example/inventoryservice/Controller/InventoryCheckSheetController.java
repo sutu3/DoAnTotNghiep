@@ -46,11 +46,11 @@ public class InventoryCheckSheetController {
     }
 
     @GetMapping("/performed-by")
-    public ApiResponse<List<InventoryCheckSheetResponse>> getAllByPerformedBy(
+    public ApiResponse<Page<InventoryCheckSheetResponse>> getAllByPerformedBy(
             @RequestParam("pageNumber") int page,
             @RequestParam("pageSize") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return ApiResponse.<List<InventoryCheckSheetResponse>>builder()
+        return ApiResponse.<Page<InventoryCheckSheetResponse>>builder()
                 .Result(inventoryCheckSheetService.getAllByPerformedBy(pageable))
                 .code(0)
                 .message("SuccessFull")

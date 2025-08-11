@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
+
 @FeignClient(name = "warehouse-service",
         //url = "https://doantotnghiep-pb6y.onrender.com"
         url = "http://localhost:8082"
@@ -26,4 +28,6 @@ public interface WarehouseClient {
     ApiResponse<StackResponse> updateBinOccupancy(@PathVariable String binId, @RequestBody UpdateOccupancyRequest request);
     @GetMapping(value = "/api/warehouses/{warehouseId}/capacity", consumes = "application/json")
     ApiResponse<WarehouseCapacityResponse> getWarehouseCapacity(@PathVariable String warehouseId);
+    @GetMapping(value = "/api/warehouses/getListgetList", consumes = "application/json")
+    ApiResponse<List<WarehouseCapacityResponse>> getAllList();
 }

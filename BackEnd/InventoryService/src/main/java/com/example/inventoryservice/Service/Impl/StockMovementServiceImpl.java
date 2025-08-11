@@ -127,7 +127,8 @@ public class StockMovementServiceImpl implements StockMovementService {
                                 inventoryWarehouse.getQuantity(), request.getQuantity());
                         throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
                     }
-                    BigDecimal newQuantityExport = inventoryWarehouse.getQuantity().subtract(request.getQuantity().multiply(BigDecimal.valueOf(-1)));
+                    BigDecimal newQuantityExport = inventoryWarehouse.getQuantity()
+                            .add(request.getQuantity());
                     stockMovement.setQuantityAfter(newQuantityExport);
                     log.info("EXPORT: {} - {} = {}", inventoryWarehouse.getQuantity(), request.getQuantity(), newQuantityExport);
                     break;
@@ -244,6 +245,17 @@ public class StockMovementServiceImpl implements StockMovementService {
         log.info("Getting stock movements for warehouse: {} from {} to {}", warehouseId, fromDate, toDate);
 
         List<StockMovement> movements = stockMovementRepo.findByWarehouseAndDateRange(warehouseId, fromDate, toDate);
+
+        return movements.stream()
+                .map(this::enrich)
+                .collect(Collectors.toList());
+    }
+    @Override
+    public List<StockMovementResponse> getAllWarehousesStockMovementsByDateRange(LocalDateTime fromDate, LocalDateTime toDate) {
+        log.info("Getting stock movements for all warehouses from {} to {}", fromDate, toDate);
+
+        // Lấy tất cả stock movements trong khoảng thời gian, không filter theo warehouse
+        List<StockMovement> movements = stockMovementRepo.findByDateRange(fromDate, toDate);
 
         return movements.stream()
                 .map(this::enrich)

@@ -15,6 +15,8 @@ public class WarehouseDeliverySpecification {
     }
     public static Specification<WarehouseDelivery> hasDeliveryId(String deliveryId) {
         return (root, query, cb) ->
-                deliveryId == null ? null : cb.equal(root.get("deliveryId"), deliveryId);
+                (deliveryId == null || deliveryId.isBlank() || deliveryId.equals("0"))
+                        ? null
+                        : cb.like(root.get("deliveryId"), "%" + deliveryId + "%");
     }
 }

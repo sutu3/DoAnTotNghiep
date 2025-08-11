@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 public interface InventoryCheckSheetService {
     Page<InventoryCheckSheetResponse> getAllByWarehouse(Pageable pageable, String warehouseId);
-    List<InventoryCheckSheetResponse> getAllByPerformedBy(Pageable pageable);
+    Page<InventoryCheckSheetResponse> getAllByPerformedBy(Pageable pageable);
     InventoryCheckSheet getById(String id);
     InventoryCheckSheetResponse getByIdResponse(String id);
     InventoryCheckSheetResponse createInventoryCheckSheet(InventoryCheckSheetRequest request);

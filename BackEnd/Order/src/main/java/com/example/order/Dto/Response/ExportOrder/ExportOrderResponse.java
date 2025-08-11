@@ -36,6 +36,8 @@ public class ExportOrderResponse {
     String description;
 
     LocalDateTime deliveryDate;
+    Integer itemCount;
+
 
     String status ;
 
@@ -44,6 +46,7 @@ public class ExportOrderResponse {
     UserResponse approvedBy;
 
     LocalDateTime approvedDate;
+    LocalDateTime createdAt;
 
 //    List<ExportItem> exportItems;
 }

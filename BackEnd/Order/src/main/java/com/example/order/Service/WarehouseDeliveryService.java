@@ -2,6 +2,7 @@ package com.example.order.Service;
 
 import com.example.order.Dto.Request.DeliveryItemRequest;
 import com.example.order.Dto.Request.WarehouseDeliveryRequest;
+import com.example.order.Dto.Response.DeliveryItem.DeliveryItemResponse;
 import com.example.order.Dto.Response.WarehouseDelivery.WarehouseDeliveryResponse;
 import com.example.order.Enum.DeliveryStatus;
 import com.example.order.Module.WarehouseDelivery;
@@ -18,7 +19,7 @@ public interface WarehouseDeliveryService {
     WarehouseDeliveryResponse getByIdResponse(String deliveryId);
     List<WarehouseDeliveryResponse> getByOrderId(String orderId);
     Page<WarehouseDeliveryResponse> getByStatusAndWarehouse(String warehouseId, String status, Pageable pageable);
-
+    List<DeliveryItemResponse> getDeliveryItems(String deliveryId);
     WarehouseDeliveryResponse addDeliveryItem(String deliveryId, DeliveryItemRequest request);
     WarehouseDeliveryResponse updateDeliveryStatus(String deliveryId, DeliveryStatus status);
     List<WarehouseDeliveryResponse> getAllByWarehouseId(String warehouseId);

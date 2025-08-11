@@ -108,12 +108,8 @@ public class ExportOrderServiceImpl implements ExportOrderService {
         String userId = GetCurrentUserId.getCurrentUserId();
         exportOrder.setStatus(status);
         exportOrder.setUpdatedAt(LocalDateTime.now());
-
-        if (status == ExportOrderStatus.APPROVED) {
-            exportOrder.setApprovedBy(userId);
-            exportOrder.setApprovedDate(LocalDateTime.now());
-        }
-
+        exportOrder.setApprovedBy(userId);
+        exportOrder.setApprovedDate(LocalDateTime.now());
         ExportOrder updatedOrder = exportOrderRepo.save(exportOrder);
         return entry(updatedOrder);
     }
@@ -164,10 +160,12 @@ public class ExportOrderServiceImpl implements ExportOrderService {
         CompletableFuture.allOf(warehouseFuture, userFuture).join();
 
         ExportOrderResponse exportOrderResponse = exportOrderMapper.toResponse(exportOrder);
-
+        exportOrderResponse.setCreatedAt(exportOrder.getCreatedAt());
         exportOrderResponse.setCreateByUser(userFuture.join());
         exportOrderResponse.setWarehouse(warehouseFuture.join());
-
+        if(exportOrder.getExportItems() != null) {
+            exportOrderResponse.setItemCount(exportOrder.getExportItems().size());
+        }
         if(exportOrder.getApprovedBy() != null && !exportOrder.getApprovedBy().isEmpty()) {
             CompletableFuture<UserResponse> adminFuture = asyncServiceImpl
                     .getUserAsync(exportOrder.getApprovedBy());

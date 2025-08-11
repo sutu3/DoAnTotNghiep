@@ -61,12 +61,11 @@ public class InventoryCheckSheetServiceImpl implements InventoryCheckSheetServic
     }
 
     @Override
-    public List<InventoryCheckSheetResponse> getAllByPerformedBy(Pageable pageable) {
+    public Page<InventoryCheckSheetResponse> getAllByPerformedBy(Pageable pageable) {
         var userId = GetCurrentUserId.getCurrentUserId();
         return inventoryCheckSheetRepo.findAllByPerformedByAndIsDeleted(userId, false,pageable)
-                .stream()
-                .map(this::enrich)
-                .collect(Collectors.toList());
+                .map(this::enrich);
+
     }
 
     @Override

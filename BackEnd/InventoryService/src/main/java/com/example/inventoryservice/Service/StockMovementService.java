@@ -23,5 +23,6 @@ public interface StockMovementService {
     List<StockMovementResponse> getMovementsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
     StockMovementResponse enrich(StockMovement stockMovement);
     List<StockMovementResponse> getStockMovementsByWarehouseAndDateRange(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate);
+    List<StockMovementResponse> getAllWarehousesStockMovementsByDateRange(LocalDateTime fromDate, LocalDateTime toDate);
 
 }

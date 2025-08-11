@@ -8,5 +8,5 @@ import java.math.BigDecimal;
 
 @Service
 public interface DashboardStatsService {
-    DashboardStatsResponse getDashboardStats(String warehouseId, String timeFilter);
-}
+    DashboardStatsResponse getWarehouseStats(String warehouseId, String timeFilter);
+    DashboardStatsResponse getAllWarehousesStats(String timeFilter);}

@@ -4,6 +4,7 @@ import com.example.userservice.Dto.Request.LevelRequest;
 import com.example.userservice.Dto.Request.StatusRequest;
 import com.example.userservice.Dto.Request.TaskRequest;
 import com.example.userservice.Dto.Responses.ApiResponse;
+import com.example.userservice.Dto.Responses.Task.StatsResponse;
 import com.example.userservice.Dto.Responses.Task.TaskResponse;
 import com.example.userservice.Form.TaskForm;
 import com.example.userservice.Service.TaskService;
@@ -65,6 +66,19 @@ public class TaskController {
                 .success(true)
                 .build();
     }
+    @GetMapping("/stats")
+    public ApiResponse<StatsResponse> getStats(
+            @RequestParam(required = false) String warehouseId,
+            @RequestParam(required = false) String taskTypeName
+
+    ){
+        return ApiResponse.<StatsResponse>builder()
+                .Result(taskService.getStats(warehouseId,taskTypeName))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
     @PutMapping("/{id}")
     public ApiResponse<TaskResponse> updateTask(
             @RequestBody TaskForm update,
@@ -101,6 +115,7 @@ public class TaskController {
                 .success(true)
                 .build();
     }
+
     @PutMapping("/{id}/complete")
     public ApiResponse<TaskResponse> updateTaskComplete(
             @PathVariable String id

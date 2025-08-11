@@ -78,4 +78,13 @@ public class AuthenController {
                 .code(0)
                 .build();
     }
+    @PutMapping("/change-password")
+    public ApiResponse<Void> changePassword(@RequestBody NewPasswordRequest request) {
+        authService.changePassword(request);
+        return ApiResponse.<Void>builder()
+                .message("Reset Password successful")
+                .success(true)
+                .code(0)
+                .build();
+    }
 }
