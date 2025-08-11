@@ -2,14 +2,15 @@ import  { useEffect, useState } from 'react';
 import {  Button } from '@heroui/react';
 import { Package, Clock } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { TaskSelector } from '@/Store/Selector';
+import {StatsSelector, TaskSelector} from '@/Store/Selector';
 import TaskList from "@/components/Admin/TaskType/TaskList.tsx";
 import TaskDetailModal from "@/components/Admin/TaskType/Modal/TaskDetail.tsx";
 import TaskSidebar from "@/components/Admin/TaskType/TaskSidebar.tsx";
 import SelectWarehouse from "@/components/Admin/Tasks/SelectWarehouse.tsx";
 import {MiddleGetWarehouseByUser} from "@/Store/Thunk/WarehouseThunk.tsx";
 import {MiddleGetAllTask} from "@/pages/TaskType/Component/Store/TaskSlice.tsx";
-import {MiddleUpdateTaskStatus} from "@/pages/TaskType/Component/Store/TaskThunk.tsx";
+import {MiddleGetStats, MiddleUpdateTaskStatus} from "@/pages/TaskType/Component/Store/TaskThunk.tsx";
+import {useGetStatsTask} from "@/Hooks/useTask.tsx";
 
 const StaffTaskDashboard = () => {
     const dispatch = useDispatch();
@@ -21,9 +22,10 @@ const StaffTaskDashboard = () => {
     const [taskId,setTaskId]= useState<string>("");
     const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState<any>(null);
-
+    const data=useSelector(StatsSelector);
     useEffect(() => {
         if(warehouse!=""){
+
             loadTasks();
         }
     }, [warehouse,taskType]);
@@ -118,7 +120,7 @@ const StaffTaskDashboard = () => {
 
                     {/* Task Details Sidebar */}
                     <div className="lg:col-span-1">
-                        <TaskSidebar />
+                        <TaskSidebar data={data} />
                     </div>
                 </div>
 

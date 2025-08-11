@@ -72,8 +72,17 @@ const UserSlice = createSlice({
     },
     setGetUser:(state, action) => {
         state.user = action.payload || null;
+    },
+    setAddUser:(state, action) => {
+        const newUser: UserData = action.payload;
+        const existingUserIndex = state.userList.findIndex(user => user.userId === newUser.userId);
+        if (existingUserIndex !== -1) {
+            state.userList[existingUserIndex] = newUser; // Update existing user
+        } else {
+            state.userList.push(newUser); // Add new user
+        }
     }
   },
 });
-export const { initToTalPage,setUserList,setUpdateUser,setGetUser } = UserSlice.actions;
+export const { initToTalPage,setUserList,setAddUser,setUpdateUser,setGetUser } = UserSlice.actions;
 export default UserSlice;

@@ -213,7 +213,13 @@ export default function DeliverySummary({ exportOrder, formData, setFormData, on
                             </div>
                             <div>
                                 <p className="font-semibold mb-2">Người nhận hàng</p>
-                                <div className="h-16 border-b border-gray-400 mb-2 mx-4"></div>
+                                <div className="h-16 border-b border-gray-400 mb-2 mx-8">
+                                    <Avatar
+                                        src={exportOrder?.customer?.urlSupplier}
+                                        name={exportOrder?.customer?.supplierName}
+                                        size="md"
+                                    />
+                                </div>
                                 <p className="text-xs text-gray-500 font-medium">
                                     {exportOrder?.customer?.supplierName || 'N/A'}
                                 </p>

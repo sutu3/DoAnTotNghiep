@@ -29,7 +29,7 @@ import {
 import {useDispatch, useSelector} from "react-redux";
 import {OrderItemSelector, OrderSelector, StacksSelector} from "@/Store/Selector.tsx";
 import {MiddleGetAllStackList} from "@/Store/Thunk/StackThunk.tsx";
-import {Bin, StackType} from "@/Store/StackSlice";
+import {Bin, setUpdateBin, StackType} from "@/Store/StackSlice";
 import LocationSelectionModal from "@/components/Staff/ExecuteImport/Modal/LocationSelectionModal.tsx";
 import {ReceiptWarehouseCreate} from "@/pages/ExecuteImport/Store/WarehouseReceiptSlice.tsx";
 import SelectWarehouseApproved from "@/components/Admin/OrderImport/select/SelectWarehouseApproved.tsx";
@@ -71,6 +71,7 @@ const CreateReceiptComponent: React.FC<CreateReceiptComponentProps> = ({setSelec
             }else{
 
                 if(warehouse!=""){
+
                     await (dispatch as any)(MiddleGetAllOrderItemByStatus(warehouse))
                     await (dispatch as any)(MiddleGetAllStackList(warehouse));
                 }
@@ -96,7 +97,7 @@ const CreateReceiptComponent: React.FC<CreateReceiptComponentProps> = ({setSelec
         if (selectedItemIndex !== null) {
             // Tìm stack và bin chính xác
             const selectedStackData = stacksBinData.find((stack: StackType) => stack.stackId === stackId);
-            const selectedBinData = selectedStackData?.bin.find((bin: Bin) => bin.binId === binId);
+            const selectedBinData:Bin = selectedStackData?.bin.find((bin: Bin) => bin.binId === binId);
 
             // Cập nhật receiptItems với bin location
             const updatedItems = orderItem.map((item: ImportOrderItem, index: number) =>
@@ -107,7 +108,9 @@ const CreateReceiptComponent: React.FC<CreateReceiptComponentProps> = ({setSelec
                     }
                     : item
             );
-            console.log(updatedItems);
+            const newBin={...selectedBinData,status:"FULL"};
+            dispatch(setUpdateBin({stackId: selectedStackData?.stackId, bin: newBin}));
+            console.log(stacksBinData);
             // Dispatch action để update store
             dispatch(OrderImportSlice.actions.setOrderImportItemList(updatedItems));
 

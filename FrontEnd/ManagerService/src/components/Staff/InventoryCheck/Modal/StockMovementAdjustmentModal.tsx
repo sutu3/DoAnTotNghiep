@@ -336,7 +336,7 @@ const StockMovementAdjustmentModal: React.FC<StockMovementAdjustmentModalProps> 
                         color="warning"
                         onPress={handleSubmit}
                         isLoading={isSubmitting}
-                        isDisabled={!isValidAdjustment}
+                        isDisabled={!isValidAdjustment||!selectBinWarehouse||note==""}
                         startContent={!isSubmitting && <Icon icon="mdi:content-save" />}
                     >
                         {isSubmitting ? "Đang xử lý..." : "Xác nhận điều chỉnh"}

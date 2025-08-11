@@ -73,9 +73,10 @@ export const AddUser = createAsyncThunk(
 export const MiddleAddUser = (user: UserCreate) => {
     return async function (dispatch: any) {
         try {
-            await dispatch(AddUser({user:
+            const action=await dispatch(AddUser({user:
                     { ...user,
                         urlImage:`https://dummyimage.com/300.png/09f/fff&text=${user.userName}}`}}));
+            dispatch(UserSlice.actions.setAddUser(action.payload.result));
         } catch (error: any) {
             showToast({
                 title: "Error",

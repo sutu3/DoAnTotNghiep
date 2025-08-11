@@ -212,6 +212,7 @@ const UpdateCheckSheetTab: React.FC<UpdateCheckSheetTabProps> = ({
                                             {/* SL thực tế */}
                                             <div>
                                                 <Input
+                                                    disabled={checkSheet.status=="COMPLETED"}
                                                     label="SL thực tế"
                                                     type="number"
                                                     value={item.actualQuantity?.toString() || ''}
@@ -237,6 +238,7 @@ const UpdateCheckSheetTab: React.FC<UpdateCheckSheetTabProps> = ({
                                         {/* Textarea và Nút cập nhật */}
                                         <div className="mt-3 flex flex-col md:flex-row md:items-center gap-3">
                                             <Textarea
+                                                disabled={checkSheet.status=="COMPLETED"}
                                                 label="Lý do điều chỉnh"
                                                 placeholder="Nhập lý do nếu có chênh lệch..."
                                                 value={item.adjustmentReason || ''}

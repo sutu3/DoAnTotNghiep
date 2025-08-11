@@ -41,7 +41,7 @@ import SupplierPage from "@/pages/Supplier/page";
 import WarehouseReceiptManagementPage from "@/pages/ExecuteImport/page.tsx";
 import ExportOrderPage from "@/pages/OrderExport/page.tsx";
 import WarehouseDeliveryPage from "@/pages/ExecuteExport/page.tsx";
-import InventoryCheckSheetPage from "@/pages/InventoryCheck/Testpage1.tsx";
+import InventoryCheckSheetPage from "@/pages/InventoryCheck/page.tsx";
 import UserProfilePage from "@/pages/Profile/page.tsx";
 import ForgotPasswordPage from "@/pages/Login/ForgotPassword/page.tsx";
 import ResetPasswordPage from "@/pages/Login/ResetPassword/page.tsx";

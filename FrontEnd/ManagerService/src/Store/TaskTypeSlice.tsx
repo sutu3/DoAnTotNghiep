@@ -38,6 +38,9 @@ const TaskTypeSlice = createSlice({
         updateTaskType: (state, action) => {
             const result:TaskType = action.payload
             state.taskTypes=state.taskTypes.filter((el:TaskType)=>el.taskTypeId==result.taskTypeId?result:el)
+        },
+        setGetTaskType: (state, action) => {
+            state.taskTypes = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -163,4 +166,5 @@ export const MiddleUpdateDescriptionTaskType = (taskTypeId:string,description: s
         }
     };
 };
+export const {setGetTaskType} = TaskTypeSlice.actions;
 export default TaskTypeSlice;

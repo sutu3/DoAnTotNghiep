@@ -73,6 +73,8 @@ export const TotalPageStockMovement = (state: { stockMovement: { totalPage: numb
     state.stockMovement.totalPage;
 export const TaskSelector = (state: { tasks: any }) =>
     state.tasks.tasks;
+export const StatsSelector = (state: { stats: any }) =>
+    state.tasks.stats;
 
 export const TaskUserSelector = (state: { taskUser: {taskUsers:any} }) =>
     state.taskUser.taskUsers;

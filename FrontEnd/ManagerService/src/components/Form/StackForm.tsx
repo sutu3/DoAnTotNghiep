@@ -22,8 +22,7 @@ const StackForm = ({ warehouse,data, onChange }: Props) => {
 
     return (
         <div className="space-y-4">
-            <p>{warehouse?.warehouseName||"N/A"}</p>
-            <p className={"ml-5"}>{warehouse?.warehouseId||"N/A"}</p>
+
 
             <Input
                 aria-labelledby="Input"

@@ -12,10 +12,10 @@ import {
     Chip,
     Spinner,
     Avatar,
-    Tooltip
+    Tooltip, Pagination
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import DeliveryStatusSelect from "@/pages/ExecuteExport/Component/Select/DeliveryStatusSelect.tsx";
 import {
@@ -23,10 +23,9 @@ import {
     MiddleUpdateWarehouseDelivery
 } from "@/pages/ExecuteExport/Store/Thunk/WarehouseDeliveryThunk.tsx";
 import { pageApi } from "@/Api/UrlApi.tsx";
-import { DeliveryWarehouseSelector } from "@/pages/ExecuteExport/Store/Selector.tsx";
+import {DeliveryWarehouseSelector, TotalPageReceipt} from "@/pages/ExecuteExport/Store/Selector.tsx";
 import {
     setDeliveries,
-    WarehouseDeliveryResponse
 } from "@/pages/ExecuteExport/Store/WarehouseDeliverySlice.tsx";
 import WarehouseSelect from "@/pages/ExecuteExport/Component/Select/WarehouseSelect.tsx";
 
@@ -37,29 +36,35 @@ interface DeliveryListComponentProps {
 
 export default function DeliveryListComponent({ onCreateNew,onViewDelivery }: DeliveryListComponentProps) {
     const dispatch = useDispatch();
-    const deliveries: WarehouseDeliveryResponse[] = useSelector(DeliveryWarehouseSelector);
+    const deliveries = useSelector(DeliveryWarehouseSelector);
     const [loading, setLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState("all");
     const [warehouse, setWarehouse] = useState<string>("");
-
+    const [page, setPage] = useState(1);
+    const pages=useSelector(TotalPageReceipt);
     useEffect(() => {
         const fetchDeliveries = async () => {
             setLoading(true);
-            try {
-                dispatch(setDeliveries([]));
-                const page: pageApi = { pageNumber: 0, pageSize: 10 };
-                if (statusFilter === "all") {
-                    await (dispatch as any)(MiddleGetAllWarehouseDeliveryByStatus(warehouse, null, page));
-                } else {
-                    await (dispatch as any)(MiddleGetAllWarehouseDeliveryByStatus(warehouse, statusFilter, page));
+            dispatch(setDeliveries([]));
+                const pageApi: pageApi = { pageNumber: page-1, pageSize: 5 };
+                if(warehouse!=""){
+                    if (statusFilter === "all") {
+                        await (dispatch as any)(MiddleGetAllWarehouseDeliveryByStatus(warehouse, null, pageApi));
+                        setLoading(false)
+                    } else {
+                        await (dispatch as any)(MiddleGetAllWarehouseDeliveryByStatus(warehouse, statusFilter, pageApi));
+                        setLoading(false)
+                    }
                 }
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchDeliveries();
-    }, [dispatch, statusFilter, warehouse]);
 
+
+        };
+        if(warehouse!="all"){
+            fetchDeliveries();
+        }
+
+    }, [ statusFilter, warehouse,page]);
+    console.log(loading)
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'PENDING': return 'warning';
@@ -133,12 +138,6 @@ export default function DeliveryListComponent({ onCreateNew,onViewDelivery }: De
             <CardBody className="p-0">
                 <Table
                     aria-label="Deliveries table"
-                    removeWrapper
-                    classNames={{
-                        table: "min-h-[200px]",
-                        th: "bg-gray-50 text-gray-700 font-semibold",
-                        td: "py-4"
-                    }}
                 >
                     <TableHeader>
                         <TableColumn>MÃ PHIẾU</TableColumn>
@@ -150,17 +149,12 @@ export default function DeliveryListComponent({ onCreateNew,onViewDelivery }: De
                         <TableColumn align="center">THAO TÁC</TableColumn>
                     </TableHeader>
                     <TableBody
-                        items={deliveries}
+                        loadingContent={<Spinner label="Loading..." />}
+                        className="bg-white dark:bg-gray-900 text-gray-800 dark:text-white"
                         isLoading={loading}
-                        loadingContent={<Spinner label="Đang tải..." />}
-                        emptyContent={
-                            <div className="text-center py-8">
-                                <Icon icon="mdi:truck-delivery-outline" className="text-4xl text-gray-300 mb-2" />
-                                <p className="text-gray-500">Chưa có phiếu xuất nào</p>
-                            </div>
-                        }
+                        emptyContent="Không có phiếu nhập kho nào"
                     >
-                        {(delivery: any) => (
+                        {deliveries.map((delivery: any) => (
                             <TableRow key={delivery.deliveryId} className="hover:bg-gray-50">
                                 <TableCell>
                                     <div className="flex flex-col">
@@ -178,12 +172,12 @@ export default function DeliveryListComponent({ onCreateNew,onViewDelivery }: De
                                 <TableCell>
                                     <div className="flex flex-col">
                                         <code className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-mono mb-1">
-                                            #{delivery.exportOrder?.exportOrderId?.slice(-8)}
+                                            #{delivery?.exportOrderId?.slice(-8)}
                                         </code>
                                         <div className="flex items-center gap-2">
                                             <Icon icon="mdi:warehouse" className="text-blue-600 text-xs" />
                                             <span className="text-xs text-gray-500">
-                                                {delivery.exportOrder?.warehouse?.warehouseName}
+                                                {delivery.warehouse?.warehouseName}
                                             </span>
                                         </div>
                                     </div>
@@ -289,9 +283,20 @@ export default function DeliveryListComponent({ onCreateNew,onViewDelivery }: De
                                     </div>
                                 </TableCell>
                             </TableRow>
-                        )}
+                        ))}
                     </TableBody>
                 </Table>
+                <div className="flex justify-center mt-4">
+                    <Pagination
+                        total={pages}
+                        page={page}
+                        onChange={setPage}
+                        showControls
+                        classNames={{
+                            cursor: "bg-blue-600 text-white"
+                        }}
+                    />
+                </div>
             </CardBody>
         </Card>
     );

@@ -281,7 +281,7 @@ export default function ExportItemModal({ isOpen, onClose, product }: ExportItem
                                                             <div className="flex justify-between items-center">
                                                                 <span className="text-sm">Tương đương:</span>
                                                                 <Chip color="success" variant="flat" size="sm">
-                                                                    {(selectedBin.quantity * selectedUnit.ratioToBase).toFixed(3)} {selectedUnit.unitName}
+                                                                    {((selectedBin?.quantity||0)*(product?.unit?.ratioToBase||1)/(selectedUnit?.ratioToBase||1)).toFixed(3)} {selectedUnit.unitName}
                                                                 </Chip>
                                                             </div>
                                                         )}

@@ -41,6 +41,19 @@ export const GetAllStack = createAsyncThunk(
             rejectWithValue
         )
 );
+export const GetStats = createAsyncThunk(
+    "stack/GetStats",
+    async (
+        { warehouse,taskType }: { warehouseId: string|null,stackName:string|null},
+        { rejectWithValue }
+    ) =>
+        await callApiThunk(
+            "GET",
+            API_ROUTES.user.tasks(null).search().byTaskTypeNameAndWarehouse(warehouse,taskType).getStats,
+            undefined,
+            rejectWithValue
+        )
+);
 export const GetAllStackList = createAsyncThunk(
     "stack/GetAllStackList",
     async (

@@ -7,7 +7,6 @@ import CheckSheetProgressSteps from "@/pages/InventoryCheck/Step/CheckSheetProgr
 import BasicInfoStep from '../../Step/BasicInfoStep';
 import ProductSelectionStep from '../../Step/ProductSelectionStep';
 import ConfirmationStep from '../../Step/ConfirmationStep';
-import QuickActions from '../QuickActions';
 import {InventoryProduct, InventoryWarehouse} from "@/Store/InventoryWarehouseSlice.tsx";
 import CheckSheetSummary from '../CheckSheetSummary';
 import {MiddleGetAllInventoryProducts} from "@/Store/Thunk/InventoryOverviewThunk.tsx";
@@ -145,10 +144,7 @@ const CreateCheckSheetTab: React.FC<CreateCheckSheetTabProps> = ({  onSuccess })
                             selectedProducts={selectedProducts}
                             checkSheetNumber={checkSheetNumber}
                         />
-                        <QuickActions
-                            onReset={resetForm}
-                            selectedProducts={selectedProducts}
-                        />
+
                     </div>
                 </div>
             </div>

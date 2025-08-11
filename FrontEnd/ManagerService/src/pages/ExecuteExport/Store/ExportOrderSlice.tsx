@@ -68,6 +68,7 @@ export interface ExportOrder {
     deliveryDate?: string;
     items: ExportOrderItem[];
     totalValue: number;
+    createdAt?: string;
 }
 
 export interface OrderRequestExportCreate {

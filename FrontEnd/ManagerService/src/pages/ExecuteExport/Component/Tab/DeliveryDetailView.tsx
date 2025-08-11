@@ -1,9 +1,12 @@
-import { Card, CardBody, CardHeader, Chip, Divider, Avatar } from "@heroui/react";
+import {Card, CardBody, CardHeader, Chip, Divider, Avatar, Spinner} from "@heroui/react";
 import { Icon } from "@iconify/react";
 import DeliveryReceiptPrintable from "@/pages/ExecuteExport/Component/Print/DeliveryReceiptPrintable.tsx";
 import {Button} from "@heroui/button";
-import {useRef} from "react";
-import {WarehouseDeliveryResponse} from "@/pages/ExecuteExport/Store/WarehouseDeliverySlice.tsx";
+import {useEffect, useRef, useState} from "react";
+import {setAddDeliveryItem, WarehouseDeliveryResponse} from "@/pages/ExecuteExport/Store/WarehouseDeliverySlice.tsx";
+import {useDispatch, useSelector} from "react-redux";
+import {MiddleGetAllDeliveryItemByDeliveryId} from "@/pages/ExecuteExport/Store/Thunk/WarehouseDeliveryThunk.tsx";
+import {DeliveryItemsSeletor} from "@/pages/ExecuteExport/Store/Selector.tsx";
 
 interface DeliveryDetailViewProps {
     delivery: WarehouseDeliveryResponse;
@@ -12,6 +15,19 @@ interface DeliveryDetailViewProps {
 
 export default function DeliveryDetailView({ delivery, onBack,  }: DeliveryDetailViewProps) {
     const printRef = useRef<HTMLDivElement>(null);
+    const dispatch=useDispatch();
+    const items=useSelector(DeliveryItemsSeletor);
+    const [loading,setLoading]=useState(false);
+
+    useEffect(() => {
+        dispatch(setAddDeliveryItem([]))
+        const fetch= async () => {
+            setLoading(true);
+            await (dispatch as any)(MiddleGetAllDeliveryItemByDeliveryId(delivery?.deliveryId))
+            setLoading(false)
+        }
+        fetch();
+    }, []);
     const exportToPDF = async () => {
         if (!printRef.current) return;
 
@@ -132,12 +148,17 @@ export default function DeliveryDetailView({ delivery, onBack,  }: DeliveryDetai
                             <CardHeader>
                                 <h3 className="font-semibold flex items-center gap-2">
                                     <Icon icon="mdi:package-variant" className="text-orange-600" />
-                                    Sản Phẩm Đã Xuất ({delivery.deliveryItems?.length || 0})
+                                    Sản Phẩm Đã Xuất ({items?.length || 0})
                                 </h3>
                             </CardHeader>
                             <CardBody>
                                 <div className="space-y-4">
-                                    {delivery.deliveryItems?.map((item: any, index: number) => (
+                                    {loading ? (
+                                            <div className="flex justify-center py-8">
+                                                <Spinner size="lg" label="Đang tải sản phẩm..." />
+                                            </div>
+                                        ) :
+                                        (items?.map((item: any, index: number) => (
                                         <div key={index} className="border rounded-lg p-4 bg-gray-50">
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                                 <div>
@@ -159,7 +180,7 @@ export default function DeliveryDetailView({ delivery, onBack,  }: DeliveryDetai
                                                 </div>
                                             </div>
                                         </div>
-                                    ))}
+                                    )))}
                                 </div>
                             </CardBody>
                         </Card>
@@ -206,7 +227,7 @@ export default function DeliveryDetailView({ delivery, onBack,  }: DeliveryDetai
                                     <div className="flex justify-between items-center">
                                         <span className="text-sm text-gray-700">Tổng sản phẩm:</span>
                                         <span className="font-semibold text-lg">
-                                        {delivery.deliveryItems?.length || 0} sản phẩm
+                                        {items?.length || 0} sản phẩm
                                     </span>
                                     </div>
                                     <Divider />
