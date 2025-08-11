@@ -3,11 +3,15 @@ package com.example.order.Controller;
 import com.example.order.Dto.Request.ReceiptItemRequest;
 import com.example.order.Dto.Request.WarehouseReceiptRequest;
 import com.example.order.Dto.Response.ApiResponse;
+import com.example.order.Dto.Response.ReceiptItem.ReceiptItemResponse;
 import com.example.order.Dto.Response.WarehouseReceipt.WarehouseReceiptResponse;
 import com.example.order.Service.WarehouseReceiptService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -62,10 +66,17 @@ public class WarehouseReceiptController {
                 .success(true)
                 .build();
     }
-    @GetMapping("/search/warehouse/{warehouseId}")
-    public ApiResponse<List<WarehouseReceiptResponse>> getReceiptsByWarehouse(@PathVariable String warehouseId) {
-        return ApiResponse.<List<WarehouseReceiptResponse>>builder()
-                .Result(warehouseReceiptService.getAllByWarehouseId(warehouseId))
+    @GetMapping("/search")
+    public ApiResponse<Page<WarehouseReceiptResponse>> getReceiptsByWarehouse(
+            @RequestParam(required = false) String warehouseId,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String receiptId,
+            @RequestParam("pageNumber") int page,
+            @RequestParam("pageSize") int size)
+    {
+        Pageable pageable = PageRequest.of(page, size);
+        return ApiResponse.<Page<WarehouseReceiptResponse>>builder()
+                .Result(warehouseReceiptService.getAllByWarehouseId(warehouseId,status,receiptId,pageable))
                 .code(0)
                 .message("Success")
                 .success(true)
@@ -80,4 +91,14 @@ public class WarehouseReceiptController {
                 .success(true)
                 .build();
     }
+    @GetMapping("/search/warehouseReceipt/{receiptId}")
+    public ApiResponse<List<ReceiptItemResponse>> getById(@PathVariable String receiptId){
+        return ApiResponse.<List<ReceiptItemResponse>>builder()
+                .Result(warehouseReceiptService.getAllReceiptItemsByReceiptId(receiptId))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+
 }

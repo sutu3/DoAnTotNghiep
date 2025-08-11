@@ -38,4 +38,8 @@ public class ProductClientRequest {
     Boolean IsActive;
     String category;
     String unit;
+    Integer minStockLevel;
+    Integer maxStockLevel;
+    Integer pendingApprovedImportQuantity;
+    Integer pendingApprovedExportQuantity;
 }

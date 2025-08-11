@@ -23,15 +23,15 @@ public class WarehouseReceiptResponse {
 
     String receiptId;
     String importOrderId;
-    String createdByUser;
+    UserResponse createdByUser;
     LocalDateTime receivedDate;
     ReceiptStatus status;
     String note;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     Boolean isDeleted;
-
+    Integer quantityReceiveItem;
     // Enriched data
     ImportOrderResponse importOrder;
-    List<ReceiptItemResponse> receiptItems;
+//    List<ReceiptItemResponse> receiptItems;
 }

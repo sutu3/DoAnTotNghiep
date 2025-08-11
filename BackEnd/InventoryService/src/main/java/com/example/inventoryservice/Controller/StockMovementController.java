@@ -63,6 +63,20 @@ public class StockMovementController {
                 .success(true)
                 .build();
     }
+    @GetMapping("/search/all-warehouses/date-range")
+    public ApiResponse<List<StockMovementResponse>> getAllWarehousesStockMovementsByDateRange(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate
+    ) {
+        return ApiResponse.<List<StockMovementResponse>>builder()
+                .Result(stockMovementService.getAllWarehousesStockMovementsByDateRange(fromDate, toDate))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+
+
 
     /**
      * Lấy danh sách stock movements theo inventory warehouse với phân trang

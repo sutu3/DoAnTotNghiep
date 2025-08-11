@@ -4,7 +4,10 @@ import com.example.userservice.Dto.Request.StatusRequest;
 import com.example.userservice.Dto.Request.TaskUserAndTaskRequest;
 import com.example.userservice.Dto.Request.TaskUserRequest;
 import com.example.userservice.Dto.Responses.ApiResponse;
+import com.example.userservice.Dto.Responses.TaskUser.StatsResponse;
 import com.example.userservice.Dto.Responses.TaskUser.TaskUserResponse;
+import com.example.userservice.Form.EvidenceImages;
+import com.example.userservice.Form.NoteForm;
 import com.example.userservice.Service.TaskUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -41,12 +44,22 @@ public class TaskUserController {
                 .success(true)
                 .build();
     }
+
     @GetMapping("/search/tasks/{id}")
     public ApiResponse<List<TaskUserResponse>> getAllByIdTask(
             @PathVariable String id
     ){
         return ApiResponse.<List<TaskUserResponse>>builder()
                 .Result(taskUserService.getAllByTaskId(id))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @GetMapping("/stats")
+    public ApiResponse<StatsResponse> getStats(){
+        return ApiResponse.<StatsResponse>builder()
+                .Result(taskUserService.getStatsByUserId())
                 .code(0)
                 .message("SuccessFull")
                 .success(true)
@@ -96,6 +109,30 @@ public class TaskUserController {
     ){
         return ApiResponse.<TaskUserResponse>builder()
                 .Result(taskUserService.updateTaskUserStatus(request,id))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @PutMapping("/{id}/Complete")
+    public ApiResponse<TaskUserResponse> updateTaskUser(
+            @RequestBody EvidenceImages request,
+            @PathVariable String id
+    ){
+        return ApiResponse.<TaskUserResponse>builder()
+                .Result(taskUserService.updateTaskUserCompleted(request,id))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
+    @PutMapping("/{id}/Cancel")
+    public ApiResponse<TaskUserResponse> updateTaskUserCancel(
+            @RequestBody NoteForm note,
+            @PathVariable String id
+    ){
+        return ApiResponse.<TaskUserResponse>builder()
+                .Result(taskUserService.updateTaskUserCancel(id,note))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

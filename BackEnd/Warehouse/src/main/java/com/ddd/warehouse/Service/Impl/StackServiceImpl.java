@@ -10,6 +10,7 @@ import com.ddd.warehouse.Mapper.StackMapper;
 import com.ddd.warehouse.Module.Bins;
 import com.ddd.warehouse.Module.Stacks;
 import com.ddd.warehouse.Module.Warehouses;
+import com.ddd.warehouse.Repo.Specification.StackSpecification;
 import com.ddd.warehouse.Repo.StackRepo;
 import com.ddd.warehouse.Service.BinService;
 import com.ddd.warehouse.Service.StackService;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -44,8 +46,12 @@ public class StackServiceImpl implements StackService {
     }
 
     @Override
-    public Page<StackResponse> getAllByWarehouseId(Pageable pageable, String warehouseId) {
-        return stackRepo.findAllByWarehouse_WarehouseId(pageable, warehouseId).map(stackMapper::toResponse);
+    public Page<StackResponse> getAllByWarehouseId(Pageable pageable, String warehouseId,String stackName) {
+        Specification<Stacks> specification = Specification
+                .where(StackSpecification.hasWarehouse(warehouseId))
+                .and(StackSpecification.hasStackName(stackName))
+                .and(StackSpecification.isDelete(false));
+        return stackRepo.findAll(specification, pageable).map(stackMapper::toResponse);
     }
 
     @Override

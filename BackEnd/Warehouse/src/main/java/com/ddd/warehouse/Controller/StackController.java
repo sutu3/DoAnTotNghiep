@@ -44,15 +44,16 @@ public class StackController {
                 .success(true)
                 .build();
     }
-    @GetMapping("/ByWarehouse/{warehouseId}")
+    @GetMapping("/search/filter")
     public ApiResponse<Page<StackResponse>> getAllByWarehouse(
+            @RequestParam(required = false) String warehouseId,
+            @RequestParam(required = false) String stackName,
             @RequestParam("pageNumber") int page,
-            @RequestParam("pageSize") int size,
-            @PathVariable String warehouseId
+            @RequestParam("pageSize") int size
     ){
         Pageable pageable = PageRequest.of(page, size);
         return ApiResponse.<Page<StackResponse>>builder()
-                .Result(stackService.getAllByWarehouseId(pageable, warehouseId))
+                .Result(stackService.getAllByWarehouseId(pageable, warehouseId,stackName))
                 .code(0)
                 .message("SuccessFull")
                 .success(true)

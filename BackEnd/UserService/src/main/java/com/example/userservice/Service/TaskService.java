@@ -3,6 +3,7 @@ package com.example.userservice.Service;
 import com.example.userservice.Dto.Request.LevelRequest;
 import com.example.userservice.Dto.Request.StatusRequest;
 import com.example.userservice.Dto.Request.TaskRequest;
+import com.example.userservice.Dto.Responses.Task.StatsResponse;
 import com.example.userservice.Dto.Responses.Task.TaskResponse;
 import com.example.userservice.Dto.Responses.TaskType.TaskTypeResponse;
 import com.example.userservice.Form.TaskForm;
@@ -24,5 +25,6 @@ public interface TaskService {
     TaskResponse updateLevel(LevelRequest level, String id);
     TaskResponse updateCompletedStatus(String id);
     String deleteTask(String id);
+    StatsResponse getStats(String warehouseId, String taskTypeName);
     TaskResponse entry(Tasks task);
 }

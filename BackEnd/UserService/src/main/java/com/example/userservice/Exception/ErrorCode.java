@@ -22,11 +22,15 @@ public enum ErrorCode {
     SUPPLIER_NOT_FOUND(1001,"Supplier not found",HttpStatus.NOT_FOUND),
     SUPPLIER_EXIST(1002,"Supplier is existed",HttpStatus.BAD_REQUEST),
     TASK_USER_NOT_FOUND(1001,"Mission User not found",HttpStatus.NOT_FOUND),
+    EVIDENCE_IMAGES_REQUIRED(1001,"Evidence images required",HttpStatus.BAD_REQUEST),
     TASK_USER_EXIST(1002,"Mission User is existed",HttpStatus.BAD_REQUEST),
+    TASK_USER_CANNOT_BE_CANCELLED(1002,"Mission User cannot be cancelled",HttpStatus.BAD_REQUEST),
+    TASK_USER_CANNOT_BE_COMPLETED(1003,"Mission User cannot be completed",HttpStatus.BAD_REQUEST),
     TASK_TYPE_NOT_FOUND(1001,"Task Type not found",HttpStatus.NOT_FOUND),
     TASK_TYPE_EXIST(1002,"Task Type is existed",HttpStatus.BAD_REQUEST),
     TASK_NOT_FOUND(1001,"Mission not found",HttpStatus.NOT_FOUND),
     TASK_EXIST(1002,"Mission is existed",HttpStatus.BAD_REQUEST),
+    INVALID_DATE_FORMAT(1003,"Invalid date format", HttpStatus.BAD_REQUEST),
     UNAUTHENTICATED(1004,"Khong du quyen truy cap",HttpStatus.UNAUTHORIZED),
     UNCATEGORIZED(9999,"Uncategorized", HttpStatus.INTERNAL_SERVER_ERROR);
     ErrorCode(int Code,String Message, HttpStatusCode sponse){

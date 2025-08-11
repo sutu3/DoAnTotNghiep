@@ -2,6 +2,7 @@ package com.example.order.Utils;
 
 import com.example.order.Client.ProductService.Dto.Response.UnitNameResponse;
 import com.example.order.Client.ProductService.ProductController;
+import com.example.order.Module.DeliveryItem;
 import com.example.order.Module.ReceiptItem;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -17,29 +18,52 @@ import java.math.RoundingMode;
 @Slf4j
 public class ConvertToBaseUnit {
     ProductController  productController;
-    public BigDecimal convertToBaseUnitPrecise(ReceiptItem receiptItem) {
+    public BigDecimal convertToBaseUnitPreciseReceipt(ReceiptItem receiptItem) {
         try {
-            log.info("Receipt Item ID: {}", receiptItem.getReceiptItemId());
-            log.info("Import Item ID: {}", receiptItem.getImportItem().getItemId());
-            log.info("Import Item Unit field: {}", receiptItem.getImportItem().getUnit());
-
-            // Kiểm tra xem unit ID có giống với receipt item ID không
-            if (receiptItem.getReceiptItemId().equals(receiptItem.getImportItem().getUnit())) {
-                log.error("CRITICAL: Unit ID is same as Receipt Item ID - data corruption detected!");
-            }
             String unitId = receiptItem.getImportItem().getUnit();
+            String productId = receiptItem.getImportItem().getProduct();
+
             UnitNameResponse unitResponse = productController.getUnitById(unitId).getResult();
+            UnitNameResponse productUnitResponse = productController.getProductById(productId).getResult().getUnit();
 
             BigDecimal receivedQuantity = new BigDecimal(receiptItem.getReceivedQuantity());
-            BigDecimal ratioToBase = new BigDecimal(unitResponse.getRatioToBase().toString());
+            BigDecimal ratioToBase = new BigDecimal(String.valueOf(unitResponse.getRatioToBase()));
+            BigDecimal ratioBase = new BigDecimal(String.valueOf(productUnitResponse.getRatioToBase()));
 
-            // Quy đổi với độ chính xác cao, làm tròn 6 chữ số thập phân
-            return receivedQuantity.multiply(ratioToBase)
-                    .setScale(6, RoundingMode.HALF_UP);
+            if (ratioBase.compareTo(BigDecimal.ZERO) == 0) {
+                log.error("Invalid ratioBase (divide by zero): productId={}", productId);
+                return receivedQuantity;
+            }
 
+            return receivedQuantity.multiply(ratioToBase).divide(ratioBase, 6, RoundingMode.HALF_UP);
         } catch (Exception e) {
             log.error("Failed to convert unit for receipt item: {}", receiptItem.getReceiptItemId(), e);
             return new BigDecimal(receiptItem.getReceivedQuantity());
         }
     }
+    public BigDecimal convertToBaseUnitPreciseDelivery(DeliveryItem deliveryItem) {
+        try {
+            String unitId = deliveryItem.getExportItem().getUnit();
+            String productId = deliveryItem.getExportItem().getProduct();
+
+            UnitNameResponse unitResponse = productController.getUnitById(unitId).getResult();
+            UnitNameResponse productUnitResponse = productController.getProductById(productId).getResult().getUnit();
+
+            BigDecimal receivedQuantity = deliveryItem.getDeliveredQuantity();
+            BigDecimal ratioToBase = new BigDecimal(String.valueOf(unitResponse.getRatioToBase()));
+            BigDecimal ratioBase = new BigDecimal(String.valueOf(productUnitResponse.getRatioToBase()));
+
+            if (ratioBase.compareTo(BigDecimal.ZERO) == 0) {
+                log.error("Invalid ratioBase (divide by zero): productId={}", productId);
+                return receivedQuantity;
+            }
+
+            return receivedQuantity.multiply(ratioToBase).divide(ratioBase, 6, RoundingMode.HALF_UP);
+        } catch (Exception e) {
+            log.error("Failed to convert unit for receipt item: {}", deliveryItem.getDeliveredQuantity(), e);
+            return deliveryItem.getDeliveredQuantity();
+        }
+    }
+
+
 }

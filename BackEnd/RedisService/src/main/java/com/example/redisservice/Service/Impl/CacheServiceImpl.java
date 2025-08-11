@@ -108,7 +108,7 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    @CacheEvict(value = "unit", key = "#unitId")
+    @CacheEvict(value = "units", key = "#unitId")
     public void evictUnit(String unitId) {
         log.info("Evicting unit cache for ID: {}", unitId);
     }

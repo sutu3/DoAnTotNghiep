@@ -27,6 +27,8 @@ public class TaskUser extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "userId",nullable = false)
     Users user;
+    @Column(columnDefinition = "TEXT COMMENT 'Danh sách ảnh minh chứng'")
+    String evidenceImages;
     @Enumerated(EnumType.STRING)
     StatusTaskUserEnum status;
     @Column(columnDefinition = "TEXT COMMENT 'Ghi chú nhiệm vụ'")

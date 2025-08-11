@@ -25,9 +25,12 @@ import com.example.order.Mapper.ReceiptItemMapper;
 import com.example.order.Mapper.WarehouseReceiptMapper;
 import com.example.order.Module.ImportOrder;
 import com.example.order.Module.ReceiptItem;
+import com.example.order.Module.WarehouseDelivery;
 import com.example.order.Module.WarehouseReceipt;
 import com.example.order.Repo.ImportOrderRepo;
 import com.example.order.Repo.ReceiptItemRepo;
+import com.example.order.Repo.Specification.WarehouseDeliverySpecification;
+import com.example.order.Repo.Specification.WarehouseReceiptSpecification;
 import com.example.order.Repo.WarehouseReceiptRepo;
 import com.example.order.Service.ImportItemService;
 import com.example.order.Service.ImportOrderService;
@@ -38,6 +41,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -61,7 +67,6 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService {
     ImportItemService importItemService;
     WarehouseReceiptMapper warehouseReceiptMapper;
     AsyncServiceImpl asyncServiceImpl;
-    ImportOrderMapper importOrderMapper;
     ReceiptItemMapper receiptItemMapper;
     InventoryController inventoryController;
     ConvertToBaseUnit convertToBaseUnit;
@@ -169,11 +174,23 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService {
     }
 
     @Override
-    public List<WarehouseReceiptResponse> getAllByWarehouseId(String warehouseId) {
-        List<WarehouseReceipt> warehouseReceipts=warehouseReceiptRepo.findAllByWarehouseAndIsDeleted(warehouseId, false);
-        return warehouseReceipts.stream()
-                .map(this::entry)
-                .collect(Collectors.toList());
+    public Page<WarehouseReceiptResponse> getAllByWarehouseId(String warehouseId, String status, String receiptId, Pageable page) {
+        Specification<WarehouseReceipt> specification = Specification
+                .where(WarehouseReceiptSpecification.hasWarehouse(warehouseId))
+                .and(WarehouseReceiptSpecification.hasStatus(status))
+                .and(WarehouseReceiptSpecification.hasReceiptId(receiptId))
+                .and(WarehouseReceiptSpecification.isDelete(false));
+        Page<WarehouseReceipt> receipts = warehouseReceiptRepo.findAll(specification, page);
+        return receipts.map(this::entry);
+    }
+
+    @Override
+    public List<ReceiptItemResponse> getAllReceiptItemsByReceiptId(String receiptId) {
+        WarehouseReceipt receipt = warehouseReceiptRepo.findById(receiptId)
+                .orElseThrow(() -> new AppException(ErrorCode.WAREHOUSE_RECEIPT_NOT_FOUND));
+        return receipt.getReceiptItems().stream().map(
+                this::enrichReceiptItem
+        ).collect(Collectors.toList());
     }
 
     @Override
@@ -217,7 +234,7 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService {
                     inventoryResponse.getResult().getInventoryWarehouseId(), // Sử dụng ID từ response
                     item.getImportItem().getProduct(),
                     "Import",
-                    convertToBaseUnit.convertToBaseUnitPrecise(item),
+                    convertToBaseUnit.convertToBaseUnitPreciseReceipt(item),
                     orderResponse.getImportOrder().getImportOrderId(),
                     GetCurrentUserId.getCurrentUserId(), // Thêm user thực hiện
                     "Import from order: " + orderResponse.getImportOrder().getImportOrderId(), // Thêm note
@@ -236,7 +253,7 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService {
 
     private void updateInventory(ReceiptItem receiptItem) {
         // Tạo StockMovementRequest để ghi nhận việc nhập hàng
-        BigDecimal quantity=convertToBaseUnit.convertToBaseUnitPrecise(receiptItem);
+        BigDecimal quantity=convertToBaseUnit.convertToBaseUnitPreciseReceipt(receiptItem);
         log.info("Updating inventory record with ID: {}",quantity.toString());
         StockMovementRequest stockMovementRequest = StockMovementRequest.builder()
                 .product(receiptItem.getImportItem().getProduct())
@@ -290,13 +307,13 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService {
         // Populate ImportOrder
         ImportOrderResponse importOrderResponse = importOrderService.entry(receipt.getImportOrder());
         response.setImportOrder(importOrderResponse);
-        response.setCreatedByUser(receipt.getCreatedByUser());
-
+        response.setCreatedByUser(userFuture.join());
+        response.setQuantityReceiveItem(receipt.getReceiptItems().size());
         // Populate ReceiptItems
-        List<ReceiptItemResponse> receiptItemResponses = receipt.getReceiptItems().stream()
-                .map(this::enrichReceiptItem)
-                .collect(Collectors.toList());
-        response.setReceiptItems(receiptItemResponses);
+//        List<ReceiptItemResponse> receiptItemResponses = receipt.getReceiptItems().stream()
+//                .map(this::enrichReceiptItem)
+//                .collect(Collectors.toList());
+//        response.setReceiptItems(receiptItemResponses);
 
         return response;
     }

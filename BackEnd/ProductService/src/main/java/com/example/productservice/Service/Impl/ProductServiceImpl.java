@@ -5,7 +5,6 @@ import com.example.productservice.Client.Inventory.Dto.Resquest.InventoryProduct
 import com.example.productservice.Client.Inventory.InventoryController;
 import com.example.productservice.Client.UserService.Dto.Response.SupplierResponse;
 import com.example.productservice.Client.UserService.Dto.Response.UserResponse;
-import com.example.productservice.Client.UserService.UserController;
 import com.example.productservice.Client.WarehouseService.WarehouseController;
 import com.example.productservice.Dto.Requests.ProductClientRequest;
 import com.example.productservice.Dto.Requests.ProductCreateWrapper;
@@ -24,22 +23,22 @@ import com.example.productservice.Repo.Specification.ProductSpecification;
 import com.example.productservice.Service.CategoryService;
 import com.example.productservice.Service.ProductService;
 import com.example.productservice.Service.UnitService;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -154,55 +153,85 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getProductsBySupplierFilteredByWarehouse(String supplierId, String warehouseId) {
+    public Page<ProductResponse> getProductsBySupplierFilteredByWarehouse(
+            String supplierId,
+            String warehouseId,
+            String productName,
+            String categoryId,
+            String unitId,
+            Pageable page
+    ) {
         log.info("📦 Start filtering products by supplier={} and warehouse={}", supplierId, warehouseId);
 
-        // 1. Lọc theo supplierId và active
-        Specification<Product> spec = Specification.where(ProductSpecification.hasSupplier(supplierId))
+        // 1. Build Specification filter
+        Specification<Product> spec = Specification
+                .where(ProductSpecification.hasSupplier(supplierId))
                 .and(ProductSpecification.isActive(true))
-                .and(ProductSpecification.isDelete(false));
+                .and(ProductSpecification.isDelete(false))
+                .and(ProductSpecification.hasProductName(productName))
+                .and(ProductSpecification.hasCategoryId(categoryId))
+                .and(ProductSpecification.hasUnitId(unitId));
 
-        List<Product> listProduct = productRepo.findAll(spec);
-        if (listProduct.isEmpty()) {
-            log.warn("⚠️ No products found for supplierId={}", supplierId);
-            return List.of();
-        }
+        Page<Product> listProduct = productRepo.findAll(spec, page);
 
-        // 2. Tạo request để gọi sang inventory service
+//        log.info("🔍 Fetched {} products from DB (before filtering by warehouse)", listProduct.getContent().size());
+//        if (listProduct.isEmpty()) {
+//            log.warn("⚠️ No products found for supplierId={}", supplierId);
+//            return Page.empty();
+//        }
+
+        // 2. Gọi sang inventory service
         ProductFilterRequest request = new ProductFilterRequest(
                 warehouseId,
-                listProduct.stream().map(productMapper::toClientRequest).toList()
+                listProduct.getContent().stream()
+                        .map(productMapper::toClientRequest)
+                        .toList()
         );
 
-        List<ProductClientRequest> filteredProductDtos = inventoryController
-                .filterProductsByWarehouse(request)
-                .getResult();
+        log.debug("📤 Sending request to InventoryService: {}", request);
+
+        List<ProductClientRequest> filteredProductDtos;
+        try {
+            filteredProductDtos = inventoryController
+                    .filterProductsByWarehouse(request)
+                    .getResult();
+            log.debug("📥 Received {} products from InventoryService",
+                    filteredProductDtos != null ? filteredProductDtos.size() : 0);
+        } catch (Exception e) {
+            log.error("❌ Failed to fetch data from InventoryService: {}", e.getMessage(), e);
+            return Page.empty();
+        }
 
         if (filteredProductDtos == null || filteredProductDtos.isEmpty()) {
             log.warn("⚠️ No products matched in warehouseId={}", warehouseId);
-            return List.of();
+//            return Page.empty();
         }
 
-        // 3. Tạo Map<productId, quantity> từ kết quả inventory
-        Map<String, BigDecimal> productQuantityMap = filteredProductDtos.stream()
-                .collect(Collectors.toMap(ProductClientRequest::getProductId, ProductClientRequest::getQuantity));
+        // 3. Map kết quả trả về từ inventory
+        Map<String, ProductClientRequest> productDataMap = filteredProductDtos.stream()
+                .collect(Collectors.toMap(ProductClientRequest::getProductId, p -> p));
 
-        // 4. Trả về danh sách enriched ProductResponse
-        List<ProductResponse> result = listProduct.stream()
-                .filter(p -> productQuantityMap.containsKey(p.getProductId()))
+        // 4. Chuyển đổi danh sách kết quả
+        List<ProductResponse> enrichedResponses = listProduct.getContent().stream()
+                .filter(p -> productDataMap.containsKey(p.getProductId()))
                 .map(p -> {
                     ProductResponse response = enrich(p);
-                    response.setQuantity(productQuantityMap.get(p.getProductId())); // Gán quantity thực tế từ kho
+                    ProductClientRequest productData = productDataMap.get(p.getProductId());
+                    response.setMaxStockLevel(productData.getMaxStockLevel());
+                    response.setMinStockLevel(productData.getMinStockLevel());
+                    response.setQuantity(productData.getQuantity());
+                    response.setPendingApprovedImportQuantity(productData.getPendingApprovedImportQuantity());
+                    response.setPendingApprovedExportQuantity(productData.getPendingApprovedExportQuantity());
+
                     return response;
                 })
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
 
-        log.info("✅ Returning {} enriched products with warehouse quantity", result.size());
-        return result;
+        log.info("✅ Returning {} enriched products with warehouse quantity and approved orders", enrichedResponses.size());
+
+        // 5. Trả về Page đã enrich lại (nếu cần giữ phân trang)
+        return new PageImpl<>(enrichedResponses, page, listProduct.getTotalElements());
     }
-
-
-
 
     @Override
     public ProductResponse getBySku(String sku) {

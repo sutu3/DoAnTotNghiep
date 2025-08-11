@@ -11,7 +11,10 @@ import com.example.order.Exception.AppException;
 import com.example.order.Exception.ErrorCode;
 import com.example.order.Mapper.ExportOrderMapper;
 import com.example.order.Module.ExportOrder;
+import com.example.order.Repo.ExportItemRepo;
 import com.example.order.Repo.ExportOrderRepo;
+import com.example.order.Repo.Specification.ExportOrderSpecification;
+import com.example.order.Repo.Specification.ImportOrderSpecification;
 import com.example.order.Service.ExportOrderService;
 import com.example.order.Utils.DateUtils;
 import lombok.AccessLevel;
@@ -20,6 +23,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,6 +40,7 @@ public class ExportOrderServiceImpl implements ExportOrderService {
     ExportOrderRepo exportOrderRepo;
     ExportOrderMapper exportOrderMapper;
     AsyncServiceImpl asyncServiceImpl;
+    private final ExportItemRepo exportItemRepo;
 
     @Override
     public ExportOrderResponse createExportOrder(ExportOrderRequest request) {
@@ -71,9 +76,12 @@ public class ExportOrderServiceImpl implements ExportOrderService {
     }
 
     @Override
-    public Page<ExportOrderResponse> getExportOrdersByWarehouse(String warehouse, Pageable pageable) {
-        return exportOrderRepo.findAllByWarehouseAndIsDeletedFalse(warehouse, pageable)
-                .map(this::entry);    }
+    public Page<ExportOrderResponse> getExportOrdersByWarehouse(String warehouse, Pageable pageable,String status) {
+        Specification<ExportOrder> specification = Specification.where(ExportOrderSpecification.hasWarehouse(warehouse))
+                .and(ExportOrderSpecification.hasStatus(status));
+        Page<ExportOrder> exportOrders = exportOrderRepo.findAll(specification, pageable);
+        return exportOrderRepo.findAll(specification, pageable).map(this::entry);
+    }
 
     @Override
     public Page<ExportOrderResponse> getExportOrdersByUser(String userId, Pageable pageable) {
@@ -100,12 +108,8 @@ public class ExportOrderServiceImpl implements ExportOrderService {
         String userId = GetCurrentUserId.getCurrentUserId();
         exportOrder.setStatus(status);
         exportOrder.setUpdatedAt(LocalDateTime.now());
-
-        if (status == ExportOrderStatus.APPROVED) {
-            exportOrder.setApprovedBy(userId);
-            exportOrder.setApprovedDate(LocalDateTime.now());
-        }
-
+        exportOrder.setApprovedBy(userId);
+        exportOrder.setApprovedDate(LocalDateTime.now());
         ExportOrder updatedOrder = exportOrderRepo.save(exportOrder);
         return entry(updatedOrder);
     }
@@ -156,10 +160,12 @@ public class ExportOrderServiceImpl implements ExportOrderService {
         CompletableFuture.allOf(warehouseFuture, userFuture).join();
 
         ExportOrderResponse exportOrderResponse = exportOrderMapper.toResponse(exportOrder);
-
+        exportOrderResponse.setCreatedAt(exportOrder.getCreatedAt());
         exportOrderResponse.setCreateByUser(userFuture.join());
         exportOrderResponse.setWarehouse(warehouseFuture.join());
-
+        if(exportOrder.getExportItems() != null) {
+            exportOrderResponse.setItemCount(exportOrder.getExportItems().size());
+        }
         if(exportOrder.getApprovedBy() != null && !exportOrder.getApprovedBy().isEmpty()) {
             CompletableFuture<UserResponse> adminFuture = asyncServiceImpl
                     .getUserAsync(exportOrder.getApprovedBy());
@@ -197,7 +203,6 @@ public class ExportOrderServiceImpl implements ExportOrderService {
                 .map(exportOrderMapper::toClient)
                 .collect(Collectors.toList());
     }
-
     @Override
     public List<ExportOrderResponseClient> getCompletedExportOrdersByWarehouse(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate) {
         List<ExportOrder> orders = exportOrderRepo.findAllByWarehouseAndStatusAndCreatedAtBetweenAndIsDeletedFalse(
@@ -205,5 +210,20 @@ public class ExportOrderServiceImpl implements ExportOrderService {
         return orders.stream()
                 .map(exportOrderMapper::toClient)
                 .collect(Collectors.toList());
+    }
+    @Override
+    public List<ExportOrderResponse> getOrdersReadyForDelivery(String warehouseId) {
+        List<ExportOrder> orders = exportOrderRepo.findAllByWarehouseAndStatusAndIsDeleted(
+                warehouseId, ExportOrderStatus.APPROVED, false);
+
+        return orders.stream()
+                .map(this::entry)
+                .collect(Collectors.toList());
+    }
+    @Override
+    public Integer getApprovedOrdersByProduct(String productId, String warehouseId) {
+        return exportItemRepo.countApprovedItemsByProductAndWarehouse(
+                productId, warehouseId, false
+        );
     }
 }

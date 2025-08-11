@@ -40,6 +40,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/file/media/download/.*",
             "/api/authen/api/auth/login",
             "/api/authen/api/auth/logout",
+            "/api/authen/api/auth/forgot-password",
             "/api/users/.*",
             "/api/authen/.*",
             "/api/orders/.*",

@@ -22,6 +22,7 @@ public class TaskResponse{
     StatusTaskEnum status;
     LevelEnum level;
     String description;
+    Boolean requiresEvidence;
     List<TaskUserResponseNoList> taskUsers;
     WarehousesResponse warehouses;
     LocalDateTime completeAt;

@@ -82,6 +82,18 @@ public class ImportOrderController {
                 .success(true)
                 .build();
     }
+    @GetMapping("/approved-orders/product/{productId}/warehouse/{warehouseId}")
+    public ApiResponse<Integer> getApprovedImportOrdersByProduct(
+            @PathVariable String productId,
+            @PathVariable String warehouseId
+    ) {
+        return ApiResponse.<Integer>builder()
+                .Result(importOrderService.getApprovedOrdersByProduct(productId, warehouseId))
+                .code(0)
+                .message("SuccessFull")
+                .success(true)
+                .build();
+    }
     /**
      * Lấy số lượng đơn hàng đang chờ xử lý cho một sản phẩm trong warehouse
      * @param productId ID của sản phẩm

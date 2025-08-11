@@ -1,9 +1,6 @@
 package com.example.authenservice.Service.Impl;
 
-import com.example.authenservice.Dtos.Request.AuthenticationRequest;
-import com.example.authenservice.Dtos.Request.IntrospectRequest;
-import com.example.authenservice.Dtos.Request.LogoutRequest;
-import com.example.authenservice.Dtos.Request.RefreshRequest;
+import com.example.authenservice.Dtos.Request.*;
 import com.example.authenservice.Dtos.Response.AuthenticationResponse;
 import com.example.authenservice.Dtos.Response.IntrospectResponse;
 import com.example.authenservice.Exception.AppException;
@@ -13,6 +10,7 @@ import com.example.authenservice.Modal.Role;
 import com.example.authenservice.Modal.User;
 import com.example.authenservice.Repo.InvalidateTokenRepo;
 import com.example.authenservice.Repo.UserRepo;
+import com.example.authenservice.Service.JavaMailSenderService;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -41,6 +39,7 @@ import java.util.*;
 public class AuthenticationService {
     UserRepo userRepo;
     InvalidateTokenRepo invalidateTokenRepo;
+    private final JavaMailSenderService javaMailSenderService;
 
     @NonFinal
     @Value("${jwt.signedJWT}")
@@ -76,7 +75,7 @@ public class AuthenticationService {
 
         if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        var token = generateToken(user);
+        var token = generateToken(user,VALID_DURATION);
 
         return AuthenticationResponse.builder().token(token).build();
     }
@@ -113,12 +112,12 @@ public class AuthenticationService {
         var user =
                 userRepo.findByEmailWithRoles(email).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
-        var token = generateToken(user);
+        var token = generateToken(user,VALID_DURATION);
 
         return AuthenticationResponse.builder().token(token).build();
     }
 
-    private String generateToken(User user) {
+    private String generateToken(User user,Long Duration) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
@@ -126,7 +125,7 @@ public class AuthenticationService {
                 .issuer("warehouse.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()
+                        Instant.now().plus(Duration, ChronoUnit.SECONDS).toEpochMilli()
                 ))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
@@ -165,7 +164,57 @@ public class AuthenticationService {
 
         return signedJWT;
     }
+    public AuthenticationResponse forgotPassword(String email) {
+        User user=userRepo.findByEmailWithRoles(email)
+                .orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
+        NotificationForgotPassword notification = NotificationForgotPassword.builder()
+                .to(user.getEmail())
+                .toName(user.getUsername())
+                .content("Reset password")
+                .resetLink("http://localhost:5173/reset-password?user="+user.getIdUser())
+                .subject("Reset password")
+                .build();
 
+        try {
+            javaMailSenderService.javaSendMailForgotPassword(notification);
+        } catch (Exception e) {
+            log.error("Error sending notification: {}", e.getMessage(), e);
+            throw new AppException(ErrorCode.NOTIFICATION_SEND_FAILED);
+        }
+        var token = generateToken(user, 10 * 60L);
+
+        return AuthenticationResponse.builder().token(token).build();
+    }
+    public AuthenticationResponse resetPassword(ResetPasswordRequest request) {
+        User user = userRepo.findById(request.userId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        if (!request.newPassword().equals(request.newPassword())) {
+            throw new AppException(ErrorCode.PASSWORD_INVALID);
+        }
+
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepo.save(user);
+        var token = generateToken(user,VALID_DURATION);
+
+        return AuthenticationResponse.builder().token(token).build();
+    }
+    public void changePassword(NewPasswordRequest request) {
+        var userId=GetCurrentUserId.getCurrentUserId();
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        if (!request.newPassword().equals(request.newPassword())) {
+            throw new AppException(ErrorCode.PASSWORD_INVALID);
+        }
+
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepo.save(user);
+
+        ;
+    }
     private String buildScope(User user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
 

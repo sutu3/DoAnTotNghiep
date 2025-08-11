@@ -5,6 +5,7 @@ import com.example.order.Module.ExportOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ExportOrderRepo extends JpaRepository<ExportOrder, String> {
+public interface ExportOrderRepo extends JpaRepository<ExportOrder, String>, JpaSpecificationExecutor<ExportOrder> {
 
     Page<ExportOrder> findAllByWarehouseAndIsDeletedFalse(String warehouse, Pageable pageable);
     Page<ExportOrder> findAllByStatusAndWarehouseAndIsDeletedFalse(ExportOrderStatus status, String warehouse, Pageable pageable);
@@ -40,4 +41,5 @@ public interface ExportOrderRepo extends JpaRepository<ExportOrder, String> {
 
     List<ExportOrder> findAllByWarehouseAndStatusAndCreatedAtBetweenAndIsDeletedFalse(
             String warehouse, ExportOrderStatus status, LocalDateTime fromDate, LocalDateTime toDate);
+    List<ExportOrder> findAllByWarehouseAndStatusAndIsDeleted(String warehouse, ExportOrderStatus status,boolean isDeleted);
 }

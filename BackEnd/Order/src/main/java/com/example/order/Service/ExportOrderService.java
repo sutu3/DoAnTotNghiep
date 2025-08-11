@@ -23,7 +23,7 @@ public interface ExportOrderService {
 
     Page<ExportOrderResponse> getAllExportOrders(Pageable pageable);
 
-    Page<ExportOrderResponse> getExportOrdersByWarehouse(String warehouse, Pageable pageable);
+    Page<ExportOrderResponse> getExportOrdersByWarehouse(String warehouse, Pageable pageable,String status);
 
     Page<ExportOrderResponse> getExportOrdersByUser(String userId, Pageable pageable);
 
@@ -44,4 +44,6 @@ public interface ExportOrderService {
     List<ExportOrderResponseClient> getExportOrdersByWarehouseAndDateRange(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate);
     List<ExportOrderResponseClient> getPendingExportOrdersByWarehouse(String warehouseId);
     List<ExportOrderResponseClient> getCompletedExportOrdersByWarehouse(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate);
+    List<ExportOrderResponse> getOrdersReadyForDelivery(String warehouseId);
+    Integer getApprovedOrdersByProduct(String productId, String warehouseId);
 }

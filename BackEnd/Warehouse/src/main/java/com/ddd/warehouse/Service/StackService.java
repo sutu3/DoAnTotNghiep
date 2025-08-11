@@ -15,7 +15,7 @@ import java.util.List;
 
 public interface StackService {
     Page<StackResponse> getAll(Pageable pageable);
-    Page<StackResponse> getAllByWarehouseId(Pageable pageable, String warehouseId);
+    Page<StackResponse> getAllByWarehouseId(Pageable pageable, String warehouseId,String stackName);
     List<StackResponse> getAllListByWarehouseId( String warehouseId);
     Boolean exsistByStack(String stackName,String warehouseId);
     StackResponse getByStackNameResponse(String stackName,String warehouseId);

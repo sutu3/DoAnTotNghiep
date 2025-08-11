@@ -52,4 +52,14 @@ public class OrderServiceFallback implements OrderController {
     public ApiResponse<List<ExportOrderResponse>> getCompletedExportOrdersByWarehouse(String warehouseId, LocalDateTime fromDate, LocalDateTime toDate) {
         throw new AppException(ErrorCode.ORDER_SERVICE_NOT_WORKING);
     }
+
+    @Override
+    public ApiResponse<Integer> getApprovedImportOrdersByProduct(String productId, String warehouseId) {
+        throw new AppException(ErrorCode.ORDER_SERVICE_NOT_WORKING);
+    }
+
+    @Override
+    public ApiResponse<Integer> getApprovedExportOrdersByProduct(String productId, String warehouseId) {
+        throw new AppException(ErrorCode.ORDER_SERVICE_NOT_WORKING);
+    }
 }

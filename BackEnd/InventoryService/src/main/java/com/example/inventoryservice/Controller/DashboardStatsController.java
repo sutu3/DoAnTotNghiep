@@ -20,13 +20,37 @@ public class DashboardStatsController {
 
     DashboardStatsService dashboardStatsService;
 
+//    @GetMapping("/warehouse/{warehouseId}")
+//    public ApiResponse<DashboardStatsResponse> getDashboardStats(
+//            @PathVariable String warehouseId,
+//            @RequestParam(defaultValue = "today") String timeFilter
+//    ) {
+//        return ApiResponse.<DashboardStatsResponse>builder()
+//                .Result(dashboardStatsService.getDashboardStats(warehouseId, timeFilter))
+//                .code(0)
+//                .message("Success")
+//                .success(true)
+//                .build();
+//    }
     @GetMapping("/warehouse/{warehouseId}")
-    public ApiResponse<DashboardStatsResponse> getDashboardStats(
+    public ApiResponse<DashboardStatsResponse> getWarehouseStats(
             @PathVariable String warehouseId,
             @RequestParam(defaultValue = "today") String timeFilter
     ) {
         return ApiResponse.<DashboardStatsResponse>builder()
-                .Result(dashboardStatsService.getDashboardStats(warehouseId, timeFilter))
+                .Result(dashboardStatsService.getWarehouseStats(warehouseId, timeFilter))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
+
+    @GetMapping("/all")
+    public ApiResponse<DashboardStatsResponse> getAllWarehousesStats(
+            @RequestParam(defaultValue = "today") String timeFilter
+    ) {
+        return ApiResponse.<DashboardStatsResponse>builder()
+                .Result(dashboardStatsService.getAllWarehousesStats(timeFilter))
                 .code(0)
                 .message("Success")
                 .success(true)
