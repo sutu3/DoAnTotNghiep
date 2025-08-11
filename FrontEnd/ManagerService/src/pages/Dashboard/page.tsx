@@ -10,7 +10,7 @@ import {
   Button,
   Select,
   SelectItem,
-  Spinner, CardFooter
+  Spinner
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { StacksSelector } from "@/Store/Selector.tsx";
@@ -88,24 +88,40 @@ export default function Dashboard() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Dashboard Quản Lý Kho
+                Dashboard Quản Lý Kho hàng
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Tổng quan hoạt động kho hàng {timeFilter === 'today' ? 'hôm nay' : timeFilter === 'week' ? 'tuần này' : 'tháng này'}
+                {warehouse === "ALL" ? "Tổng quan tất cả kho hàng" : "Tổng quan hoạt động kho hàng"} {timeFilter === 'today' ? 'hôm nay' : timeFilter === 'week' ? 'tuần này' : 'tháng này'}
               </p>
             </div>
-            <div className="flex gap-3 w-[400px]">
-              <SelectWarehouseApproved warehouse={warehouse} setWarehouse={setWarehouse}/>
+            <div className="flex gap-3 w-[500px]">
+              {/* Toggle Button cho Tổng Kho */}
+              {/*<Button*/}
+              {/*    variant={warehouse === "ALL" ? "solid" : "bordered"}*/}
+              {/*    color={warehouse === "ALL" ? "primary" : "default"}*/}
+              {/*    onClick={() => setWarehouse("ALL")}*/}
+              {/*    startContent={<Icon icon="mdi:warehouse-outline" />}*/}
+              {/*    className="min-w-[120px]"*/}
+              {/*>*/}
+              {/*  Tổng Kho*/}
+              {/*</Button>*/}
+
+              <SelectWarehouseApproved
+                  warehouse={warehouse === "ALL" ? "" : warehouse}
+                  setWarehouse={(value) => setWarehouse(value || "ALL")}
+                  disabled={warehouse === "ALL"}
+              />
               <Select
                   size="sm"
                   selectedKeys={[timeFilter]}
                   onSelectionChange={(keys) => setTimeFilter(Array.from(keys)[0] as string)}
-                  className="w-[250px]"
+                  className="w-[200px]"
               >
                 <SelectItem key="today">Hôm nay</SelectItem>
                 <SelectItem key="week">Tuần này</SelectItem>
                 <SelectItem key="month">Tháng này</SelectItem>
               </Select>
+
               <Button
                   color="primary"
                   startContent={<Icon icon="mdi:refresh" />}
@@ -115,7 +131,6 @@ export default function Dashboard() {
               </Button>
             </div>
           </div>
-
           {/* Stats Cards - Giữ nguyên như code cũ */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="border-l-4 border-l-blue-500">

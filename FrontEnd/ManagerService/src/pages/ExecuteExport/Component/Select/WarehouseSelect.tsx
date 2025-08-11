@@ -32,7 +32,7 @@ const SelectWarehouseDeliveryFilter = ({
     // Set warehouse mặc định nếu chưa có
     useEffect(() => {
         if (warehouses?.length > 0 && !warehouse) {
-            setWarehouse("all"); // Mặc định hiển thị tất cả
+            setWarehouse(warehouses[0].warehouseId); // Mặc định hiển thị tất cả
         }
     }, [warehouses, warehouse, setWarehouse]);
 

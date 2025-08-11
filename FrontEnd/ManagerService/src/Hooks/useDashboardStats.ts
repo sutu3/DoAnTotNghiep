@@ -26,11 +26,30 @@ export const useDashboardStats = (warehouseId: string, timeFilter: string) => {
 
     useEffect(() => {
         const fetchStats = async () => {
-            if (!warehouseId) return;
-
             setLoading(true);
             try {
-                const response:ApiResponse<DashboardStatsResponse> = await fetchApi({method:"GET",url:API_ROUTES.dashboard.stats(warehouseId, timeFilter),body:undefined,headers:undefined});
+                let response: ApiResponse<DashboardStatsResponse>;
+
+                if (warehouseId === "ALL") {
+                    // API cho tổng kho
+                    response = await fetchApi({
+                        method: "GET",
+                        url: API_ROUTES.dashboard.allStats(timeFilter),
+                        body: undefined,
+                        headers: undefined
+                    });
+                } else if (warehouseId) {
+                    // API cho từng kho
+                    response = await fetchApi({
+                        method: "GET",
+                        url: API_ROUTES.dashboard.stats(warehouseId, timeFilter),
+                        body: undefined,
+                        headers: undefined
+                    });
+                } else {
+                    return;
+                }
+
                 const data = response.result;
                 setStats(data);
             } finally {

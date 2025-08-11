@@ -1,4 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
+import {Bin, StackType} from "@/Store/StackSlice.tsx";
 
 export interface Warehouse {
   warehouseId: string;
@@ -7,6 +8,11 @@ export interface Warehouse {
   street: string;
   district: string;
   country: string;
+  stacks?:StackType[]
+  description?: string;
+  bins?:Bin[]
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface WarehouseState {
   warehouseList: Warehouse[];

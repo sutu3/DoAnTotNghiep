@@ -24,11 +24,7 @@ export const ManagerLink = [
         icon: Warehouse,
         path: "/admin/locations",
       },
-      {
-        label: "Inventory Overview",
-        icon: ShoppingBag,
-        path: "/admin/inventory",
-      },
+
       {
         label: "Check Storage Limits",
         icon: Warehouse,
@@ -60,9 +56,7 @@ export const ManagerLink = [
         label: "Approve Export Requests",
         icon: PackagePlus,
         path: "/admin/export-approvals",
-      },
-      { label: "Return Requests", icon: PackagePlus, path: "/admin/returns" },
-    ],
+      },],
   },
   {
     title: "TaskType Management",
@@ -79,7 +73,6 @@ export const ManagerLink = [
     title: "Users & Settings",
     links: [
       { label: "Users", icon: Users, path: "/admin/users" },
-      { label: "Roles & Permissions", icon: Settings, path: "/admin/roles" },
       { label: "Settings", icon: Settings, path: "/admin/settings" },
     ],
   },

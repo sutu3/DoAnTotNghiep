@@ -3,7 +3,8 @@ import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
 import {callApiThunk} from "@/Store/Store.tsx";
 import { TaskTypeCreated} from "@/Store/TaskTypeSlice.tsx";
-import TaskUserSlice, {TaskUser, TaskUserCreate} from "@/pages/TaskType/Component/Store/TaskUserSlice.tsx";
+import {TaskUser} from "@/pages/TaskType/Component/Store/TaskUserSlice.tsx";
+import {stats} from "@/Hooks/useTask.tsx";
 
 interface Warehouse {
     warehouseName: string;
@@ -35,6 +36,7 @@ export interface TaskNoList {
     taskId: string;
     taskType: TaskTypeCreated
     warehouses:Warehouse
+    requiresEvidence?:boolean;
     status: "Pending" | "In_Progress" | "Complete"| "Cancel" | string; // Enum if possible
     level: "Low" | "Medium" | "Hight" | string; // Enum nếu backend cố định giá trị
     description: string;
@@ -50,12 +52,14 @@ export interface TaskCreated {
 }
 interface TaskState  {
     tasks: Task[],
+    stats?: stats;
     totalPage: number,
 }
 
 
 const initialState: TaskState = {
     tasks: [],
+    stats:null,
     totalPage:0,
 };
 const TaskSlice = createSlice({
@@ -64,6 +68,10 @@ const TaskSlice = createSlice({
     reducers: {
         initToTalPage: (state, action) => {
             state.totalPage = action.payload || 0;
+        },
+        setStats: (state, action) => {
+            const statsData = action.payload;
+            state.stats = statsData ;
         },
         setUpdateTask:(state, action) => {
             const updatedTask: Task = action.payload;
@@ -129,6 +137,6 @@ export const MiddleGetAllTask = (page: pageApi,warehouseId:string,taskType:strin
         }
     };
 };
-export const {setUpdateTask, initToTalPage} = TaskSlice.actions;
+export const {setUpdateTask,setStats, initToTalPage} = TaskSlice.actions;
 
 export default TaskSlice;

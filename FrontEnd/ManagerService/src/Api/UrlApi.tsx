@@ -20,6 +20,7 @@ export const API_ROUTES = {
     Authen:()=>{
       const baseUrl = TestGateWay+"/authen/api/auth";
       return{
+        changePassword:baseUrl+"/change-password",
         login:baseUrl+"/login",
         logout:baseUrl+"/logout",
         refresh:baseUrl+"/refresh",
@@ -29,6 +30,8 @@ export const API_ROUTES = {
     },
   },
   dashboard: {
+    allStats: (timeFilter: string) =>
+        `${TestGateWay}/inventories/api/dashboard/stats/all?timeFilter=${timeFilter}`,
     stats: (warehouseId: string, timeFilter: string) =>
         `${TestGateWay}/inventories/api/dashboard/stats/warehouse/${warehouseId}?timeFilter=${timeFilter}`
   },
@@ -106,6 +109,8 @@ export const API_ROUTES = {
       return{
         addMovement: base,
         create: base,
+        allWarehouseDateRange: (fromDate: string, toDate: string) =>
+            `${base}/search/all-warehouses/date-range?fromDate=${fromDate}&toDate=${toDate}`,
         warehouseDateRange: (warehouseId: string, fromDate: string, toDate: string) =>
             `${base}/search/warehouse/${warehouseId}/date-range?fromDate=${fromDate}&toDate=${toDate}`,
         search:()=>{
@@ -242,6 +247,11 @@ export const API_ROUTES = {
                 byStatus: url.slice(0,url.length)+"&"+pageUrl,
                 getAll: `${search}/warehouse/${warehouseId}?${pageUrl}`,
               };
+            },
+            byDeliveryId:(deliveryId:string)=>{
+                return {
+                    getAll: `${search}/deliveryId/${deliveryId}`,
+                };
             }
           }
         })
@@ -544,11 +554,23 @@ export const API_ROUTES = {
               if (warehouseId) params.append("warehouseId", warehouseId);
               if (taskType) params.append("taskName", taskType);
 
-
               return {
                 getAll: `${searchUrl}?${params.toString()}${pageUrl}`,
               };
             },
+              filter: (
+                  warehouseId: string | null,
+                  taskType: string | null,
+              ) => {
+                  const params = new URLSearchParams();
+
+                  if (warehouseId) params.append("warehouseId", warehouseId);
+                  if (taskType) params.append("taskName", taskType);
+
+                  return {
+                      stats: `${base}/stats?${params.toString()}`,
+                  };
+              },
           };
         })(),
       };

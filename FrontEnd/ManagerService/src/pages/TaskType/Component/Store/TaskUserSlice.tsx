@@ -1,6 +1,7 @@
 import { createSlice} from "@reduxjs/toolkit";
 import {UserData} from "@/Store/UserSlice.tsx";
 import { TaskNoList} from "@/pages/TaskType/Component/Store/TaskSlice.tsx";
+import {stats} from "@/Hooks/useTask.tsx";
 
 
 
@@ -60,6 +61,7 @@ const TaskUserSlice = createSlice({
         initToTalPage: (state, action) => {
             state.totalPage = action.payload || 0;
         },
+
         setTaskUsers: (state, action) => {
             state.taskUsers = action.payload;
         },

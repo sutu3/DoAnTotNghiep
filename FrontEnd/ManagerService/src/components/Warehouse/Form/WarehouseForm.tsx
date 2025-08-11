@@ -1,4 +1,4 @@
-import React, {  useEffect } from 'react';
+import React from 'react';
 import { Input,  Textarea } from '@heroui/react';
 import {Building2, Package} from 'lucide-react';
 
@@ -12,27 +12,7 @@ interface WarehouseBasicFormProps {
 
 const WarehouseBasicForm: React.FC<WarehouseBasicFormProps> = ({ data, onChange }) => {
 
-    useEffect(() => {
-        // Load managers từ API - sử dụng pattern tương tự UserThunk
-        loadManagers();
-    }, []);
 
-    const loadManagers = async () => {
-        try {
-            // API call để lấy danh sách user có role manager
-            // const response = await fetch(API_ROUTES.user.managers);
-            // setManagers(response.data);
-
-            // Mock data for now
-            // setManagers([
-            //     { userId: "manager1", userName: "Nguyễn Văn A", fullName: "Nguyễn Văn A" },
-            //     { userId: "manager2", userName: "Trần Thị B", fullName: "Trần Thị B" },
-            //     { userId: "manager3", userName: "Lê Văn C", fullName: "Lê Văn C" },
-            // ]);
-        } catch (error) {
-            console.error('Failed to load managers:', error);
-        }
-    };
 
     return (
         <div className="space-y-6">

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {User} from "@/types";
+import {User, Warehouse} from "@/types";
 import {ExportOrder} from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 export interface DeliveryItem {
     exportItemId: string;
@@ -33,7 +33,8 @@ export interface WarehouseDeliveryResponse {
     deliveryDate: string;
     status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
     notes?: string;
-    warehouse: string;
+    warehouse: Warehouse;
+
     exportOrder:ExportOrder;
     deliveryItems: DeliveryItemResponse[];
 }
@@ -49,6 +50,7 @@ export interface DeliveryItemResponse {
 }
 interface WarehouseDeliveryState {
     deliveries: WarehouseDeliveryResponse[];
+    items:DeliveryItemResponse[];
     loading: boolean;
     error: string | null;
     totalPage: number;
@@ -56,6 +58,7 @@ interface WarehouseDeliveryState {
 
 const initialState: WarehouseDeliveryState = {
     deliveries: [],
+    items:[],
     loading: false,
     error: null,
     totalPage:0
@@ -78,6 +81,9 @@ const WarehouseDeliverySlice = createSlice({
                 return delivery;
             });
         },
+        setAddDeliveryItem: (state, action) => {
+            state.items = action.payload;
+        },
         setAddListDelivery: (state, action) => {
             state.deliveries= state.deliveries.length!=0?[...state.deliveries, action.payload]:action.payload;
         },
@@ -91,5 +97,5 @@ const WarehouseDeliverySlice = createSlice({
     }
 });
 
-export const {initTotalPage, setDeliveries, clearError,setAddListDelivery,setUpdateDelivery } = WarehouseDeliverySlice.actions;
+export const {initTotalPage,setAddDeliveryItem, setDeliveries, clearError,setAddListDelivery,setUpdateDelivery } = WarehouseDeliverySlice.actions;
 export default WarehouseDeliverySlice;

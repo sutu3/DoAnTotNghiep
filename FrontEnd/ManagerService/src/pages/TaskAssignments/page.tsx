@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React,{useEffect, useState} from 'react';
 import {
     Card,
     CardBody,
@@ -11,12 +11,12 @@ import {
     TableBody,
     TableRow,
     TableCell,
-    Spinner
+    Spinner, Pagination
 } from '@heroui/react';
-import { Edit3, Save, X, Plus, Search } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
-import { TaskTypeSelector, TotalPageTask } from '@/Store/Selector';
-import {MiddleGetAllTaskType, MiddleUpdateTaskType, TaskType, TaskTypeCreated} from '@/Store/TaskTypeSlice';
+import {Edit3, Save, X, Plus, Search} from 'lucide-react';
+import {useDispatch, useSelector} from 'react-redux';
+import {TaskTypeSelector, TotalPageTask} from '@/Store/Selector';
+import {MiddleGetAllTaskType, MiddleUpdateTaskType,setGetTaskType, TaskType, TaskTypeCreated} from '@/Store/TaskTypeSlice';
 import TaskTypeEditModal from "@/components/Admin/Tasks/Modal/TaskTypeEditModal.tsx";
 import TaskTypeCreateModal from "@/components/Admin/Tasks/Modal/TaskTypeCreateModal.tsx";
 import {pageApi} from "@/Api/UrlApi.tsx";
@@ -25,13 +25,13 @@ import SelectWarehouse from "@/components/Admin/Tasks/SelectWarehouse.tsx";
 const TaskAssignmentsPage = () => {
     const dispatch = useDispatch();
     const taskTypes = useSelector(TaskTypeSelector);
-    const totalPage = useSelector(TotalPageTask);
 
     const [loading, setLoading] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editingName, setEditingName] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [page, setPage] = useState(1);
+
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedTaskType, setSelectedTaskType] = useState<TaskTypeCreated>({
         description: "",
@@ -39,18 +39,20 @@ const TaskAssignmentsPage = () => {
         warehouses: ""
     });
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [warehouse,setWarehouse] = useState<string>("");
+    const [warehouse, setWarehouse] = useState<string>("");
+    const pages = useSelector(TotalPageTask);
     useEffect(() => {
         loadTaskTypes();
-    }, [page,warehouse]);
+    }, [page, warehouse]);
 
     const loadTaskTypes = async () => {
         setLoading(true);
         try {
-
-            const page:pageApi={pageNumber: 0, pageSize: 10}
-            if(warehouse!=""){
-                await (dispatch as any)(MiddleGetAllTaskType(warehouse,page ));
+            console.log("Loading task types for warehouse:", warehouse);
+            const pageApi: pageApi = {pageNumber: page - 1, pageSize: 2}
+            dispatch(setGetTaskType([]))
+            if (warehouse != "") {
+                await (dispatch as any)(MiddleGetAllTaskType(warehouse, pageApi));
             }
         } finally {
             setLoading(false);
@@ -67,8 +69,8 @@ const TaskAssignmentsPage = () => {
 
         setLoading(true);
         try {
-            const taskUpdate:TaskTypeCreated={...selectedTaskType,taskName:editingName}
-            await (dispatch as any)(MiddleUpdateTaskType(taskTypeId,taskUpdate));
+            const taskUpdate: TaskTypeCreated = {...selectedTaskType, taskName: editingName}
+            await (dispatch as any)(MiddleUpdateTaskType(taskTypeId, taskUpdate));
 
             setEditingId(null);
             setEditingName('');
@@ -85,10 +87,10 @@ const TaskAssignmentsPage = () => {
 
     const handleDetailEdit = (taskType: TaskType) => {
         console.log(taskType);
-        const tasktypeEdit:TaskTypeCreated={
-            taskName:taskType.taskName,
-            description:taskType.description,
-            warehouses:taskType?.warehouses?.warehouseId
+        const tasktypeEdit: TaskTypeCreated = {
+            taskName: taskType.taskName,
+            description: taskType.description,
+            warehouses: taskType?.warehouses?.warehouseId
         }
         setEditingId(taskType.taskTypeId);
         setSelectedTaskType(tasktypeEdit);
@@ -109,7 +111,7 @@ const TaskAssignmentsPage = () => {
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-4">
                                 <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-3">
-                                    <Edit3 className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                                    <Edit3 className="w-8 h-8 text-blue-600 dark:text-blue-400"/>
                                 </div>
                                 <div>
                                     <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
@@ -123,7 +125,7 @@ const TaskAssignmentsPage = () => {
 
                             <Button
                                 color="primary"
-                                startContent={<Plus className="w-4 h-4" />}
+                                startContent={<Plus className="w-4 h-4"/>}
                                 onClick={() => setIsCreateModalOpen(true)}
                             >
                                 Thêm loại nhiệm vụ
@@ -136,7 +138,7 @@ const TaskAssignmentsPage = () => {
                                 placeholder="Tìm kiếm theo tên hoặc mô tả..."
                                 value={searchTerm}
                                 onValueChange={setSearchTerm}
-                                startContent={<Search className="w-4 h-4 text-gray-400" />}
+                                startContent={<Search className="w-4 h-4 text-gray-400"/>}
                                 className="flex-1"
                             />
                         </div>
@@ -159,10 +161,10 @@ const TaskAssignmentsPage = () => {
                                 <TableColumn>KHO</TableColumn>
                                 <TableColumn>THAO TÁC</TableColumn>
                             </TableHeader>
-                            <TableBody  className="bg-white dark:bg-gray-900 text-gray-800 dark:text-white"
-                                        isLoading={loading}
-                                        loadingContent={<Spinner label="Loading..." />}
-                                        emptyContent="No Task Type found">
+                            <TableBody className="bg-white dark:bg-gray-900 text-gray-800 dark:text-white"
+                                       isLoading={loading}
+                                       loadingContent={<Spinner label="Loading..."/>}
+                                       emptyContent="No Task Type found">
                                 {filteredTaskTypes.map((taskType: TaskType) => (
                                     <TableRow key={taskType.taskTypeId}>
                                         <TableCell>
@@ -197,7 +199,7 @@ const TaskAssignmentsPage = () => {
                                                             size="sm"
                                                             color="success"
                                                             variant="light"
-                                                            startContent={<Save className="w-3 h-3" />}
+                                                            startContent={<Save className="w-3 h-3"/>}
                                                             onClick={() => handleEditSave(taskType.taskTypeId)}
                                                             isLoading={loading}
                                                         >
@@ -207,7 +209,7 @@ const TaskAssignmentsPage = () => {
                                                             size="sm"
                                                             color="danger"
                                                             variant="light"
-                                                            startContent={<X className="w-3 h-3" />}
+                                                            startContent={<X className="w-3 h-3"/>}
                                                             onClick={handleEditCancel}
                                                         >
                                                             Hủy
@@ -219,7 +221,7 @@ const TaskAssignmentsPage = () => {
                                                             size="sm"
                                                             color="primary"
                                                             variant="light"
-                                                            startContent={<Edit3 className="w-3 h-3" />}
+                                                            startContent={<Edit3 className="w-3 h-3"/>}
                                                             onClick={() => handleEditStart(taskType)}
                                                         >
                                                             Sửa tên
@@ -240,6 +242,17 @@ const TaskAssignmentsPage = () => {
                                 ))}
                             </TableBody>
                         </Table>
+                        <div className="flex justify-center mt-4">
+                            <Pagination
+                                total={pages}
+                                page={page}
+                                onChange={setPage}
+                                showControls
+                                classNames={{
+                                    cursor: "bg-blue-600 text-white"
+                                }}
+                            />
+                        </div>
                     </CardBody>
                 </Card>
 

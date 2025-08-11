@@ -1,10 +1,9 @@
 import  {useEffect, useState } from 'react';
 import {Card, CardBody, Button} from '@heroui/react';
-import {  Save, ArrowLeft } from 'lucide-react';
+import {Save, ArrowLeft, Key} from 'lucide-react';
 import {  useNavigate } from 'react-router-dom';
 import UserProfileHeader from "@/components/Admin/Profile/UserProfileHeader.tsx";
 import UserBasicInfoForm from "@/components/Admin/Profile/Form/UserBasicInfoForm.tsx";
-import UserContactForm from '@/components/Admin/Profile/Form/UserContactForm';
 import UserActivitySummary from "@/components/Admin/Profile/UserActivitySummary.tsx";
 import UserWarehouseInfo from "@/components/Admin/Profile/UserWarehouseInfo.tsx";
 import {UserData, UserUpdate} from "@/Store/UserSlice.tsx";
@@ -13,9 +12,12 @@ import {UserSelector} from "@/Store/Selector.tsx";
 import {MiddleGetInforUser, MiddleUpdateInforUser} from "@/Store/Thunk/UserThunk.tsx";
 import {MiddleUploadImage, UploadResponse} from "@/Store/Thunk/UploadThunk.tsx";
 import {useFileStore} from "@/zustand/File.tsx";
+import ChangePasswordModal from './Component/Modal/ChangePasswordModal';
 
 const UserProfilePage = () => {
     const navigate = useNavigate();
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const {file}=useFileStore();
@@ -109,6 +111,14 @@ const UserProfilePage = () => {
                             isEditing={isEditing}
                             onChange={handleFormChange}
                         />
+                        <Button
+                            color="secondary"
+                            variant="bordered"
+                            onClick={() => setIsPasswordModalOpen(true)}
+                            startContent={<Key className="w-4 h-4" />}
+                        >
+                            Đổi mật khẩu
+                        </Button>
 
                         {/* Action Buttons */}
                         {isEditing && (
@@ -144,6 +154,11 @@ const UserProfilePage = () => {
                     </div>
                 </div>
             </div>
+            <ChangePasswordModal
+                isOpen={isPasswordModalOpen}
+                onOpenChange={setIsPasswordModalOpen}
+                userId={user?.userId || ''}
+            />
         </div>
     );
 };

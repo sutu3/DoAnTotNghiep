@@ -5,6 +5,7 @@ import {useDispatch} from "react-redux";
 import {pageApi} from "@/Api/UrlApi.tsx";
 import {MiddleGetAllGroupUnit} from "@/Store/Thunk/GroupUnitThunk.tsx";
 import TableUI from "@/components/Admin/Unit/Table/TableUI.tsx";
+import {setUnitGroup} from "@/Store/GroupUnit.tsx";
 
 
 
@@ -16,9 +17,10 @@ const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const PageApi: pageApi = { pageNumber: 0, pageSize:  5 };
-        setLoading(true);
         const fetch=async ()=>{
-            (dispatch as any)(MiddleGetAllGroupUnit(PageApi));
+            dispatch(setUnitGroup([]));
+            setLoading(true);
+            await (dispatch as any)(MiddleGetAllGroupUnit(PageApi));
             setLoading(false);
         }
         fetch();

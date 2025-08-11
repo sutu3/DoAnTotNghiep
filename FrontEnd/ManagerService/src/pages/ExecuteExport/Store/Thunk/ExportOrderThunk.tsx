@@ -4,7 +4,7 @@ import {API_ROUTES, pageApi} from "@/Api/UrlApi.tsx";
 import OrderExportSlice, {
     ExportItemCreate, ExportItemCreateUI,
     ExportOrder, ExportOrderItem,
-    OrderRequestExportCreate,
+    OrderRequestExportCreate,initTotalPage
 } from "@/pages/ExecuteExport/Store/ExportOrderSlice.tsx";
 import {setExpiringError} from "@/Store/InventoryOverView.tsx";
 import {showToast} from "@/components/UI/Toast/ToastUI.tsx";
@@ -135,7 +135,7 @@ export const MiddleExportOrder = (request:WarehouseDeliveryRequest, ListOrderIte
     return async function (dispatch: any) {
         try {
             const action=await dispatch(AddDeliveryWarehouseForOrder({request}));
-            dispatch(setAddListDelivery(action?.payload?.result));
+            // dispatch(setAddListDelivery(action?.payload?.result));
             const convertItem=mapExportOrderItemsToCreateList(ListOrderItem,request.exportOrderId)
             await dispatch(ExportOrderItemForOrder({orderId:request.exportOrderId,items:convertItem}));
             // Final success notification
@@ -159,6 +159,7 @@ export const MiddleGetAllExportOrderByStatus = (warehouse:string, status:string|
         try {
             const action=await dispatch(GetExportOrdersByStatus({status,warehouseId:warehouse,page}))
             dispatch(OrderExportSlice.actions.setOrderExportList(action?.payload?.result?.content));
+            dispatch(initTotalPage(action?.payload?.result?.totalPages));
         } catch (error: any) {
             dispatch(setExpiringError(error.message));
             showToast({

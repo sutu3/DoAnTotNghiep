@@ -172,8 +172,8 @@ export default function DeliveryItemsTable({ exportOrderId, exportOrder }: Deliv
                         }}
                     >
                         <TableHeader>
-                            <TableColumn>SẢN PHẨM</TableColumn>
-                            <TableColumn width="120">SỐ LƯỢNG</TableColumn>
+                            <TableColumn width="180">SẢN PHẨM</TableColumn>
+                            <TableColumn width="50">SỐ LƯỢNG</TableColumn>
                             <TableColumn width="100">ĐƠN VỊ</TableColumn>
                             <TableColumn width="120">ĐƠN GIÁ</TableColumn>
                             <TableColumn width="120">VỊ TRÍ</TableColumn>

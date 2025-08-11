@@ -123,30 +123,6 @@ const UnitThumbnail: React.FC<UnitThumbnailProps> = ({ unit }) => {
                         </div>
                     </div>
                 </div>
-
-                <Divider className="my-6" />
-
-                {/* Action buttons */}
-                <div className="flex gap-2">
-                    <Button
-                        color="primary"
-                        variant="flat"
-                        size="sm"
-                        startContent={<Edit className="w-4 h-4" />}
-                        className="flex-1"
-                    >
-                        Chỉnh sửa
-                    </Button>
-                    <Button
-                        color="danger"
-                        variant="flat"
-                        size="sm"
-                        startContent={<Trash2 className="w-4 h-4" />}
-                        className="flex-1"
-                    >
-                        Xóa
-                    </Button>
-                </div>
             </CardBody>
         </Card>
     );

@@ -26,6 +26,7 @@ export interface InventoryProduct{
     status:string;
     productDetails:Product;
     warehouseDetails:Warehouse;
+    updatedAt?: string;
 }
 export interface InventoryProductCreate{
     product:string,

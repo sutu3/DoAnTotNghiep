@@ -270,8 +270,6 @@ export const MiddleMarkGoodsArrived = (orderId: string) => {
 export const MiddleImportOrder = (orderId: string | null, ListOrderItem: ImportOrderItem[],receipt:ReceiptWarehouseCreate) => {
     return async function (dispatch: any) {
         try {
-            console.log(ListOrderItem)
-            console.log(receipt)
             await dispatch(AddReceipt({payload:receipt}));
             await dispatch(ImportOrderItemForOrder({orderId,items:ListOrderItem}));
 

@@ -72,9 +72,17 @@ export default function MyTasksPage() {
 
 
 
-    const handleViewDetail = (taskUser: TaskUser) => {
+    const handleCompleteTask = (taskUser: TaskUser) => {
         setSelectedTask(taskUser);
-        setIsDetailModalOpen(true);
+        if(!taskUser.task?.requiresEvidence){
+            // If the task does not require evidence, directly update status to In_Progress
+            const fetch= async () => {
+                await (dispatch as any)(MiddleUpdateTaskUser(taskUser?.id, "Complete", ""));
+            }
+            fetch();
+        }else{
+            setIsCompleteModalOpen(true);
+        }
     };
 
     const handleStartTask = (taskUser: TaskUser) => {
@@ -83,9 +91,9 @@ export default function MyTasksPage() {
         handleUpdateStatus(taskUser.id, "In_Progress");
     };
 
-    const handleCompleteTask = (taskUser: TaskUser) => {
+    const handleViewDetail = (taskUser: TaskUser) => {
         setSelectedTask(taskUser);
-        setIsCompleteModalOpen(true);
+        setIsDetailModalOpen(true);
     };
 
     const handleCancelTask = (taskUser: TaskUser) => {

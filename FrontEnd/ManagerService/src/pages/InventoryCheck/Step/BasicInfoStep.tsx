@@ -70,7 +70,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                     <Button
                         color="primary"
                         onClick={onNext}
-                        isDisabled={!canProceed}
+                        isDisabled={!canProceed||notes==""}
                         endContent={<Icon icon="mdi:arrow-right" />}
                     >
                         Tiếp theo

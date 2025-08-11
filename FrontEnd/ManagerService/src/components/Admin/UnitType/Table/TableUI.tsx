@@ -29,6 +29,7 @@ const UnitTable: React.FC<UnitTableProps> = ({
                                                  currentPage,
                                                  onPageChange
                                              }) => {
+    console.log(loading)
     const columns = [
         { key: "unitName", label: "Tên đơn vị" },
         { key: "shortName", label: "Tên viết tắt" },

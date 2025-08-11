@@ -113,6 +113,7 @@ export const MiddleGetAllTaskUser = ( tasks:string) => {
 export const MiddleUpdateTaskUser = ( taskUserId:string,status:string,image:string|null) => {
     return async function check(dispatch: any) {
         try {
+            console.log(status)
             if(status!=="Complete" && image==null){
                 const action=await dispatch(UpdateTaskUser({status,taskUserId}));
                 dispatch(setUpdateTaskUsers(action?.payload?.result));
@@ -121,7 +122,7 @@ export const MiddleUpdateTaskUser = ( taskUserId:string,status:string,image:stri
                 const action=await dispatch(UpdateTaskUserCancel({note:image,taskUserId}));
                 dispatch(setUpdateTaskUsers(action?.payload?.result));
             }
-            else{
+            if(status==="Complete"){
                 const action=await dispatch(UpdateTaskUserComplete({image,taskUserId}));
                 dispatch(setUpdateTaskUsers(action?.payload?.result));
             }

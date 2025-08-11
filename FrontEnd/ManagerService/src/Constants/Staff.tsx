@@ -13,7 +13,6 @@ export const Staff = [
       { label: "My Tasks", icon: Home, path: "/staff/tasks" },
       { label: "Execute Import", icon: PackagePlus, path: "/staff/import" },
       { label: "Execute Export", icon: PackagePlus, path: "/staff/export" },
-      { label: "Execute Return", icon: PackagePlus, path: "/staff/returns" },
       {
         label: "Check Inventory",
         icon: ShoppingBag,
@@ -33,11 +32,6 @@ export const Staff = [
         label: "Create Export Request",
         icon: Package,
         path: "/staff/request-export",
-      },
-      {
-        label: "Create Return Request",
-        icon: Package,
-        path: "/staff/request-return",
       },
     ],
   },
