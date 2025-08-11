@@ -25,6 +25,10 @@ public class TaskSpecification {
         return (root, query, criteriaBuilder) ->
                 warehouses == null ? null : criteriaBuilder.equal(root.get("warehouses"), warehouses);
     }
+    public static Specification<Tasks> hasStatus(String status) {
+        return (root, query, criteriaBuilder) ->
+                status == null ? null : criteriaBuilder.equal(root.get("status"), status);
+    }
 
 
 }

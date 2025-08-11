@@ -5,6 +5,7 @@ import com.example.userservice.Client.WarehouseService.Redis.WarehouseController
 import com.example.userservice.Dto.Request.LevelRequest;
 import com.example.userservice.Dto.Request.StatusRequest;
 import com.example.userservice.Dto.Request.TaskRequest;
+import com.example.userservice.Dto.Responses.Task.StatsResponse;
 import com.example.userservice.Dto.Responses.Task.TaskResponse;
 import com.example.userservice.Enum.LevelEnum;
 import com.example.userservice.Enum.StatusTaskEnum;
@@ -124,6 +125,25 @@ public class TaskServiceImpl implements TaskService {
         task.setIsDeleted(true);
         taskRepo.save(task);
         return "Deleted Completed";
+    }
+
+    @Override
+    public StatsResponse getStats(String warehouseId, String taskTypeName) {
+        Specification<Tasks> baseSpec = Specification
+                .where(TaskSpecification.hasTaskTypeNameLike(taskTypeName))
+                .and(TaskSpecification.hasWarehouses(warehouseId));
+
+        Integer pending = (int) taskRepo.count(baseSpec.and(TaskSpecification.hasStatus(StatusTaskEnum.Pending.name())));
+        Integer inProgress = (int) taskRepo.count(baseSpec.and(TaskSpecification.hasStatus(StatusTaskEnum.In_Progress.name())));
+        Integer complete = (int) taskRepo.count(baseSpec.and(TaskSpecification.hasStatus(StatusTaskEnum.Complete.name())));
+        Integer total = (int) taskRepo.count(baseSpec);
+
+        return StatsResponse.builder()
+                .totalTasks(total)
+                .totalTasksPending(pending)
+                .totalTasksInProgress(inProgress)
+                .totalTasksCompleted(complete)
+                .build();
     }
 
     @Override

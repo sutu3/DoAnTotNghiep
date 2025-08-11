@@ -3,6 +3,7 @@ package com.example.order.Controller;
 import com.example.order.Dto.Request.DeliveryItemRequest;
 import com.example.order.Dto.Request.WarehouseDeliveryRequest;
 import com.example.order.Dto.Response.ApiResponse;
+import com.example.order.Dto.Response.DeliveryItem.DeliveryItemResponse;
 import com.example.order.Dto.Response.WarehouseDelivery.WarehouseDeliveryResponse;
 import com.example.order.Enum.DeliveryStatus;
 import com.example.order.Service.WarehouseDeliveryService;
@@ -81,7 +82,15 @@ public class WarehouseDeliveryController {
                 .success(true)
                 .build();
     }
-
+    @GetMapping("/search/deliveryId/{deliveryId}")
+    public ApiResponse<List<DeliveryItemResponse>> getDeliveriesItemByDeliveríesId(@PathVariable String deliveryId) {
+        return ApiResponse.<List<DeliveryItemResponse>>builder()
+                .Result(warehouseDeliveryService.getDeliveryItems(deliveryId))
+                .code(0)
+                .message("Success")
+                .success(true)
+                .build();
+    }
     @PostMapping("/{deliveryId}/items")
     public ApiResponse<WarehouseDeliveryResponse> addDeliveryItem(
             @PathVariable String deliveryId,
@@ -120,9 +129,9 @@ public class WarehouseDeliveryController {
     }
 
     @PutMapping("/{deliveryId}/complete")
-    public ApiResponse<Void> completeDelivery(@PathVariable String deliveryId) {
-        warehouseDeliveryService.completeDelivery(deliveryId);
-        return ApiResponse.<Void>builder()
+    public ApiResponse<WarehouseDeliveryResponse> completeDelivery(@PathVariable String deliveryId) {
+        return ApiResponse.<WarehouseDeliveryResponse>builder()
+                .Result(warehouseDeliveryService.completeDelivery(deliveryId))
                 .code(0)
                 .message("Delivery completed successfully")
                 .success(true)

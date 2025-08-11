@@ -1,6 +1,7 @@
 package com.example.order.Dto.Response.WarehouseDelivery;
 
 import com.example.order.Client.UserService.Dto.Response.UserResponse;
+import com.example.order.Client.WarehouseService.Dto.Responses.Warehouse.WarehousesResponse;
 import com.example.order.Dto.Response.DeliveryItem.DeliveryItemResponse;
 import com.example.order.Dto.Response.ExportOrder.ExportOrderResponse;
 import com.example.order.Enum.DeliveryStatus;
@@ -30,6 +31,7 @@ public class WarehouseDeliveryResponse {
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     Boolean isDeleted;
+    WarehousesResponse warehouse;
 
     // Enriched data
     ExportOrderResponse exportOrder;

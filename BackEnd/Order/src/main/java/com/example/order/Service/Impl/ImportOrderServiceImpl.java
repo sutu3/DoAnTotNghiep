@@ -128,8 +128,10 @@ public class ImportOrderServiceImpl implements ImportOrderService {
     @Override
     public ImportOrderResponse updateApprove(String id) {
         ImportOrder importOrder = getById(id);
+        var idUser = GetCurrentUserId.getCurrentUserId();
         importOrder.setStatus(OrderStatus.InProgress);
         importOrder.setType(OrderType.Accept);
+        importOrder.setAccessByAdmin(idUser);
         importOrder.setAccessDate(LocalDateTime.now());
         importOrder.setUpdatedAt(LocalDateTime.now());
 

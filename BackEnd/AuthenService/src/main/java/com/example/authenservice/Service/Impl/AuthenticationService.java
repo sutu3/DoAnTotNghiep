@@ -200,7 +200,21 @@ public class AuthenticationService {
 
         return AuthenticationResponse.builder().token(token).build();
     }
+    public void changePassword(NewPasswordRequest request) {
+        var userId=GetCurrentUserId.getCurrentUserId();
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
+        if (!request.newPassword().equals(request.newPassword())) {
+            throw new AppException(ErrorCode.PASSWORD_INVALID);
+        }
+
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepo.save(user);
+
+        ;
+    }
     private String buildScope(User user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
 

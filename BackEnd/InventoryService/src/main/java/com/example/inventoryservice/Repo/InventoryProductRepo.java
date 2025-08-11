@@ -38,6 +38,9 @@ public interface InventoryProductRepo extends JpaRepository<InventoryProduct, St
     Page<InventoryProduct> findAllByStatusAndIsDeleted(String status, Boolean isDeleted, Pageable pageable);
 
     // Đếm số lượng sản phẩm theo warehouse
+    Integer countByIsDeleted(Boolean isDeleted);
+    @Query("SELECT COUNT(ip) FROM InventoryProduct ip WHERE ip.totalQuantity <= ip.minStockLevel AND ip.isDeleted = false")
+    Integer countLowStock();
     Integer countByWarehouseAndIsDeleted(String warehouse, Boolean isDeleted);
 
     @Query("SELECT COUNT(ip) FROM InventoryProduct ip " +

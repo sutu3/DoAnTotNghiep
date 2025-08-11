@@ -142,6 +142,14 @@ public class WarehouseDeliveryServiceImpl implements WarehouseDeliveryService {
     }
 
     @Override
+    public List<DeliveryItemResponse> getDeliveryItems(String deliveryId) {
+        WarehouseDelivery delivery = getById(deliveryId);
+
+        List<DeliveryItem> deliveryItems=delivery.getDeliveryItems();
+        return deliveryItems.stream().map(this::enrichDeliveryItem).collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public WarehouseDeliveryResponse addDeliveryItem(String deliveryId, DeliveryItemRequest request) {
         WarehouseDelivery delivery = getById(deliveryId);
@@ -231,7 +239,7 @@ public class WarehouseDeliveryServiceImpl implements WarehouseDeliveryService {
 
             // Build basic response
             WarehouseDeliveryResponse response = warehouseDeliveryMapper.toResponse(delivery);
-
+            response.setWarehouse(warehouseFuture.join());
             // Set enriched delivery-level data
             response.setCreatedByUser(createdByUserFuture.join());
 
@@ -241,13 +249,13 @@ public class WarehouseDeliveryServiceImpl implements WarehouseDeliveryService {
                 response.setExportOrder(enrichedExportOrder);
             }
 
-            // Enrich delivery items in parallel
-            if (delivery.getDeliveryItems() != null && !delivery.getDeliveryItems().isEmpty()) {
-                List<DeliveryItemResponse> enrichedItems = delivery.getDeliveryItems().parallelStream()
-                        .map(this::enrichDeliveryItem)
-                        .collect(Collectors.toList());
-                response.setDeliveryItems(enrichedItems);
-            }
+//            // Enrich delivery items in parallel
+//            if (delivery.getDeliveryItems() != null && !delivery.getDeliveryItems().isEmpty()) {
+//                List<DeliveryItemResponse> enrichedItems = delivery.getDeliveryItems().parallelStream()
+//                        .map(this::enrichDeliveryItem)
+//                        .collect(Collectors.toList());
+//                response.setDeliveryItems(enrichedItems);
+//            }
 
             return response;
 
